@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd /Users/bogao/sync/sydPage/src
+
+echo "-200- go install gxl..."
+go install gxl
+
+echo "-201- go install got..."
+go install got
+
+echo "-202- go install syd..."
+go install syd
+
+echo "-203- go run main.go..."
+go run main.go

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link href="../css/main.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" media="print" href="order-print.css" />
+</head>
+<body>
+<div class="header">
+	<h1>进销存管理</h1>
+</div>
+<div class="container">
+    <div class="menu">
+        <dl>
+        	<dt>订单管理</dt>
+            <dd><a href="">新增订单</a></dd>
+            <dd><a href="">订单列表</a></dd>
+        </dl>
+        <dl>
+        	<dt>商品管理</dt>
+            <dd><a href="">新增商品</a></dd>
+            <dd><a href="">商品列表</a></dd>
+            <dd><a href="">退换货管理</a></dd>
+        </dl>
+        <dl>
+        	<dt>联系人信息</dt>
+            <dd><a href="">新增联系人</a></dd>
+            <dd><a href="">客户列表</a></dd>
+            <dd><a href="">厂家列表</a></dd>
+        </dl>
+        <dl>
+        	<dt>生成报表</dt>
+            <dd><a href="">当日销量统计</a></dd>
+            <dd><a href="">历史销量统计</a></dd>
+            <dd><a href="">欠款统计</a></dd>
+        </dl>
+    </div>
+    <div class="content">
+    	<h2>订单打印</h2>
+        <div class="order_create">
+            <table class="main_tbl">
+            	<tr>
+                    <td colspan="5">订单号：88130430888</td>
+                    <td align="right" colspan="2">订单日期：2013-04-29</td>
+                </tr>
+            	<tr>
+                    <td colspan="2">客户：高博</td>
+                    <td colspan="5" align="right">
+                    	自提
+                    </td>
+                </tr>
+                <tr>
+                    <td>商品名称</td>
+                    <td>数量</td>
+                    <td>单位</td>
+                    <td>单价</td>
+                    <td>总价</td>
+                    <td>备注</td>
+                    <td>&nbsp;</td>
+                </tr>
+                 <tr>
+                    <td><input type="text" value="" size="20"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="件" size="4"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td>1212</td>
+                    <td><input type="text" value="" size="50"></td>
+                    <td><a href="">删</a></td>
+                </tr>
+                 <tr>
+                    <td><input type="text" value="" size="20"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="50"></td>
+                    <td><a href="">删</a></td>
+                </tr>
+                <tr>
+                    <td><input type="text" value="" size="20"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="50"></td>
+                    <td><a href="">删</a></td>
+                </tr>
+                <tr>
+                    <td><input type="text" value="" size="20"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="4"></td>
+                    <td><input type="text" value="" size="6"></td>
+                    <td><input type="text" value="" size="50"></td>
+                    <td><a href="">删</a></td>
+                </tr>
+                <tr>
+                    <td colspan="7"><a href="">新增</a></td>
+                </tr>
+                <tr>
+                    <td>合计</td>
+                    <td>20</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>2,232.00</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>实收</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td><input type="text" value="2,230.00" size="6"></td>
+                    <td>优惠：2元</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+            <div class="">
+            	实际支付：<input type="text" value="2,230.00" size="6"> <input type="checkbox">已结清
+            </div>
+            <div class="btn_main">
+            	<input type="button" value="生成订单">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+
+</div>
+</body>
+</html>

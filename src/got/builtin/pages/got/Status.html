@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Go on Tapestry(GOT) WebFramework</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" type="text/css" media="screen" />
+  </head>
+  <body>
+
+    <div class="container-fluid">
+      <div class="page-header">
+        <h2>GOT Framework (Go on Tapestry)</h2>
+      </div>
+
+      <h2>Pages</h2><hr />
+      <table class="table-stripped">
+        <tr>
+          <td></td>
+        </tr>
+      </table>
+
+      <h2>Tempaltes</h2><hr />
+      <table class="table table-stripped table-condensed">
+        <tr>
+          <th>Template Name</th>
+          <th>Template Root</th>
+        </tr>
+        
+        {{range .Tpls}}
+        <tr>
+          <td>{{.Name}}</td>
+          <td>{{.}}</td>
+        </tr>
+        {{end}}
+        
+      </table>
+      
+    </div>    
+  </body>
+</html>

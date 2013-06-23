@@ -1,0 +1,93 @@
+
+	// Get column names
+	columns, err := rows.Columns()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Make a slice for the values
+	values := make([]sql.RawBytes, len(columns))
+
+	// rows.Scan wants '[]interface{}' as an argument, so we must copy the
+	// references into such a slice
+	// See http://code.google.com/p/go-wiki/wiki/InterfaceSlice for details
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	// Fetch rows
+	for rows.Next() {
+		// get RawBytes from data
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// Now do something with the data.
+		// Here we just print each column as a string.
+		var value string
+		for i, col := range values {
+			// Here we can check if the value is nil (NULL value)
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = string(col)
+			}
+			fmt.Println(columns[i], ": ", value)
+		}
+		fmt.Println("-----------------------------------")
+	}
+	strconv.Atoi("9")
+
+
+
+// func xxx() {
+// 	// log.Println(len(rows.Columns()))
+// 	// log.Printf("%v", rows)
+// 	// fmt.Println("-------")
+// 	for rows.Next() {
+// 		values, _ := rows.Columns()
+// 		fmt.Println(values[1])
+// 		id, _ := strconv.Atoi(values[0])
+// 		p := &model.Person{
+// 			Id:   id,
+// 			Name: values[1],
+// 			// Type       string "enum(客户|厂家)" // person type
+// 			// Phone      string
+// 			// City       string
+// 			// PostalCode int
+// 			// QQ         int
+// 			// Website    string
+// 			// Note       string
+// 			// CreateTime time.Time
+// 			// UpdateTime time.Time
+// 		}
+// 		rows.Scan(p.Id, p.Name, p.Type, p.Phone, p.City, p.PostalCode, p.QQ, p.Website, p.Note, p.CreateTime, p.UpdateTime)
+// 		fmt.Println(p)
+// 	}
+
+// 	return []*model.Person{}
+// }
+
+
+
+/*
+   syd :: person
+*/
+func CreatePerson(person *model.Person) {
+	connect()
+	defer close()
+
+	log.Printf("Create person: %v", person)
+
+	stmt, err := db.Prepare("insert into person(name, type, phone, city, postalcode, qq,website, note, updatetime) values(?,?,?,?,?,?,?,?,?)")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	stmt.Exec(person.Name, person.Type, person.Phone, person.City, person.PostalCode, person.QQ, person.Website, person.Note, time.Now())
+}
+
+

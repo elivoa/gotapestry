@@ -1,0 +1,16 @@
+@charset "UTF-8";
+/*frame*/
+html,body,p{margin:0;padding:0;}
+html{font-size:9pt;width:210mm;}
+
+.pr_tbl table{border-collapse:collapse;}
+.pr_tbl th,.pr_tbl td{padding:2mm 4mm;border:1px solid #666;}
+h2{margin:0;padding:5mm 0 2mm;font-size:9pt;}
+.pr_top{padding-bottom:2mm;line-height:1.8em;}
+.pr_topl{float:left;}
+.pr_topr{float:right;text-align:right;}
+.pr_container{margin:6mm}
+.clearfix{clear:both;}
+.clearfix:after{display:block;content:"";height:0;overflow:hidden;clear:both;}
+.pr_back td{padding:1mm 5mm 1mm 0;}
+.pr_p1{margin:5mm 0 3mm;}

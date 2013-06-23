@@ -1,0 +1,50 @@
+{{/* Compoennt: OrderDetailsEditor */}}
+
+<script type="text/javascript" src="/static/js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="/static/js/suggest-control.js"></script>
+
+<table>
+  {{with $o:=.}}
+  {{range .Details}}
+  <tr class="product-line">
+    <td>
+      <input type="hidden" name="Order.Details.Id" value="{{.Id}}"
+             autocomplete="off" />
+      <input type="text" size="20" class="product-id"
+             name="Order.Details.ProductId" value="{{.ProductId}}"
+             autocomplete="off" />
+    </td>
+    <td>
+      <input type="text" size="6" class="quantity" autocomplete="off" 
+             name="Order.Details.Quantity" value="{{.Quantity}}" />
+    </td>
+    <td><input type="text" size="4" value="件" ></td>
+    <td>
+      <input type="text" size="4" class="price" autocomplete="off" 
+             name="Order.Details.SellingPrice" value="{{.SellingPrice}}" />
+    </td>
+    <td><span class="sum">-.--</span></td>
+    <td><input type="text" size="50" autocomplete="off" 
+               name="Order.Details.Note" value="{{.Note}}"></td>
+    <td>
+      <a class="fn_delete_line" href="/order/delete/{{$o.Id}}">删</a>
+    </td>
+  </tr>
+  {{end}}
+  {{end}}
+
+</table>
+
+
+<script type="text/javascript">
+  $(function() {
+    sc = new window.SuggestControl({
+      "id" : "{{.ClientId}}",
+      "category" : "{{.Category}}"
+    })
+    sc.init()
+  });
+</script>
+
+
+

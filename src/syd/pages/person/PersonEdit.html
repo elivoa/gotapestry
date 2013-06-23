@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    {{template "header"}}
+
+  </head>
+  <body>
+    <div class="header">
+	  <h1>进销存管理</h1>
+    </div>
+    <div class="container">
+
+      {{template "left-nav"}}
+
+      <div class="content">
+    	<h2>{{.SubTitle}}联系人</h2>
+
+        <div class="main_form">
+          <form method="POST" id="PersonForm" action="">
+            <input type="hidden" name="Person.Id" value="{{.Person.Id}}" />
+
+            {{/* TODO: [tmp] support redirect to form */}}
+            <input type="hidden" name="t:form" value="PersonForm" />
+
+            <dl class="clearfix">
+              <dt><i>*</i>姓名：</dt>
+              <dd>
+                <input type="text" size="12"
+                       name="Person.Name" value="{{.Person.Name}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>类型：</dt>
+              <dd>
+                {{t_select $ "data" .TypeData "name" "Person.Type" "value" .Person.Type "Header" "请选择"}}
+                <!--
+                <select name="Person.Type" value="{{.Person.Type}}">
+                  <option>请选择</option>
+                  <option value="customer">客户</option>
+                  <option value="factory">厂家</option>
+                </select>
+                -->
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>电话：</dt>
+              <dd>
+                <input type="text" size="12"
+                       name="Person.Phone" value="{{.Person.Phone}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>所在地：</dt>
+              <dd>
+
+                {{t_provinceselect $ "name" "Person.City" "value" .Person.City}}
+
+                <!--
+                <select name="Person.City" value="{{.Person.City}}">
+                  <option value="">省</option>
+                  <option value="上海">上海</option>
+                  <option value="嘉兴">嘉兴</option>
+                  <option value="濮院">濮院</option>
+                </select>
+                -->
+                <input type="text" size="12"
+                       name="Person.Address" value="{{.Person.Address}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>邮编：</dt>
+              <dd>
+                <input type="text" size="12"
+                       name="Person.PostalCode" value="{{.Person.PostalCode}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>QQ：</dt>
+              <dd>
+                <input type="text" site="12"
+                       name="Person.QQ" value="{{.Person.QQ}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>网店：</dt>
+              <dd>
+                <input type="text" site="12"
+                       name="Person.Website" value="{{.Person.Website}}" />
+              </dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>备注：</dt>
+              <dd><textarea name="Person.Note">{{.Person.Note}}</textarea></dd>
+              <dd></dd>
+            </dl>
+            <dl class="clearfix">
+              <dt></dt>
+              <dd><input type="submit" value="提交"></dd>
+              <dd></dd>
+            </dl>
+          </form>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer">
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{{/* Component: syd/SuggestControl */}}
+
+<script type="text/javascript" src="/static/js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="/static/js/suggest-control.js"></script>
+
+<div class="parent-class">
+  <input type="hidden" class="suggest-id" name="{{.Name}}" value="{{.Value}}" />
+  <input type="text" class="suggest-display" value="{{.DisplayValue}}" />
+</div>
+
+<script type="text/javascript">
+  $(function(){
+    sc = new window.SuggestControl({
+      "category" : "{{.Category}}"
+    })
+    sc.init()
+  });
+</script>

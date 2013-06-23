@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    {{template "header"}}
+
+  </head>
+  <body>
+    <div class="header">
+	  <h1>进销存管理</h1>
+    </div>
+    <div class="container">
+
+      {{template "left-nav"}}
+
+      <div class="content">
+    	<h2>{{.SubTitle}}列表</h2>
+        <div class="person_list">
+		  <table>
+            <tr>
+              <th>客户姓名</th>
+              <th>地址</th>
+              <th>电话</th>
+              <th>qq</th>
+              <th>网店</th>
+              <th>备注</th>
+              <th>操作</th>
+            </tr>
+
+            {{range .Persons}}
+            <tr>
+              <td>{{.Name}}</td>
+              <td>{{.Address}}</td>
+              <td>{{.Phone}}</td>
+              <td>{{.QQ}}</td>
+              <td><a href="{{.Website}}">{{.Website}}</a></td>
+              <td>{{.Note}}</td>
+              <td>
+                <a href="/person/edit/{{.Id}}">修改</a>
+                <a href="/person/delete/{{.Id}}/{{$.PersonType}}"
+                   onclick="return confirm('确认删除?')">删除</a>
+              </td>
+            </tr>
+            {{end}}
+
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+
+    </div>
+  </body>
+</html>

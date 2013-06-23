@@ -1,0 +1,8 @@
+<select name="{{.Name}}">
+  <option>{{.Header}}</option>
+  {{range $k, $v :=.Data}}
+  <option value="{{$k}}" {{if $.IsSelected $k}} selected="selected" {{end}}>
+    {{$v}}
+  </option>
+  {{end}}
+</select>

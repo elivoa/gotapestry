@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link href="../css/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="header">
+	<h1>进销存管理</h1>
+</div>
+<div class="container">
+    <div class="menu">
+        <dl>
+        	<dt>订单管理</dt>
+            <dd><a href="">新增订单</a></dd>
+            <dd><a href="">订单列表</a></dd>
+        </dl>
+        <dl>
+        	<dt>商品管理</dt>
+            <dd><a href="">新增商品</a></dd>
+            <dd><a href="">商品列表</a></dd>
+            <dd><a href="">退换货管理</a></dd>
+        </dl>
+        <dl>
+        	<dt>联系人信息</dt>
+            <dd><a href="">新增联系人</a></dd>
+            <dd><a href="">客户列表</a></dd>
+            <dd><a href="">厂家列表</a></dd>
+        </dl>
+        <dl>
+        	<dt>生成报表</dt>
+            <dd><a href="">当日销量统计</a></dd>
+            <dd><a href="">历史销量统计</a></dd>
+            <dd><a href="">欠款统计</a></dd>
+        </dl>
+    </div>
+    <div class="content">
+    	<h2>订单列表</h2>
+        <div class="tab">
+            <a class="cur" href="#">待处理订单</a>
+            <a href="">已发货订单</a>
+            <a href="">已完成订单</a>
+            <a href="">全部订单</a>
+        </div>
+        <!--搜索条件
+		<div class="filter">
+        	<dl>
+                <dt>
+                	付款状态
+                </dt>
+                <dd>
+                	<select>
+                    	<option>未付款</option>
+                        <option>已付款</option>
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        -->
+        <div class="tbl_list">
+        	<table>
+            	<tr>
+                	<th>订单号</th>
+                    <th>客户姓名</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                <tr>
+                	<td>88130430888</td>
+                    <td>abc</td>
+                    <td>2013-04-30</td>
+                    <td>
+                    	<a href="#">修改</a>
+                    	<a href="#">发货</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="footer">
+
+</div>
+</body>
+</html>

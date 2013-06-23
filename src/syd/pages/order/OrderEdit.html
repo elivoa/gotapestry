@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    {{template "header"}}
+    <script type="text/javascript" src="/static/js/order_edit.js"></script>
+
+  </head>
+  <body>
+    <div class="header">
+	  <h1>进销存管理</h1>
+    </div>
+    <div class="container">
+
+      {{template "left-nav"}}
+
+      <div class="content">
+    	<h2>{{.SubTitle}}订单</h2>
+        <div class="order_create">
+
+          {{with .Order}}
+
+          <form method="POST" id="OrderForm" action="">
+            <input type="hidden" name="Order.Id" value="{{.Id}}" />
+
+            {{/* [tmp] support redirect to form */}}
+            <input type="hidden" name="t:form" value="OrderForm" />
+
+            <table>
+              <tr>
+                <td colspan="5">订单号：{{.TrackNumber}}
+                  <input type="hidden"
+                         name="Order.TrackNumber" value="{{.TrackNumber}}" />
+                </td>
+                <td align="right" colspan="2">订单日期：
+                  {{.CreateTime | beautytime}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">客户：
+
+                  {{t_suggestcontrol $ "name" "Order.CustomerId" "value" .CustomerId "category" "customer"}}
+                  
+                  <!--
+                      <input type="text" class="odc_custname"
+                             name="Order.CustomerId" value="{{.CustomerId}}" />
+                      -->
+                </td>
+                
+                <td colspan="5">
+                  <div class="auto-radio" value="{{.DeliveryMethod}}">
+                    <input type="radio" name="Order.DeliveryMethod"
+                           value="TakeAway">自提
+                    <input type="radio" name="Order.DeliveryMethod"
+                           value="Express">发货
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>商品名称</td>
+                <td>数量</td>
+                <td>单位</td>
+                <td>单价</td>
+                <td>总价</td>
+                <td>备注</td>
+                <td>&nbsp;</td>
+              </tr>
+
+              {{with $o:=.}}
+              {{range .Details}}
+              <tr class="product-line">
+                <td>
+                  <input type="hidden" name="Order.Details.Id" value="{{.Id}}" />
+                  <input type="hidden" class="product-id"
+                         name="Order.Details.ProductId" value="{{.ProductId}}" />
+                  <input type="text" class="product-trigger" size="20" autocomplete="off"
+                         value="{{$.ProductDisplayName .ProductId}}" />
+                </td>
+                <td>
+                  <input type="text" size="6" class="quantity" autocomplete="off" 
+                         name="Order.Details.Quantity" value="{{.Quantity}}" />
+                </td>
+                <td><input type="text" size="4" value="件" ></td>
+                <td>
+                  <input type="text" size="4" class="price" autocomplete="off" 
+                         name="Order.Details.SellingPrice" value="{{.SellingPrice}}" />
+                </td>
+                <td><span class="sum">-.--</span></td>
+                <td><input type="text" size="50" autocomplete="off" 
+                           name="Order.Details.Note" value="{{.Note}}"></td>
+                <td>
+                  <a class="fn_delete_line" href="/order/delete/{{$o.Id}}">删</a>
+                </td>
+              </tr>
+              {{end}}
+              {{end}}
+
+              <tr>
+                <td colspan="7"><a href="#" class="fn_add_line">新增</a></td>
+              </tr>
+              <tr>
+                <td>合计</td>
+                <td><span class="total-quantity">--</span></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td><span class="total-price">0.00</span></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>实收</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>
+                  <input type="text" size="6" class="pay"
+                         name=""/>
+                </td>
+                <td>
+                  优惠: <span class="price-cut-display">--</span>元
+                  <input type="hidden" class="price-cut"
+                         name="Order.PriceCut" value="{{.PriceCut}}" />
+                </td>
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+
+            <div class="">
+              实际支付：
+              <input type="text" class="actual-paid" value="0" size="6">
+              <input type="checkbox">已结清
+            </div>
+
+            <div class="btn_main">
+              <input type="submit" value="{{$.SubmitLabel}}订单">
+            </div>
+          </form>
+
+          {{end}}
+
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+
+    </div>
+  </body>
+</html>

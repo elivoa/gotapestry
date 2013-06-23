@@ -1,0 +1,7 @@
+
+
+2013-05-05  Elivoa Gao  <elivoa@gmail.com>
+	* DeleteCustomer: Delete customer.
+
+2013-05-03  Elivoa Gao  <elivoa@gmail.com>
+	* PersonModule: submit form for create person.
