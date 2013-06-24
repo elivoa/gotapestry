@@ -23,7 +23,7 @@ func GotBuiltinModule(r *mux.Router) {
 	register.RegisterApp(
 		"got/builtin",
 		"GOT Core Modules",
-		"/Users/bogao/sync/sydPage/src/got/builtin",
+		"/Users/bogao/develop/gitme/gotapestry/src/got/builtin",
 	)
 
 	// pages

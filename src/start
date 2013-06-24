@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /Users/bogao/sync/sydPage/src
+#cd /Users/bogao/sync/sydPage/src
 
 echo "-200- go install gxl..."
 go install gxl

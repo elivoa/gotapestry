@@ -48,7 +48,7 @@ func sydModule(r *mux.Router) {
 	register.RegisterApp(
 		"syd",
 		"SYD Module",
-		"/Users/bogao/sync/sydPage/src/syd",
+		"/Users/bogao/develop/gitme/gotapestry/src/syd", // TODO auto process this address
 	)
 
 	index_pages.Register()
