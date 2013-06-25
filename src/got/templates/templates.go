@@ -23,11 +23,11 @@ func init() {
 	registerComponentFuncs() // TEST
 
 	// init functions
-	Templates.Funcs(template.FuncMap{
-		"formattime":     FormatTime,
-		"beautytime":     BeautyTime,
-		"formatcurrency": FormatCurrency,
-	})
+	// Templates.Funcs(template.FuncMap{
+	// 	"formattime":     FormatTime,
+	// 	"beautytime":     BeautyTime,
+	// 	"formatcurrency": FormatCurrency,
+	// })
 }
 
 // old

@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title></title>
 
-    {{template "header"}}
+    {{t_layout_header $}}
+    
     <script type="text/javascript" src="/static/js/order_edit.js"></script>
 
   </head>
@@ -14,7 +15,7 @@
     </div>
     <div class="container">
 
-      {{template "left-nav"}}
+      {{t_layout_leftnav $}}
 
       <div class="content">
     	<h2>{{.SubTitle}}订单</h2>
@@ -24,6 +25,7 @@
 
           <form method="POST" id="OrderForm" action="">
             <input type="hidden" name="Order.Id" value="{{.Id}}" />
+            <input type="hidden" name="Order.Status" value="{{.Status}}" />
 
             {{/* [tmp] support redirect to form */}}
             <input type="hidden" name="t:form" value="OrderForm" />

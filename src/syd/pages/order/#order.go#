@@ -8,9 +8,9 @@ import (
 	"got/route"
 	"got/templates"
 	"gxl"
-	"strings"
 	"syd/dal"
 	"syd/model"
+	"strings"
 )
 
 /* ________________________________________________________________________________
@@ -81,17 +81,16 @@ func (p *OrderList) ShowCustomerName(customerId int) string {
 	}
 }
 
-func (p *OrderList) TabCurrentStyle(tab string) string {
-	if strings.ToLower(p.Tab) == strings.ToLower(tab) {
-		return "cur"
+func (p *OrderList) TabCurrentStyle(tab string){
+	if strings.ToLower(p.Tab) == strings.ToLower(tab){
+		
 	}
-	return ""
 }
 
-/* ________________________________________________________________________________
+		/* ________________________________________________________________________________
    Order Detail
 */
-type OrderDetail struct {
+		type} OrderDetail struct {
 	core.Page
 }
 
@@ -178,9 +177,9 @@ func (p *OrderEdit) OnSuccessFromOrderForm() (string, string) {
 	// modify logic
 	switch p.Order.DeliveryMethod {
 	case "Express":
-		p.Order.Status = "New"
+		p.Order.Status = "ToDeliver"
 	case "TakeAway":
-		p.Order.Status = "Delivering"
+		p.Order.Status = "New"
 	}
 
 	// update

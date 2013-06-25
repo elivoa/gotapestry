@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"strings"
 )
 
 /*_______________________________________________________________________________
@@ -19,10 +20,9 @@ func registerComponentFuncs() {
 }
 
 func RegisterComponent(name string, f interface{}) {
-	debuglog("-108- [RegisterComponent] t_%v", name)
-	Templates.Funcs(template.FuncMap{
-		fmt.Sprintf("t_%v", name): f,
-	})
+	funcName := fmt.Sprintf("t_%v", strings.Replace(name, "/", "_", -1))
+	debuglog("-108- [RegisterComponent] ", funcName)
+	Templates.Funcs(template.FuncMap{funcName: f})
 }
 
 // --------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ func init() {
 type Order struct {
 	Id             int
 	TrackNumber    int64
-	Status         string "" // New | Closed
+	Status         string "" // New | ToDeliver | Delivering | Closed
 	DeliveryMethod string "" // TakeAway | Express(圆通，顺风)
 
 	CustomerId int // reference
@@ -37,8 +37,10 @@ type Order struct {
 
 func NewOrder() *Order {
 	order := &Order{
-		TrackNumber: GenerateOrderId(), DeliveryMethod: "Express",
-		CreateTime: time.Now(),
+		TrackNumber:    GenerateOrderId(),
+		Status:         "New",
+		DeliveryMethod: "Express",
+		CreateTime:     time.Now(),
 	}
 	order.Details = []*OrderDetail{
 		&OrderDetail{},
@@ -108,22 +110,3 @@ func (d *OrderDetail) String() string {
 	return fmt.Sprintf("OrderDetail:Id:%v, OrderTrackNumber:%v, ProductId:%v, Note:%v",
 		d.Id, d.OrderTrackNumber, d.ProductId, d.Note)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

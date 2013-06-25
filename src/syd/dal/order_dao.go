@@ -1,10 +1,12 @@
 package dal
 
 import (
+	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
+	"strings"
 	"syd/model"
 	"time"
 )
@@ -165,7 +167,6 @@ func getOrderDetails(trackNumber int64) (*[]*model.OrderDetail, error) {
 func UpdateOrder(order *model.Order) (*model.Order, error) {
 	if logdebug {
 		log.Printf("[dal] Edit Order: %v", order)
-		log.Println(order.Id)
 	}
 
 	// organize order details. delete all and then add all.
@@ -222,30 +223,51 @@ func deleteDetails(trackNumber int64) error {
 }
 
 /*_______________________________________________________________________________
-  List person with type
+  List person with type, default by status.
   Note: do not contains Details.
 */
-func ListOrder(orderType string) *[]model.Order {
+func ListOrder(status string) *[]model.Order {
+	// debug log
 	if logdebug {
-		log.Printf("[dal] List order with type:%v", orderType)
+		log.Printf("[dal] List order with type:%v", status)
 	}
 
+	// header declare
+	var err error
+
+	// connection, // TODO need a connection pool?
 	db.Connect()
 	defer db.Close()
 
-	stmt, err := db.DB.Prepare("select * from `order`")
+	// 1. query
+	var queryString string
+	if strings.ToLower(status) == "all" {
+		queryString = "select * from `order`"
+	} else {
+		queryString = "select * from `order` where status = ?"
+	}
+
+	// 2. prepare
+	stmt, err := db.DB.Prepare(queryString)
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query()
+	// 3. query
+	var rows *sql.Rows
+	if strings.ToLower(status) == "all" {
+		rows, err = stmt.Query()
+	} else {
+		rows, err = stmt.Query(status)
+	}
 	if err != nil {
 		panic(err.Error())
 	}
 	defer rows.Close()
 
-	// big performance issue, maybe.
+	// 4. process results.
+	// big performance issue, maybe. who knows.
 	orders := []model.Order{}
 	for rows.Next() {
 		p := new(model.Order)

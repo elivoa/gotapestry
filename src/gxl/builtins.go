@@ -1,3 +1,6 @@
+/*
+  Go Extend Library
+*/
 package gxl
 
 import ()

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title></title>
 
-    {{template "header"}}
+    {{t_layout_header $}}
 
   </head>
   <body>
@@ -13,16 +13,16 @@
     </div>
     <div class="container">
 
-      {{template "left-nav"}}
+      {{t_layout_leftnav $}}
 
       <div class="content">
     	<h2>订单列表</h2>
 
         <div class="tab">
-          <a class="cur" href="#">待处理订单</a>
-          <a href="">已发货订单</a>
-          <a href="">已完成订单</a>
-          <a href="">全部订单</a>
+          <a class='{{$.TabCurrentStyle "New"}}' href="/order/list/New">待处理订单</a>
+          <a class='{{$.TabCurrentStyle "Delivering"}}' href="/order/list/Delivering">已发货订单</a>
+          <a class='{{$.TabCurrentStyle "Closed"}}' href="/order/list/Closed">已完成订单</a>
+          <a class='{{$.TabCurrentStyle "All"}}' href="/order/list/All">全部订单</a>
         </div>
         <!--搜索条件
 		    <div class="filter">
@@ -41,24 +41,38 @@
             -->
 
         <div class="tbl_list">
-          <table>
+          <table border="1" style="border-collapse: collapse;border-color: #ddd;">
             <tr>
               <th>订单号</th>
               <th>客户姓名</th>
+              <th>订单数量</th>
+              <th>订单金额</th>
+              <th>订单状态</th>
+              <th>运输</th>
               <th>创建时间</th>
               <th>操作</th>
             </tr>
+
+            {{if len .Orders | not}}
+            <tr><td colspan="8">无记录</td></tr>
+            {{else}}
 
             {{range .Orders}}
             <tr>
               <td>{{.TrackNumber}}</td>
               <td>{{$.ShowCustomerName .CustomerId}}</td>
-              <td>{{.CreateTime}}</td>
+              <td align="right">{{.TotalCount}}</td>
+              <td align="right">{{.TotalPrice | beautycurrency}}</td>
+              <td>{{.Status}}</td>
+              <td>{{.DeliveryMethod}}</td>
+              <td>{{.CreateTime | beautytime}}</td>
               <td>
                 <a href="/order/edit/{{.Id}}">修改</a>
                 <a href="#">发货</a>
               </td>
             </tr>
+            {{end}}
+
             {{end}}
 
           </table>

@@ -11,7 +11,8 @@ func registerHelperFuncs() {
 	Templates.Funcs(template.FuncMap{
 		"formattime":     FormatTime,
 		"beautytime":     BeautyTime,
-		"formatcurrency": FormatCurrency,
+		"formatcurrency": BeautyCurrency,
+		"beautycurrency": BeautyCurrency,
 	})
 }
 
@@ -28,6 +29,6 @@ func BeautyTime(t time.Time) string {
 	return t.Format("2006-01-02 03:04:05")
 }
 
-func FormatCurrency(d float64) string {
+func BeautyCurrency(d float64) string {
 	return fmt.Sprintf("%.2f", d)
 }
