@@ -1,3 +1,5 @@
+// TODO delete this. this is replaced by register-component.go
+
 package register
 
 import (

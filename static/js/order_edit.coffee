@@ -153,6 +153,7 @@ class OrderManageDetails
       # empty value
       newline.find('input').each (idx, obj) ->
         $(obj).attr "value",""
+        $(obj).val ""
       newline.find('.sum').html("")
 
       # attach to table
@@ -178,11 +179,18 @@ $ ->
     hiddenClass : ".product-id"
     category : "product"
     onSelect : (line, suggestion) ->
-      # TODO fill in all the following textbox.
+      console.log suggestion
+      productId = suggestion.data
 
-      # console.log "--------------------------"
-      # console.log line
-      # console.log suggestion
+      # TODO -客单价- -修改过不覆盖？-
+      url = "/api/product/"+ productId
+      $.getJSON(url, (data)->
+        console.log 'ajax send...'
+        console.log data
+        if data
+          $(line).find(".price").val(data.Price)
+        # pass
+      )
   })
   sc.init()
 

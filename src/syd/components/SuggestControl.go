@@ -42,10 +42,14 @@ func (c *SuggestControl) initSuggest() {
 	switch c.Category {
 	case "factory", "customer":
 		person := dal.GetPerson(id)
-		c.DisplayValue = person.Name
+		if person != nil {
+			c.DisplayValue = person.Name
+		}
 	case "product":
 		product := dal.GetProduct(id)
-		c.DisplayValue = product.Name
+		if product != nil {
+			c.DisplayValue = product.Name
+		}
 	default:
 	}
 	//	}

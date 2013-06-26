@@ -311,9 +311,13 @@ func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
 				debuglog("-900- [route:return] parse template '%v'", tname)
 				lcc.return_template(tname)
 
-			case "json", "text":
+			case "text":
 				debuglog("-902- [route:return] return plain string")
-				lcc.return_text(returns...)
+				lcc.return_text("plain/text", returns...)
+
+			case "json":
+				debuglog("-902- [route:return] return plain string")
+				lcc.return_text("text/json", returns...)
 
 			case "redirect":
 				url, err := extractString(1, returns...)
@@ -357,7 +361,7 @@ func extractString(index int, data ...reflect.Value) (string, error) {
 }
 
 // support second parameter type: string, []byte
-func (lcc *LifeCircleControl) return_text(data ...reflect.Value) {
+func (lcc *LifeCircleControl) return_text(contentType string, data ...reflect.Value) {
 	// now we only return 1 result.
 	lcc.ResultType = data[1].String()
 	v := data[1]
@@ -368,6 +372,9 @@ func (lcc *LifeCircleControl) return_text(data ...reflect.Value) {
 		v = v.Elem()
 	}
 
+	lcc.W.Header().Add("content-type", contentType)
+
+	// write text
 	switch v.Kind() {
 	case reflect.Slice, reflect.Array:
 		// only support byte slice

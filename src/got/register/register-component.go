@@ -22,13 +22,23 @@ var Components = ProtonSegment{Name: "/"}
 func Component(f func(), components ...core.IComponent) int {
 	for _, c := range components {
 		url := makeUrl(f, c)
-		Components.Add(url, c, "component")
+		selectors := Components.Add(url, c, "component")
+
+		// fmt.Println("+-+-+-+--=-=----------------------------------------=-=-=-=-==-")
+		for _, selector := range selectors {
+			// fmt.Println(selector)
+
+			lowerKey := strings.ToLower(strings.Join(selector, "/"))
+			templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
+
+		}
 
 		// different from page, need to register template func.
-		_, segments := trimPathSegments(url, "components")
-		key := strings.Join(segments, "/")
-		lowerKey := strings.ToLower(key)
-		templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
+		// _, segments := trimPathSegments(url, "components")
+		// key := strings.Join(segments, "/")
+		// lowerKey := strings.ToLower(key)
+		// templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
+
 	}
 	return len(components)
 }

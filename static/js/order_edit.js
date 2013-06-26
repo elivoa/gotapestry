@@ -166,7 +166,8 @@
         line = $(lines[lines.length - 1]);
         newline = line.clone();
         newline.find('input').each(function(idx, obj) {
-          return $(obj).attr("value", "");
+          $(obj).attr("value", "");
+          return $(obj).val("");
         });
         newline.find('.sum').html("");
         newline.insertAfter(line);
@@ -188,7 +189,19 @@
       triggerClass: ".product-trigger",
       hiddenClass: ".product-id",
       category: "product",
-      onSelect: function(line, suggestion) {}
+      onSelect: function(line, suggestion) {
+        var productId, url;
+        console.log(suggestion);
+        productId = suggestion.data;
+        url = "/api/product/" + productId;
+        return $.getJSON(url, function(data) {
+          console.log('ajax send...');
+          console.log(data);
+          if (data) {
+            return $(line).find(".price").val(data.Price);
+          }
+        });
+      }
     });
     sc.init();
     omd = new OrderManageDetails();

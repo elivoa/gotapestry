@@ -14,7 +14,10 @@ import (
 
 func Register() {}
 func init() {
-	register.Page(Register, &PersonIndex{}, &PersonList{}, &PersonEdit{})
+	register.Page(Register,
+		&PersonIndex{}, &PersonList{}, &PersonEdit{},
+		&PersonDetail{},
+	)
 }
 
 var (
@@ -52,7 +55,7 @@ func (p *PersonList) Setup() interface{} {
 	// return "template", "person-list"
 }
 
-// TODO 
+// TODO
 func (p *PersonList) Ondelete() {
 
 }
@@ -111,4 +114,26 @@ func (p *PersonEdit) OnSuccessFromPersonForm() (string, string) {
 		dal.CreatePerson(p.Person)
 	}
 	return "redirect", fmt.Sprintf("/person/list/%v", p.Person.Type)
+}
+
+/* ________________________________________________________________________________
+   PersonEdit
+*/
+type PersonDetail struct {
+	core.Page
+
+	Id *gxl.Int `path-param:"1"`
+
+	Person *model.Person
+	Orders *[]model.Order
+}
+
+func (p *PersonDetail) Setup() {
+	if p.Id == nil {
+		return
+	}
+	p.Person = dal.GetPerson(p.Id.Int)
+	if p.Person != nil {
+		p.Orders = dal.ListOrderByCustomer(p.Person.Id, "all")
+	}
 }

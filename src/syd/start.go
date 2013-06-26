@@ -10,11 +10,13 @@ import (
 
 	// pages & components' import
 	index_pages "syd/pages"
+	api_pages "syd/pages/api"
 	person_pages "syd/pages/person"
 	product_pages "syd/pages/product"
 
 	syd_components "syd/components"
 	layout_components "syd/components/layout"
+	order_components "syd/components/order"
 )
 
 func Start() {
@@ -49,9 +51,10 @@ func sydModule(r *mux.Router) {
 	index_pages.Register()
 	person_pages.Register()
 	product_pages.Register()
-
+	api_pages.Register()
 	syd_components.Register()
 	layout_components.Register()
+	order_components.Register()
 }
 
 // register simple router module into GOT.

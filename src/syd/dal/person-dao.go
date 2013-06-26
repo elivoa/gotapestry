@@ -68,7 +68,11 @@ func GetPerson(id int) *model.Person {
 	row := stmt.QueryRow(id)
 	p := new(model.Person)
 	row.Scan(&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ, &p.Website, &p.Note, &p.CreateTime, &p.UpdateTime)
-	return p
+	if p.Id > 0 {
+		return p
+	} else {
+		return nil
+	}
 }
 
 var EmptyPersonList = &[]model.Person{}

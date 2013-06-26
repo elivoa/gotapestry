@@ -40,12 +40,10 @@ type OrderList struct {
 	Orders *[]model.Order
 	Tab    string `path-param:"1"`
 
-	customerNames map[int]*model.Person // order-id -> customer names
+	// customerNames map[int]*model.Person // order-id -> customer names
 }
 
 func (p *OrderList) Activate() {
-	fmt.Println("tabisssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
-	fmt.Println(p.Tab)
 	if p.Tab == "" {
 		p.Tab = "all"
 	}
@@ -53,32 +51,6 @@ func (p *OrderList) Activate() {
 
 func (p *OrderList) SetupRender() {
 	p.Orders = dal.ListOrder(p.Tab)
-
-	// fetch customer names
-	// TODO batch it
-	length := len(*p.Orders)
-	if length > 0 {
-		p.customerNames = make(map[int]*model.Person, length)
-		for _, o := range *p.Orders {
-			if _, ok := p.customerNames[o.CustomerId]; ok {
-				continue
-			}
-
-			customer := dal.GetPerson(o.CustomerId)
-			if customer != nil {
-				p.customerNames[customer.Id] = customer
-			}
-		}
-	}
-}
-
-func (p *OrderList) ShowCustomerName(customerId int) string {
-	customer, ok := p.customerNames[customerId]
-	if ok {
-		return customer.Name
-	} else {
-		return fmt.Sprintf("_[ p%v ]_", customerId)
-	}
 }
 
 func (p *OrderList) TabCurrentStyle(tab string) string {

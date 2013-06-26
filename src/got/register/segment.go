@@ -47,16 +47,22 @@ var pathMap map[string]string = map[string]string{
 
 // ________________________________________________________________________________
 // parse url and put it into segments.
+// return what?
+// TODO return [][]string:
+//   order, list
+//   order, orderlist
 //
-func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
+func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) (selectors [][]string) {
 	src, segments := trimPathSegments(baseUrl, pathMap[protonType])
-	debug.Log("-___- [Register %v] register %v::%v url:%v", protonType, src, segments, baseUrl)
+	debug.Log("-___- [Register %v] %v::%v url:%v", protonType, src, segments, baseUrl)
 
 	// add to register
 	var (
 		currentSeg = s
 		prevSeg    = "//nothing//"
 		isPage     = (protonType == "page")
+
+		selectorPrefix = []string{} // tempvalue
 	)
 	for idx, seg := range segments {
 		lowerSeg := strings.ToLower(seg)
@@ -68,14 +74,14 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 				log.Fatalf("Conflict of Page defination %v.\n", baseUrl)
 			}
 			currentSeg = existSeg
-			// append(selectors, seg)
+			selectorPrefix = append(selectorPrefix, seg)
 		} else {
-			log.Printf("-www- [RegisterPage] seg: %v; \n", seg)
+			// the last node
 
-			// last node, create segment{} and add to chain
+			// log.Printf("-www- [RegisterPage] seg: %v; \n", seg)
 			if idx == len(segments)-1 {
-				log.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
-				log.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
+				// log.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
+				// log.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
 
 				// ~ 2 ~ overlap keywords: i.e.: order/OrderEdit ==> order/edit
 				var (
@@ -87,7 +93,9 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 				} else if strings.HasPrefix(lowerSeg, prevSeg) {
 					// eg: /order/OrderList
 					shortSeg = seg[len(prevSeg):]
-					finalSegs = append(finalSegs, shortSeg)
+					if shortSeg != "" {
+						finalSegs = append(finalSegs, shortSeg)
+					}
 
 					// if isPage { // only page removes suffix "Index"
 					// 	// eg: /order/OrderIndex --> /order
@@ -108,6 +116,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 					// 	}
 					// }
 				}
+				// fmt.Printf(">>>>>> seg: %v shortSeg: %v\n", seg, shortSeg)
 
 				// speical: for segment Index, go back to parent.
 				if isPage {
@@ -116,10 +125,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 						if trimlen >= 0 {
 							shortSeg = shortSeg[:trimlen]
 						}
-
 						if shortSeg == "" {
-							fmt.Printf("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[---   %v \n", finalSegs)
-							// fmt.Println("fallback")
 							// fallback TODO
 							currentSeg.Src = src
 							currentSeg.Path = strings.Join(segments, "/")
@@ -129,11 +135,20 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 							// eg: /order/OrderDetailIndex --> /order/detail
 							finalSegs = append(finalSegs, shortSeg)
 						}
+
 					}
 				}
 
 				if strings.HasSuffix(lowerSeg, prevSeg) {
-					finalSegs = append(finalSegs, seg[:len(seg)-len(prevSeg)])
+					s := seg[:len(seg)-len(prevSeg)]
+					if s != "" {
+						finalSegs = append(finalSegs, s)
+					} else {
+						// fallback TODO
+						currentSeg.Src = src
+						currentSeg.Path = strings.Join(segments, "/")
+						currentSeg.Proton = p
+					}
 				}
 
 				// finally add segment struct to chains.
@@ -148,15 +163,17 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 						Proton: p,
 					}
 					currentSeg.AddChild(segment)
-					// append(selectors, s)
+					selector := []string{}
+					// fmt.Printf(">>>>>>>>>>>selectorPrefix %v\n", selectorPrefix)
+					selector = append(selector, selectorPrefix...)
+					selector = append(selector, s)
+					selectors = append(selectors, selector)
 				}
 				currentSeg = segment
 				return
 
 			} else {
-				// log.Printf("-www- [RegisterPage] normal path node %v; \n", seg)
-
-				// the middle path
+				// the middle part
 				segment = &ProtonSegment{
 					Name:   seg,
 					Parent: currentSeg,
@@ -164,12 +181,13 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) {
 				}
 				currentSeg.AddChild(segment)
 				currentSeg = segment
-				// append(selectors, seg)
+				selectorPrefix = append(selectorPrefix, seg)
 			}
 
 		}
 		prevSeg = lowerSeg
 	}
+	return
 }
 
 // Lookup the structure, find the right page/component.
