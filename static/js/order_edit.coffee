@@ -182,14 +182,20 @@ $ ->
       console.log suggestion
       productId = suggestion.data
 
-      # TODO -客单价- -修改过不覆盖？-
-      url = "/api/product/"+ productId
-      $.getJSON(url, (data)->
-        console.log 'ajax send...'
-        console.log data
-        if data
-          $(line).find(".price").val(data.Price)
-        # pass
+      # get customer id. TODO bad design
+      customerId = $(".suggest-id").val()
+      url = "/api/customer_price/" + customerId + "/" + productId
+      $.ajax({
+        url: url
+        context: document.body
+        dataType: 'json'
+        success: (data)->
+          if data
+            $(line).find(".price").val(data.price)
+        error: (jqXHR, textStatus, errorThrown)->
+          console.log textStatus
+      }).done(->
+        console.log 'done...'
       )
   })
   sc.init()

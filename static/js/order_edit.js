@@ -190,16 +190,25 @@
       hiddenClass: ".product-id",
       category: "product",
       onSelect: function(line, suggestion) {
-        var productId, url;
+        var customerId, productId, url;
         console.log(suggestion);
         productId = suggestion.data;
-        url = "/api/product/" + productId;
-        return $.getJSON(url, function(data) {
-          console.log('ajax send...');
-          console.log(data);
-          if (data) {
-            return $(line).find(".price").val(data.Price);
+        customerId = $(".suggest-id").val();
+        url = "/api/customer_price/" + customerId + "/" + productId;
+        return $.ajax({
+          url: url,
+          context: document.body,
+          dataType: 'json',
+          success: function(data) {
+            if (data) {
+              return $(line).find(".price").val(data.price);
+            }
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            return console.log(textStatus);
           }
+        }).done(function() {
+          return console.log('done...');
         });
       }
     });

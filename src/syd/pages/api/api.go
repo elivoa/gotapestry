@@ -33,10 +33,33 @@ func (p *Api) Setup() (string, string) {
 	case "person":
 		person := dal.GetPerson(p.Param1)
 		return toJson(person)
+
 	case "product":
 		product := dal.GetProduct(p.Param1)
 		return toJson(product)
+
+	case "customer_price":
+		// TODO extract to service
+		var (
+			personId  int     = p.Param1
+			productId int     = p.Param2
+			price     float64 = -1 // final price
+		)
+		if personId > 0 {
+			customerPrice := dal.GetCustomerPrice(personId, productId)
+			if nil != customerPrice {
+				price = customerPrice.Price
+			}
+		}
+		if price <= 0 {
+			product := dal.GetProduct(p.Param2)
+			if product != nil {
+				price = product.Price
+			}
+		}
+		return "json", fmt.Sprintf("{\"price\":%v}", price)
 	}
+
 	return needName()
 }
 

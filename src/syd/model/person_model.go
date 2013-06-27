@@ -30,3 +30,16 @@ func NewPerson() *Person {
 }
 
 // TODO type is enum
+
+//
+// Customer Special Price
+//
+
+type CustomerPrice struct {
+	Id           int
+	PersonId     int
+	ProductId    int
+	Price        float64
+	CreateTime   time.Time
+	LastUsedTime time.Time
+}

@@ -79,8 +79,6 @@ class SuggestControl
 ## expose
 window.SuggestControl = SuggestControl
 
-
-
         # console.log suggestion
         # console.log currentValue
         #reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g'),
