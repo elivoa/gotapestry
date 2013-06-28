@@ -6,6 +6,8 @@
 
     {{t_layout_header $}}
 
+    <script type="text/javascript" src="/static/js/p/product/product_edit.js"></script>
+
   </head>
   <body>
     <div class="header">
@@ -27,9 +29,50 @@
 
             <dl class="clearfix">
               <dt><i>*</i>商品名称：</dt>
-              <dd><input type="text" name="Product.Name" value="{{.Name}}" size="30"></dd>
+              <dd>
+                <input type="text" name="Product.Name" value="{{.Name}}" size="30">
+              </dd>
               <dd class=""></dd>
             </dl>
+
+            <!-- ******************************************************** -->
+            <hr/>
+
+            <div id="color-area" class="mt-container">
+              {{range .Colors}}
+              <dl class="clearfix mt-line">
+                <dt>颜色：</dt>
+                <dd>
+                  <input type="text" name="Product.Colors" value="{{.}}"
+                         size="15">
+                  <a href="#" class="mt-remove">delete</a>
+                </dd>
+                <dd></dd>
+              </dl>
+              {{end}}
+              <dl><a href="#" class="mt-add">ADD</a><dl>
+            </div>
+
+            <div id="size-area" class="mt-container">
+              {{range .Sizes}}
+              <dl class="clearfix mt-line">
+                <dt>尺码：</dt>
+                <dd>
+                  <input type="text" name="Product.Sizes" value="{{.}}"
+                         size="15">
+                  <a href="#" class="mt-remove">delete</a>
+                </dd>
+                <dd></dd>
+              </dl>
+              {{end}}
+              <dl><a href="#" class="mt-add">ADD</a><dl>
+            </div>
+
+            <!-- ******************************************************** -->
+
+
+            <hr/>
+            
             <dl class="clearfix">
               <dt>货号：</dt>
               <dd><input type="text" name="Product.ProductId" value="{{.ProductId}}" size="30"></dd>

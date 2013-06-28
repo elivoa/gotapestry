@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"syd/dal"
 	"syd/model"
+	"syd/service/productservice"
 )
 
 func Register() {
@@ -20,31 +21,6 @@ func Register() {
 		&ProductCreate{},
 	)
 }
-
-/*
-   Struct Product | Product Module
-   -------------------------------------------------------------------------------
-*/
-// type ProductPage struct{}
-
-// func (p *ProductPage) Mapping(r *mux.Router) {
-// 	r.HandleFunc("/product/", route.PageHandler(&ProductIndex{}))
-// 	//r.HandleFunc("/product/", route.RedirectHandler("/product/create"))
-// 	r.HandleFunc("/product/list", ProductListPage)
-
-// 	// Note: Keep Orders! post must before no-matcher version
-// 	editHandler := route.PageHandler(&ProductEdit{})
-// 	r.HandleFunc("/product/create", editHandler).Methods("POST")
-// 	r.HandleFunc("/product/create", editHandler)
-
-// 	r.HandleFunc("/product/edit/{id:[0-9]+}", editHandler).Methods("POST")
-// 	r.HandleFunc("/product/edit/{id:[0-9]+}", editHandler)
-
-// 	// TODO as method of list
-// 	r.HandleFunc("/product/delete/{id:[0-9]+}", ProductDeletePage)
-
-// 	r.HandleFunc("/product/{id:[0-9]+}", route.PageHandler(&ProductDetail{}))
-// }
 
 /* ________________________________________________________________________________
    Product Home Page
@@ -58,9 +34,8 @@ type ProductCreate struct{ core.Page }
 
 func (p *ProductCreate) Setup() (string, string) { return "redirect", "/product/edit" }
 
-/*
+/* ________________________________________________________________________________
    Product Create Page
-   -------------------------------------------------------------------------------
 */
 type ProductEdit struct {
 	core.Page
@@ -86,7 +61,7 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	p.Title = "create product post"
 
 	if p.Id != nil {
-		p.Product = dal.GetProduct(p.Id.Int)
+		p.Product = productservice.GetProduct(p.Id.Int)
 		p.SubTitle = "编辑"
 	} else {
 		p.Product = model.NewProduct()
@@ -96,11 +71,10 @@ func (p *ProductEdit) Setup() { // (string, string) {
 }
 
 func (p *ProductEdit) OnSuccessFromProductForm() (string, string) {
-	fmt.Println(">>> submit form and redirect to list page.")
 	if p.Id != nil {
-		dal.UpdateProduct(p.Product)
+		productservice.UpdateProduct(p.Product)
 	} else {
-		dal.CreateProduct(p.Product)
+		productservice.CreateProduct(p.Product)
 	}
 	return "redirect", "/product/list"
 }

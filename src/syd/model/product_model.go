@@ -17,11 +17,16 @@ type Product struct {
 	Note         string
 	CreateTime   time.Time
 	UpdateTime   time.Time
+
+	// additional information
+	Colors     []string // these two information stores in product_properties table.
+	Sizes      []string
+	Properties map[string][]string // other properties // TODO
 }
 
 func NewProduct() *Product {
-	// return &Product{Name: "测试:破洞猫头", ProductId: "123456", Brand: "sniddle", Price: 128.8, FactoryPrice: 10.00, Stock: 1000, Note: "这是一个测试的条目"}
-	return &Product{}
+	return &Product{
+		Colors: []string{"请输入颜色"},
+		Sizes:  []string{"请输入尺码"},
+	}
 }
-
-// TODO type is enum

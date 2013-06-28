@@ -31,11 +31,9 @@ func CreateProduct(product *model.Product) *model.Product {
 	}
 	lastInsertId, err := result.LastInsertId()
 	if err == nil || lastInsertId > 0 {
-		//	product.Id = lastInsertId
+		product.Id = int(lastInsertId)
 	}
 	return product
-	// log.Printf("Create Product Result is: %v\n", result)
-	// log.Println(err)
 }
 
 /* update an existing item */

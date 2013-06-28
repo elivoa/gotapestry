@@ -83,7 +83,7 @@ func componentLifeCircle(name string) func(...interface{}) interface{} {
 		lcc.Flow()
 		handleComponentReturn(lcc, seg)
 
-		fmt.Printf("Component HTML is:\n%v\n^^^^^^^^^^^^^^^^^^^^\n", lcc.String)
+		// fmt.Printf("Component HTML is:\n%v\n^^^^^^^^^^^^^^^^^^^^\n", lcc.String)
 		return template.HTML(lcc.String)
 	}
 }
