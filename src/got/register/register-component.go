@@ -24,21 +24,10 @@ func Component(f func(), components ...core.IComponent) int {
 		url := makeUrl(f, c)
 		selectors := Components.Add(url, c, "component")
 
-		// fmt.Println("+-+-+-+--=-=----------------------------------------=-=-=-=-==-")
 		for _, selector := range selectors {
-			// fmt.Println(selector)
-
 			lowerKey := strings.ToLower(strings.Join(selector, "/"))
 			templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
-
 		}
-
-		// different from page, need to register template func.
-		// _, segments := trimPathSegments(url, "components")
-		// key := strings.Join(segments, "/")
-		// lowerKey := strings.ToLower(key)
-		// templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
-
 	}
 	return len(components)
 }
@@ -52,15 +41,14 @@ func Component(f func(), components ...core.IComponent) int {
   Return: string or template.HTML
 */
 func componentLifeCircle(name string) func(...interface{}) interface{} {
-	// log.Printf("[building] register component %v", name)
 
 	return func(params ...interface{}) interface{} {
 
 		log.Printf("-620- [flow] Render Component %v ....", name)
 
 		// 1. find base component type
-		seg, _, err := Components.Lookup(name)
-		if err != nil || seg == nil {
+		result, err := Components.Lookup(name)
+		if err != nil || result.Segment == nil {
 			panic(fmt.Sprintf("Component %v not found!", name))
 		}
 		if len(params) < 1 {
@@ -70,20 +58,10 @@ func componentLifeCircle(name string) func(...interface{}) interface{} {
 		// 2. find container page/component
 		container := params[0].(core.IProton)
 
-		// fmt.Println("---------------------------------------------------------==========--------")
-		// println("seg.Proton")
-		// fmt.Println(seg.Proton)
-		// fmt.Println("container")
-		// fmt.Println(container)
-		// println("params:")
-		// fmt.Println(params)
-
-		// 2. create lifecircle controler
-		lcc := lifecircle.NewComponentFlow(container, seg.Proton, params[1:])
+		// 3. create lifecircle controler
+		lcc := lifecircle.NewComponentFlow(container, result.Segment.Proton, params[1:])
 		lcc.Flow()
-		handleComponentReturn(lcc, seg)
-
-		// fmt.Printf("Component HTML is:\n%v\n^^^^^^^^^^^^^^^^^^^^\n", lcc.String)
+		handleComponentReturn(lcc, result.Segment)
 		return template.HTML(lcc.String)
 	}
 }

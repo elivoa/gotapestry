@@ -14,11 +14,6 @@ import (
 	"reflect"
 )
 
-const (
-	TemplateKey = "template-key"
-	PageKey     = "page-key"
-)
-
 var (
 	emptyParameters = []reflect.Value{}
 	debugLog        = true
@@ -37,26 +32,33 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 
 	printAccessHeader(r)
 
-	// 1. let's find the write pages.
-	seg, pageUrl, err := register.Pages.Lookup(url)
-	fmt.Printf(">>>>>>ｓｅｇ　ｉｓ　: %v\n", seg)
+	// 1. let's find the right pages.
+	result, err := register.Pages.Lookup(url)
 	if nil != err {
 		panic(err.Error())
 	}
-	if seg == nil {
-		panic(fmt.Sprintf("Error: seg.Proton is null. seg: %v", seg))
+	if result == nil || result.Segment == nil {
+		panic(fmt.Sprintf("Error: seg.Proton is null. seg: %v", result.Segment))
 	}
-	if seg.Proton == nil {
+	if result.Segment.Proton == nil {
 		// TODO redirect to 404 page.
 		fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		panic(fmt.Sprintf("~~~~ Page not found ~~~~"))
 	}
 
-	debug.Log("-601- [RouteFind] %v", seg)
+	debug.Log("-601- [RouteFind] %v", result.Segment)
 
 	// go through lifecircle
-	lcc := lifecircle.NewPageFlow(w, r, seg.Proton).SetPageUrl(pageUrl).Flow()
-	handleReturn(lcc, seg)
+	lcc := lifecircle.NewPageFlow(w, r, result.Segment.Proton)
+	lcc.SetPageUrl(result.PageUrl).SetEventName(result.EventName)
+	if result.EventName == "" {
+		lcc.Flow() // normal flow
+		handleReturn(lcc, result.Segment)
+	} else {
+		lcc.EventCall(result.EventName) // event call
+		// when call event, process common return ('redirect', "...")
+		// TODO 1: default return the current page.
+	}
 
 	printAccessFooter(r)
 }
@@ -77,14 +79,6 @@ func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment
 				lcc.Err = e
 			}
 		}
-		// var err error
-		// if lcc.Kind == "component" {
-		// 	var buffer bytes.Buffer
-		// 	err = templates.RenderTemplate(&buffer, templateName, lcc.Proton)
-		// 	lcc.String = buffer.String()
-		// } else {
-		// 	err = templates.RenderTemplate(lcc.W, templateName, lcc.Proton)
-		// }
 	}
 
 	if lcc.Err != nil {
@@ -107,18 +101,6 @@ func LocateGOTTemplate(src string, path string) (string, string) {
 	key := fmt.Sprintf("%v:%v", src, path)
 	templateFilePath := filepath.Join(appConfig.FilePath, "pages", path) + ".html"
 	return key, templateFilePath
-
-	// if templateName == "" {
-	// 	lcc.Err = errors.New(fmt.Sprintf(
-	// 		"%v %v must has an associated template or other return.",
-	// 		lcc.Kind, lcc.Name,
-	// 	))
-	// 	return lcc.Err
-	// }
-
-	// debuglog("-980- Render Tempalte %v.", templateName)
-
-	//	return "", ""
 }
 
 // --------------------------------------------------------------------------------

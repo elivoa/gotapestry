@@ -190,65 +190,85 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) (
 	return
 }
 
+type LookupResult struct {
+	Segment   *ProtonSegment
+	PageUrl   string
+	EventName string
+}
+
 // Lookup the structure, find the right page/component.
 // TODO performance
-func (s *ProtonSegment) Lookup(url string) (segment *ProtonSegment, pageUrl string, err error) {
+func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	logLookup("- - - [Lookup] '%v'\n", url)
 
-	var level int
-	var seg string
+	// 1. pre-process url
 	trimedUrl := strings.Trim(url, " ")
 	if !strings.HasSuffix(trimedUrl, "/") {
 		trimedUrl += "/"
 	}
 	segments := strings.Split(trimedUrl, "/")
 
-	// fmt.Println("--------------------------------------------------------------------------")
-	// fmt.Println(trimedUrl)
-	// fmt.Println(segments)
-	// fmt.Println(len(segments))
-	segment = s
+	var (
+		level int
+		seg   string
+		event string
+	)
+	// BUG: param segment not used?
+	segment := s // loop channel object
 	for level, seg = range segments {
 		logLookup("- - - [Lookup] Step: Level %v Seg:[ %-10v ] segment:[ %-20v ]\n",
 			level, seg, segment)
-		if level == 0 && seg == "" { // skip the first / segment.
-			// fmt.Printf("----- %v \n", segment)
-			// first segment must be /
+
+		// skip the first / segment.
+		if level == 0 && seg == "" {
 			continue
 		}
 
-		seg = strings.ToLower(seg)
+		// If contains ".", this is an event call.
+		// and match stops here, others are parameters of event.
+		index := strings.Index(seg, ".")
+		if index > 0 {
+			event = seg[index+1:]
+			seg = strings.ToLower(seg[0:index])
+			segment = segment.Children[seg]
+			level = level + 1
+			break
+		}
 
-		// logLookup("--- segment[%-10v].NumChildren = %v :: HasChildren([ %v ]) is %v\n",
-		// 	segment.Seg, len(segment.Children),
-		// 	seg, segment.HasChild(seg),
-		// )
-		// logLookup("-d- seg[%v], segment[%v]\n",
-		// 	seg, segment,
-		// )
-
-		// try to go next level.
+		// NEXT LEVEL LOOP
 		if segment.Children == nil || len(segment.Children) == 0 || !segment.HasChild(seg) {
-			// fmt.Printf("----- %v \n", segment)
 			logLookup("- - - [Lookup] match finished.")
-			break // stop match here
+			break
 		} else {
-			// find, go next level
 			segment = segment.Children[seg]
 		}
 	}
 
-	// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-	// fmt.Printf("+ segments: \n")
-	// for idx, s := range segments {
-	// 	fmt.Printf("%v:%v\n", idx, s)
-	// }
-	pageUrl = strings.Join(segments[:level], "/")
-	log.Printf("- - - [Lookup] 'pageurl is' %v\n", pageUrl)
+	{
+		// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
+		// fmt.Printf("+ segments: \n")
+		// for idx, s := range segments {
+		// 	fmt.Printf("%v:%v\n", idx, s)
+		// }
+	}
+
+	// get page url
+	pageUrl := strings.Join(segments[:level], "/")
+	if event != "" {
+		index := strings.LastIndex(pageUrl, ".")
+		pageUrl = pageUrl[:index]
+	}
+	// log.Printf("- - - [Lookup] 'pageurl is' %v  (including event)\n", pageUrl)
 
 	if nil == segment {
 		err = errors.New("Lookup Failed.")
 	}
+	result = &LookupResult{
+		Segment:   segment,
+		PageUrl:   pageUrl,
+		EventName: event,
+	}
+	logLookup("- - - [Lookup] Result is %v", result)
 	return
 }
 
@@ -256,7 +276,7 @@ func (s *ProtonSegment) Lookup(url string) (segment *ProtonSegment, pageUrl stri
    Print Helper
 */
 
-// String()
+// string()
 func (s *ProtonSegment) String() string {
 	return fmt.Sprintf("%-14v (%v)[SRC='%v' PATH='%v']",
 		s.Name, len(s.Children), s.Src, s.Path)

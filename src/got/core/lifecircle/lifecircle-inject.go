@@ -29,8 +29,8 @@ func (lcc *LifeCircleControl) InjectValue() {
 	lcc.SetInjected("W", "R")      // TODO what if inject failed.
 
 	// 2. inject parameter
-	// TODO cache tag (use map instead of loop all fields)
-	// How to deal with 0 and NaN, use Injected
+	//    TODO cache tag (use map instead of loop all fields)
+	//    How to deal with 0 and NaN, use Injected
 
 	// 2.1 get value
 	values := make(map[string][]string)
@@ -47,7 +47,14 @@ func (lcc *LifeCircleControl) InjectValue() {
 		panic(fmt.Sprintf("%v should has prefix %v", url, lcc.PageUrl))
 	}
 
+	// 2.3 parepare parameters
 	paramsString := url[len(lcc.PageUrl):]
+	if lcc.EventName != "" {
+		index := strings.Index(paramsString, "/")
+		if index > 0 {
+			paramsString = paramsString[index:]
+		}
+	}
 	var strParams []string
 	if len(paramsString) > 0 {
 		if strings.HasPrefix(paramsString, "/") {

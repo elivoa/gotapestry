@@ -3,14 +3,10 @@ package product
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/context"
-	"github.com/gorilla/mux"
 	"got/core"
+	"got/debug"
 	"got/register"
-	"got/route"
 	"gxl"
-	"net/http"
-	"strconv"
 	"syd/dal"
 	"syd/model"
 	"syd/service/productservice"
@@ -118,43 +114,17 @@ func (p *ProductList) Setup() {
 	p.Products = dal.ListProduct()
 }
 
+// NOTE: event name is case sensitive. Kill this when add cache.
+func (p *ProductList) Ondelete(productId int) (string, string) {
+	debug.Log("Delete Product %d", productId)
+	dal.DeleteProduct(productId)
+	// TODO make this default redirect.
+	return "redirect", "/product/list"
+}
+
 // --------------------------------------------------------------------------------
 
 var (
 	//	listTypeLabel   = map[string]string{"customer": "客户", "factory": "厂商"}
 	createEditLabel = map[string]string{"create": "新建", "edit": "编辑"}
 )
-
-/*
-   Old handler
-   -------------------------------------------------------------------------------
-*/
-
-func ProductDeletePage(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-
-	// TODO: important: need some security validation
-	dal.DeleteProduct(id)
-
-	// redirect to person list.
-	http.Redirect(w, r, "/product/list", http.StatusFound)
-}
-
-/*
-   Product Details page
-   -------------------------------------------------------------------------------
-*/
-type ProductDetail struct {
-	core.Page
-	Id      int "required" // product Id
-	Product *model.Product
-}
-
-func (p *ProductDetail) SetupRender() {
-	id, err := strconv.Atoi(mux.Vars(p.R)["id"])
-	if err == nil {
-		p.Product = dal.GetProduct(id)
-	}
-	context.Set(p.R, route.TemplateKey, "product-detail")
-}

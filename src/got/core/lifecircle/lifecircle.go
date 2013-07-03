@@ -14,10 +14,10 @@ import (
 	"strings"
 )
 
-/*________________________________________________________________________________
-TODO:
- . Callback functions
-________________________________________________________________________________*/
+/* ________________________________________________________________________________
+   TODO:
+   . Callback functions
+*/
 const (
 	// TemplateKey = "template-key"
 	PageKey  = "page-key"
@@ -47,18 +47,18 @@ type LifeCircleControl struct {
 	R *http.Request
 
 	// target
-	Proton  core.IProton  // IPage or IComponent value
-	V       reflect.Value // Value of page
-	Name    string        // page name or component name
-	Path    string        // ???
-	Kind    string        // enum: page|component
-	PageUrl string        // matched page url, Activate parameter part
+	Proton    core.IProton  // IPage or IComponent value
+	V         reflect.Value // Value of page
+	Name      string        // page name or component name
+	Path      string        // ???
+	Kind      string        // enum: page|component
+	PageUrl   string        // matched page url, Activate parameter part
+	EventName string        // an event call on page, not page render
 
 	// result type:[template|redirect]
 	ResultType string // got.Return_xxx
 	String     string // component html
 	Err        error  // error if something error
-
 }
 
 /* ______________________________
@@ -118,9 +118,13 @@ func NewComponentFlow(
 /* ______________________________
    Flow
 */
-
 func (lcc *LifeCircleControl) SetPageUrl(pageUrl string) *LifeCircleControl {
 	lcc.PageUrl = pageUrl
+	return lcc
+}
+
+func (lcc *LifeCircleControl) SetEventName(event string) *LifeCircleControl {
+	lcc.EventName = event
 	return lcc
 }
 
@@ -135,6 +139,7 @@ var flowEvents = []string{
 	"AfterRender",
 }
 
+// normal page flow
 func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	lcc.InjectValue()
 
@@ -181,19 +186,29 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	return lcc // for chain
 }
 
+// event call page flow
+// TODO support component event call
+func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
+	lcc.InjectValue()
+	if lcc.Kind == "page" {
+		// Life Circle: Activate (TODO extract function)
+		// if ret := lcc.CallEventWithURLParameters("Activate"); ret {
+		if ret := lcc.CallEvent("Activate"); ret {
+			return lcc
+		}
+	}
+
+	// call event. TODO add parameters.
+	fmt.Println("\n\n\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+	fmt.Println("Call event %v with parameters.", event)
+	if ret := lcc.CallEventWithURLParameters("On" + event); ret {
+		return lcc
+	}
+	return lcc // for chain
+}
+
 // Call Events, and other events.
 func (lcc *LifeCircleControl) CallEvent(name string) bool {
-	// fmt.Println(name)
-	// if name == "AfterRender" && false{
-	// 	// debug
-	// 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	// 	fmt.Println("DEBUG:")
-
-	// 	cache.StructCache.ParseFromRoot(lcc.V, "Order.Details.Id")
-
-	// 	// END debug
-	// }
-	//reflect.TypeOf(method).NumIn
 	method := lcc.V.MethodByName(name)
 	if method.IsValid() {
 		debuglog("-730- [flow] Call Event: %v::%v().", lcc.Name, name)
@@ -216,7 +231,15 @@ func (lcc *LifeCircleControl) CallEventWithURLParameters(name string) bool {
 		panic(fmt.Sprintf("%v should has prefix %v", url, lcc.PageUrl))
 	}
 
+	// parepare parameters, TODO extract method.
 	paramsString := url[len(lcc.PageUrl)+1:]
+	if lcc.EventName != "" {
+		index := strings.Index(paramsString, "/")
+		if index > 0 {
+			paramsString = paramsString[index+1:]
+		}
+	}
+
 	fmt.Printf("-0- params is %v\n", paramsString)
 	strParams := strings.Split(paramsString, "/")
 	for _, strParam := range strParams {

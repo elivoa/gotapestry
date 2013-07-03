@@ -55,9 +55,10 @@ func (p *PersonList) Setup() interface{} {
 	// return "template", "person-list"
 }
 
-// TODO
-func (p *PersonList) Ondelete() {
-
+func (p *PersonList) Ondelete(personId int, personType string) (string, string) {
+	dal.DeletePerson(personId)
+	// TODO make this default redirect.
+	return "redirect", fmt.Sprintf("/person/list/%v", personType)
 }
 
 /* ________________________________________________________________________________
