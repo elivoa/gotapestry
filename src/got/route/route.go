@@ -145,7 +145,8 @@ func PageHandler(basePage core.IPage) func(http.ResponseWriter, *http.Request) {
 
 // helper
 func printAccessHeader(r *http.Request) {
-	log.Printf("\n____________________________________________________________________________________")
+	fmt.Println()
+	log.Printf("____________________________________________________________________________________")
 	log.Printf(">>> access %v\n", r.URL.Path)
 	// log.Printf("> w is %v\n", reflect.TypeOf(w))
 	// log.Printf("> w is %v\n", reflect.TypeOf(req))

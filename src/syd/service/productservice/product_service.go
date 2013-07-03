@@ -1,6 +1,7 @@
 package productservice
 
 import (
+	"strings"
 	"syd/dal"
 	"syd/model"
 )
@@ -36,6 +37,18 @@ func UpdateProduct(product *model.Product) {
 	if product.Sizes != nil {
 		dal.UpdateProductProperties(product.Id, "size", product.Sizes...)
 	}
+
+	// update stock information
+	if product.Stocks != nil {
+		dal.ClearProductStock(product.Id) // clear
+		for key, stock := range product.Stocks {
+			ps := strings.Split(key, "__")
+			if len(ps) != 2 {
+				panic("Key format not correct!" + key)
+			}
+			dal.SetProductStock(product.Id, ps[0], ps[1], stock)
+		}
+	}
 }
 
 //
@@ -47,6 +60,7 @@ func GetProduct(id int) *model.Product {
 	if product != nil {
 		product.Colors = dal.GetProductProperties(id, "color")
 		product.Sizes = dal.GetProductProperties(id, "size")
+		product.Stocks = *dal.ListProductStocks(id)
 	}
 	return product
 }

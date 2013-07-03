@@ -1,6 +1,7 @@
 package product
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
@@ -8,7 +9,6 @@ import (
 	"got/register"
 	"got/route"
 	"gxl"
-	"log"
 	"net/http"
 	"strconv"
 	"syd/dal"
@@ -47,6 +47,10 @@ type ProductEdit struct {
 	// property
 	Id      *gxl.Int       `path-param:"1"`
 	Product *model.Product `` // Product Model
+	Stocks  []int          // receive stock numbers, transfer to product later.
+
+	// display
+	StockJson string
 }
 
 // init this page
@@ -55,11 +59,8 @@ func (p *ProductEdit) New() *ProductEdit {
 }
 
 func (p *ProductEdit) Setup() { // (string, string) {
-	log.Println("[building] Page.SetupRender()")
-	log.Println("[product] enter create/edit product")
-
+	// page values
 	p.Title = "create product post"
-
 	if p.Id != nil {
 		p.Product = productservice.GetProduct(p.Id.Int)
 		p.SubTitle = "编辑"
@@ -67,10 +68,35 @@ func (p *ProductEdit) Setup() { // (string, string) {
 		p.Product = model.NewProduct()
 		p.SubTitle = "新建"
 	}
-	//return "template", "product-edit"
+
+	// stock json
+	if p.Product.Stocks != nil {
+		jsonbytes, err := json.Marshal(p.Product.Stocks)
+		if err != nil {
+		}
+		p.StockJson = string(jsonbytes)
+		// p.StockJson = p.StockJson[1 : len(p.StockJson)-1]
+	}
 }
 
 func (p *ProductEdit) OnSuccessFromProductForm() (string, string) {
+	// clear values
+	p.Product.ClearValues()
+
+	// transfer stocks value to product.Stocks
+	if p.Stocks != nil {
+		p.Product.Stocks = map[string]int{}
+		i := 0
+		for _, color := range p.Product.Colors {
+			for _, size := range p.Product.Sizes {
+				key := fmt.Sprintf("%v__%v", color, size)
+				p.Product.Stocks[key] = p.Stocks[i]
+				i = i + 1
+			}
+		}
+	}
+
+	// write to db
 	if p.Id != nil {
 		productservice.UpdateProduct(p.Product)
 	} else {

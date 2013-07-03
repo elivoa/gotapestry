@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
+	"got/debug"
 )
 
 /* Set customer private price */
@@ -76,7 +77,7 @@ func GetProductProperties(propertyId int, propertiesName string) (values []strin
 	defer db.CloseConn(conn)
 
 	stmt, err := conn.Prepare("select value from product_property where " +
-		"product_id=? and property_name=?")
+		"product_id=? and property_name=? order by id asc")
 	defer db.CloseStmt(stmt)
 	if db.Err(err) {
 		return
@@ -85,7 +86,7 @@ func GetProductProperties(propertyId int, propertiesName string) (values []strin
 	rows, err := stmt.Query(propertyId, propertiesName)
 	defer db.CloseRows(rows)
 	if db.Err(err) {
-		return
+		return nil
 	}
 
 	// big performance issue, maybe.
@@ -115,4 +116,107 @@ func UpdateProductProperties(productId int, propertyName string, values ...strin
 			AddProductProperty(productId, propertyName, value)
 		}
 	}
+}
+
+// ________________________________________________________________________________
+// product color-size special values.
+//
+// NOTE: 1. only stock used. price is not used here.
+//
+
+/* Set special value of product color*size: stock and unit prices. */
+func SetProductStock(productId int, color string, size string, stock int) {
+	setProductCSValue(productId, color, size, "stock", stock, 0)
+}
+
+func SetProductPrice(productId int, color string, size string, price float64) {
+	setProductCSValue(productId, color, size, "price", 0, price)
+}
+
+//   _________________
+func setProductCSValue(productId int, color string, size string,
+	field string, stock int, price float64) {
+
+	db.Connect()
+	defer db.Close()
+
+	_sql := fmt.Sprintf("insert into product_cs_value (product_id, color, size, %v) values (?,?,?,?) on duplicate key update %v = ?", field, field)
+
+	stmt, err := db.DB.Prepare(_sql)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	if field == "stock" {
+		_, err := stmt.Exec(productId, color, size, stock, stock)
+		if err != nil {
+			debug.Error(err)
+		}
+	} else if field == "price" {
+		_, err := stmt.Exec(productId, color, size, price, stock)
+		if err != nil {
+			debug.Error(err)
+		}
+	}
+
+}
+
+func ClearProductStock(productId int) error {
+	conn, _ := db.Connect()
+	defer conn.Close()
+
+	stmt, err := db.DB.Prepare("delete from product_cs_value where product_id = ?")
+	defer stmt.Close()
+	if db.Err(err) {
+		return err
+	}
+
+	_, err = stmt.Exec(productId)
+	if db.Err(err) {
+		return err
+	}
+	return nil
+}
+
+/*_______________________________________________________________________________
+  List Product Stocks
+*/
+func ListProductStocks(productId int) *map[string]int {
+	var err error
+	db.Connect()
+	defer db.Close()
+
+	// 1. query
+	var queryString = "select color,size,stock from `product_cs_value` where product_id = ?"
+
+	// 2. prepare
+	stmt, err := db.DB.Prepare(queryString)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	// 3. query
+	rows, err := stmt.Query(productId)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// 4. process results.
+	// big performance issue, maybe. who knows.
+	var (
+		color  string
+		size   string
+		stock  int
+		stocks = map[string]int{}
+	)
+
+	for rows.Next() {
+		rows.Scan(&color, &size, &stock)
+		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
+	}
+	// fmt.Println(stocks)
+	return &stocks
 }

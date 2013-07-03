@@ -23,6 +23,7 @@
       };
       this.onInit;
       this.onRemove;
+      this.afterRemove;
       this.onRemoveLastLine = this.defaultRemoveLastLine;
       this.onNewline;
       this.registerEvent();
@@ -30,7 +31,6 @@
 
     EditableTable.prototype.registerEvent = function() {
       var _;
-      console.log("register object id is: " + this.id);
       _ = this;
       $("#" + this.id + " " + this.config.mtAddButton).on("click", $.proxy(this.addline, this));
       return $("#" + this.id).on("click", this.config.mtRemoveButton, $.proxy(this.removeline, this));
@@ -58,18 +58,27 @@
     };
 
     EditableTable.prototype.removeline = function(e) {
-      var line;
+      var line, nItems, shouldRemove;
       e.preventDefault();
       line = $(e.target).parents(this.config.mtLine);
-      if ($("#" + this.id + " " + this.config.mtLine).length > 1) {
+      nItems = $("#" + this.id + " " + this.config.mtLine).length;
+      if (this.onRemove) {
+        this.onRemove(line);
+      }
+      shouldRemove = true;
+      if (nItems === 1) {
+        if (this.onRemoveLastLine) {
+          shouldRemove = this.onRemoveLastLine(line);
+        }
+      }
+      if (shouldRemove === true) {
         if (this.onRemove) {
           this.onRemove(line);
         }
-        return line.detach();
-      } else {
-        if (this.onRemoveLastLine) {
-          return this.onRemoveLastLine(line);
-        }
+        line.detach();
+      }
+      if (this.afterRemove) {
+        return this.afterRemove(line);
       }
     };
 

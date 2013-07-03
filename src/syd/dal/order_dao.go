@@ -293,7 +293,7 @@ func ListOrderByCustomer(personId int, status string) *[]model.Order {
 	db.Connect()
 	defer db.Close()
 
-	// 1. query
+	// 1. query` 
 	var queryString string
 	if strings.ToLower(status) == "all" {
 		queryString = "select * from `order` where customer_id = ?"

@@ -19,16 +19,23 @@ class EditableTable
       mtInsertDirection: "above" # [above|after]
     }
 
-    # callbacks
+    ## callbacks
     @onInit
+
+    # Call on each line remove
     @onRemove
+    @afterRemove
+
+    # Before remove last line; return true to remove last line
     @onRemoveLastLine = @defaultRemoveLastLine
-    @onNewline # can clear some values, default clear all input's value
+
+    # can clear some values, default clear all input's value
+    @onNewline
 
     @registerEvent()
 
   registerEvent: ->
-    console.log "register object id is: #{@id}"
+    # console.log "register object id is: #{@id}"
     _=@
 
     $("##{@id} #{@config.mtAddButton}").on "click", $.proxy @addline,@
@@ -57,11 +64,18 @@ class EditableTable
   removeline: (e)->
     e.preventDefault()
     line = $(e.target).parents(@config.mtLine)
-    if $("##{@id} #{@config.mtLine}").length > 1
+    nItems = $("##{@id} #{@config.mtLine}").length
+
+    # call events
+    @onRemove(line) if @onRemove
+    shouldRemove = true # always remove, if event returns true
+    if nItems == 1
+      # callback events
+      shouldRemove = @onRemoveLastLine(line) if @onRemoveLastLine
+    if shouldRemove == true
       @onRemove(line) if @onRemove #callback
       line.detach()
-    else
-      @onRemoveLastLine(line) if @onRemoveLastLine #callback
+    @afterRemove(line) if @afterRemove
 
   # Default Events
   defaultRemoveLastLine: (line)->

@@ -7,25 +7,180 @@
 
 
 (function() {
-  var ProductEdit;
+  var ProductColorSizeTableGenerator, ProductEdit;
 
   ProductEdit = (function() {
 
-    function ProductEdit() {
+    function ProductEdit(stockcache) {
+      this.colorId = "color-area";
+      this.sizeId = "size-area";
+      this.csqTableId = "cs-container";
+      if (stockcache !== void 0) {
+        this.stockcache = JSON && JSON.parse(stockcache) || $.parseJSON(stockcache);
+      } else {
+        this.stockcache = {};
+      }
       this.init();
     }
 
     ProductEdit.prototype.init = function() {
       var colorMT, sizeMT;
-      console.log("init ProductEdit page!!!");
-      colorMT = new EditableTable("color-area");
-      colorMT.onRemoveLastLine = function() {
-        return alert("至少需要保留一个颜色！");
+      colorMT = new EditableTable(this.colorId);
+      colorMT.onRemoveLastLine = function(line) {
+        return $(line).find("input").each(function(idx, obj) {
+          $(obj).attr("value", "");
+          return $(obj).val("");
+        });
       };
-      sizeMT = new EditableTable("size-area");
-      return sizeMT.onRemoveLastLine = function() {
-        return alert("至少需要保留一个尺码！");
+      colorMT.afterRemove = $.proxy(this.onCSQTableRefresh, this);
+      sizeMT = new EditableTable(this.sizeId);
+      sizeMT.onRemoveLastLine = function() {
+        return $(line).find("input").each(function(idx, obj) {
+          $(obj).attr("value", "");
+          return $(obj).val("");
+        });
       };
+      sizeMT.afterRemove = $.proxy(this.onCSQTableRefresh, this);
+      $('body').on("blur", ".csq-trigger", $.proxy(this.onCSQTableRefresh, this));
+      return this.firstTimeDrawCSQTable();
+    };
+
+    ProductEdit.prototype.firstTimeDrawCSQTable = function() {
+      var pcstg, _ref;
+      _ref = this.readColorSizes(), this.colors = _ref[0], this.sizes = _ref[1];
+      pcstg = new ProductColorSizeTableGenerator(this.colors, this.sizes);
+      pcstg.replace(this.csqTableId);
+      console.log(this.stockcache);
+      return this.fillProductQuantity();
+    };
+
+    ProductEdit.prototype.onCSQTableRefresh = function() {
+      var pcstg, _ref, _ref1;
+      _ref = this.readColorSizes(), this.colors = _ref[0], this.sizes = _ref[1];
+      this.cacheStock();
+      pcstg = new ProductColorSizeTableGenerator(this.colors, this.sizes);
+      pcstg.replace(this.csqTableId);
+      _ref1 = this.readColorSizes(), this.colors = _ref1[0], this.sizes = _ref1[1];
+      return this.fillProductQuantity();
+    };
+
+    ProductEdit.prototype.readColorSizes = function() {
+      var colors, sizes;
+      colors = [];
+      sizes = [];
+      $("#" + this.colorId + " .mt-line .csq-trigger").each(function(idx, obj) {
+        var v;
+        v = obj.value.replace(/^\s+|\s+$/g, "");
+        if (v !== "") {
+          return colors.push(v);
+        }
+      });
+      $("#" + this.sizeId + " .mt-line .csq-trigger").each(function(idx, obj) {
+        var v;
+        v = obj.value.replace(/^\s+|\s+$/g, "");
+        if (v !== "") {
+          return sizes.push(v);
+        }
+      });
+      return [colors, sizes];
+    };
+
+    ProductEdit.prototype.cacheStock = function() {
+      var color, key, o, size, _i, _len, _ref, _results;
+      _ref = this.colors;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        color = _ref[_i];
+        _results.push((function() {
+          var _j, _len1, _ref1, _results1;
+          _ref1 = this.sizes;
+          _results1 = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            size = _ref1[_j];
+            key = "" + color + "__" + size;
+            o = $("#" + this.csqTableId + " #csq_" + key);
+            if (o !== void 0) {
+              _results1.push(this.stockcache[key] = o.val());
+            } else {
+              _results1.push(void 0);
+            }
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
+    };
+
+    ProductEdit.prototype.fillProductQuantity = function() {
+      var k, o, v, _ref, _results;
+      _ref = this.stockcache;
+      _results = [];
+      for (k in _ref) {
+        v = _ref[k];
+        o = $("#" + this.csqTableId + " #csq_" + k);
+        if (o !== void 0) {
+          _results.push(o.val(v));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    ProductEdit.prototype.cacheStock___backup = function() {
+      var color, i, size, stocks, _i, _len, _ref, _results;
+      stocks = [];
+      $("#" + this.csqTableId + " .stock").each(function(idx, obj) {
+        return stocks.push(obj.value);
+      });
+      i = 0;
+      _ref = this.colors;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        color = _ref[_i];
+        _results.push((function() {
+          var _j, _len1, _ref1, _results1;
+          _ref1 = this.sizes;
+          _results1 = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            size = _ref1[_j];
+            _results1.push(this.stockcache["" + color + "__" + size] = stocks[i++]);
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
+    };
+
+    ProductEdit.prototype.fillProductQuantity_backup_badversion = function() {
+      var color, i, size, stockInputs, value, _i, _len, _ref, _results;
+      stockInputs = $("#" + this.csqTableId + " .stock");
+      console.log("--------------------------------------------------------------------------------");
+      console.log(stockInputs);
+      console.log(">>> ", this.stockcache);
+      i = 0;
+      _ref = this.colors;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        color = _ref[_i];
+        _results.push((function() {
+          var _j, _len1, _ref1, _results1;
+          _ref1 = this.sizes;
+          _results1 = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            size = _ref1[_j];
+            console.log(">>> Set " + i + "'th " + this.stockcache["" + color + "__" + size]);
+            value = this.stockcache["" + color + "__" + size];
+            if (value === void 0) {
+              _results1.push(stockInputs[i++].value = "");
+            } else {
+              _results1.push(stockInputs[i++].value = value);
+            }
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
     };
 
     return ProductEdit;
@@ -33,7 +188,64 @@
   })();
 
   $(function() {
-    return window['ProductEdit'] = new ProductEdit;
+    return window['ProductEdit'] = ProductEdit;
   });
+
+  ProductColorSizeTableGenerator = (function() {
+
+    function ProductColorSizeTableGenerator(colors, sizes) {
+      if (colors.length === 0) {
+        this.colors = ["默认颜色"];
+      } else {
+        this.colors = colors;
+      }
+      if (sizes.length === 0) {
+        this.sizes = ["均码"];
+      } else {
+        this.sizes = sizes;
+      }
+      this.generateHtml();
+    }
+
+    ProductColorSizeTableGenerator.prototype.generateHtml = function() {
+      var color, htmls, nColors, nSizes, size, _i, _j, _len, _len1, _ref, _ref1;
+      htmls = [];
+      htmls.push("<!-- Generated Table, input quantity here -->");
+      htmls.push("<table class=\"prd_tbl\">");
+      htmls.push(" <tr>");
+      htmls.push("  <th align=\"left\">颜色</th>");
+      htmls.push("  <th align=\"left\">尺码</th>");
+      htmls.push("  <th align=\"left\">数量</th>");
+      htmls.push(" </tr>");
+      nColors = this.colors.length;
+      nSizes = this.sizes.length;
+      _ref = this.colors;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        color = _ref[_i];
+        htmls.push(" <tr>");
+        htmls.push("  <td rowspan=\"" + nSizes + "\">" + color + "</td>");
+        htmls.push("  <td>" + this.sizes[0] + "</td>");
+        htmls.push("  <td><input type=\"text\" name=\"Stocks\" id=\"csq_" + color + "__" + this.sizes[0] + "\" class=\"stock\" size=\"8\" value=\"\"></td>");
+        htmls.push(" </tr>");
+        _ref1 = this.sizes.slice(1, this.sizes.length);
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          size = _ref1[_j];
+          htmls.push(" <tr>");
+          htmls.push("  <td>" + size + "</td>");
+          htmls.push("  <td><input type=\"text\" name=\"Stocks\" id=\"csq_" + color + "__" + size + "\" class=\"stock\" size=\"8\" value=\"\"></td>");
+          htmls.push(" </tr>");
+        }
+      }
+      htmls.push("</table>");
+      return this.html = htmls.join("\n");
+    };
+
+    ProductColorSizeTableGenerator.prototype.replace = function(divId) {
+      return $("#" + divId).html(this.html);
+    };
+
+    return ProductColorSizeTableGenerator;
+
+  })();
 
 }).call(this);

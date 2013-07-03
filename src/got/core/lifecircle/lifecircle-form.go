@@ -1,3 +1,10 @@
+/*
+Lifecircle-form
+
+Inject values when submit.
+
+*/
+
 package lifecircle
 
 import (
@@ -19,33 +26,78 @@ var c = cache.StructCache
   TODO:
     . Support parse repeated values.
     . Support File upload
+
+  BUG:
 */
 func (lcc *LifeCircleControl) InjectFormValues() {
 
+	// debug print
 	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
 		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.R.Form)
 	}
 
-	// 为了迎合gorilla/schema的奇葩要求，这里需要转换FormData
+	// 为了迎合gorilla/schema的奇葩要求，这里需要转换格式为：FormData
 	// version 1: for form.keys for path.segments.
 	// TODO version 2: l2cache
 
-	data := map[string][]string{}
-
+	// 1) Precondition
 	v := lcc.V
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		lcc.Err = errors.New("got/lifecircle: interface must be a pointer to struct")
 		return
 	}
-	// -----------------------------------------------------------------------
-	// parse array in form
-	for path, formValue := range lcc.R.Form {
-		fmt.Printf("  ~~ processing key:path:%v v.type: %v\n", path, v.Type())
 
-		// is need translate
-		fmt.Printf("++++ lcc:%v\n", lcc)
-		template, needTranslate := isNeedTranslate(path, v.Type())
-		if needTranslate {
+	// ---------------------------------
+	// 2) Parse array in form
+	data := map[string][]string{} // stores transfered FormData
+
+	for path, formValue := range lcc.R.Form {
+
+		// ------------------------------------------------------------
+		// Get something from cache.
+		// is path in name Attribute need translate to "x.y.1.z" format
+		var (
+			leafType reflect.Type
+			template string
+			ok       bool
+		)
+		ti := tcache.getTranslateInfo(v.Type())
+		ti.l.Lock()
+		template, ok = ti.templates[path]
+		ti.l.Unlock()
+		if !ok {
+			template, leafType = ti.Create(path, v.Type())
+		} else {
+			leafType = ti.types[path]
+		}
+		// ---- END ----
+
+		{ // DEBUG PRINT
+			var k string
+			if leafType == nil {
+				k = "nil"
+			} else {
+				k = leafType.Kind().String()
+			}
+			fmt.Printf(" ~~ processing key-path [%-20v],"+
+				" leafKind:[%v], template:[%-20v] v.type: %v\n",
+				path, k, template, v.Type(),
+			)
+		} // ---- END DEBUG ----
+
+		// issue #4 in github.com/gorilla/schema
+		// this is just a fix. filter out all empty string.
+		if leafType != nil && leafType.Kind() == reflect.Slice {
+			switch leafType.Elem().Kind() {
+			case reflect.Int, reflect.Float32, reflect.Float64, reflect.Int64:
+				formValue = _killEmpty(formValue, "0")
+			case reflect.String:
+				formValue = _killEmpty(formValue, " ")
+			}
+		}
+
+		if template == "" {
+			// no need to translate, copy the value
 			data[path] = formValue
 		} else {
 			for idx, value := range formValue {
@@ -55,154 +107,171 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 		}
 	}
 
+	// debug print
 	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
 		debug.PrintFormMap("~ 2 ~ gorilla/schema Data", data)
 	}
 
-	// decode
+	// 3) decode
 	utils.SchemaDecoder.Decode(lcc.Proton, data)
 
+	// debug print
 	if debug.FLAG_print_form_submit_details {
 		fmt.Printf("++++++++++ lcc.Proton = %v=n", lcc.Proton)
-		fmt.Println("\n+END FORM SUBMIT LOG+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+		fmt.Println("\n+END FORM SUBMIT LOG+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
+			"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 	}
 }
 
-// --------------------------------------------------------------------------------
+func _killEmpty(slices []string, emptyTo string) []string {
+	nvalue := make([]string, len(slices))
+	// empty value to 0
+	for idx, value := range slices {
+		if strings.Trim(value, " ") == "" {
+			nvalue[idx] = emptyTo
+		} else {
+			nvalue[idx] = value
+		}
+	}
+	return nvalue
+}
 
+func translateRequestFromIntoGorillaForm(
+	requestForm map[string][]string) *map[string][]string {
+	return nil
+}
+
+// ________________________________________________________________________________
+// The Cache part. L2Cache (L1Cache is got/cache)
+//
 var tcache = NewTranslateCache()
-
-// top cache of value path
-type translateCache struct {
-	l sync.Mutex
-	m map[reflect.Type]*translateInfo
-}
-
-// m: map[path]template - template='' means noneed to translate
-type translateInfo struct {
-	l sync.Mutex
-	m map[string]string
-}
 
 func NewTranslateCache() *translateCache {
 	return &translateCache{m: make(map[reflect.Type]*translateInfo)}
 }
 
-func (c *translateCache) GetOrInitInfo(t reflect.Type) *translateInfo {
+//
+// Top Translate Cache stores which type should translate.
+//
+type translateCache struct {
+	l sync.Mutex
+	m map[reflect.Type]*translateInfo
+}
+
+// translateInfo stores the [translate-path] of a [path].
+// template-path = '' means no need to translate
+type translateInfo struct {
+	l         sync.Mutex
+	templates map[string]string       // path -> template
+	types     map[string]reflect.Type // path -> last node type
+}
+
+// get translateInfo from cache, if nil, create an empty one.
+func (c *translateCache) getTranslateInfo(t reflect.Type) *translateInfo {
 	c.l.Lock()
 	ti := c.m[t]
 	if ti == nil {
-		ti = &translateInfo{m: make(map[string]string)}
+		// init new translateInfo
+		ti = &translateInfo{
+			templates: make(map[string]string),
+			types:     make(map[string]reflect.Type),
+		}
 		c.m[t] = ti
 	}
 	c.l.Unlock()
 	return ti
 }
 
-// create info, cache, and return tempate.
-// TODO: for now, only support 1 slice objects in it.
-func (i *translateInfo) Create(path string, t reflect.Type) string {
-	var typo = t
-
+/*
+  Create template and last-node-type for `path` in translateInfo.
+  cache them then return.
+  Param:
+    path - select path;
+    t - root type
+  Return
+  TODO:
+    for now, only support 1 slice objects in it.
+*/
+func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Type) {
+	var parentType = t
 	pieces := strings.Split(path, ".")
 	segs := make([]string, 0)
 	hasSlice := false
+
+	// debug print
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Printf("++ CREATE TRANSLATE_INFO: PATH:%v on Type:%v --> %v\n", path, t, pieces)
-	for _, p := range pieces {
-		// adjust typo to the write struct type.
-		allow, isSlice := false, false
 
-		fmt.Println("++++++++  ------------------------------------------  +++++++++++++++++")
-		fmt.Printf("++++ DDDDDDDDDDDDDD: path:%-6v piece:%-10v  TYPO:%v\n", path, p, typo)
-		fmt.Printf("++++ DDDDDDDDDDDDDD: typo.Kind() = %v\n", typo.Kind())
-		// if typo.Kind() == reflect.Ptr {
-		// 	fmt.Println("typo is ptr")
+	// last node's type, if slice, it's slice's element type.
+	// NOTE:!! for now only return slice element's type.
+	var leafType reflect.Type
+
+	// 1. start loop in path
+	for idx, p := range pieces {
+
+		// debug print
+		// {
+		// 	if p == "Stocks" {
+		// 		fmt.Println("++++++++  ------------------------------------------  ++++++++")
+		// 		fmt.Printf("++++ DDDDDDDDDDDDDD: path:%-6v piece:%-10v  parentType:%v\n",
+		// 			path, p, parentType)
+		// 		fmt.Printf("++++ DDDDDDDDDDDDDD: typo.Kind() = %v\n", parentType.Kind())
+		// 		fmt.Println("....................................................")
+		// 	}
 		// }
 
-		switch typo.Kind() {
-		case reflect.Ptr:
-			elem := typo.Elem()
-			switch elem.Kind() {
-			case reflect.Struct:
-				allow = true
-			case reflect.Slice:
-				isSlice = true
-			default:
-				allow = false
-			}
-			typo = typo.Elem() // remove pointer
-		case reflect.Struct:
-			allow = true
-		case reflect.Slice:
-			isSlice = true
-		default:
-			allow = false
-		}
-
-		if isSlice {
-			allow = true
-			typo = typo.Elem()        // remove slice pointer
-			segs = append(segs, "%d") // append number place-holder
-
-			// set global flag
-			if hasSlice { // forbbid 2 slice in one path.
-				panic("lifecircle: Don't allow 2 level slice elements. " + path)
-			}
-			hasSlice = true
-		}
-
-		// get StructInfo if is struct value
-		// set next round type to fields' type. nil if not go on.
-		var structInfo *cache.StructInfo = nil
-		if allow {
-			structInfo = c.GetnCache(typo)
-			fieldInfo, ok := structInfo.Fields[p]
-			if !ok { // no such field, stop.
-				typo = nil
-			} else {
-				typo = fieldInfo.Type
-			}
-		} else {
-			typo = nil
-		}
-
-		// append the 1
+		// 3. append path segments to template.
+		//   ** root can't be slice type
 		segs = append(segs, p)
+
+		// 1. get StructInfo from cache.
+		structInfo := c.GetnCache(parentType)
+		if nil == structInfo {
+			panic("struct info is null for " + parentType.String())
+		}
+
+		fieldInfo, ok := structInfo.Fields[p]
+		if ok && fieldInfo != nil {
+			leafType = fieldInfo.Type
+			if fieldInfo.IsSlice {
+				// if leafe node && is slice, stop here.
+				if idx == len(pieces)-1 {
+					break
+				}
+				hasSlice = true
+				segs = append(segs, "%d") // append number place-holder
+			} else if fieldInfo.Type.Kind() == reflect.Struct {
+				// continue
+			} else {
+				// stop here
+			}
+		}
+
+		//
+		if ok && fieldInfo != nil {
+			parentType = fieldInfo.Type
+		} else {
+			// no such field, stop.
+			parentType = nil
+			// fmt.Printf("++++ FieldInfo for path-segment[%v] is nil, !!so break here!!\n", p)
+			break
+		}
 	}
 
+	// construct template
 	var template string = ""
 	if hasSlice {
 		template = strings.Join(segs, ".")
 	}
 
+	// set to TranslateInfo
 	i.l.Lock()
-	i.m[path] = template
+	i.templates[path] = template
+	i.types[path] = leafType
 	i.l.Unlock()
 
-	//	fmt.Printf(" *********** create template for %v is: %v\n", path, template)
-	return template
-}
+	fmt.Printf("**** Create template for %v is: %v\n", path, template)
+	fmt.Printf("**** Final type is: %v\n\n", leafType)
+	return template, leafType
 
-// v.Kind() must be struct
-// return template, isNeedTranslate?
-func isNeedTranslate(path string, t reflect.Type) (string, bool) {
-	ti := tcache.GetOrInitInfo(t)
-
-	var (
-		template string
-		ok       bool
-	)
-	ti.l.Lock()
-	template, ok = ti.m[path]
-	ti.l.Unlock()
-	if !ok {
-		template = ti.Create(path, t)
-	}
-	return template, template == ""
-}
-
-func translateRequestFromIntoGorillaForm(
-	requestForm map[string][]string) *map[string][]string {
-	return nil
 }
