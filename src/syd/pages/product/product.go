@@ -117,6 +117,19 @@ func (p *ProductList) Setup() {
 	p.Products = dal.ListProduct()
 }
 
+// display: total stocks
+func (p *ProductList) NStock(productId int) (sum int) {
+	stockmap := dal.ListProductStocks(productId)
+	if stockmap != nil {
+		for _, stock := range *stockmap {
+			if stock > 0 {
+				sum += stock
+			}
+		}
+	}
+	return
+}
+
 // NOTE: event name is case sensitive. Kill this when add cache.
 func (p *ProductList) Ondelete(productId int) (string, string) {
 	debug.Log("Delete Product %d", productId)

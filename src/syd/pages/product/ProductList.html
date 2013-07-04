@@ -32,7 +32,7 @@
             <tr>
               <td><a href="#">{{.Name}}</a></td>
               <td align="right" class="price">{{formatcurrency .Price}}</td>
-              <td align="right">{{.Stock}}</td>
+              <td align="right">{{$.NStock .Id}}</td>
               <td>{{formattime .CreateTime "2006-01-02"}}</td>
               <td class="f12">
                 <a href="#">入库</a> <span class="vline">|</span>
