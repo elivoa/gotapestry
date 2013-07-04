@@ -66,12 +66,15 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	}
 
 	// stock json
-	if p.Product.Stocks != nil {
+	if p.Product.Stocks != nil && len(p.Product.Stocks) > 0 {
 		jsonbytes, err := json.Marshal(p.Product.Stocks)
 		if err != nil {
+			p.StockJson = "{}"
 		}
 		p.StockJson = string(jsonbytes)
 		// p.StockJson = p.StockJson[1 : len(p.StockJson)-1]
+	} else {
+		p.StockJson = "{}"
 	}
 }
 
