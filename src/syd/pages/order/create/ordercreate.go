@@ -17,13 +17,10 @@ import (
    Register all pages under /order
 */
 func init() {
-	register.Page(Register, &OrderList{}, &OrderIndex{}, &OrderEdit{})
+	register.Page(Register)
 }
 func Register() {}
 
-// ________________________________________________________________________________
-// Start Order pages
-//
 // ____ Order Index _______________________________________________________________
 type OrderIndex struct {
 	core.Page           `PageRedirect:"/order/list"`

@@ -1,6 +1,9 @@
-package got
+package config
 
-import ()
+import (
+	"path"
+	"runtime"
+)
 
 // ________________________________________________________________________________
 // System configs
@@ -13,21 +16,27 @@ var Config = NewConfigure()
 
 type Configure struct {
 	Version           string   `Framewrok Version`
+	BasePath          string   // /path/to/home
+	SrcPath           string   // /path/to/home/src
+	StaticPath        string   // /path/to/home/static
 	BasePackages      []string `Packages taht contains Pages and Components etc`
 	PagePackages      []string `no use`
 	ComponentPackages []string `...`
 }
 
 func NewConfigure() Configure {
-	return Configure{
-		Version:      "Alpha 2",
-		BasePackages: []string{"happystroking"},
+	// 1. get base path
+	_, file, _, ok := runtime.Caller(1)
+	if !ok {
+		panic("Can't get current path!")
 	}
-}
+	basePath := path.Join(path.Dir(file), "../../..")
 
-// ________________________________________________________________________________
-// Got start configs
-
-type GotConfig struct {
-	StaticResources []string // e.g.: ["/static/", "../"]
+	return Configure{
+		Version:      "Alpha 3",
+		BasePackages: []string{"happystroking"},
+		BasePath:     basePath,
+		SrcPath:      path.Join(basePath, "src"),
+		StaticPath:   path.Join(basePath, "static"),
+	}
 }

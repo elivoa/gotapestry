@@ -2,17 +2,23 @@ package register
 
 import (
 	"fmt"
+	"got/config"
+	"path"
 )
 
 // ________________________________________________________________________________
 // Application Config
 var Apps *AppConfigs = &AppConfigs{}
 
-func RegisterApp(name string, displayName string, path string) {
+// Register App, including AppName, DisplayName, and relative path.
+// Param:
+//   path - path relative to Config.SrcPath
+//
+func RegisterApp(name string, displayName string, relativePath string) {
 	app := AppConfig{
 		Name:        name,
 		DisplayName: displayName,
-		FilePath:    path,
+		FilePath:    path.Join(config.Config.SrcPath, relativePath),
 	}
 	Apps.Add(&app)
 }

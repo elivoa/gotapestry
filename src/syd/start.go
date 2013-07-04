@@ -1,22 +1,24 @@
 package syd
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
-	"got"
-	"got/register"
-	"syd/pages/ajax"
-	"syd/pages/order"
-
 	// pages & components' import
 	index_pages "syd/pages"
 	api_pages "syd/pages/api"
 	person_pages "syd/pages/person"
 	product_pages "syd/pages/product"
 
+	pages_order "syd/pages/order"
+	pages_order_create "syd/pages/order/create"
+
 	syd_components "syd/components"
 	layout_components "syd/components/layout"
 	order_components "syd/components/order"
+
+	"fmt"
+	"github.com/gorilla/mux"
+	"got"
+	"got/register"
+	"syd/pages/ajax"
 )
 
 func Start() {
@@ -45,13 +47,17 @@ func sydModule(r *mux.Router) {
 	register.RegisterApp(
 		"syd",
 		"SYD Module",
-		"/Users/bogao/develop/gitme/gotapestry/src/syd", // TODO auto process this address
+		"syd",
 	)
 
 	index_pages.Register()
 	person_pages.Register()
 	product_pages.Register()
 	api_pages.Register()
+
+	pages_order.Register()
+	pages_order_create.Register()
+
 	syd_components.Register()
 	layout_components.Register()
 	order_components.Register()
@@ -61,7 +67,7 @@ func sydModule(r *mux.Router) {
 func simpleModule(r *mux.Router) {
 	// person.New().Mapping(r)
 	// product.New().Mapping(r)
-	order.New().Mapping(r)
+	// order.New().Mapping(r)
 	ajax.New().Mapping(r)
 }
 

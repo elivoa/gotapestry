@@ -16,14 +16,12 @@ import (
 	builtin_components "got/builtin/components"
 )
 
-import ()
-
 func GotBuiltinModule(r *mux.Router) {
 
 	register.RegisterApp(
 		"got/builtin",
 		"GOT Core Modules",
-		"/Users/bogao/develop/gitme/gotapestry/src/got/builtin",
+		"got/builtin",
 	)
 
 	// pages
