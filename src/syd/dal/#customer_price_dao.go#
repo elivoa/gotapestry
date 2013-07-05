@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
@@ -74,8 +75,23 @@ func getCustomerPrice(personId int, productId int, number int) *[]model.Customer
 	conn, _ := db.Connect()
 	defer conn.Close()
 
-	stmt, err := db.DB.Prepare("select * from customer_special_price " +
-		"where person_id = ? and product_id = ? order by create_time DESC limit ?")
+	stmt, err := conn.Prepare("select * from product where id = ?")
+	defer stmt.Close()
+	if db.Err(err) {
+		return nil, err
+	}
+
+	// ----------------------------
+	row := stmt.QueryRow(id)
+	p := new(model.Product)
+	err = row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.CreateTime, &p.UpdateTime)
+	if db.Err(err) {
+		return nil, err
+	}
+	return p, nil
+
+	// ---------------------------------
+	stmt, err := db.DB.Prepare
 	if err != nil {
 		panic(err.Error())
 	}
@@ -83,6 +99,10 @@ func getCustomerPrice(personId int, productId int, number int) *[]model.Customer
 
 	rows, err := stmt.Query(personId, productId, number)
 	defer db.CloseRows(rows)
+	if nil != err {
+		fmt.Println("********************************************************************************")
+		fmt.Println(err)
+	}
 	if db.Err(err) {
 		return nil
 	}

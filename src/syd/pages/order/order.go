@@ -129,7 +129,7 @@ func (p *OrderEdit) SetupRender() (interface{}, string) {
 }
 
 func (p *OrderEdit) ProductDisplayName(id int) string {
-	product := dal.GetProduct(id)
+	product, _ := dal.GetProduct(id)
 	if product != nil {
 		return product.Name
 	}

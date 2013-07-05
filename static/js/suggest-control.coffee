@@ -16,6 +16,7 @@
     reset value if canceled.
 
 ###
+
 class SuggestControl
   constructor: (param)->
     @param = param

@@ -103,8 +103,6 @@ func GetOrder(id int) (*model.Order, error) {
 	defer conn.Close()
 
 	stmt, err := db.DB.Prepare("select * from `order` where id = ?")
-
-	// stmt, err := db.DB.Prepare("select id, track_number, status, delivery_method, customer_id, total_price, total_count, price_cut, note, create_time, update_time, close_time from `order` where id = ?")
 	defer stmt.Close()
 	if db.Err(err) {
 		return nil, err
@@ -293,7 +291,7 @@ func ListOrderByCustomer(personId int, status string) *[]model.Order {
 	db.Connect()
 	defer db.Close()
 
-	// 1. query` 
+	// 1. query`
 	var queryString string
 	if strings.ToLower(status) == "all" {
 		queryString = "select * from `order` where customer_id = ?"

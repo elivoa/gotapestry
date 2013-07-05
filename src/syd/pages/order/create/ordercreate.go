@@ -2,164 +2,58 @@ package order
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"got/core"
 	"got/register"
-	"got/route"
-	"got/templates"
-	"gxl"
-	"strings"
-	"syd/dal"
 	"syd/model"
+	"syd/service/personservice"
 )
 
 /* ________________________________________________________________________________
    Register all pages under /order
 */
 func init() {
-	register.Page(Register)
+	register.Page(Register,
+		&OrderCreateIndex{},
+		&OrderCreateDetail{},
+	)
 }
 func Register() {}
 
-// ____ Order Index _______________________________________________________________
-type OrderIndex struct {
-	core.Page           `PageRedirect:"/order/list"`
-	__got_page_redirect int `PageRedirect:"/order/list"` //?
-}
-
-func (p *OrderIndex) SetupRender() (string, string) {
-	return "redirect", "/order/list"
-}
-
-/* ________________________________________________________________________________
-   Order List
-*/
-type OrderList struct {
+// ____ Order Create Index ___________________________________________________________
+// BUG: OrderCreate here can't fallback to /order/create
+//
+type OrderCreateIndex struct {
 	core.Page
-
-	Orders *[]model.Order
-	Tab    string `path-param:"1"`
-
-	// customerNames map[int]*model.Person // order-id -> customer names
+	CustomerId int `param:"."`
 }
 
-func (p *OrderList) Activate() {
-	if p.Tab == "" {
-		p.Tab = "all"
+func (p *OrderCreateIndex) Setup() {
+	// enter person create order.
+}
+
+func (p *OrderCreateIndex) OnSuccessFromCustomerForm() (string, string) {
+	if p.CustomerId > 0 {
+		url := fmt.Sprintf("/order/create/detail?customer=%v", p.CustomerId)
+		return "redirect", url
 	}
+	return "redirect", "thispage"
 }
 
-func (p *OrderList) SetupRender() {
-	p.Orders = dal.ListOrder(p.Tab)
-}
-
-func (p *OrderList) TabCurrentStyle(tab string) string {
-	if strings.ToLower(p.Tab) == strings.ToLower(tab) {
-		return "cur"
-	}
-	return ""
-}
-
-/* ________________________________________________________________________________
-   Order Detail
-*/
-type OrderDetail struct {
+// ____ Order Create Details _______________________________________________________________
+//
+type OrderCreateDetail struct {
 	core.Page
+	CustomerId int `query:"customer"`
+
+	Customer *model.Customer
 }
 
-/* ________________________________________________________________________________
-   Order Create/Edit
-*/
-func New() *OrderPage {
-	// templates.Add("order-edit")
-	// templates.Add("order-list")
-	templates.Add("order-detail")
-	return &OrderPage{}
-}
-
-type OrderPage struct{}
-
-func (p *OrderPage) Mapping(r *mux.Router) {
-	// r.HandleFunc("/order/", route.RedirectHandler("/order/list"))
-	// r.HandleFunc("/order/list", route.PageHandler(&OrderList{}))
-	r.HandleFunc("/order/{id:[0-9]+}", route.PageHandler(&OrderDetail{}))
-
-	// editHandler := route.PageHandler(&OrderEdit{})
-	// r.HandleFunc("/order/create", editHandler)
-	// r.HandleFunc("/order/edit/{id:[0-9]+}", editHandler)
-}
-
-/* ________________________________________________________________________________
-   Order Edit
-*/
-type OrderEdit struct {
-	core.Page
-	Title       string // `path-param:"2"`
-	SubTitle    string
-	SubmitLabel string
-
-	Id    *gxl.Int     `path-param:"1"` // is this param useful?
-	Order *model.Order ``
-}
-
-// func (p *OrderEdit) Activate(id int64) {
-// 	p.Id = big.NewInt(id)
-// }
-
-func (p *OrderEdit) SetupRender() (interface{}, string) {
-	var err error
-	if p.Id != nil {
-		p.Order, err = dal.GetOrder(p.Id.Int)
-		if err != nil {
-			return err, ""
-		}
-		p.Title = "编辑订单"
-		p.SubTitle = "编辑"
-		p.SubmitLabel = "保存"
-	} else {
-		p.Order = model.NewOrder()
-		p.Title = "新建订单"
-		p.SubTitle = "新建"
-		p.SubmitLabel = "保存"
+func (p *OrderCreateDetail) Setup() {
+	p.Customer = personservice.GetCustomer(p.CustomerId)
+	if p.Customer == nil {
+		panic(fmt.Sprintf("customer not found: id: %v", p.CustomerId))
 	}
-	return nil, ""
-}
-
-func (p *OrderEdit) ProductDisplayName(id int) string {
-	product := dal.GetProduct(id)
-	if product != nil {
-		return product.Name
-	}
-	return "【error】"
-}
-
-// func (p *OrderEdit) AfterRender() (interface{}, string) {
-// 	return "template", "order-edit"
-// }
-
-func (p *OrderEdit) OnSuccessFromOrderForm() (string, string) {
-
-	// debug log
-	fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-	fmt.Printf("+ OrderDetails %v\n", len(p.Order.Details))
-	for idx, o := range p.Order.Details {
-		fmt.Printf("+ %v: %v\n", idx, o)
-	}
-	fmt.Println()
-
-	// modify logic
-	switch p.Order.DeliveryMethod {
-	case "Express":
-		p.Order.Status = "New"
-	case "TakeAway":
-		p.Order.Status = "Delivering"
-	}
-
-	// update
-	if p.Id != nil {
-		dal.UpdateOrder(p.Order)
-	} else {
-		dal.CreateOrder(p.Order)
-	}
-	return "redirect", "/order/list"
+	// Validate Privileges.
+	
+	
 }

@@ -56,8 +56,8 @@ func UpdateProduct(product *model.Product) {
 // TODO get all properties.
 //
 func GetProduct(id int) *model.Product {
-	product := dal.GetProduct(id)
-	if product != nil {
+	product, err := dal.GetProduct(id)
+	if err == nil && product != nil {
 		product.Colors = dal.GetProductProperties(id, "color")
 		product.Sizes = dal.GetProductProperties(id, "size")
 		product.Stocks = *dal.ListProductStocks(id)

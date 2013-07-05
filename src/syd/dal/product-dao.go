@@ -54,24 +54,28 @@ func UpdateProduct(product *model.Product) {
 	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, time.Now(), product.Id)
 }
 
-func GetProduct(id int) *model.Product {
+// Get product [updated new version]
+func GetProduct(id int) (*model.Product, error) {
 	if logdebug {
 		log.Printf("[dal] Get Product with id %v", id)
 	}
 
-	db.Connect()
-	defer db.Close()
+	conn, _ := db.Connect()
+	defer conn.Close()
 
-	stmt, err := db.DB.Prepare("select * from product where id = ?")
-	if err != nil {
-		panic(err.Error())
-	}
+	stmt, err := conn.Prepare("select * from product where id = ?")
 	defer stmt.Close()
+	if db.Err(err) {
+		return nil, err
+	}
 
 	row := stmt.QueryRow(id)
 	p := new(model.Product)
-	row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.CreateTime, &p.UpdateTime)
-	return p
+	err = row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.CreateTime, &p.UpdateTime)
+	if db.Err(err) {
+		return nil, err
+	}
+	return p, nil
 }
 
 /*

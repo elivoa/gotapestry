@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    {{t_layout_header $}}
+
+  </head>
+  <body>
+    <div class="header">
+	  <h1>进销存管理</h1>
+    </div>
+    <div class="container">
+
+      {{t_layout_leftnav $}}
+
+      <div class="content">
+    	<h2>新增订单</h2>
+        <div class="create_order">
+
+          <form method="POST" id="CustomerForm" action=""
+                onsubmit="return checkForm();">
+            {{/* [tmp] support redirect to form */}}
+            <input type="hidden" name="t:form" value="CustomerForm" />
+
+            <div class="prd_form">
+              <h3><i>选择客户</i></h3>
+              <div>输入客户姓名：
+                {{t_suggestcontrol $ "name" "CustomerId" "value" "" "category" "customer"}}
+                <!-- <input type="text" value="" size="45"> -->
+              </div>
+            </div> 
+            <div class="btn_main">
+              <input type="submit" value="下一步">
+            </div>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      
+      <script type="text/javascript">
+  function checkForm(){
+    strid = $("#CustomerForm .suggest-id").val()
+    if(strid != ""){
+      id  = parseInt(strid)
+      if( id >0){
+        return true;
+      }
+    }
+    alert("请先选定客户（输入无效）")
+    return false
+  }
+      </script>
+      
+    </div>
+  </body>
+</html>

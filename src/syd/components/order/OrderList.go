@@ -8,7 +8,8 @@ import (
 	"syd/model"
 )
 
-func Register() {
+func Register() {}
+func init() {
 	register.Component(Register, &OrderList{})
 }
 

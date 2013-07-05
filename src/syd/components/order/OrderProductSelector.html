@@ -1,0 +1,84 @@
+
+<!-- Import javascript. TODO got this -->
+
+<!-- suggest control -->
+<script type="text/javascript" src="/static/js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="/static/js/suggest-control.js"></script>
+
+<script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
+<script type="text/javascript" src="/static/js/c/order/product_selector.js"></script>
+
+<!-- core part -->
+
+<h3><i>选择商品</i></h3>
+<div class="prd_choose product-select">输入商品名称：
+  <input type="hidden" class="product-id" />
+  <input type="text" class="product-trigger" size="45" autocomplete="off" />
+</div>
+<table class="product-selector">
+  <tr>
+    <td>
+
+      <div id="cs-container">
+        <!-- TODO: may cause id conflict, auto this -->
+        <table class="prd_tbl">
+          <tr>
+            <th align="left">颜色</th>
+            <th align="left">尺码</th>
+            <th align="left">数量</th>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- <table class="prd_tbl"> -->
+      <!--   <tr> -->
+      <!--     <th align="left">颜色</th> -->
+      <!--     <th align="left">尺码</th> -->
+      <!--     <th align="left">数量</th> -->
+      <!--   </tr> -->
+      <!--   <tr> -->
+      <!--     <td class="cur" rowspan="3">黑色</td> -->
+      <!--     <td class="cur">M</td> -->
+      <!--     <td><input type="text" size="8" value=""></td> -->
+      <!--   </tr> -->
+      <!--   <tr> -->
+      <!--     <td>L</td> -->
+      <!--     <td><input type="text" size="8" value=""></td> -->
+      <!--   </tr> -->
+      <!--   <tr> -->
+      <!--     <td>XL</td> -->
+      <!--     <td><input type="text" size="8" value=""></td> -->
+      <!--   </tr> -->
+      <!--   <tr> -->
+      <!--     <td rowspan="2">白色</td> -->
+      <!--     <td>M</td> -->
+      <!--     <td><input type="text" size="8" value=""></td> -->
+      <!--   </tr> -->
+      <!--   <tr> -->
+      <!--     <td>L</td> -->
+      <!--     <td><input type="text" size="8" value=""></td> -->
+      <!--   </tr> -->
+      <!-- </table> -->
+
+    </td>
+    <td>
+      <div class="prd_price">
+        <p class="price">125.00</p>
+        <p class="info">原价：138.00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠</p>
+      </div>
+    </td>
+    <td>
+      <p>填写备注信息：</p>
+      <textarea rows="4" cols="40"></textarea>
+    </td>    
+  </tr>
+  <tr>
+    <td colspan="3" align="center"><input type="button" value="加入订单"></td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  $(function(){
+    new OrderProductSelector({{.CustomerId}})
+  });
+</script>

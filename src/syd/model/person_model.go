@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+//
+// core person model
+//
 type Person struct {
 	Id         int    // id
 	Name       string // pesron name
@@ -27,6 +30,15 @@ type Person struct {
 
 func NewPerson() *Person {
 	return &Person{Name: "", Type: "customer", Note: ""}
+}
+
+//
+// Advanced Wrapper
+//
+type Customer struct {
+	Person
+	// advanced properties
+	Accumulated float64 // 累计欠款
 }
 
 // TODO type is enum

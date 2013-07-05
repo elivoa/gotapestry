@@ -18,7 +18,7 @@ func registerComponentFuncs() {
 
 func RegisterComponent(name string, f interface{}) {
 	funcName := fmt.Sprintf("t_%v", strings.Replace(name, "/", "_", -1))
-	debuglog("-108- [RegisterComponent] ", funcName)
+	debuglog("-108- [RegisterComponent] %v", funcName)
 	Templates.Funcs(template.FuncMap{funcName: f})
 }
 

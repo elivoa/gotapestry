@@ -46,8 +46,8 @@ func (c *SuggestControl) initSuggest() {
 			c.DisplayValue = person.Name
 		}
 	case "product":
-		product := dal.GetProduct(id)
-		if product != nil {
+		product, err := dal.GetProduct(id)
+		if err == nil && product != nil {
 			c.DisplayValue = product.Name
 		}
 	default:

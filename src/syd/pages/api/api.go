@@ -12,6 +12,7 @@ import (
 	"got/debug"
 	"got/register"
 	"syd/dal"
+	"syd/service/productservice"
 )
 
 func Register() {
@@ -35,32 +36,43 @@ func (p *Api) Setup() (string, string) {
 		return toJson(person)
 
 	case "product":
-		product := dal.GetProduct(p.Param1)
+		product := productservice.GetProduct(p.Param1)
+		fmt.Println("********************************************************************************")
+		fmt.Println(product)
+		fmt.Println(product.Colors)
+		fmt.Println(product.Sizes)
 		return toJson(product)
 
 	case "customer_price":
-		// TODO extract to service
-		var (
-			personId  int     = p.Param1
-			productId int     = p.Param2
-			price     float64 = -1 // final price
-		)
-		if personId > 0 {
-			customerPrice := dal.GetCustomerPrice(personId, productId)
-			if nil != customerPrice {
-				price = customerPrice.Price
-			}
-		}
-		if price <= 0 {
-			product := dal.GetProduct(p.Param2)
-			if product != nil {
-				price = product.Price
-			}
-		}
-		return "json", fmt.Sprintf("{\"price\":%v}", price)
+		return "json", getCustomerPrice(p.Param1, p.Param2)
 	}
 
 	return needName()
+}
+
+// Helpers
+// --------------------------------------------------------------------------------
+func getCustomerPrice(personId int, productId int) string {
+	// TODO extract to service
+	var price float64 = -1        // customer price
+	var productPrice float64 = -1 // product price
+	if personId > 0 {
+		// get customer price
+		customerPrice := dal.GetCustomerPrice(personId, productId)
+		if nil != customerPrice {
+			price = customerPrice.Price
+		}
+	}
+
+	// get product price
+	product, err := dal.GetProduct(productId)
+	if err == nil && product != nil {
+		productPrice = product.Price
+	}
+	if price <= 0 {
+		price = productPrice
+	}
+	return fmt.Sprintf("{\"price\":%v, \"productPrice\":%v}", price, productPrice)
 }
 
 // Helper error return functions.
