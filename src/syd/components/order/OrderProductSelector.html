@@ -6,7 +6,7 @@
 <script type="text/javascript" src="/static/js/suggest-control.js"></script>
 
 <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
-<script type="text/javascript" src="/static/js/c/order/product_selector.js"></script>
+<script type="text/javascript" src="/static/js/c/order/order_product_selector.js"></script>
 
 <!-- core part -->
 
@@ -69,16 +69,16 @@
     </td>
     <td>
       <p>填写备注信息：</p>
-      <textarea rows="4" cols="40"></textarea>
+      <textarea rows="4" cols="40" class="notes"></textarea>
     </td>    
   </tr>
   <tr>
-    <td colspan="3" align="center"><input type="button" value="加入订单"></td>
+    <td colspan="3" align="center"><input type="button" class="ops-add" value="加入订单"></td>
   </tr>
 </table>
 
 <script type="text/javascript">
-  $(function(){
-    new OrderProductSelector({{.CustomerId}})
-  });
+  // $(function(){
+  //   new OrderProductSelector({{.CustomerId}})
+  // });
 </script>

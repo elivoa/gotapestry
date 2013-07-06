@@ -6,7 +6,7 @@
     
     {{t_layout_header $}}
     <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
-    <script type="text/javascript" src="/static/js/p/order/order_edit.js"></script>
+    <script type="text/javascript" src="/static/js/p/order/order_create_detail.js"></script>
 
   </head>
   <body>
@@ -31,85 +31,15 @@
               <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}
             </div>
           </div>
-          <div class="prd_form">
 
+          <div class="prd_form">
             {{t_order_productselector $ "CustomerId" .Customer.Id}}
-            
           </div>
+
           <div class="">
-            <table class="main_tbl order_tbl">
-              <tr>
-                <th align="left">商品名称</th>
-                <th align="left">单价</th>
-                <th align="left">颜色</th>
-                <th align="left">尺码</th>
-                <th align="left">数量</th>
-                <th align="center">合计数量</th>
-                <th align="right">合计金额</th>
-                <th align="left">备注</th>
-                <th align="left">操作</th>
-              </tr>
-              <tr>
-                <td valign="top" rowspan="4"><strong>绣虎头</strong></td>
-                <td valign="top" rowspan="4"><span class="price">138.00</span></td>
-                <td>红色</td>
-                <td>M</td>
-                <td>5</td>
-                <td valign="top" align="center" rowspan="4"><strong>20</strong></td>
-                <td valign="top" align="right" rowspan="4"><strong class="price">2,760.00</strong></td>
-                <td valign="top" rowspan="4">-</td>
-                <td valign="top" rowspan="4"><a href="#">编辑</a><span class="vline">|</span><a href="#">删除</a></td>
-              </tr>
-              <tr>
-                <td>红色</td>
-                <td>L</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>黑色</td>
-                <td>L</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>绿色</td>
-                <td>XL</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td valign="top" rowspan="1"><strong>鲸鱼宝宝</strong></td>
-                <td valign="top" rowspan="1"><span class="tag_price_lower" title="原价88元"></span><span class="price">78.00</span></td>
-                <td>-</td>
-                <td>-</td>
-                <td>5</td>
-                <td valign="top" align="center" rowspan="1"><strong>5</strong></td>
-                <td valign="top" align="right" rowspan="1"><strong class="price">360.00</strong></td>
-                <td valign="top" rowspan="1">备注信息备注信息</td>
-                <td valign="top" rowspan="1"><a href="#">编辑</a><span class="vline">|</span><a href="#">删除</a></td>
-              </tr>
-              <tr>
-                <td valign="top" rowspan="1"><strong>糖果小开衫</strong></td>
-                <td valign="top" rowspan="1"><span class="price">80.00</span></td>
-                <td>绿色</td>
-                <td>-</td>
-                <td>10</td>
-                <td valign="top" align="center" rowspan="1"><strong>10</strong></td>
-                <td valign="top" align="right" rowspan="1"><strong class="price">800.00</strong></td>
-                <td valign="top" rowspan="1">-</td>
-                <td valign="top" rowspan="1"><a href="#">编辑</a><span class="vline">|</span><a href="#">删除</a></td>
-              </tr>
-              <tr class="total">
-                <td valign="top" align="right"><strong>总计</strong></td>
-                <td valign="top">&nbsp;</td>
-                <td valign="top">&nbsp;</td>
-                <td valign="top">&nbsp;</td>
-                <td valign="top">&nbsp;</td>
-                <td valign="top" align="center" rowspan="1"><strong>35</strong></td>
-                <td valign="top" align="right" rowspan="1"><strong class="price">3,920.00</strong></td>
-                <td valign="top">&nbsp;</td>
-                <td valign="top">&nbsp;</td>
-              </tr>
-            </table>
+            {{t_order_detailsform $}}
           </div>
+          
           <div class="prd_form">
             <h3><i>发货方式</i></h3>
             <div>
@@ -136,3 +66,9 @@
     </div>
   </body>
 </html>
+
+<script type="text/javascript">
+  $(function(){
+    new OrderCreateDetail({{.CustomerId}})
+  });
+</script>

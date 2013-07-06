@@ -1,4 +1,5 @@
 ###
+---------------------------------------------
  SYD Project
  Suggest Control
 
@@ -14,15 +15,20 @@
 
   TODO:
     reset value if canceled.
-
+----------------------------------------------
 ###
 
+window.SuggestControl =
 class SuggestControl
   constructor: (param)->
     @param = param
     @default "parentClass", ".parent-class"
     @default "hiddenClass", ".suggest-id"
     @default "triggerClass", ".suggest-display"
+
+    # PUBLIC:
+    @selection # id{id:, name:}
+
 
   default: (key, defaultValue)->
     if !@param[key]
@@ -42,17 +48,38 @@ class SuggestControl
 
       onSelect: (suggestion)->
         parent = $(this).parents(_.param["parentClass"])
-        parent.find(_.param["hiddenClass"]).val(suggestion.data)
-        parent.find(_.param["triggerClass"]).val(_.formatValue(suggestion.value))
+        _.select(suggestion.data, _.formatValue(suggestion.value), this)
         _.param["onSelect"](parent, suggestion) if _.param["onSelect"]
 
       formatResult:(suggestion, currentValue) ->
-        # TODO highlight matches...
+        # TODO highlight matc3hes...
         return _.formatValue(suggestion.value)
     }
 
     # register init items.
     $(@param["triggerClass"]).each $.proxy @eachDisplayClass,@
+
+  # PUBLIC
+  select:(id, name, obj) -> # optional obj
+    @selection = {id: id, name: name}
+    @_setSelection(id, name, obj)
+
+  # PUBLIC
+  clearSelect: (obj)-> # optional objN
+    @selection = null
+    @_setSelection('', '', obj)
+
+  # set selection
+  _setSelection: (id, name, obj) ->
+    console.log id, name, obj
+    if obj
+      parent = $(obj).parents(@param["parentClass"])
+    else
+      console.log
+      parent = $(@param["parentClass"])
+    parent.find(@param["hiddenClass"]).val(id)
+    parent.find(@param["triggerClass"]).val(name)
+
 
   eachDisplayClass: (idx, obj)->
     @register obj
@@ -77,11 +104,8 @@ class SuggestControl
     return value.substr(value.indexOf("||") + 2)
 
 
-## expose
-window.SuggestControl = SuggestControl
-
-        # console.log suggestion
-        # console.log currentValue
-        #reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g'),
-        #pattern = '(' + currentValue.replace(reEscape, '\\$1') + ')';
-        #return ">>> " + suggestion.value.replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>')
+# console.log suggestion
+# console.log currentValue
+#reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g'),
+#pattern = '(' + currentValue.replace(reEscape, '\\$1') + ')';
+#return ">>> " + suggestion.value.replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>')
