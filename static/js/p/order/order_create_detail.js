@@ -16,9 +16,10 @@
         _.ops.clear();
         return console.log('all done');
       };
-      this.odf.onEdit = function(product) {
-        return console.log(product);
-      };
+      this.odf.onEdit = $.proxy(function(product) {
+        console.log(product);
+        return this.ops.refresh(product);
+      }, this);
     }
 
     return OrderCreateDetail;

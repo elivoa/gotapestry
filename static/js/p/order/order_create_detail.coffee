@@ -10,10 +10,7 @@ class OrderCreateDetail
   constructor: (customerId)->
     _=@
 
-    # ops
     @ops = new OrderProductSelector(customerId)
-
-    # odf
     @odf = new OrderDetailsForm
 
     ## Interactions
@@ -24,5 +21,7 @@ class OrderCreateDetail
       _.ops.clear()
       console.log 'all done'
 
-    @odf.onEdit = (product)->
+    @odf.onEdit = $.proxy (product)->
       console.log product
+      @ops.refresh product
+    ,@
