@@ -1,0 +1,46 @@
+@charset "utf-8";
+/*Header*/
+.header {background:url(../../images/header/bg_header.png) repeat-x; position:absolute;top:0;left:0;width:100%;height:44px;}
+.header .logo{float:left;margin:8px 0 0 20px;}
+.header .loginbar{float:right;color:#fff;margin:12px 20px 0 0;}
+.header .loginbar a{color:#fff;}
+/*Container*/
+.container{background:#fff;box-shadow:0 0 6px rgba(0,0,0,.5);border-radius:10px;margin:60px 50px 40px;min-height:400px;overflow:hidden;}
+.left_menu{width:180px;float:left;overflow:hidden;}
+.main_content{margin:0 20px 0 200px;overflow:hidden;}
+
+/*--------------------------------------NORMAL------------------------------------------*/
+/*content*/
+.price{color:#e40000;}
+/*Titles*/
+h1{border-bottom:1px dashed #999;font-size:14px;font-weight:bold;padding:23px 5px 7px;}
+
+/*Form Elements*/
+input[type=text],textarea{background:#fff;border:1px solid #d4d4d4;box-shadow:inset 0 3px 3px rgba(0,0,0,.1);padding:4px;border-radius:3px;}
+input[type=text].inp_error,textarea.inp_error{border:1px solid #e90000;background:#fedbdb;}
+input[type=text]:focus,textarea:focus{border:1px solid #1f91cd;box-shadow:inset 0 3px 3px rgba(0,0,0,.1),0 0 4px rgba(0,112,117,.75);}
+
+select{padding:2px;}
+/*Buttons*/
+.btn_content{text-align:center}
+.btn_a_s,.btn_a_l{background:#239fdb;border:1px solid #1682b6;display:inline-block;color:#fff;}
+.btn_a_s:hover,.btn_a_l:hover{text-decoration:none;background:#5cc3f5;border:1px solid #24a1dd;}
+.btn_a_s{height:24px;line-height:24px;padding:0 15px;border-radius:3px;}
+.btn_a_l{height:36px;line-height:36px;padding:3px 40px;border-radius:5px;font-size:16px;font-family:"SimHei";box-shadow:inset -1px -2px 1px rgba(0,0,0,.3),inset 1px 1px 1px rgba(255,255,255,.4);text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.btn_a_l:hover{box-shadow:inset -1px -2px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
+.btn_a_l:active{box-shadow:none;}
+
+.btn_b_s,.btn_b_l{background:#48c253;border:1px solid #2ca137;display:inline-block;color:#fff;}
+.btn_b_s:hover,.btn_b_l:hover{text-decoration:none;background:#58d963;border:1px solid #39ba45;}
+.btn_b_s{height:24px;line-height:24px;padding:0 15px;border-radius:3px;}
+.btn_b_l{height:36px;line-height:36px;padding:3px 40px;border-radius:5px;font-size:16px;font-family:"SimHei";box-shadow:inset -1px -2px 1px rgba(0,0,0,.3),inset 1px 1px 1px rgba(255,255,255,.4);text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.btn_b_l:hover{box-shadow:inset -1px -2px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
+.btn_b_l:active{box-shadow:none;}
+
+.btn_c_s,.btn_c_l{background:#fff;border:1px solid #c4c4c4;display:inline-block;color:#fff;color:#777;}
+.btn_c_s:hover,.btn_c_l:hover{text-decoration:none;background:#5cc3f5;border:1px solid #24a1dd;color:#fff;}
+.btn_c_s{height:24px;line-height:24px;padding:0 15px;border-radius:3px;box-shadow:inset -1px -1px 1px rgba(0,0,0,.3),inset 1px 1px 1px rgba(255,255,255,.4);}
+.btn_c_l{height:36px;line-height:36px;padding:3px 40px;border-radius:5px;font-size:16px;font-family:"SimHei";box-shadow:inset -1px -2px 1px rgba(0,0,0,.3),inset 1px 1px 1px rgba(255,255,255,.4);text-shadow:0 1px 1px rgba(0,0,0,.2);}
+.btn_c_s:hover{box-shadow:inset -1px -1px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
+.btn_c_l:hover{box-shadow:inset -1px -2px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
+.btn_c_s:active,.btn_c_l:active{box-shadow:none;}

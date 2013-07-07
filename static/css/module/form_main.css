@@ -1,0 +1,11 @@
+@charset "utf-8";
+.form_main {}
+.form_main dl{margin:0 0 10px;position:relative;}
+.form_main dt{float:left;width:110px;text-align:right;padding:3px 0;}
+.form_main dt i{color:#f00;font-size:18px;overflow:hidden;display:inline-block;height:12px;font-weight:bold;font-family:"Courier New", Courier, monospace}
+.form_main dd{margin-left:116px;}
+.form_main dd.tips{position:absolute;top:-28px;background:#ebdb83;border-radius:3px;padding:3px 5px 3px 10px;line-height:18px;box-shadow:0 1px 2px rgba(0,0,0,.6);display:none;}
+.form_main dd.tips b{position:absolute;bottom:-8px;height:8px;overflow:hidden;}
+.form_main dd.tips b i{width:12px;height:12px;overflow:hidden;display:block;border:1px solid #9a9a9a;background:#ebdb83;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);margin-top:-10px;box-shadow:0 0 2px rgba(0,0,0,.6);}
+.form_main .tips_close{width:18px;height:18px;background:url(../../images/icons/tips_close.png) no-repeat 2px 3px;float:right;border-radius:3px;margin:0 0 0 5px;}
+.form_main .tips_close:hover{background-color:rgba(255,255,255,.6);}

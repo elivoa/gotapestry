@@ -14,7 +14,7 @@ func init() {
 type Order struct {
 	Id             int
 	TrackNumber    int64
-	Status         string "" // New | ToDeliver | Delivering | Closed
+	Status         string "" // todeliver | delivering | done | canceled | (all)
 	DeliveryMethod string "" // TakeAway | Express(圆通，顺风)
 
 	CustomerId int // reference

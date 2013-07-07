@@ -1,51 +1,32 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
-
-    {{t_layout_header $}}
-
+    <link href="/static/css/pages/pg_list_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `订单列表` }}
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+  <body class="PG_list_order">
+    
+    {{t_layout_headernav $}}
+    
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      {{t_layout_leftnav $ "CurPage" `/order/list`}}
 
-      <div class="content">
-    	<h2>订单列表</h2>
-
-        <div class="tab">
-          <a class='{{$.TabCurrentStyle "New"}}' href="/order/list/New">待处理订单</a>
-          <a class='{{$.TabCurrentStyle "Delivering"}}' href="/order/list/Delivering">已发货订单</a>
-          <a class='{{$.TabCurrentStyle "Closed"}}' href="/order/list/Closed">已完成订单</a>
-          <a class='{{$.TabCurrentStyle "All"}}' href="/order/list/All">全部订单</a>
-        </div>
-        <!--搜索条件
-		    <div class="filter">
-        	  <dl>
-                <dt>
-                  付款状态
-                </dt>
-                <dd>
-                  <select>
-                    <option>未付款</option>
-                    <option>已付款</option>
-                  </select>
-                </dd>
-              </dl>
-            </div>
-            -->
+      <div class="main_content">
+    	<h1>订单列表</h1>
+		<div class="tab_main"><div class="bg">
+			<ul class="clearfix">
+			  <li class="{{$.TabStyle `todeliver`}}"><a href="/order/list/todeliver">待发货订单</a></li>
+			  <li class="{{$.TabStyle `delivering`}}"><a href="/order/list/delivering">已发货订单</a></li>
+			  <li class="{{$.TabStyle `done`}}"><a href="/order/list/done">已完成订单</a></li>
+			  <li class="{{$.TabStyle `canceled`}}"><a href="/order/list/canceled">已取消订单</a></li>
+			  <li class="{{$.TabStyle `all`}}"><a href="/order/list/all">全部订单</a></li>
+			</ul>
+		</div></div>
 
         {{t_order_list $ "orders" .Orders}}
 
       </div>
-    </div>
-    <div class="footer">
-
     </div>
   </body>
 </html>

@@ -1,0 +1,14 @@
+@charset "utf-8";
+.tbl_main {}
+.tbl_main th,.tbl_main td{padding:8px 12px;border:1px solid #ccc;}
+.tbl_main th{ background:-webkit-gradient(linear, 0 0, 0 70%, from(#e1e1e1), to(#ffffff));padding-top:12px;padding-bottom:12px;}
+.tbl_main tr:nth-of-type(odd) td{background:#f8f8f8;}
+.tbl_main td {
+    -webkit-transition-property: background-color;
+    -webkit-transition-duration: 0.2s;
+    -webkit-transition-timing-function: ease;
+}
+.tbl_main tr:hover td{
+    background-color: #fdffd3;
+}
+.tbl_main .vline{color:#999;margin:0 10px;}

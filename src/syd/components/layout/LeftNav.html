@@ -1,25 +1,23 @@
-<div class="menu">
+
+
+<div class="left_menu">
   <dl>
     <dt>订单管理</dt>
-    <dd><a href="/order/create">新增订单</a></dd>
-    <dd><a href="/order/list">订单列表</a></dd>
+    <dd class="{{.Style `/order/create` }}"><a href="/order/create">新增订单</a></dd>
+    <dd class="{{.Style `/order/list` }}"><a href="/order/list">订单列表</a></dd>
   </dl>
+  <div class="hrline"></div>
   <dl>
     <dt>商品管理</dt>
-    <dd><a href="/product/create">新增商品</a></dd>
-    <dd><a href="/product/list">商品列表</a></dd>
-    <dd><a href="/product/change">退换货管理</a></dd>
+    <dd class="{{.Style `/product/create` }}"><a href="/product/create">新增商品</a></dd>
+    <dd class="{{.Style `/product/list` }}"><a href="/product/list">商品列表</a></dd>
+    <dd class="{{.Style `/product/change` }}"><a href="/product/change">退换货管理</a></dd>
   </dl>
+  <div class="hrline"></div>
   <dl>
-    <dt>联系人信息</dt>
-    <dd><a class="cur" href="/person/edit">新增联系人</a></dd>
-    <dd><a href="/person/list/customer">客户列表</a></dd>
-    <dd><a href="/person/list/factory">厂家列表</a></dd>
-  </dl>
-  <dl>
-    <dt>生成报表</dt>
-    <dd><a href="">当日销量统计</a></dd>
-    <dd><a href="">历史销量统计</a></dd>
-    <dd><a href="">欠款统计</a></dd>
+    <dt>联系人管理</dt>
+    <dd class="{{.Style `/person/edit` }}"><a href="/person/edit">新增联系人</a></dd>
+    <dd class="{{.Style `/person/list/customer` }}"><a href="/person/list/customer">客户列表</a></dd>
+    <dd class="{{.Style `/person/list/factory` }}"><a href="/person/list/factory">厂家列表</a></dd>
   </dl>
 </div>

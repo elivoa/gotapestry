@@ -1,0 +1,9 @@
+@charset "utf-8";
+.tab_main {overflow:hidden;width:100%;}
+.tab_main .bg{border-bottom:1px solid #ccc;height:32px;box-shadow:inset -2px -2px 2px rgba(0,0,0,.1);width:102%;}
+.tab_main ul{height:30px;overflow:hidden;padding-top:3px;margin-left:30px;}
+.tab_main li{float:left;line-height:28px;background:#f2f2f2;border-radius:5px 5px 0 0;margin:0 5px 0 0;font-size:14px;border:1px solid #ccc;box-shadow:inset 0 -2px 3px rgba(0,0,0,.1);}
+.tab_main li.cur{background:#fff;border-bottom-color:#fff;box-shadow:0 0 4px rgba(0,0,0,.2),inset 0 1px 2px rgba(0,0,0,.1);}
+.tab_main li a{color:#666;padding:0 18px;height:28px;}
+.tab_main li a:hover{text-decoration:none;color:#000;text-shadow:0 0 3px #fff;}
+.tab_main li.cur a{color:#000;}

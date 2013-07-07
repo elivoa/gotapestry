@@ -35,7 +35,9 @@ func Start() {
 
 	// start server
 	g.StartServer(&got.GotConfig{
-		StaticResources: []string{"/static/", "../"},
+		StaticResources: [][]string{
+			[]string{"/static/", "../"},
+		},
 	})
 }
 

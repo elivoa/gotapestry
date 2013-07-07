@@ -1,0 +1,6 @@
+@charset "utf-8";
+.tab_s{background:#35c1db;border:1px solid #21a5bd;border-radius:5px;box-shadow:inset 0 -1px 4px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.6);padding:0 12px;}
+.tab_s a{float:left;line-height:22px;height:22px;padding:4px 12px;border-right:1px solid #21a5bd;color:#fff;font-weight:bold;text-shadow:1px 0 2px rgba(0,0,0,.4)}
+.tab_s a:hover{background:#4edcf6;text-decoration:none;}
+.tab_s a.cur,.tab_s a.cur:hover{background:#21a5bd;box-shadow:inset 0 1px 0 rgba(0,0,0,.3),inset 0 0 2px rgba(0,0,0,.3);text-shadow:0 -1px 0 rgba(0,0,0,.2)}
+.tab_s a.first{border-left:1px solid #21a5bd;}

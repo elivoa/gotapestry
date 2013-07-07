@@ -1,68 +1,67 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
-    
-    {{t_layout_header $}}
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `新增订单` }}
     <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
     <script type="text/javascript" src="/static/js/p/order/order_create_detail.js"></script>
-
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+  <body class="PG_create_order">
+
+    {{t_layout_headernav $}}
+
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      {{t_layout_leftnav $ "CurPage" `/order/create`}}
 
-      <div class="content">
-    	<h2>新增订单</h2>
-        
-        <div class="create_order">
-          <div class="prd_form">
-            <h3><i>客户信息</i></h3>
-            <!--无累计欠款，则写累计欠款：无-->
-            <div>
-              <span class="floatr">累计欠款：
-                <strong class="price">{{.Customer.Accumulated}}TODO</strong>元
-              </span>
-              <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}
+      <div class="main_content">
+    	<h1>新增订单</h1>
+        <div class="B_order_step2"></div>
+
+        <!-- 客户信息 -->
+        <div class="unit">
+          <div class="tit"><strong>客户信息</strong></div>
+          <div class="B_person_info">
+            <span class="B_overdraft">累计欠款：
+              <strong class="price">{{.Customer.Accumulated}}TODO</strong>元
+            </span>
+            <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}</div>
+        </div>
+
+        <!-- ------------------------------- -->
+        {{t_order_productselector $ "CustomerId" .Customer.Id}}
+
+        <div class="">
+          {{t_order_detailsform $}}
+        </div>
+        <!-- ------------------------------- -->
+
+        <div class="unit">
+          <div class="tit"><strong>发货方式</strong></div>
+          <div class="B_express">
+            <div class="B_choose_express">
+              <label class="checked"><input type="radio"><span class="B_ico_yto"></span></label>
+              <label><input type="radio"><span class="B_ico_sf"></span></label>
+              <label><input type="radio"><span class="B_ico_pickup"></span></label>
+            </div>
+            <div class="B_fare">
+              运费：<input type="text" size="10" value=""> 
+			  <label><input type="checkbox"> 到付</label>
             </div>
           </div>
-
-          <div class="prd_form">
-            {{t_order_productselector $ "CustomerId" .Customer.Id}}
-          </div>
-
-          <div class="">
-            {{t_order_detailsform $}}
-          </div>
-          
-          <div class="prd_form">
-            <h3><i>发货方式</i></h3>
-            <div>
-              <div>
-                <input type="radio">圆通速递
-                <input type="radio">顺丰速运
-                <input type="radio">自提
-              </div>
-              <div>
-                运费：<input type="text" value=""> <label><input type="checkbox">到付</label>
-              </div>
-            </div>
-          </div>
-          <div class="prd_form">
-            <h3><i>添加订单备注</i></h3>
-            <div><textarea rows="4" style="width:90%"></textarea></div>
-          </div>
-          <div class="btn_main"><input type="button" value="确认下单"></div>
+        </div>
+		<div class="unit">
+          <div class="tit"><strong>订单备注</strong></div>
+		  <div class="B_order_remark">
+			<textarea rows="4"></textarea>
+		  </div>
+		</div>
+        <div class="btn_content">
+          <input type="button" class="btn_a_l" value="确认下单">
+          <!-- <a class="btn_a_l" href="#">确认下单</a> -->
         </div>
       </div>
-    </div>
-    <div class="footer">
-
+      
     </div>
   </body>
 </html>

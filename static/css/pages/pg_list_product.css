@@ -1,0 +1,13 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/tab_s.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/pager_main.css";
+
+.PG_list_product .tab_s{margin:30px 0 20px;}
+.PG_list_product .list_product{margin:0 0 100px;}
+.PG_list_product .list_product .tbl_main{width:100%;}
+.PG_list_product .list_product .pager_main{margin:20px 0 0;}
+.PG_list_product .B_sold_out{color:#b2b2b2;background-color:#CCC;display:inline-block;padding:0 5px;border-radius:3px;}

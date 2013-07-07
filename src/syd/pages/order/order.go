@@ -56,7 +56,7 @@ func (p *OrderList) SetupRender() {
 	p.Orders = dal.ListOrder(p.Tab)
 }
 
-func (p *OrderList) TabCurrentStyle(tab string) string {
+func (p *OrderList) TabStyle(tab string) string {
 	if strings.ToLower(p.Tab) == strings.ToLower(tab) {
 		return "cur"
 	}

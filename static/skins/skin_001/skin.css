@@ -1,0 +1,8 @@
+@charset "utf-8";
+body {background:#053063;}
+a{color:#147bc8;}
+.container{background:#fff url(images/bg_leftmenu.png) repeat-y 0 0;}
+.left_menu dd a,.left_menu dd.cur a:hover{color:#333;}
+.left_menu dd a:hover{background:#a0c0d7;color:#fff;}
+.left_menu dd.cur{background:#fff;}
+.left_menu dd.cur a{color:#076ab3;}

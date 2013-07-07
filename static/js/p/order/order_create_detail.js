@@ -5,19 +5,24 @@
   window.OrderCreateDetail = OrderCreateDetail = (function() {
 
     function OrderCreateDetail(customerId) {
-      var _;
-      _ = this;
       this.ops = new OrderProductSelector(customerId);
       this.odf = new OrderDetailsForm;
-      this.ops.onAddToOrder = function(product) {
+      this.ops.onSelectProduct = $.proxy(function(productId) {
+        var product;
+        product = this.odf.data.products[productId];
+        if (product) {
+          alert("已经添加了这件商品，不能重复添加！如需添加或修改，请点击下面对应商品的编辑按钮！谢谢合作！");
+          return this.ops.clear();
+        }
+      }, this);
+      this.ops.onAddToOrder = $.proxy(function(product) {
         console.log(product);
-        _.odf.appendProduct(product);
-        _.odf.refreshOrderForm();
-        _.ops.clear();
-        return console.log('all done');
-      };
+        this.odf.appendProduct(product);
+        this.odf.refreshOrderForm();
+        return this.ops.clear();
+      }, this);
       this.odf.onEdit = $.proxy(function(product) {
-        console.log(product);
+        console.log("Edit Product: ", product);
         return this.ops.refresh(product);
       }, this);
     }

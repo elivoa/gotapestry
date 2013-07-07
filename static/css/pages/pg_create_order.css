@@ -1,0 +1,47 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/form_main.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/tbl_s.css";
+@import "../../css/module/unit.css";
+@import "../../css/module/tbl_s.css";
+.PG_create_order .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
+.PG_create_order .unit{margin:40px 0 20px;}
+.PG_create_order .form_main{margin:30px 0 40px;}
+.PG_create_order .btn_content{margin-bottom:100px;}
+.PG_create_order .btn_content a{margin:0 10px;}
+/*下单步骤图*/
+.B_order_step1,.B_order_step2,.B_order_step3{background:url(../../images/order/order_step.png) no-repeat;width:750px;height:31px;}
+.B_order_step2{background-position:0 -40px;}
+.B_order_step3{background-position:0 -80px;}
+/*客户信息*/
+.B_person_info{padding:20px 30px;}
+.B_overdraft{float:right}
+.B_overdraft .price{font-size:14px;}
+/*商品选择*/
+.B_prd_choose{background:#def2fb;padding:10px;margin:20px;border:1px solid #cae0ea;box-shadow:inset 0 1px 0 rgba(0,0,0,.2);border-radius:5px;}
+.B_prd_att{margin:0 20px 20px;}
+.B_prd_price{margin:0 60px;}
+.B_prd_price .price{font-size:36px;}
+.B_prd_att .B_info{margin:10px 0 0 3px;color:#999;}
+.B_prd_att .B_text{padding:0 0 8px;}
+.B_prd_att .B_btn{padding-top:20px;}
+.B_express{margin:20px 30px 30px;}
+.B_choose_express{}
+.B_choose_express .B_ico_yto,.B_choose_express .B_ico_sf,.B_choose_express .B_ico_pickup{background:url(../../images/order/express.png) no-repeat;width:60px;height:28px;display:inline-block; vertical-align:middle;}
+.B_choose_express .B_ico_yto{background-position:-100px 0;}
+.B_choose_express .B_ico_sf{background-position:0 0;}
+.B_choose_express .B_ico_pickup{background-position:-200px 0;}
+.B_choose_express label{display:inline-block;width:65px;height:28px;border:3px solid #fff;margin:0 10px 0 0;}
+.B_choose_express label.checked{border-color:#1b8010;position:relative;}
+.B_choose_express label.checked:after{content:"";width:9px;height:9px;display:block;overflow:hidden;position:absolute;right:0;bottom:0;background:#1b8010 url(../../images/order/choose_express.png) no-repeat;}
+.B_choose_express label input{display:none;}
+.B_fare{margin:20px 0 0;}
+.B_fare label{margin:0 0 0 40px}
+.B_order_remark{margin:20px 30px 30px;}
+.B_order_remark textarea{width:90%;}
+
+.B_print_content{border:1px solid #ccc;margin:30px 0;padding:10px 20px;}
+.B_btn_print{text-align:right;border-bottom:1px dashed #ccc;padding:0 0 10px;margin:0 0 20px;}

@@ -8,6 +8,7 @@
       this.customerId = customerId;
       this.containerClass = "product-selector";
       this.product = {};
+      this.onSelectProduct;
       this.onAddToOrder;
       this.init();
     }
@@ -16,40 +17,19 @@
       var _;
       _ = this;
       this.sc = new SuggestControl({
-        parentClass: ".product-select",
+        parentClass: ".product-selector",
         triggerClass: ".product-trigger",
         hiddenClass: ".product-id",
         category: "product",
-        onSelect: function(line, suggestion) {
-          console.log("select: ", suggestion);
-          return _.onProductSelect(line, suggestion);
-        }
+        onSelect: $.proxy(function(line, suggestion) {
+          this.onProductSelect(line, suggestion);
+          if (this.onSelectProduct) {
+            return this.onSelectProduct(suggestion.data);
+          }
+        }, this)
       });
       this.sc.init();
       return $(".ops-add").bind('click', $.proxy(this.onAddToOrderClick, this));
-    };
-
-    OrderProductSelector.prototype.refresh = function(product) {
-      this.product = product;
-      this.sc.select(product.id, product.name);
-      return this.refreshContent();
-    };
-
-    OrderProductSelector.prototype.refreshContent = function() {
-      var pcstg;
-      console.log('refresh content, ', this.product);
-      if (this.product.colors !== null && this.product.sizes !== null) {
-        pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes);
-        pcstg.replace("cs-container");
-      } else {
-        $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
-      }
-      $("." + this.containerClass + " .price").html(this.product.price);
-      if (this.product.productPrice - this.product.price === 0) {
-        return $("." + this.containerClass + " .info").html("");
-      } else {
-        return $("." + this.containerClass + " .info").html(("原价：" + this.product.productPrice) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠");
-      }
     };
 
     OrderProductSelector.prototype.onProductSelect = function(line, suggestion) {
@@ -94,6 +74,48 @@
           return console.log(textStatus);
         }
       });
+    };
+
+    OrderProductSelector.prototype.refresh = function(product) {
+      this.product = product;
+      this.sc.select(product.id, product.name);
+      return this.refreshContent();
+    };
+
+    OrderProductSelector.prototype.refreshContent = function() {
+      var pcstg;
+      console.log('refresh content, ', this.product);
+      if (this.product.colors !== null && this.product.sizes !== null) {
+        pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes);
+        pcstg.replace("cs-container");
+      } else {
+        $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
+      }
+      $("." + this.containerClass + " .price").html(this.product.price);
+      if (this.product.productPrice - this.product.price === 0) {
+        $("." + this.containerClass + " .info").html("");
+      } else {
+        $("." + this.containerClass + " .info").html(("原价：" + this.product.productPrice) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠");
+      }
+      return this.fillQuantities();
+    };
+
+    OrderProductSelector.prototype.fillQuantities = function() {
+      var o, q, _i, _len, _ref, _results;
+      if (this.product && this.product.quantity) {
+        _ref = this.product.quantity;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          q = _ref[_i];
+          o = $("#cs-container #csq_" + q[0] + "__" + q[1]);
+          if (o !== void 0) {
+            _results.push(o.val(q[2]));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      }
     };
 
     OrderProductSelector.prototype.onAddToOrderClick = function(e) {

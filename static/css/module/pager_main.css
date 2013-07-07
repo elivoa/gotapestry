@@ -1,0 +1,6 @@
+@charset "utf-8";
+.pager_main{text-align:center;}
+.pager_main span{margin:0 6px;}
+.pager_main span a{padding:0 10px;line-height:24px;height:24px;display:inline-block;border-radius:3px;margin:0 2px;}
+.pager_main span a:hover{background:#d5d5d5;text-decoration:none;color:#fff;}
+.pager_main span a.cur{background:#81dced;text-decoration:none;color:#fff;}

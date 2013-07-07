@@ -11,11 +11,12 @@ class OrderDetailsForm
     @onDelete = @defaultOnDelete # delete line callback
     @onEdit # edit line callback
 
+    # all data in product.
     @data = {
       order: []
       products: {}
     }
-    # @addTestData() # test
+    # @addTestData() # no test data
     @refreshOrderForm()
 
 
@@ -73,8 +74,7 @@ class OrderDetailsForm
       @onDelete(@data.products[id]) if @onDelete
 
   defaultOnDelete:(product)->
-    ok = confirm "真的要删除这条记录么？"
-    return if not ok
+    return if not confirm "真的要删除这条记录么？"
     delete @data.products[product.id]
     idx = @data.order.indexOf(product.id)
     if idx>=0
@@ -86,10 +86,43 @@ class OrderDetailsForm
     tfoot.find(".sumQuantity").html(sumQuantity)
     tfoot.find(".sumPrice").html(sumPrice)
 
-
+  ## hide if no stock
   # generate one product. with all it's quantities.
   # parameter is product json
   generateTR:(json, totalQuantity, totalPrice)->
+    quantities = []
+    quantities.push q for q in json.quantity when q[2] >0
+    nquantity = quantities.length
+    htmls = []
+    htmls.push "<tr>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'><strong>#{json.name}</strong></td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'><span class='price'>#{json.price}</span></td>"
+    htmls.push "  <td>#{quantities[0][0]}</td>"
+    htmls.push "  <td>#{quantities[0][1]}</td>"
+    htmls.push "  <td>#{quantities[0][2]}</td>"
+    htmls.push "  <td valign='top' align='center' rowspan='#{nquantity}'>"
+    htmls.push "      <strong>#{totalQuantity}</strong></td>"
+    htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'>"
+    htmls.push "      <strong class='price'>#{totalPrice}</strong></td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>#{json.note}</td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>"
+    htmls.push "      <a href='#' class='odf-delete'>删除</a>"
+    htmls.push "  </td>"
+    htmls.push "</tr>"
+    for quantity in quantities.slice(1, nquantity)
+      htmls.push "<tr>"
+      htmls.push "  <td>#{quantity[0]}</td>"
+      htmls.push "  <td>#{quantity[1]}</td>"
+      htmls.push "  <td>#{quantity[2]}</td>"
+      htmls.push "</tr>"
+    return htmls
+
+
+  ## Old version: no stock means 0 stock.
+  # generate one product. with all it's quantities.
+  # parameter is product json
+  generateTR_oldversion:(json, totalQuantity, totalPrice)->
     nquantity = json.quantity.length
     htmls = []
     htmls.push "<tr>"
@@ -98,10 +131,15 @@ class OrderDetailsForm
     htmls.push "  <td>#{json.quantity[0][0]}</td>"
     htmls.push "  <td>#{json.quantity[0][1]}</td>"
     htmls.push "  <td>#{json.quantity[0][2]}</td>"
-    htmls.push "  <td valign='top' align='center' rowspan='#{nquantity}'><strong>#{totalQuantity}</strong></td>"
-    htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'><strong class='price'>#{totalPrice}</strong></td>"
+    htmls.push "  <td valign='top' align='center' rowspan='#{nquantity}'>"
+    htmls.push "      <strong>#{totalQuantity}</strong></td>"
+    htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'>"
+    htmls.push "      <strong class='price'>#{totalPrice}</strong></td>"
     htmls.push "  <td valign='top' rowspan='#{nquantity}'>#{json.note}</td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'><a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span><a href='#' class='odf-delete'>删除</a></td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>"
+    htmls.push "      <a href='#' class='odf-delete'>删除</a>"
+    htmls.push "  </td>"
     htmls.push "</tr>"
     for quantity in json.quantity.slice(1, nquantity)
       htmls.push "<tr>"
@@ -111,8 +149,11 @@ class OrderDetailsForm
       htmls.push "</tr>"
     return htmls
 
-#######################################################
-  # Test Data
+
+
+  #######################################################
+  # Test Data || Example prudoct json
+  #######################################################
   addTestData:->
     testproduct = {
       id:1,

@@ -33,8 +33,10 @@ func (g *GOT) StartServer(config *GotConfig) {
 
 	// mapping static files
 	if config.StaticResources != nil {
-		g.r.PathPrefix(config.StaticResources[0]).
-			Handler(http.FileServer(http.Dir(config.StaticResources[1])))
+		for _, staticResource := range config.StaticResources {
+			g.r.PathPrefix(staticResource[0]).
+				Handler(http.FileServer(http.Dir(staticResource[1])))
+		}
 	}
 
 	// got url matcher
@@ -68,5 +70,5 @@ func PrintRegistry() {
 // Got start configs
 
 type GotConfig struct {
-	StaticResources []string // e.g.: ["/static/", "../"]
+	StaticResources [][]string // e.g.: [["/static/", "../"], ...]
 }

@@ -1,0 +1,16 @@
+@charset "UTF-8";
+/*frame*/
+html,body,p{margin:0;padding:0;}
+html{font-size:11pt;line-height:1.4em;width:210mm;}
+.order_print{width:200mm;}
+
+.prt_tit{height:10mm;}
+.prt_tit span{float:left;width:33%;}
+.prt_tbl{width:100%;}
+.prt_tbl th{border-bottom:2px solid #000;font-weight:normal;}
+.prt_tbl th,.prt_tbl td{padding:3px 25px 3px 5px;}
+.prt_tbl tfoot td{border-top:2px solid #000;font-size:1.2em;}
+.prt_tbl td strong{font-weight:normal;}
+.prt_tbl td.line{height:5px;overflow:hidden;font-size:1px;line-height:1px;}
+.other_info{margin:8mm 0 0;line-height:1.8em;}
+.underline{display:inline-block;border-bottom:1px solid #000;width:20mm;}

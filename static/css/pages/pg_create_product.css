@@ -1,0 +1,26 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/form_main.css";
+@import "../../css/module/unit.css";
+@import "../../css/module/tbl_s.css";
+
+.PG_create_product .unit{margin:40px 0 20px;}
+.PG_create_product .form_main{margin:20px 0;}
+.PG_create_product .prd_attr{margin-right:20px;}
+.PG_create_product .btn_content{margin-bottom:100px;}
+.PG_create_product .prd_attr{margin-bottom:10px;}
+/*产品属性*/
+.prd_attr{background:#f1f1f1;border:1px solid #d5d5d5;padding:10px;overflow:hidden;}
+.prd_attr h4{margin:0 0 8px;}
+.prd_attr .mar_t{margin-top:15px;}
+.prd_attr li{float:left;margin-right:20px;position:relative;}
+.prd_attr li .prd_attr_del{position:absolute;right:6px;top:6px;visibility:hidden;background:#F60 url(../../images/icons/prd_attr_close.png);width:14px;height:14px;display:inline-block;border-radius:3px;text-align:center;cursor:pointer;}
+.prd_attr li:hover .prd_attr_del{visibility:visible;}
+.prd_attr li:hover .prd_attr_del:hover{background-color:#FC3;}
+.prd_attr .prd_attr_del b{font:bold 14px Tahoma, Geneva, sans-serif;top:-3px;display:inline-block;color:#fff;position:relative;}
+.prd_attr .btn_add{background:#F60;box-shadow:inset 0 -3px 0 rgba(0,0,0,.4);width:23px;height:23px;display:inline-block;border-radius:12px;text-align:center;cursor:pointer;}
+..prd_attr btn_add:hover{background:#FC3;}
+.prd_attr .btn_add b{font:bold 23px Verdana;margin-top:-5px;display:inline-block;color:#fff;text-shadow: 0 -1px 0 rgba(0,0,0,.9);}
+

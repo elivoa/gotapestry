@@ -14,8 +14,9 @@ class OrderProductSelector
     @containerClass = "product-selector"
     @product = {} # product json of this table.
 
-    # callbacks
-    @onAddToOrder # callback on add to orderp
+    # callbacks (on basically means after)
+    @onSelectProduct # callback after user select a product
+    @onAddToOrder    # callback on add to orderp
 
     # call init
     @init()
@@ -28,45 +29,19 @@ class OrderProductSelector
 
     # Suggest on Product
     @sc = new SuggestControl({
-      parentClass : ".product-select",
+      parentClass : ".product-selector",
       triggerClass : ".product-trigger",
       hiddenClass : ".product-id"
       category : "product"
-      onSelect : (line, suggestion) ->
-        console.log "select: ", suggestion
-        _.onProductSelect line, suggestion
+      onSelect : $.proxy (line, suggestion) ->
+        @onProductSelect line, suggestion
+        @onSelectProduct suggestion.data if @onSelectProduct
+      ,@
     })
     @sc.init()
 
     # bind action on AddToOrder button
     $(".ops-add").bind 'click', $.proxy @onAddToOrderClick,@
-
-
-  ## ________________________________________
-  ## Public: call by others.
-  refresh: (product)->
-    @product = product
-    @sc.select(product.id, product.name)
-    @refreshContent()
-
-
-  ## ________________________________________
-  refreshContent: ()->
-    console.log 'refresh content, ', @product
-    # update cstable
-    if @product.colors!= null && @product.sizes != null
-      pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes)
-      pcstg.replace("cs-container") # TODO make this robust.
-    else
-      $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!")
-
-    # update price
-    $(".#{@containerClass} .price").html(@product.price)
-    if @product.productPrice - @product.price == 0
-      $(".#{@containerClass} .info").html("")
-    else
-      $(".#{@containerClass} .info").html("原价：#{@product.productPrice}"+
-      "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠")
 
 
   ## ________________________________________
@@ -113,6 +88,46 @@ class OrderProductSelector
       error: (jqXHR, textStatus, errorThrown)->
         console.log textStatus
     })
+
+
+  ## ________________________________________
+  ## Public: call by others.
+  refresh: (product)->
+    @product = product
+    @sc.select(product.id, product.name)
+    @refreshContent()
+
+
+  ## ________________________________________
+  refreshContent: ()->
+    console.log 'refresh content, ', @product
+    # 1/3 update cstable
+    if @product.colors!= null && @product.sizes != null
+      pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes)
+      pcstg.replace("cs-container") # TODO make this robust.
+    else
+      $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!")
+
+    # 2/3 update price
+    $(".#{@containerClass} .price").html(@product.price)
+    if @product.productPrice - @product.price == 0
+      $(".#{@containerClass} .info").html("")
+    else
+      $(".#{@containerClass} .info").html("原价：#{@product.productPrice}"+
+      "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠")
+
+    # 3/3 refresh stock if has
+    @fillQuantities()
+
+  ## ________________________________________
+  fillQuantities: ->
+    if @product and @product.quantity
+      for q in @product.quantity
+        o = $("#cs-container #csq_#{q[0]}__#{q[1]}") # TODO hardcode
+        if o != undefined
+          o.val q[2]
+
+
 
 
   ## ________________________________________

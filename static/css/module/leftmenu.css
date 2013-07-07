@@ -1,0 +1,10 @@
+@charset "utf-8";
+.left_menu {margin:0 0 40px;}
+.left_menu dl{}
+.left_menu dt{font-size:14px;margin:25px 20px 10px;}
+.left_menu dd{padding:2px 7px;}
+.left_menu dd a{display:block;height:24px;line-height:24px;padding:0 10px 0 28px;border-radius:3px;}
+.left_menu dd a:hover{text-decoration:none;}
+.left_menu dd.cur{box-shadow:-3px 0 3px rgba(0,0,0,.3);}
+.left_menu dd.cur a:hover{background:none;}
+.left_menu .hrline{border-top:1px solid #f0f9ff;border-bottom:1px solid #afc8da;height:0;overflow:hidden;margin:12px 12px 0;}

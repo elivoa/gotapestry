@@ -1,0 +1,9 @@
+@charset "utf-8";
+@import"../../css/global/base.css";
+@import"../../css/global/frame.css";
+@import"../../css/module/leftmenu.css";
+@import"../../css/module/tbl_main.css";
+@import"../../css/module/pager_main.css";
+.PG_list_person .list_person{margin:30px 0 100px;}
+.PG_list_person .list_person .tbl_main{width:100%;}
+.PG_list_person .list_person .pager_main{margin:20px 0 0;}

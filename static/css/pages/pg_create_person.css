@@ -1,0 +1,6 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/form_main.css";
+.PG_create_person .form_main{margin:40px 0 100px;}

@@ -1,38 +1,52 @@
 <!DOCTYPE HTML>
-<div class="tbl_list">
-  <table border="1" style="border-collapse: collapse;border-color: #ddd;">
+
+<div class="list_order">
+
+  {{if len .Orders | not}}
+  <span>无记录</span>
+  {{else}}
+
+  <table class="tbl_main">
     <tr>
-      <th>订单号</th>
-      <th>客户姓名</th>
-      <th>订单数量</th>
-      <th>订单金额</th>
-      <th>订单状态</th>
-      <th>运输</th>
-      <th>创建时间</th>
-      <th>操作</th>
+      <th align="left">订单号</th>
+      <th align="left">客户</th>
+      <th align="left">订单状态</th>
+      <th align="left">日期</th>
+      <th align="left">操作</th>
     </tr>
 
-    {{if len .Orders | not}}
-    <tr><td colspan="8">无记录</td></tr>
-    {{else}}
 
     {{range .Orders}}
     <tr>
-      <td>{{.TrackNumber}}</td>
-      <td>{{$.ShowCustomerName .CustomerId}}</td>
-      <td align="right">{{.TotalCount}}</td>
-      <td align="right">{{.TotalPrice | beautycurrency}}</td>
+	  <td nowrap><a href="#">{{.TrackNumber}}</a></td>
+      <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
       <td>{{.Status}}</td>
-      <td>{{.DeliveryMethod}}</td>
-      <td>{{.CreateTime | beautytime}}</td>
-      <td>
-        <a href="/order/edit/{{.Id}}">修改</a>
-        <a href="#">发货</a>
-      </td>
+      <td nowrap>{{.CreateTime | beautytime}}</td>
+      <td nowrap>
+        <a href="/order/edit/{{.Id}}">修改订单</a><span class="vline">|</span>
+        <a href="/order/print/{{.Id}}">打印订单</a><span class="vline">|</span>
+        <a href="">发货</a><span class="vline">|</span>
+        <a href="/order/cancel/{{.Id}}">取消订单</a></td>
     </tr>
     {{end}}
 
-    {{end}}
-
+    <tr>
+	  <td nowrap><a href="#">TODO</a></td>
+      <td nowrap>高博</td>
+      <td>已发货</td>
+      <td nowrap>2013-05-20</td>
+      <td nowrap><a href="">结款</a></td>
+    </tr>
+	<tr>
+	  <td nowrap><a href="#">TODO Status</a></td>
+      <td nowrap>高博</td>
+      <td>已完成</td>
+      <td nowrap>2013-05-20</td>
+      <td nowrap><a href="">查看订单</a></td>
+    </tr>
   </table>
+  
+  {{end}}
+
+  <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 </div>

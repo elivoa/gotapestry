@@ -79,9 +79,8 @@
     };
 
     OrderDetailsForm.prototype.defaultOnDelete = function(product) {
-      var idx, ok;
-      ok = confirm("真的要删除这条记录么？");
-      if (!ok) {
+      var idx;
+      if (!confirm("真的要删除这条记录么？")) {
         return;
       }
       delete this.data.products[product.id];
@@ -100,6 +99,46 @@
     };
 
     OrderDetailsForm.prototype.generateTR = function(json, totalQuantity, totalPrice) {
+      var htmls, nquantity, q, quantities, quantity, _i, _j, _len, _len1, _ref, _ref1;
+      quantities = [];
+      _ref = json.quantity;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        q = _ref[_i];
+        if (q[2] > 0) {
+          quantities.push(q);
+        }
+      }
+      nquantity = quantities.length;
+      htmls = [];
+      htmls.push("<tr>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'><strong>" + json.name + "</strong></td>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'><span class='price'>" + json.price + "</span></td>");
+      htmls.push("  <td>" + quantities[0][0] + "</td>");
+      htmls.push("  <td>" + quantities[0][1] + "</td>");
+      htmls.push("  <td>" + quantities[0][2] + "</td>");
+      htmls.push("  <td valign='top' align='center' rowspan='" + nquantity + "'>");
+      htmls.push("      <strong>" + totalQuantity + "</strong></td>");
+      htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
+      htmls.push("      <strong class='price'>" + totalPrice + "</strong></td>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>" + json.note + "</td>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>");
+      htmls.push("      <a href='#' class='odf-delete'>删除</a>");
+      htmls.push("  </td>");
+      htmls.push("</tr>");
+      _ref1 = quantities.slice(1, nquantity);
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        quantity = _ref1[_j];
+        htmls.push("<tr>");
+        htmls.push("  <td>" + quantity[0] + "</td>");
+        htmls.push("  <td>" + quantity[1] + "</td>");
+        htmls.push("  <td>" + quantity[2] + "</td>");
+        htmls.push("</tr>");
+      }
+      return htmls;
+    };
+
+    OrderDetailsForm.prototype.generateTR_oldversion = function(json, totalQuantity, totalPrice) {
       var htmls, nquantity, quantity, _i, _len, _ref;
       nquantity = json.quantity.length;
       htmls = [];
@@ -109,10 +148,15 @@
       htmls.push("  <td>" + json.quantity[0][0] + "</td>");
       htmls.push("  <td>" + json.quantity[0][1] + "</td>");
       htmls.push("  <td>" + json.quantity[0][2] + "</td>");
-      htmls.push("  <td valign='top' align='center' rowspan='" + nquantity + "'><strong>" + totalQuantity + "</strong></td>");
-      htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'><strong class='price'>" + totalPrice + "</strong></td>");
+      htmls.push("  <td valign='top' align='center' rowspan='" + nquantity + "'>");
+      htmls.push("      <strong>" + totalQuantity + "</strong></td>");
+      htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
+      htmls.push("      <strong class='price'>" + totalPrice + "</strong></td>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>" + json.note + "</td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'><a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span><a href='#' class='odf-delete'>删除</a></td>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>");
+      htmls.push("      <a href='#' class='odf-delete'>删除</a>");
+      htmls.push("  </td>");
       htmls.push("</tr>");
       _ref = json.quantity.slice(1, nquantity);
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
