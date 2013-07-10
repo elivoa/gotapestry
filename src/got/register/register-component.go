@@ -72,13 +72,12 @@ func handleComponentReturn(lcc *lifecircle.LifeCircleControl, seg *ProtonSegment
 	if seg != nil && lcc.Err == nil && lcc.ResultType == "" {
 		// find default tempalte to return
 		key, tplPath := LocateGOTComponentTemplate(seg.Src, seg.Path)
-		debug.Log("-756- [ComponentTemplateSelect] %v -> %v", key, tplPath)
+		// debug.Log("-756- [ComponentTemplateSelect] %v -> %v", key, tplPath)
 		_, err := templates.GotTemplateCache.Get(key, tplPath)
 		if nil != err {
 			lcc.Err = err
 		} else {
-			fmt.Println("render component tempalte " + key)
-
+			// fmt.Println("render component tempalte " + key)
 			var buffer bytes.Buffer
 			err = templates.RenderGotTemplate(&buffer, key, lcc.Proton)
 			if err != nil {

@@ -102,7 +102,7 @@ func NewComponentFlow(
 	container core.IProton, component core.IComponent,
 	params []interface{}) *LifeCircleControl {
 
-	fmt.Println("+++++++++++++++++++ [Cretae Component Flow]" +
+	fmt.Println(".................... [Cretae Component Flow]" +
 		" ---------------------------------------------------------------")
 	debug.Log("- C - [Component Container] Type: %v, ComponentType:%v,\n",
 		reflect.TypeOf(container), reflect.TypeOf(component))
@@ -161,12 +161,16 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	//    Support OnSuccess Method.
 	// TODO：只有page才POST，修复component中提交form的bug。设计一个方案。
 	if lcc.R.Method == "POST" && lcc.Kind == "page" {
-		formName := lcc.R.FormValue("t:form")
 		// POST.1 first inject form values
 		lcc.InjectFormValues()
 
 		// POST.2 call success method
-		methodName := fmt.Sprintf("%v%v", "OnSuccessFrom", formName)
+		methodName := "OnSuccess"
+		formName := lcc.R.FormValue("t:form")
+		if formName != "" {
+			methodName = fmt.Sprintf("%v%v", "OnSuccessFrom", formName)
+		}
+
 		if lcc.CallEvent(methodName) {
 			return lcc
 		}

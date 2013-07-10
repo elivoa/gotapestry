@@ -1,11 +1,17 @@
 @charset "utf-8";
-@import"../../css/global/base.css";
-@import"../../css/global/frame.css";
-@import"../../css/module/leftmenu.css";
-@import"../../css/module/tab_main.css";
-@import"../../css/module/tbl_main.css";
-@import"../../css/module/pager_main.css";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/tab_main.css";
+@import "../../css/module/search_filter.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/pager_main.css";
+@import "../../css/module/form_main.css";
+@import "../../css/module/express.css";
+@import "../../css/layer/layer.css";
 .PG_list_order .tab_main{margin:30px 0 20px;}
 .PG_list_order .list_order{margin:20px 0 100px;}
 .PG_list_order .list_order .tbl_main{width:100%;}
 .PG_list_order .list_order .pager_main{margin:20px 0 0;}
+.PG_list_order .tips_content{margin:50px 40px 100px 0;}
+.filter_content{margin:30px 0 20px;}

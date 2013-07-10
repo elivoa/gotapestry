@@ -1,0 +1,24 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/form_main.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/tbl_s.css";
+@import "../../css/module/unit.css";
+@import "../../css/module/express.css";
+.PG_detail_order .unit{margin:40px 0 20px;}
+.PG_detail_order .form_main{margin:30px 0 40px;}
+.PG_detail_order .btn_content{margin-bottom:100px;}
+.PG_detail_order .btn_content a{margin:0 10px;}
+.PG_detail_order .tips_content_b{margin-top:10px;}
+.PG_detail_order .tips_content_b strong{color:#e90000;}
+/*客户信息*/
+.B_person_info{padding:20px 30px;}
+.B_overdraft{float:right}
+.B_overdraft .price{font-size:14px;}
+
+.PG_detail_order .B_express{margin:20px 30px;}
+.PG_detail_order .B_shipping_price,.PG_detail_order .B_order_num{margin-left:40px;}
+.PG_detail_order .B_shipping_method{border:1px solid #ccc;display:inline-block;box-shadow:0 0 5px #ccc;}
+.PG_detail_order .B_order_remark{margin:20px 30px;}

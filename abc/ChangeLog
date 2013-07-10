@@ -1,0 +1,9 @@
+
+2013-07-04  Elivoa Gao  <elivoa@gmail.com>
+	* SYD/Product: V1.0 redesigned done. With separated color and size choose.
+
+2013-05-05  Elivoa Gao  <elivoa@gmail.com>
+	* DeleteCustomer: Delete customer.
+
+2013-05-03  Elivoa Gao  <elivoa@gmail.com>
+	* PersonModule: submit form for create person.

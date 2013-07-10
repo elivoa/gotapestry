@@ -28,7 +28,7 @@ func GetFunctionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
-var log_lookup bool = true
+var log_lookup bool = false
 
 func logLookup(format string, params ...interface{}) {
 	if log_lookup {

@@ -7,14 +7,16 @@ import (
 	"got/debug"
 	"got/register"
 	"gxl"
+	"strings"
 	"syd/dal"
 	"syd/model"
 	"syd/service/productservice"
 )
 
 func Register() {
-	register.Page(Register, &ProductIndex{}, &ProductEdit{}, &ProductList{},
-		&ProductCreate{},
+	register.Page(Register,
+		&ProductIndex{}, &ProductEdit{}, &ProductList{},
+		&ProductCreate{}, &ProductDetail{},
 	)
 }
 
@@ -41,9 +43,10 @@ type ProductEdit struct {
 	SubTitle string
 
 	// property
-	Id      *gxl.Int       `path-param:"1"`
-	Product *model.Product `` // Product Model
-	Stocks  []int          // receive stock numbers, transfer to product later.
+	Id       *gxl.Int       `path-param:"1"`
+	Product  *model.Product `` // Product Model
+	Stocks   []int          // receive stock numbers, transfer to product later.
+	Pictures []string       // uploaded picture's key
 
 	// display
 	StockJson string
@@ -95,6 +98,11 @@ func (p *ProductEdit) OnSuccessFromProductForm() (string, string) {
 		}
 	}
 
+	// transfer pictures value to pictures.
+	if p.Pictures != nil {
+		p.Product.Pictures = strings.Join(p.Pictures, ";")
+	}
+
 	// write to db
 	if p.Id != nil {
 		productservice.UpdateProduct(p.Product)
@@ -136,6 +144,36 @@ func (p *ProductList) Ondelete(productId int) (string, string) {
 	dal.DeleteProduct(productId)
 	// TODO make this default redirect.
 	return "redirect", "/product/list"
+}
+
+// ________________________________________________________________________________
+// Product Details
+
+type ProductDetail struct {
+	core.Page
+	Id      *gxl.Int `path-param:"1"`
+	Product *model.Product
+}
+
+func (p *ProductDetail) Setup() {
+	p.Product = productservice.GetProduct(p.Id.Int)
+}
+
+func (p *ProductDetail) Pictures() []string {
+	return productservice.ProductPictrues(p.Product)
+}
+
+func (p *ProductDetail) Picture(index int) string {
+	return productservice.ProductPictrues(p.Product)[index]
+}
+
+func (p *ProductDetail) SupplierName(id int) string {
+	person := dal.GetPerson(id)
+	if person != nil {
+		return person.Name
+	} else {
+		return "供货商_" + string(id)
+	}
 }
 
 // --------------------------------------------------------------------------------

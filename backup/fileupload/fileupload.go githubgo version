@@ -1,0 +1,59 @@
+package fileupload
+
+import (
+	"fmt"
+	"got/core"
+	jfu "got/module/fileupload"
+	"got/register"
+)
+
+func Register() {}
+func init() {
+	register.Page(Register, &FileUploadIndex{}, &FileUploadTest{})
+}
+
+type FileUploadIndex struct {
+	core.Page
+}
+
+func (p *FileUploadIndex) Setup() {
+	fmt.Println("... file upload::Setup ...")
+	uh := getJFU()
+	uh.ServeHTTP(p.W, p.R)
+}
+
+func (p *FileUploadIndex) AfterRender() (string, string) {
+	return "json", "{chedan: 'is not you'}"
+}
+
+func (p *FileUploadIndex) OnSuccess() (string, string) {
+	uh := getJFU()
+	uh.ServeHTTP(p.W, p.R)
+	return "json", "{chedan: 'submit success'}"
+}
+
+func getJFU() *jfu.UploadHandler {
+	//
+	// Initialize UploadHandler
+	//
+	conf := jfu.DefaultConfig
+	conf.MaxFileSize = 100 << 12 // 10=100kb, 12=10M
+	ds := jfu.GetFakeDataStore()
+	uh := &jfu.UploadHandler{
+		Prefix: "/got/fileupload/",
+		Store:  &ds,
+		Conf:   &conf,
+		Cache:  &jfu.FakeCache{},
+	}
+
+	// serve
+	fmt.Println("Serve http.............")
+	return uh
+}
+
+// ________________________________________________________________________________
+//
+
+type FileUploadTest struct {
+	core.Page
+}

@@ -9,25 +9,37 @@ import (
 	"got/register"
 
 	// pages import
-	root_pages "got/builtin/pages"
-	builtin_pages "got/builtin/pages/got"
+	p_root "got/builtin/pages"
+	p_builtin "got/builtin/pages/got"
+	p_fileupload "got/builtin/pages/got/fileupload"
 
 	// components import
-	builtin_components "got/builtin/components"
+	c_builtin "got/builtin/components"
 )
 
 func GotBuiltinModule(r *mux.Router) {
 
+	//
+	// register core builtin components and pages
+	//
 	register.RegisterApp(
-		"got/builtin",
-		"GOT Core Modules",
-		"got/builtin",
+		"got/builtin",      // app name
+		"GOT Core Modules", // app description
+		"got/builtin",      // app path related
 	)
 
 	// pages
-	root_pages.Register()
-	builtin_pages.Register()
+	p_root.Register()
+	p_builtin.Register()
+	p_fileupload.Register()
 
 	// components
-	builtin_components.Register()
+	c_builtin.Register()
+
+	//
+	// *** very special:: file upload *** TODO make this beautiful.
+	// Special mapping, all file upload maps here
+	//
+	r.HandleFunc("/got/fileupload/", p_fileupload.FU)
+
 }

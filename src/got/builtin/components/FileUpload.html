@@ -1,0 +1,68 @@
+<div></div>
+<div id="{{.Tid}}" class="fileuploader {{.Class}}" style="{{.Style}}">
+
+  <input name="__got_fileupload_path__" value="{{.Folder}}" >
+  <input id="" type="file" name="files[]" data-url="/got/fileupload/" multiple>
+
+  {{range .Restore}}
+  <div>
+    <input type="hidden" name="{{$.Name}}" value="{{.}}">
+    <a href="{{$.PictureLink .}}" target="_blank">{{.}}</a>
+    <a href="#" onclick="alert('TODO: delete this file on server.')">x</a>
+  </div>
+  {{end}}
+  
+  <div>
+    <div class="bar" style="width: 0%;"></div>
+  </div>
+  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+  <!-- we have jquery anywhere -->
+  <script src="/static/lib/fileupload/js/vendor/jquery.ui.widget.js"></script>
+  <script src="/static/lib/fileupload/js/jquery.iframe-transport.js"></script>
+  <script src="/static/lib/fileupload/js/jquery.fileupload.js"></script>
+</div>
+
+<script>
+  $(function () {
+    // TODO make this module, auto it's ID
+    id = "{{.Tid}}"
+    container = $('#' + id)
+    $('#' + id + " input").fileupload({
+      dataType: 'json',
+      progressInterval : 1,
+      sequentialUploads : true,
+
+      add: function (e, data) {
+        data.context = $('<p class="fu_add"/>').text('Uploading ' + data.files[0].name + ' ...')
+          .appendTo(container);
+        data.submit();
+      },
+      
+      progressall: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        container.find('.bar').css('width', progress + '%');
+      },
+      
+      done: function (e, data) {
+        $.each(data.result.files, function (index, file) {
+          $('<div><input type="hidden" name="{{.Name}}" ></div>').val(file.name).appendTo(container);
+        });                    
+
+        data.context.text('Uploaded: ' + data.files[0].name);
+        console.log('upload finished.')
+      },
+      
+    });
+  });
+</script>
+
+<style type="text/css">
+.fileuploader {
+    border:solid 1px #aaeeaa;width:300px;padding:4px;
+}
+.bar {
+    height: 18px;
+    background: green;
+}
+</style>
+

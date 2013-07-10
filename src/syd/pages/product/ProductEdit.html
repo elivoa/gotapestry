@@ -1,42 +1,36 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
-    
-    {{t_layout_header $}}
+    <link href="/static/css/pages/pg_create_product.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `新增订单` }}
     <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
     <script type="text/javascript" src="/static/js/p/product/product_edit.js"></script>
-    
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+
+  <body class="PG_create_product">
+
+    {{t_layout_headernav $}}
 
     <div class="container">
+      
+      {{t_layout_leftnav $ "CurPage" `/product/create`}}
 
-      {{t_layout_leftnav $}}
+      <div class="main_content">
 
-      <div class="content">
-    	<h2>{{.SubTitle}}商品</h2>
-        <div class="main_form">
+        {{with .Product}}
 
-          {{with .Product}}
+        <form method="POST" id="ProductForm" t:id="ProductForm" action="">
+          <input type="hidden" name="Product.Id" value="{{.Id}}" />
+          {{/* [tmp] support redirect to form */}}
+          <input type="hidden" name="t:form" value="ProductForm" />
 
-          <form method="POST" id="ProductForm" t:id="ProductForm" action="">
-            <input type="hidden" name="Product.Id" value="{{.Id}}" />
-            {{/* [tmp] support redirect to form */}}
-            <input type="hidden" name="t:form" value="ProductForm" />
-
-
-            <div class="prd_form">
-              <h3><i>商品基础信息</i></h3>
+    	  <h1>{{$.SubTitle}}商品</h1>
+          <div class="unit">
+            <div class="tit"><strong>商品基础信息</strong></div>
+            <div class="form_main">
               <dl class="clearfix">
                 <dt><i>*</i>商品名称：</dt>
-                <dd>
-                  <input type="text" name="Product.Name" value="{{.Name}}" size="45">
-                </dd>
+                <dd><input type="text" name="Product.Name" value="{{.Name}}" size="45" /></dd>
                 <dd class=""></dd>
               </dl>
               <dl class="clearfix">
@@ -62,50 +56,51 @@
               </dl>
 
               <!-- THIS IS PRODUCT COLOR & SIZE SELECTOR -->
-              
+
               <dl class="clearfix">
                 <dt>商品规格：</dt>
-                <dd class="prd_attr">
-                  <div>
-                    <h4>颜色</h4>
-                    <ul id="color-area" class="prd_attrlist mt-container">
-                      {{range .Colors}}
-                      <li class="mt-line">
-                        <input type="text" name="Product.Colors" value="{{.}}"
-                               size="12" class="csq-trigger"/>
-                        <a class="btn_del mt-remove" href="#"><b>x</b></a>
-                      </li>
-                      {{end}}
-                      <li class="add">
-                        <a href="###" class="btn_add mt-add"><b>+</b></a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="clear" style="height:10px;"></div>
+                <dd class="B_prd_attr">
+                  <h4>颜色（不填为默认颜色）</h4>
+                  <ul class="clearfix mt-container" id="color-area">
+                    <li class="mt-line" style="display:none">
+                      <input type="text" name="Product.Colors" size="12" class="csq-trigger"/>
+                      <a class="B_btn_del mt-remove" href="#"></a>
+                    </li>
+                    {{range .Colors}}
+                    <li class="mt-line">
+                      <input type="text" name="Product.Colors" value="{{.}}"
+                             size="12" class="csq-trigger"/>
+                      <a class="B_btn_del mt-remove" href="#"></a>
+                    </li>
+                    {{end}}
+                    <li class="add">
+                      <a href="###" class="B_btn_add mt-add"></a>
+                    </li>
+                  </ul>
 
-                  <div>
-                    <h4>尺码（不填为均码）</h4>
-                    <ul id="size-area" class="prd_attrlist mt-container">
-                      {{range .Sizes}}
-                      <li class="mt-line">
-                        <input type="text" name="Product.Sizes" value="{{.}}"
-                               size="12" class="csq-trigger"/>
-                        <a class="btn_del mt-remove" href="#"><b>x</b></a>
-                      </li>
-                      {{end}}
-                      <li class="add">
-                        <a href="###" class="btn_add mt-add"><b>+</b></a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="clear"></div>
-                  
+                  <h4 class="mar_t">尺码（不填为均码）</h4>
+                  <ul class="clearfix mt-container" id="size-area">
+                    <li class="mt-line" style="display:none">
+                      <input type="text" name="Product.Sizes" size="12" class="csq-trigger"/>
+                      <a class="B_btn_del mt-remove" href="#"></a>
+                    </li>
+                    {{range .Sizes}}
+                    <li class="mt-line">
+                      <input type="text" name="Product.Sizes" value="{{.}}"
+                             size="12" class="csq-trigger"/>
+                      <a class="B_btn_del mt-remove" href="#"></a>
+                    </li>
+                    {{end}}
+                    <li class="add">
+                      <a href="###" class="B_btn_add mt-add"></a>
+                    </li>
+                  </ul>
                 </dd>
                 <dd>
                   <div id="cs-container">
-
                     <!-- Generated Table, input quantity here [NO USE HERE] -->
-                    <table class="prd_tbl" style="display:none">
+
+                    <table class="tbl_s">
                       <tr>
                         <th align="left">颜色</th>
                         <th align="left">尺码</th>
@@ -114,30 +109,37 @@
                       <tr>
                         <td rowspan="2">白色</td>
                         <td>M</td>
-                        <td><input type="text" class="stock" size="8" value=""></td>
+                        <td><input type="text" size="8" value=""></td>
                       </tr>
                       <tr>
                         <td>L</td>
                         <td><input type="text" size="8" value=""></td>
                       </tr>
                     </table>
-                    <!-- ABOVE IS ONLY AN EXAMPLE! -->
-                    
+
                   </div>
                 </dd>
               </dl>
             </div>
-            
-            <div class="prd_form">
-              <h3><i>商品图片</i></h3>
+          </div>
+          <div class="unit">
+            <div class="tit"><strong>商品图片</strong></div>
+            <div class="form_main">
               <dl class="clearfix">
                 <dt>图片：</dt>
-                <dd><input type="file" size="12"></dd>
+                <dd>
+                  <!-- <input type="file" size="12"> -->
+                  
+                  {{t_fileupload $ "tid" `fileupload` "name" `Pictures` "folder" `product-pic` "restore" .PictureKeys "style" "width:480px"}}
+                  
+                </dd>
                 <dd></dd>
               </dl>
             </div>
-            <div class="prd_form">
-              <h3><i>供货商信息</i></h3>
+          </div>
+          <div class="unit">
+            <div class="tit"><strong>供货商信息</strong></div>
+            <div class="form_main">
               <dl class="clearfix">
                 <dt>供货商：</dt>
                 <dd>
@@ -146,35 +148,39 @@
                 <dd></dd>
               </dl>
               <dl class="clearfix">
-                <dt>供货价格：(TODO)</dt>
-                <dd><input type="text" size="12"><a href="">历史价格查询</a></dd>
+                <dt>供货价格：</dt>
+                <dd><input type="text" size="12"> <a href="">历史价格查询</a></dd>
                 <dd class=""></dd>
               </dl>
             </div>
-            <div class="prd_form">
-              <h3><i>备注信息</i></h3>
-              <div class="clear">
-                <textarea name="Product.Note" cols="80" rows="4">{{.Note}}</textarea>
-              </div>
+          </div>
+          <div class="unit">
+            <div class="tit"><strong>其他信息</strong></div>
+            <div class="form_main">
+              <dl class="clearfix">
+                <dt>备注：</dt>
+                <dd>
+                  <textarea name="Product.Note" cols="80" rows="4">{{.Note}}</textarea>
+                </dd>
+                <dd></dd>
+              </dl>
             </div>
-            <div class="btn_main"><input type="submit" value="提交新商品"></div>
+          </div>
+          <div class="btn_content"><input type="submit" class="btn_a_l" value="提交新商品"></div>
 
-          </form>
-          {{end}}
-          
-        </div>
+        </form>
+        {{end}}
+
+        
       </div>
     </div>
+  </body>
+</html>
 
-    <div class="footer"></div>
-
-    <script type="text/javascript">
+<script type="text/javascript">
   $(function() {
     pe =  new ProductEdit({{.StockJson}});
   });
-    </script>
-    
-  </body>
-</html>
+</script>
 
 

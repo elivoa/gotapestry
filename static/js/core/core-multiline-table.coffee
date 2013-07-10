@@ -46,8 +46,9 @@ class EditableTable
     lines = $("##{@id} #{@config.mtLine}")
     if lines.length > 0
       # clone the last line
-      line = $(lines[lines.length-1])
+      line = $(lines[0]) # $(lines[lines.length-1]) # last line
       newline = line.clone()
+      line.css {display:""}
 
       # empty values, expose callback functions
       newline.find('input').each (idx, obj) ->

@@ -41,8 +41,11 @@
       e.preventDefault();
       lines = $("#" + this.id + " " + this.config.mtLine);
       if (lines.length > 0) {
-        line = $(lines[lines.length - 1]);
+        line = $(lines[0]);
         newline = line.clone();
+        line.css({
+          display: ""
+        });
         newline.find('input').each(function(idx, obj) {
           $(obj).attr("value", "");
           return $(obj).val("");

@@ -1,6 +1,7 @@
 package productservice
 
 import (
+	"path/filepath"
 	"strings"
 	"syd/dal"
 	"syd/model"
@@ -63,4 +64,15 @@ func GetProduct(id int) *model.Product {
 		product.Stocks = *dal.ListProductStocks(id)
 	}
 	return product
+}
+
+func ProductPictrues(product *model.Product) []string {
+	if nil == product {
+		return []string{}
+	}
+	pkeys := product.PictureKeys()
+	for i := 0; i < len(pkeys); i++ {
+		pkeys[i] = filepath.Join("/pictures", pkeys[i])
+	}
+	return pkeys
 }

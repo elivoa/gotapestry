@@ -1,0 +1,26 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/unit.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/tbl_s.css";
+@import "../../css/module/form_main.css";
+@import "../../css/layer/layer.css";
+.PG_detail_product{}
+.PG_detail_product .B_prd{margin:30px 0;}
+.PG_detail_product .unit{margin:30px 0;}
+.PG_detail_product .form_main{margin:20px;}
+.PG_detail_product .form_main dl{margin-bottom:20px;}
+.PG_detail_product .form_main dt{padding:0;}
+.B_prd_img{float:left;width:320px;height:320px;border:1px solid #ccc;text-align:center}
+.B_prd_img img{max-width:320px;max-height:320px;}
+.B_prd_info{margin-left:350px;}
+.B_prd_info h2{font-size:14px;margin:0 0 15px;}
+.B_prd_info p{margin:0 0 5px;line-height:2em;}
+.B_prd_info .price{font-size:1.6em;margin-right:5px;}
+.B_stock .tbl_s{min-width:240px;}
+
+.B_prd_sale{}
+.B_prd_sale .B_tit{margin-top:6px;border-top:1px solid #ccc;}
+.B_prd_sale .B_tit strong{background:#fff;padding:0 12px;margin-top:-6px;margin-left:30px;display:inline-block;position:relative;}

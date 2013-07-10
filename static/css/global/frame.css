@@ -44,3 +44,15 @@ select{padding:2px;}
 .btn_c_s:hover{box-shadow:inset -1px -1px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
 .btn_c_l:hover{box-shadow:inset -1px -2px 1px rgba(0,0,0,.2),inset 1px 1px 1px rgba(255,255,255,.5);}
 .btn_c_s:active,.btn_c_l:active{box-shadow:none;}
+
+/*tips*/
+.tips_content{text-align:center;font-size:14px;}
+.icon_warning,.icon_ok{width:32px;height:32px;display:inline-block; vertical-align:middle;margin-right:8px;}
+.icon_warning{background:url(../../images/icons/warning.png) no-repeat;}
+.icon_ok{background:url(../../images/icons/ok.png) no-repeat;}
+.tips_content_b{font-size:14px;background:#fff1a4;border-radius:4px;padding:10px;}
+/*icons*/
+.icon_yto,.icon_sf,.icon_pickup{background:url(../../images/order/express.png) no-repeat;width:60px;height:28px;display:inline-block; vertical-align:middle;}
+.icon_yto{background-position:-100px 0;}
+.icon_sf{background-position:0 0;}
+.icon_pickup{background-position:-200px 0;}

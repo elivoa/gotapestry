@@ -35,14 +35,14 @@
         htmls.push("  <tr>");
         htmls.push("    <td rowspan=\"" + nSizes + "\">" + color + "</td>");
         htmls.push("    <td>" + this.sizes[0] + "</td>");
-        htmls.push("    <td><input type=\"text\" size=\"8\" id=\"csq_" + color + "__" + this.sizes[0] + "\" class=\"stock\"></td>");
+        htmls.push("    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_" + color + "__" + this.sizes[0] + "\" class=\"stock\"></td>");
         htmls.push("  </tr>");
         _ref1 = this.sizes.slice(1, this.sizes.length);
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           size = _ref1[_j];
           htmls.push("  <tr>");
           htmls.push("    <td>" + size + "</td>");
-          htmls.push("    <td><input type=\"text\" size=\"8\" id=\"csq_" + color + "__" + size + "\" class=\"stock\"></td>");
+          htmls.push("    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_" + color + "__" + size + "\" class=\"stock\"></td>");
           htmls.push("  </tr>");
         }
       }

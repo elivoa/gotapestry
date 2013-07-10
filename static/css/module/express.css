@@ -1,0 +1,7 @@
+@charset "utf-8";
+.choose_express{}
+
+.choose_express label{display:inline-block;width:65px;height:28px;border:3px solid #fff;margin:0 10px 0 0;}
+.choose_express label.checked{border-color:#1b8010;position:relative;}
+.choose_express label.checked:after{content:"";width:9px;height:9px;display:block;overflow:hidden;position:absolute;right:0;bottom:0;background:#1b8010 url(../../images/order/choose_express.png) no-repeat;}
+.choose_express label input{display:none;}

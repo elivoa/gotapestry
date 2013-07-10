@@ -6,7 +6,7 @@
 @import "../../css/module/tbl_main.css";
 @import "../../css/module/tbl_s.css";
 @import "../../css/module/unit.css";
-@import "../../css/module/tbl_s.css";
+@import "../../css/module/express.css";
 .PG_create_order .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
 .PG_create_order .unit{margin:40px 0 20px;}
 .PG_create_order .form_main{margin:30px 0 40px;}
@@ -29,15 +29,7 @@
 .B_prd_att .B_text{padding:0 0 8px;}
 .B_prd_att .B_btn{padding-top:20px;}
 .B_express{margin:20px 30px 30px;}
-.B_choose_express{}
-.B_choose_express .B_ico_yto,.B_choose_express .B_ico_sf,.B_choose_express .B_ico_pickup{background:url(../../images/order/express.png) no-repeat;width:60px;height:28px;display:inline-block; vertical-align:middle;}
-.B_choose_express .B_ico_yto{background-position:-100px 0;}
-.B_choose_express .B_ico_sf{background-position:0 0;}
-.B_choose_express .B_ico_pickup{background-position:-200px 0;}
-.B_choose_express label{display:inline-block;width:65px;height:28px;border:3px solid #fff;margin:0 10px 0 0;}
-.B_choose_express label.checked{border-color:#1b8010;position:relative;}
-.B_choose_express label.checked:after{content:"";width:9px;height:9px;display:block;overflow:hidden;position:absolute;right:0;bottom:0;background:#1b8010 url(../../images/order/choose_express.png) no-repeat;}
-.B_choose_express label input{display:none;}
+
 .B_fare{margin:20px 0 0;}
 .B_fare label{margin:0 0 0 40px}
 .B_order_remark{margin:20px 30px 30px;}

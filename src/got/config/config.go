@@ -15,11 +15,13 @@ import (
 var Config = NewConfigure()
 
 type Configure struct {
-	Version           string   `Framewrok Version`
-	BasePath          string   // /path/to/home
-	SrcPath           string   // /path/to/home/src
-	StaticPath        string   // /path/to/home/static
-	BasePackages      []string `Packages taht contains Pages and Components etc`
+	Version      string `Framewrok Version`
+	BasePath     string // /path/to/home
+	SrcPath      string // /path/to/home/src
+	StaticPath   string // /path/to/home/static
+	ResourcePath string // /var/site/data/syd/
+
+	BasePackages      []string `Packages that contains Pages and Components etc`
 	PagePackages      []string `no use`
 	ComponentPackages []string `...`
 }
@@ -36,7 +38,9 @@ func NewConfigure() Configure {
 		Version:      "Alpha 3",
 		BasePackages: []string{"happystroking"},
 		BasePath:     basePath,
-		SrcPath:      path.Join(basePath, "src"),
-		StaticPath:   path.Join(basePath, "static"),
+		ResourcePath: "/tmp/",
+
+		SrcPath:    path.Join(basePath, "src"),
+		StaticPath: path.Join(basePath, "static"),
 	}
 }

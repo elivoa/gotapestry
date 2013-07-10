@@ -19,13 +19,13 @@ func CreateProduct(product *model.Product) *model.Product {
 		log.Printf("[dal] Create product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?)")
+	stmt, err := db.DB.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, pictures, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, time.Now(), time.Now())
+	result, err := stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, product.Pictures, time.Now(), time.Now())
 	if err != nil {
 		panic(err.Error())
 	}
@@ -45,13 +45,13 @@ func UpdateProduct(product *model.Product) {
 		log.Printf("[dal] Edit product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, note=?, updatetime=? where id=?")
+	stmt, err := db.DB.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, note=?, pictures=?, updatetime=? where id=?")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, time.Now(), product.Id)
+	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, product.Pictures, time.Now(), product.Id)
 }
 
 // Get product [updated new version]
@@ -71,7 +71,7 @@ func GetProduct(id int) (*model.Product, error) {
 
 	row := stmt.QueryRow(id)
 	p := new(model.Product)
-	err = row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.CreateTime, &p.UpdateTime)
+	err = row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime)
 	if db.Err(err) {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func ListProduct() *[]model.Product {
 	products := []model.Product{}
 	for rows.Next() {
 		p := new(model.Product)
-		rows.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.CreateTime, &p.UpdateTime)
+		rows.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime)
 		// TODO Peformance problem.
 		products = append(products, *p)
 	}

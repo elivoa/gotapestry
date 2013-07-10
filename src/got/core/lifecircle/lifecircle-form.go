@@ -31,9 +31,22 @@ var c = cache.StructCache
 */
 func (lcc *LifeCircleControl) InjectFormValues() {
 
+	// add ParseForm to fix bugs in go1.1.1
+	err := lcc.R.ParseForm()
+	if err != nil {
+		lcc.Err = err
+		return
+		// panic(err.Error())
+	}
+
 	// debug print
 	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
 		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.R.Form)
+		// fmt.Println(lcc.R)
+		// fmt.Println(lcc.R.Form)
+		// fmt.Println(lcc.R.FormValue)
+		// fmt.Println(lcc.R.FormFile)
+		// fmt.Println(lcc.R.UserAgent)
 	}
 
 	// 为了迎合gorilla/schema的奇葩要求，这里需要转换格式为：FormData
@@ -50,6 +63,12 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	// ---------------------------------
 	// 2) Parse array in form
 	data := map[string][]string{} // stores transfered FormData
+
+	// don't import multipart form.
+	// err = lcc.R.ParseMultipartForm(1024 * 1024 * 10) // MOVE CONFIG OUT
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
 
 	for path, formValue := range lcc.R.Form {
 

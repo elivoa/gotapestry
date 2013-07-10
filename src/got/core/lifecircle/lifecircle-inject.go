@@ -63,11 +63,11 @@ func (lcc *LifeCircleControl) InjectValue() {
 		strParams = strings.Split(paramsString, "/")
 	}
 	debug.Log("-   - [injection] URL:%v, parameters:%v", url, strParams)
-	fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-	fmt.Printf("+ url: %v\n", url)
-	fmt.Printf("+ lcc.PageUrl: %v\n", lcc.PageUrl)
-	fmt.Printf("+ paramsString: %v\n", paramsString)
-	fmt.Printf("+ strParams: %v\n", strParams)
+	// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
+	// fmt.Printf("+ url: %v\n", url)
+	// fmt.Printf("+ lcc.PageUrl: %v\n", lcc.PageUrl)
+	// fmt.Printf("+ paramsString: %v\n", paramsString)
+	// fmt.Printf("+ strParams: %v\n", strParams)
 
 	// ...
 	for i := 0; i < t.NumField(); i++ {
@@ -108,8 +108,8 @@ func (lcc *LifeCircleControl) InjectValue() {
 				panic(fmt.Sprintf("TAG path-param must be numbers. not %v.", tagValue))
 			}
 			if pathParamIndex <= len(strParams) {
-				fmt.Printf("\t>>>>>> pathParamIndexis %v, len(strParams) = %v\n",
-					pathParamIndex, len(strParams))
+				// fmt.Printf("\t>>>>>> pathParamIndexis %v, len(strParams) = %v\n",
+				// 	pathParamIndex, len(strParams))
 				values[fieldKey] = []string{strParams[pathParamIndex-1]}
 				lcc.SetInjected(f.Name)
 			}
@@ -145,10 +145,13 @@ func analysisTranslateSuffix(t reflect.Type) string {
 func (lcc *LifeCircleControl) InjectComponentParameters(params []interface{}) *LifeCircleControl {
 	// debug log .....
 	// log.Printf("-621- Component [%v]'s params is: ", seg.Name)
-	for i, p := range params {
-		fmt.Printf("\t%3v: %v\n", i, p)
+	debug := false
+	if debug {
+		for i, p := range params {
+			fmt.Printf("\t%3v: %v\n", i, p)
+		}
+		fmt.Println("\t~ END Params ~")
 	}
-	fmt.Println("\t~ END Params ~")
 
 	data := make(map[string][]string)
 	var key string
@@ -164,7 +167,9 @@ func (lcc *LifeCircleControl) InjectComponentParameters(params []interface{}) *L
 			// set flag
 			lcc.SetInjected(key)
 		} else {
-			fmt.Printf(">>>> param: %10v = %v\n", key, param)
+			if debug {
+				fmt.Printf(">>>> param: %10v = %v\n", key, param)
+			}
 			if key == "" || param == nil {
 				// panic("value is nil")
 				continue

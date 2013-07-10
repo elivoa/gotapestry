@@ -14,29 +14,13 @@ import (
 var Templates *template.Template
 
 func init() {
-	// init template
+	// init template TODO remove this, change another init method.
 	Templates = template.Must(template.ParseFiles(
 		LocatePath("nothing"),
 	))
 
 	registerHelperFuncs()
 	registerComponentFuncs() // TEST
-
-	// init functions
-	// Templates.Funcs(template.FuncMap{
-	// 	"formattime":     FormatTime,
-	// 	"beautytime":     BeautyTime,
-	// 	"formatcurrency": FormatCurrency,
-	// })
-}
-
-// old
-func Add(templateName string) {
-	tml, err := Templates.ParseFiles(LocatePath(templateName))
-	template.Must(tml, err)
-	if err != nil {
-		panic(err.Error())
-	}
 }
 
 /*
@@ -86,7 +70,7 @@ func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 }
 
 /*
-   Utils
+   Utils TODO remove this
 */
 func LocatePath(name string) (templates string) {
 	return fmt.Sprintf("../src/template/%v.html", name)
@@ -155,4 +139,13 @@ func RenderTemplate(w io.Writer, tmpl string, p interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// old TODO remove this
+func Add(templateName string) {
+	tml, err := Templates.ParseFiles(LocatePath(templateName))
+	template.Must(tml, err)
+	if err != nil {
+		panic(err.Error())
+	}
 }

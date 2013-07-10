@@ -34,8 +34,11 @@ func (g *GOT) StartServer(config *GotConfig) {
 	// mapping static files
 	if config.StaticResources != nil {
 		for _, staticResource := range config.StaticResources {
-			g.r.PathPrefix(staticResource[0]).
-				Handler(http.FileServer(http.Dir(staticResource[1])))
+			// g.r.PathPrefix(staticResource[0]).
+			// 	Handler(http.FileServer(http.Dir(staticResource[1])))
+			http.Handle(staticResource[0],
+				http.StripPrefix(staticResource[0], http.FileServer(http.Dir(staticResource[1]))),
+			)
 		}
 	}
 
@@ -49,7 +52,6 @@ func (g *GOT) StartServer(config *GotConfig) {
 
 // ________________________________________________________________________________
 // Init GOT framework builtin module.
-// TODO: automatically get this address
 //
 func PrintRegistry() {
 	register.Apps.PrintALL()

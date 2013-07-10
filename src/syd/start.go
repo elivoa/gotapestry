@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"got"
+	"got/config"
 	"got/register"
 	"syd/pages/ajax"
 )
@@ -34,9 +35,11 @@ func Start() {
 	welcome()
 
 	// start server
+	config.Config.ResourcePath = "/var/site/data/syd/pictures/"
 	g.StartServer(&got.GotConfig{
 		StaticResources: [][]string{
-			[]string{"/static/", "../"},
+			[]string{"/pictures/", "/var/site/data/syd/pictures/"},
+			[]string{"/static/", "../static/"},
 		},
 	})
 }
@@ -80,5 +83,5 @@ func welcome() {
 	fmt.Println("`                                                `")
 	fmt.Println("``````````````````````````````````````````````````")
 	fmt.Printf("Server Started, Listen localhost:8080\n\n")
-	got.PrintRegistry()
+	// got.PrintRegistry()
 }

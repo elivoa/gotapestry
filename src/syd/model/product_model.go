@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// TODO Design:model, how to split model data and fields.
 type Product struct {
 	Id           int    // id
 	Name         string // product name
@@ -19,7 +20,9 @@ type Product struct {
 	CreateTime   time.Time
 	UpdateTime   time.Time
 
-	// additional information
+	Pictures string // picture keys splited by ';' filenamne can't contain ';'
+
+	// additional information, not in persistence
 	Colors     []string // these two information stores in product_properties table.
 	Sizes      []string
 	Properties map[string][]string // other properties // TODO
@@ -41,8 +44,10 @@ func NewProduct() *Product {
 }
 
 func (p *Product) ClearValues() {
-	p.ClearColors()
-	p.ClearSizes()
+	if p != nil {
+		p.ClearColors()
+		p.ClearSizes()
+	}
 }
 
 func (p *Product) ClearColors() {
@@ -79,4 +84,8 @@ func (p *Product) ClearSizes() {
 		}
 	}
 	p.Sizes = newSizes
+}
+
+func (p *Product) PictureKeys() []string {
+	return strings.Split(p.Pictures, ";")
 }
