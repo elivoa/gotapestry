@@ -19,7 +19,7 @@ func CreateProduct(product *model.Product) *model.Product {
 		log.Printf("[dal] Create product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, pictures, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?)")
+	stmt, err := db.DB.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, pictures, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err.Error())
 	}

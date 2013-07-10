@@ -1,8 +1,7 @@
 @charset "UTF-8";
 /*frame*/
 html,body,p{margin:0;padding:0;}
-html{font-size:11pt;line-height:1.4em;width:210mm;}
-.order_print{width:200mm;}
+.order_print{width:200mm;font-size:11pt;line-height:1.4em;width:210mm;}
 
 .prt_tit{height:10mm;}
 .prt_tit span{float:left;width:33%;}

@@ -27,3 +27,8 @@
 .L_cash_wait td{background:#ffc0c0;}
 .L_cash_done td{background:#c2fbc7;}
 .L_pager_content{text-align:right;margin:10px 0;}
+
+/*入库*/
+.L_warehousing{}
+.L_warehousing .form_main{margin-right:60px;padding:20px 0 5px;}
+.L_warehousing .tbl_s{width:100%}
