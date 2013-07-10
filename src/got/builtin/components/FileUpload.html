@@ -45,7 +45,7 @@
       
       done: function (e, data) {
         $.each(data.result.files, function (index, file) {
-          $('<div><input type="hidden" name="{{.Name}}" ></div>').val(file.name).appendTo(container);
+          $('<div><input type="hidden" name="{{.Name}}" value="'+file.name+'" ></div>').appendTo(container);
         });                    
 
         data.context.text('Uploaded: ' + data.files[0].name);
