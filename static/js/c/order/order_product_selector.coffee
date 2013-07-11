@@ -103,8 +103,7 @@ class OrderProductSelector
     console.log 'refresh content, ', @product
     # 1/3 update cstable
     if @product.colors!= null && @product.sizes != null
-      pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes)
-      pcstg.replace("cs-container") # TODO make this robust.
+      pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes, "cs-container")
     else
       $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!")
 

@@ -4,7 +4,7 @@
 
   window.ProductCSTableGenerator = ProductColorSizeTableGenerator = (function() {
 
-    function ProductColorSizeTableGenerator(colors, sizes) {
+    function ProductColorSizeTableGenerator(colors, sizes, tid, editable, data) {
       if (colors.length === 0) {
         this.colors = ["默认颜色"];
       } else {
@@ -15,6 +15,8 @@
       } else {
         this.sizes = sizes;
       }
+      this.tid = tid === void 0 ? "..." : tid;
+      this.editable = editable === void 0 ? true : editable;
       this.generateHtml();
     }
 
@@ -47,11 +49,8 @@
         }
       }
       htmls.push("</table>");
-      return this.html = htmls.join("\n");
-    };
-
-    ProductColorSizeTableGenerator.prototype.replace = function(divId) {
-      return $("#" + divId).html(this.html);
+      this.html = htmls.join("\n");
+      return $("#" + this.tid).html(this.html);
     };
 
     return ProductColorSizeTableGenerator;

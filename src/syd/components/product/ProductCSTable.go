@@ -7,7 +7,7 @@ import (
 	"syd/service/productservice"
 )
 
-func Register()
+func Register() {}
 func init() {
 	register.Component(Register, &ProductColorSizeTable{})
 }
@@ -20,11 +20,11 @@ func init() {
 
 type ProductColorSizeTable struct {
 	core.Component
-
-	Id      int
-	Product *model.Product
+	Tid       string // client id
+	ProductId int    // product id
+	Product   *model.Product
 }
 
 func (p *ProductColorSizeTable) Setup() {
-	p.Product = productservice.GetProduct(p.Id)
+	p.Product = productservice.GetProduct(p.ProductId)
 }

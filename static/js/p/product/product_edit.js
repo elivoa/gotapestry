@@ -48,8 +48,7 @@
     ProductEdit.prototype.firstTimeDrawCSQTable = function() {
       var pcstg, _ref;
       _ref = this.readColorSizes(), this.colors = _ref[0], this.sizes = _ref[1];
-      pcstg = new ProductCSTableGenerator(this.colors, this.sizes);
-      pcstg.replace(this.csqTableId);
+      pcstg = new ProductCSTableGenerator(this.colors, this.sizes, this.csqTableId);
       console.log(this.stockcache);
       return this.fillProductQuantity();
     };
@@ -58,8 +57,7 @@
       var pcstg, _ref, _ref1;
       _ref = this.readColorSizes(), this.colors = _ref[0], this.sizes = _ref[1];
       this.cacheStock();
-      pcstg = new ProductCSTableGenerator(this.colors, this.sizes);
-      pcstg.replace(this.csqTableId);
+      pcstg = new ProductCSTableGenerator(this.colors, this.sizes, this.csqTableId);
       _ref1 = this.readColorSizes(), this.colors = _ref1[0], this.sizes = _ref1[1];
       return this.fillProductQuantity();
     };

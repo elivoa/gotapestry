@@ -1,10 +1,8 @@
 @charset "UTF-8";
 /*frame*/
-html,body,p{margin:0;padding:0;}
-.order_print{width:200mm;font-size:11pt;line-height:1.4em;width:210mm;}
-
+.order_print{font-size:12pt;line-height:1.4em;width:241mm;}
 .prt_tit{height:10mm;}
-.prt_tit span{float:left;width:33%;}
+.prt_tit span{float:left;width:33%;font-size:9pt;}
 .prt_tbl{width:100%;}
 .prt_tbl th{border-bottom:2px solid #000;font-weight:normal;}
 .prt_tbl th,.prt_tbl td{padding:3px 25px 3px 5px;}

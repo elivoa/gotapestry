@@ -56,8 +56,7 @@ class ProductEdit
     # TODO init stockcache with server values, ajax?
     # restore cs-table
     [@colors, @sizes] = @readColorSizes()
-    pcstg = new ProductCSTableGenerator(@colors, @sizes)
-    pcstg.replace(@csqTableId)
+    pcstg = new ProductCSTableGenerator(@colors, @sizes, @csqTableId)
     # restore stock number.
     console.log @stockcache
     @fillProductQuantity()
@@ -65,8 +64,7 @@ class ProductEdit
   onCSQTableRefresh: ->
     [@colors, @sizes] = @readColorSizes()
     @cacheStock()
-    pcstg = new ProductCSTableGenerator(@colors, @sizes)
-    pcstg.replace(@csqTableId)
+    pcstg = new ProductCSTableGenerator(@colors, @sizes, @csqTableId)
     [@colors, @sizes] = @readColorSizes()
     @fillProductQuantity()
 

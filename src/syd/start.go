@@ -13,6 +13,7 @@ import (
 	syd_components "syd/components"
 	layout_components "syd/components/layout"
 	order_components "syd/components/order"
+	c_product "syd/components/product"
 
 	"fmt"
 	"github.com/gorilla/mux"
@@ -66,6 +67,7 @@ func sydModule(r *mux.Router) {
 	syd_components.Register()
 	layout_components.Register()
 	order_components.Register()
+	c_product.Register()
 }
 
 // register simple router module into GOT.

@@ -1,52 +1,47 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
 
-    {{t_layout_header $}}
-
+    <link href="/static/css/pages/pg_create_person.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" (print .SubTitle "联系人") }}
+    
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+  <body class="PG_create_person">
+
+    {{t_layout_headernav $}}
+
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      {{t_layout_leftnav $ "CurPage" `/person/list`}}
 
-      <div class="content">
-    	<h2>{{.SubTitle}}联系人</h2>
-
-        <div class="main_form">
+      <div class="main_content">
+    	<h1>{{.SubTitle}}联系人</h1>
+        
+        <div class="form_main">
           <form method="POST" id="PersonForm" action="">
             <input type="hidden" name="Person.Id" value="{{.Person.Id}}" />
-
             {{/* TODO: [tmp] support redirect to form */}}
             <input type="hidden" name="t:form" value="PersonForm" />
 
             <dl class="clearfix">
               <dt><i>*</i>姓名：</dt>
               <dd>
-                <input type="text" size="12"
+                <input type="text" size="12" class="inp_error"
                        name="Person.Name" value="{{.Person.Name}}" />
               </dd>
-              <dd></dd>
+              <dd class="tips" style="display:block">
+                <b><i></i></b><a class="tips_close" href="#"></a>必须填写客户姓名
+              </dd>
             </dl>
+
             <dl class="clearfix">
               <dt>类型：</dt>
               <dd>
                 {{t_select $ "data" .TypeData "name" "Person.Type" "value" .Person.Type "Header" "请选择"}}
-                <!--
-                    <select name="Person.Type" value="{{.Person.Type}}">
-                      <option>请选择</option>
-                      <option value="customer">客户</option>
-                      <option value="factory">厂家</option>
-                    </select>
-                    -->
               </dd>
               <dd></dd>
             </dl>
+
             <dl class="clearfix">
               <dt>电话：</dt>
               <dd>
@@ -55,32 +50,35 @@
               </dd>
               <dd></dd>
             </dl>
+
             <dl class="clearfix">
               <dt>所在地：</dt>
               <dd>
 
                 {{t_provinceselect $ "name" "Person.City" "value" .Person.City}}
 
-                <!--
-                    <select name="Person.City" value="{{.Person.City}}">
-                      <option value="">省</option>
-                      <option value="上海">上海</option>
-                      <option value="嘉兴">嘉兴</option>
-                      <option value="濮院">濮院</option>
-                    </select>
-                    -->
+                {{/*<!--
+                        <select name="Person.City" value="{{.Person.City}}">
+                          <option value="">省</option>
+                          <option value="上海">上海</option>
+                          <option value="嘉兴">嘉兴</option>
+                          <option value="濮院">濮院</option>
+                        </select>
+                        -->
+                */}}
                 <input type="text" size="12"
                        name="Person.Address" value="{{.Person.Address}}" />
               </dd>
-              <dd></dd>
+              <dd class="tips"></dd>
             </dl>
+
             <dl class="clearfix">
               <dt>邮编：</dt>
               <dd>
                 <input type="text" size="12"
                        name="Person.PostalCode" value="{{.Person.PostalCode}}" />
               </dd>
-              <dd></dd>
+              <dd class="tips"></dd>
             </dl>
             <dl class="clearfix">
               <dt>QQ：</dt>
@@ -108,13 +106,11 @@
               <dd><input type="submit" value="提交"></dd>
               <dd></dd>
             </dl>
+
           </form>
         </div>
       </div>
-
-    </div>
-    <div class="footer">
-
     </div>
   </body>
 </html>
+

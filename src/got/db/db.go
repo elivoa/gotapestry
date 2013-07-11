@@ -58,7 +58,6 @@ type Filter struct {
 /*
   Error handling
 */
-
 func Err(err error) bool {
 	if err != nil {
 		debug.Error(err)

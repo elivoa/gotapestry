@@ -1,1 +1,9 @@
-<div></div>
+<div id="{{.Tid}}"></div>
+
+<script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
+<script type="text/javascript">
+  $(function(){
+    a = new ProductCSTableGenerator({{.Product.Colors}}, {{.Product.Sizes}}, "{{.Tid}}", false)
+  });
+</script>
+

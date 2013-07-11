@@ -32,13 +32,6 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 
 	printAccessHeader(r)
 
-	debuglog := true
-	if debuglog {
-		fmt.Println("``````````````````````````````````````````````````````````````````````````````````````````")
-		fmt.Printf("r.Method=%v\n", r.Method)
-		fmt.Println(r.Form)
-	}
-
 	// 1. let's find the right pages.
 	result, err := register.Pages.Lookup(url)
 	if nil != err {

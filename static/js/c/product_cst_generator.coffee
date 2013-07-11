@@ -4,17 +4,19 @@
 
 window.ProductCSTableGenerator =
 class ProductColorSizeTableGenerator
-  constructor: (colors, sizes) ->
+  # the last two parameter can ignored.
+  constructor: (colors, sizes, tid, editable, data) ->
 
     # clear parameters
     if colors.length == 0 then @colors=["默认颜色"] else @colors = colors
     if sizes.length == 0 then @sizes=["均码"] else @sizes = sizes
+    @tid = if tid == undefined then "..." else tid # client ID
+    @editable = if editable == undefined then true else editable # edit or display only
 
     # generate html
     @generateHtml()
 
   generateHtml: ->
-    #
     htmls = []
     htmls.push '<table class="tbl_s">'
     htmls.push '  <tr>'
@@ -41,7 +43,6 @@ class ProductColorSizeTableGenerator
     htmls.push "</table>"
     @html = htmls.join("\n")
 
-  replace: (divId)->
-      $("##{divId}").html(@html)
-
+    # append to container
+    $("##{@tid}").html(@html)
 

@@ -86,8 +86,7 @@
       var pcstg;
       console.log('refresh content, ', this.product);
       if (this.product.colors !== null && this.product.sizes !== null) {
-        pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes);
-        pcstg.replace("cs-container");
+        pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes, "cs-container");
       } else {
         $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
       }

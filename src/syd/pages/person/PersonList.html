@@ -1,32 +1,28 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
-
-    {{t_layout_header $}}
-
+    <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" (print .SubTitle "列表") }}
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+  <body class="PG_list_person">
+    {{t_layout_headernav $}}
+
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      {{t_layout_leftnav $ "CurPage" `/person/list`}}
 
-      <div class="content">
-    	<h2>{{.SubTitle}}列表</h2>
-        <div class="person_list">
-		  <table>
+      <div class="main_content">
+    	<h1>{{.SubTitle}}列表</h1>
+        <div class="list_person">
+          <table class="tbl_main">
             <tr>
-              <th>客户姓名</th>
-              <th>地址</th>
-              <th>电话</th>
-              <th>qq</th>
-              <th>网店</th>
-              <th>备注</th>
-              <th>操作</th>
+              <th align="left">客户姓名</th>
+              <th align="left">地址</th>
+              <th align="left">电话</th>
+              <th align="left">qq</th>
+              <th align="left">网店</th>
+              <th align="left">备注</th>
+              <th align="left">操作</th>
             </tr>
 
             {{range .Persons}}
@@ -46,11 +42,9 @@
             {{end}}
 
           </table>
+          <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
         </div>
       </div>
-    </div>
-    <div class="footer">
-
     </div>
   </body>
 </html>
