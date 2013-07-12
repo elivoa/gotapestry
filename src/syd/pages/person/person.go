@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"syd/dal"
 	"syd/model"
+	"syd/service/personservice"
 )
 
 func Register() {}
@@ -40,12 +41,12 @@ type PersonList struct {
 	core.Page
 
 	PersonType string `path-param:"1" param:"type"`
-	Persons    *[]model.Person
+	Persons    []*model.Person
 	SubTitle   string
 }
 
 func (p *PersonList) Setup() interface{} {
-	persons, err := dal.ListPerson(p.PersonType)
+	persons, err := personservice.List(p.PersonType)
 	if err != nil {
 		return err
 	}
@@ -112,7 +113,8 @@ func (p *PersonEdit) OnSuccessFromPersonForm() (string, string) {
 	if p.Id != nil {
 		dal.UpdatePerson(p.Person)
 	} else {
-		dal.CreatePerson(p.Person)
+		personservice.Create(p.Person)
+		// dal.CreatePerson(p.Person)
 	}
 	return "redirect", fmt.Sprintf("/person/list/%v", p.Person.Type)
 }

@@ -45,13 +45,13 @@ func UpdateProduct(product *model.Product) {
 		log.Printf("[dal] Edit product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, note=?, pictures=?, updatetime=? where id=?")
+	stmt, err := db.DB.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, shelfno=?,note=?, pictures=?, updatetime=? where id=?")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.Note, product.Pictures, time.Now(), product.Id)
+	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.ShelfNo, product.Note, product.Pictures, time.Now(), product.Id)
 }
 
 // Get product [updated new version]

@@ -15,7 +15,8 @@ type Product struct {
 	Price        float64
 	Supplier     int
 	FactoryPrice float64
-	Stock        int // 库存量 || not used again?
+	Stock        int    // 库存量 || not used again?
+	ShelfNo      string // 货架号
 	Note         string
 	CreateTime   time.Time
 	UpdateTime   time.Time

@@ -4,24 +4,29 @@ import (
 	"path/filepath"
 	"strings"
 	"syd/dal"
+	"syd/dal/productdao"
 	"syd/model"
 )
 
 //
 // CreateProduct create a new Product into database, including it's properties.
 //
-func CreateProduct(product *model.Product) *model.Product {
+func CreateProduct(product *model.Product) (*model.Product, error) {
 	if product == nil {
-		return nil
+		panic("Product can't be null!")
 	}
-	newProduct := dal.CreateProduct(product)
+	newProduct, err := productdao.Create(product)
+	if err != nil {
+		return nil, err
+	}
+	// newProduct := dal.CreateProduct(product)
 	if product.Colors != nil {
 		dal.UpdateProductProperties(newProduct.Id, "color", product.Colors...)
 	}
 	if product.Sizes != nil {
 		dal.UpdateProductProperties(newProduct.Id, "size", product.Sizes...)
 	}
-	return newProduct
+	return newProduct, nil
 }
 
 func UpdateProduct(product *model.Product) {
@@ -57,7 +62,7 @@ func UpdateProduct(product *model.Product) {
 // TODO get all properties.
 //
 func GetProduct(id int) *model.Product {
-	product, err := dal.GetProduct(id)
+	product, err := productdao.Get(id)
 	if err == nil && product != nil {
 		product.Colors = dal.GetProductProperties(id, "color")
 		product.Sizes = dal.GetProductProperties(id, "size")
@@ -75,4 +80,8 @@ func ProductPictrues(product *model.Product) []string {
 		pkeys[i] = filepath.Join("/pictures", pkeys[i])
 	}
 	return pkeys
+}
+
+func ListProducts() ([]*model.Product, error) {
+	return productdao.ListAll()
 }

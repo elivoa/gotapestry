@@ -22,6 +22,12 @@ func Log(format string, params ...interface{}) {
 	}
 }
 
+func Debug(format string, params ...interface{}) {
+	if DebugLog {
+		fmt.Printf(format, params...)
+	}
+}
+
 // ________________________________________________________________________________
 // Error Handling
 //

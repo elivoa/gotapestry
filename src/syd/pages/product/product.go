@@ -10,6 +10,7 @@ import (
 	"strings"
 	"syd/dal"
 	"syd/model"
+	"syd/service/personservice"
 	"syd/service/productservice"
 )
 
@@ -118,11 +119,17 @@ func (p *ProductEdit) OnSuccessFromProductForm() (string, string) {
 */
 type ProductList struct {
 	core.Page
-	Products *[]model.Product
+	Products []*model.Product
 }
 
 func (p *ProductList) Setup() {
-	p.Products = dal.ListProduct()
+	var err error
+	p.Products, err = productservice.ListProducts()
+	if nil != err {
+		panic(err.Error())
+		// Goto error page
+	}
+	// p.Products = dal.ListProduct()
 }
 
 // display: total stocks
@@ -168,12 +175,14 @@ func (p *ProductDetail) Picture(index int) string {
 }
 
 func (p *ProductDetail) SupplierName(id int) string {
-	person := dal.GetPerson(id)
+	if id <= 0 {
+		return ""
+	}
+	person := personservice.GetPerson(id)
 	if person != nil {
 		return person.Name
-	} else {
-		return "供货商_" + string(id)
 	}
+	return "供货商_" + string(id)
 }
 
 // --------------------------------------------------------------------------------

@@ -70,12 +70,12 @@ func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment
 	if seg != nil && lcc.Err == nil && lcc.ResultType == "" {
 		// find default tempalte to return
 		key, tplPath := LocateGOTTemplate(seg.Src, seg.Path)
-		debug.Log("-755- [TemplateSelect] %v -> %v", key, tplPath)
+		// debug.Log("-755- [TemplateSelect] %v -> %v", key, tplPath)
 		_, err := templates.GotTemplateCache.Get(key, tplPath)
 		if nil != err {
 			lcc.Err = err
 		} else {
-			fmt.Println("render tempalte " + key)
+			// fmt.Println("render tempalte " + key)
 			e := templates.RenderGotTemplate(lcc.W, key, lcc.Proton)
 			if e != nil {
 				lcc.Err = e
