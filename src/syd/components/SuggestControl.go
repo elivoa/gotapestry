@@ -3,6 +3,7 @@ package components
 import (
 	"got/core"
 	"syd/dal"
+	"syd/service/personservice"
 )
 
 /*
@@ -38,10 +39,14 @@ func (c *SuggestControl) Setup() { // (string, string) {
 func (c *SuggestControl) initSuggest() {
 	// id, err := strconv.Atoi(c.Value)
 	id := c.Value
-	//if err == nil {
 	switch c.Category {
-	case "factory", "customer":
-		person := dal.GetPerson(id)
+	case "factory":
+		person := personservice.GetCustomer(id)
+		if person != nil {
+			c.DisplayValue = person.Name
+		}
+	case "customer":
+		person := personservice.GetProducer(id)
 		if person != nil {
 			c.DisplayValue = person.Name
 		}
@@ -52,5 +57,4 @@ func (c *SuggestControl) initSuggest() {
 		}
 	default:
 	}
-	//	}
 }

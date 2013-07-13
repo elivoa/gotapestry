@@ -1,5 +1,14 @@
 /*
  SQL Helper is a helper method in total filtering.
+
+ Usage Examples:
+  em.Select().Where("id", 5).QueryOne()
+  em.Select("id","name").Where("type", "person").Query()
+  ...
+  em.Update().Where("id", 5).Exec(name, class, ...)
+  em.Update().Exec(name, class, ..., id)
+  em.Update("time").Where("id", 5, "person", 6).Exec(time)
+
 */
 package db
 
@@ -39,6 +48,7 @@ type Entity struct {
 	PK           string   // primary key field name
 	Fields       []string // field names
 	CreateFields []string // fields used in create things.
+	UpdateFields []string // fields used in create things.
 }
 
 // TODO Cache queryParser here.
@@ -50,27 +60,29 @@ func (e *Entity) Create(queryName string) *QueryParser {
 }
 
 func (e *Entity) Select(fields ...string) *QueryParser {
-	parser := &QueryParser{
-		e:                 e,
-		operation:         "select",
-		useCustomerFields: true,
-		fields:            fields,
-	}
-	if nil == fields || len(fields) == 0 {
-		parser.useCustomerFields = false
-	}
-	return parser
+	return e.createQueryParser("select", fields...)
 }
 
 func (e *Entity) Insert(fields ...string) *QueryParser {
+	return e.createQueryParser("insert", fields...)
+}
+
+func (e *Entity) Update(fields ...string) *QueryParser {
+	return e.createQueryParser("update", fields...)
+}
+
+func (e *Entity) Delete() *QueryParser {
+	return e.createQueryParser("delete")
+}
+
+func (e *Entity) createQueryParser(operation string, fields ...string) *QueryParser {
 	parser := &QueryParser{
-		e:                 e,
-		operation:         "insert",
-		useCustomerFields: true,
-		fields:            fields,
+		e:         e,
+		operation: operation,
+		fields:    fields,
 	}
-	if nil == fields || len(fields) == 0 {
-		parser.useCustomerFields = false
+	if nil != fields && len(fields) > 0 {
+		parser.useCustomerFields = true
 	}
 	return parser
 }
@@ -144,19 +156,21 @@ func (p *QueryParser) Prepare() *QueryParser {
 		// add where condition, default only support and
 		if p.where != nil && len(p.where) > 0 {
 			sql.WriteString(" WHERE ")
-			for i := 0; i < len(p.where); i = i + 2 {
-				k, v := p.where[i].(string), p.where[i+1]
-				sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
-				p.values = append(p.values, v)
-				if i < len(p.where)-3 {
-					sql.WriteString(" and ")
-				}
-			}
+			p.values = appendWhereClouse(&sql, p.where...)
+			// for i := 0; i < len(p.where); i = i + 2 {
+			// 	k, v := p.where[i].(string), p.where[i+1]
+			// 	sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
+			// 	p.values = append(p.values, v)
+			// 	if i < len(p.where)-3 {
+			// 		sql.WriteString(" and ")
+			// 	}
+			// }
 		}
 		// TODO order by
 		// TODO limit
 
 	case "insert":
+		// em.Insert().Exec(name, class, ...)
 		sql.WriteString("insert into ")
 		sql.WriteString(e.Table)
 		sql.WriteString(" (")
@@ -176,6 +190,60 @@ func (p *QueryParser) Prepare() *QueryParser {
 			sql.WriteString("?")
 		}
 		sql.WriteString(" )")
+
+	case "update":
+		// em.Update().Where("id", 5).Exec(name, class, ...)
+		// em.Update().Exec(name, class, ..., id)
+		sql.WriteString("update ")
+		sql.WriteString(e.Table)
+		sql.WriteString(" set ")
+
+		fields := e.UpdateFields
+		if p.useCustomerFields {
+			fields = p.fields
+		}
+		for i := 0; i < len(fields); i++ {
+			if i > 0 {
+				sql.WriteString(",")
+			}
+			sql.WriteString(fmt.Sprintf("`%v`=?", fields[i]))
+		}
+
+		// where
+		sql.WriteString(" WHERE ")
+		if p.where == nil || len(p.where) == 0 {
+			sql.WriteString(fmt.Sprintf(" `%v` = ?", e.PK))
+		} else {
+			p.values = appendWhereClouse(&sql, p.where...)
+			// for i := 0; i < len(p.where); i = i + 2 {
+			// 	k, v := p.where[i].(string), p.where[i+1]
+			// 	sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
+			// 	p.values = append(p.values, v)
+			// 	if i < len(p.where)-3 {
+			// 		sql.WriteString(" and ")
+			// 	}
+			// }
+		}
+
+	case "delete":
+		// em.Delete().Where("id", 5).Exec()
+		sql.WriteString("delete from ")
+		sql.WriteString(e.Table)
+
+		// where
+		sql.WriteString(" WHERE ")
+		if p.where == nil || len(p.where) == 0 {
+			sql.WriteString(fmt.Sprintf(" `%v` = ?", e.PK))
+		} else {
+			for i := 0; i < len(p.where); i = i + 2 {
+				k, v := p.where[i].(string), p.where[i+1]
+				sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
+				p.values = append(p.values, v)
+				if i < len(p.where)-3 {
+					sql.WriteString(" and ")
+				}
+			}
+		}
 
 	}
 	p.sql = sql.String()
@@ -206,9 +274,11 @@ func (p *QueryParser) QueryOne(receiver func(*sql.Row) error) error {
 
 	// 3. execute
 	row := stmt.QueryRow(p.values...)
-	err = receiver(row) // callbacks to receive values.
-	if Err(err) {
-		return err
+	if row != nil {
+		err = receiver(row) // callbacks to receive values.
+		if Err(err) {
+			return err
+		}
 	}
 	return nil
 }
@@ -251,6 +321,7 @@ func (p *QueryParser) Query(receiver func(*sql.Rows) (bool, error)) error {
 	return nil
 }
 
+// exec command insert, update, delete
 func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 	p.Prepare()
 
@@ -270,7 +341,15 @@ func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 	}
 
 	// 3. execute
-	res, err := stmt.Exec(values...)
+	v := []interface{}{}
+	v = append(v, values...)
+
+	// for update command, use values as where condition.
+	if p.values != nil && len(p.values) > 0 {
+		v = append(v, p.values)
+	}
+
+	res, err := stmt.Exec(v...)
 	if Err(err) {
 		return nil, err
 	}
@@ -297,4 +376,18 @@ func fieldString(fields []string) string {
 	return fmt.Sprintf("`%v`",
 		strings.Join(fields, "`, `"),
 	)
+}
+
+func appendWhereClouse(sql *bytes.Buffer, where ...interface{}) []interface{} {
+	values := []interface{}{}
+	for i := 0; i < len(where); i = i + 2 {
+		fmt.Println("------------------------------------------------------------------------------------------")
+		k, v := where[i].(string), where[i+1]
+		sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
+		values = append(values, v)
+		if i < len(where)-2 {
+			sql.WriteString(" and ")
+		}
+	}
+	return values
 }

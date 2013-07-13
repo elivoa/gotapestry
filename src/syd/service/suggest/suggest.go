@@ -6,6 +6,7 @@ import (
 	"got/debug"
 	"strings"
 	"syd/dal"
+	"syd/service/personservice"
 	"syd/utils"
 )
 
@@ -45,14 +46,14 @@ func IsLoaded() bool {
 func Load() {
 	SuggestCache = make(map[string][]Item, 100)
 
-	persons, err := dal.ListPerson("customer")
+	persons, err := personservice.ListCustomer()
 	if err != nil {
 		debug.Error(err)
 	} else {
-		debug.Log("[suggest] load %v customers.", len(*persons))
-		personItems := make([]Item, len(*persons))
+		debug.Log("[suggest] load %v customers.", len(persons))
+		personItems := make([]Item, len(persons))
 		SuggestCache[Customer] = personItems
-		for i, person := range *persons {
+		for i, person := range persons {
 			personItems[i] = Item{
 				Id:          person.Id,
 				Text:        person.Name,
@@ -61,13 +62,13 @@ func Load() {
 		}
 	}
 
-	factories, err := dal.ListPerson("factory")
+	factories, err := personservice.ListFactory()
 	if err != nil {
 	} else {
-		debug.Log("[suggest] load %v factories.", len(*factories))
-		factoryItems := make([]Item, len(*factories))
+		debug.Log("[suggest] load %v factories.", len(factories))
+		factoryItems := make([]Item, len(factories))
 		SuggestCache[Factory] = factoryItems
-		for i, factory := range *factories {
+		for i, factory := range factories {
 			factoryItems[i] = Item{
 				Id:          factory.Id,
 				Text:        factory.Name,
@@ -157,12 +158,3 @@ func Lookup(q string, category string) (*[]Item, error) {
 	result := filtered[:found]
 	return &result, nil
 }
-
-
-
-
-
-
-
-
-

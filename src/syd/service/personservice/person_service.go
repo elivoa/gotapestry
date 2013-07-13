@@ -5,19 +5,29 @@ import (
 	"syd/model"
 )
 
-func GetPerson(customerId int) *model.Customer {
-	person, _ := persondao.Get(customerId)
+// is this correct?
+func GetProducer(id int) *model.Producer {
+	person, _ := persondao.Get(id)
 	if nil == person {
 		return nil
 	}
-	customer := model.Customer{
-		Person:      *person,
-		Accumulated: 998,
+	producer := model.Producer{
+		Person: *person,
+		// Accumulated: 998,
 	}
-	// TODO get Accumulated
-	return &customer
+	return &producer
 }
 
+// is this correct?
+func GetPerson(id int) *model.Person {
+	person, _ := persondao.Get(id)
+	if nil == person {
+		return nil
+	}
+	return person
+}
+
+// is this correct?
 func GetCustomer(customerId int) *model.Customer {
 	person, _ := persondao.Get(customerId)
 	if nil == person {
@@ -43,6 +53,15 @@ func ListFactory() ([]*model.Person, error) {
 	return persondao.ListAll("customer")
 }
 
-func Create(person *model.Person) (*model.Person, error) {
+// only return error?
+func Create(person *model.Person) error {
 	return persondao.Create(person)
+}
+
+func Update(person *model.Person) (int64, error) {
+	return persondao.Update(person)
+}
+
+func Delete(id int) (int64, error) {
+	return persondao.Delete(id)
 }

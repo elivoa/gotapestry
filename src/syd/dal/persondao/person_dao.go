@@ -1,3 +1,12 @@
+/*
+  Data Access Object for person module.
+
+  Time-stamp: <[person_dao.go] Elivoa @ Saturday, 2013-07-13 13:16:22>
+
+  Note: This is the latest Template for dao functions.
+
+
+*/
 package persondao
 
 import (
@@ -5,7 +14,6 @@ import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
-	"log"
 	"syd/model"
 	"time"
 )
@@ -18,6 +26,8 @@ var em = &db.Entity{
 		"postalcode", "qq", "website", "note", "createtime", "updatetime"},
 	CreateFields: []string{"name", "type", "phone", "city", "address",
 		"postalcode", "qq", "website", "note", "createtime", "updatetime"}, // CreateFields
+	UpdateFields: []string{"name", "type", "phone", "city", "address",
+		"postalcode", "qq", "website", "note", "updatetime"}, // UpdateFields
 }
 
 func init() {
@@ -69,86 +79,39 @@ func ListAll(personType string) ([]*model.Person, error) {
 // ________________________________________________________________________________
 // Create person
 //
-func Create(person *model.Person) (*model.Person, error) {
+func Create(person *model.Person) error {
 	res, err := em.Insert().Exec(
 		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode,
 		person.QQ, person.Website, person.Note, time.Now(), time.Now(),
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	liid, err := res.LastInsertId()
 	person.Id = int(liid)
-	return person, nil
+	return nil
 }
 
-/* update an existing item */
-func UpdatePerson(person *model.Person) {
-	db.Connect()
-	defer db.Close()
-
-	if logdebug {
-		log.Printf("[dal] Edit person: %v", person)
-	}
-
-	stmt, err := db.DB.Prepare("update person set name=?, type=?, phone=?, city=?, address=?, postalcode=?, qq=?, website=?, note=?, updatetime=? where id=?")
+// ________________________________________________________________________________
+// Update returns RowsAffacted, error
+//
+func Update(person *model.Person) (int64, error) {
+	res, err := em.Update().Exec(person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode, person.QQ, person.Website, person.Note, time.Now(), person.Id)
 	if err != nil {
-		panic(err.Error())
+		return 0, err
 	}
-	defer stmt.Close()
-
-	stmt.Exec(person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode, person.QQ, person.Website, person.Note, time.Now(), person.Id)
+	return res.RowsAffected()
 }
 
 var EmptyPersonList = &[]model.Person{}
 
-/*
-  List person with type @the latest example of go-dao
-*/
-func ListPerson(personType string) (persons *[]model.Person, err error) {
-	if logdebug {
-		log.Printf("[dal] List person with type:%v", personType)
-	}
-
-	conn, _ := db.Connect()
-	defer db.CloseConn(conn)
-
-	stmt, err := conn.Prepare("select * from person where type=?")
-	defer db.CloseStmt(stmt)
-	if db.Err(err) {
-		return
-	}
-
-	rows, err := stmt.Query(personType)
-	defer db.CloseRows(rows)
-	if db.Err(err) {
-		return
-	}
-
-	// big performance issue, maybe.
-	ps := []model.Person{}
-	for rows.Next() {
-		p := new(model.Person)
-		rows.Scan(&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ, &p.Website, &p.Note, &p.CreateTime, &p.UpdateTime)
-		ps = append(ps, *p)
-	}
-	persons = &ps
-	return
-}
-
-func DeletePerson(id int) {
-	if logdebug {
-		log.Printf("[dal] delete person %n", id)
-	}
-
-	db.Connect()
-	defer db.Close()
-
-	stmt, err := db.DB.Prepare("delete from person where id = ?")
+// ________________________________________________________________________________
+// Delete a pesron
+//
+func Delete(id int) (int64, error) {
+	res, err := em.Delete().Exec()
 	if err != nil {
-		panic(err.Error())
+		return 0, err
 	}
-	defer stmt.Close()
-
-	stmt.Exec(id)
+	return res.RowsAffected()
 }

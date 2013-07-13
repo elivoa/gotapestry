@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"got/core"
 	"got/register"
-	"syd/dal"
 	"syd/model"
+	"syd/service/personservice"
 )
 
 func Register() {}
@@ -38,7 +38,7 @@ func (p *OrderList) SetupRender() {
 				continue
 			}
 
-			customer := dal.GetPerson(o.CustomerId)
+			customer := personservice.GetPerson(o.CustomerId)
 			if customer != nil {
 				p.customerNames[customer.Id] = customer
 			}

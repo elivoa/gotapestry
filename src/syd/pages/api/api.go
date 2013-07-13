@@ -12,6 +12,7 @@ import (
 	"got/debug"
 	"got/register"
 	"syd/dal"
+	"syd/service/personservice"
 	"syd/service/productservice"
 )
 
@@ -32,7 +33,7 @@ type Api struct {
 func (p *Api) Setup() (string, string) {
 	switch p.APIName {
 	case "person":
-		person := dal.GetPerson(p.Param1)
+		person := personservice.GetPerson(p.Param1)
 		return toJson(person)
 
 	case "product":

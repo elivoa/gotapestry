@@ -2,13 +2,11 @@ package person
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"got/core"
 	"got/register"
 	"gxl"
-	"net/http"
-	"strconv"
 	"syd/dal"
+	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/personservice"
 )
@@ -57,24 +55,9 @@ func (p *PersonList) Setup() interface{} {
 }
 
 func (p *PersonList) Ondelete(personId int, personType string) (string, string) {
-	dal.DeletePerson(personId)
+	personservice.Delete(personId)
 	// TODO make this default redirect.
 	return "redirect", fmt.Sprintf("/person/list/%v", personType)
-}
-
-/* ________________________________________________________________________________
-   TODO
-*/
-func PersonDelete(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	personType := vars["type"]
-
-	// TODO: important: need some security validation
-	dal.DeletePerson(id)
-
-	// redirect to person list.
-	http.Redirect(w, r, fmt.Sprintf("/person/list/%v", personType), http.StatusFound)
 }
 
 /*_______________________________________________________________________________
@@ -101,7 +84,12 @@ func (p *PersonEdit) Setup() {
 	p.Title = "create/edit Person"
 
 	if p.Id != nil {
-		p.Person = dal.GetPerson(p.Id.Int)
+		person, err := persondao.Get(p.Id.Int)
+		if err != nil {
+			// TODO how to handle error on page object?
+			panic(err.Error())
+		}
+		p.Person = person
 		p.SubTitle = "编辑"
 	} else {
 		p.Person = model.NewPerson()
@@ -111,10 +99,9 @@ func (p *PersonEdit) Setup() {
 
 func (p *PersonEdit) OnSuccessFromPersonForm() (string, string) {
 	if p.Id != nil {
-		dal.UpdatePerson(p.Person)
+		personservice.Update(p.Person)
 	} else {
 		personservice.Create(p.Person)
-		// dal.CreatePerson(p.Person)
 	}
 	return "redirect", fmt.Sprintf("/person/list/%v", p.Person.Type)
 }
@@ -135,7 +122,7 @@ func (p *PersonDetail) Setup() {
 	if p.Id == nil {
 		return
 	}
-	p.Person = dal.GetPerson(p.Id.Int)
+	p.Person = personservice.GetPerson(p.Id.Int)
 	if p.Person != nil {
 		p.Orders = dal.ListOrderByCustomer(p.Person.Id, "all")
 	}

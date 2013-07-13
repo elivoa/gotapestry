@@ -41,6 +41,11 @@ type Customer struct {
 	Accumulated float64 // 累计欠款
 }
 
+type Producer struct {
+	Person
+	// advanced properties
+}
+
 // TODO type is enum
 
 //
