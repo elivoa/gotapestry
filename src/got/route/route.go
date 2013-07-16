@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"reflect"
+	rd "runtime/debug"
 )
 
 var (
@@ -21,7 +22,7 @@ var (
 
 // ________________________________________________________________________________
 // GOT Tapestry style Handler
-
+//
 func RouteHandler(w http.ResponseWriter, r *http.Request) {
 	url := "/" + mux.Vars(r)["url"]
 
@@ -30,21 +31,27 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// if error occured
 	printAccessHeader(r)
+	defer func() {
+		if err := recover(); err != nil {
+			processPanic(err)
+			// TODO render 500 page.
+			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		}
+		printAccessFooter(r)
+	}()
 
 	// 1. let's find the right pages.
 	result, err := register.Pages.Lookup(url)
 	if nil != err {
-		fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		panic(err.Error())
 	}
 	if result == nil || result.Segment == nil {
-		fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		panic(fmt.Sprintf("Error: seg.Proton is null. seg: %v", result.Segment))
 	}
 	if result.Segment.Proton == nil {
 		// TODO redirect to 404 page.
-		fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		panic(fmt.Sprintf("~~~~ Page not found ~~~~"))
 	}
 
@@ -61,8 +68,6 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 		// when call event, process common return ('redirect', "...")
 		// TODO 1: default return the current page.
 	}
-
-	printAccessFooter(r)
 }
 
 func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment) {
@@ -84,8 +89,7 @@ func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment
 	}
 
 	if lcc.Err != nil {
-		debug.Error(lcc.Err)
-		http.Error(lcc.W, fmt.Sprint(lcc.Err), http.StatusInternalServerError)
+		panic(lcc.Err.Error())
 	}
 }
 
@@ -141,4 +145,13 @@ func printAccessFooter(r *http.Request) {
 	//debug.Log("^ ^ ^ ^ ^ ^ ^ ^ PAGE RENDER END ^ ^ ^ ^ ^ ^ ^ ^ ^ ^")
 	fmt.Println("-----------------------------^         PAGE RENDER END           -----------------------------------")
 	fmt.Println("....................................................................................................")
+}
+
+func processPanic(err interface{}) {
+	log.Printf("xxxxxxxx  PANIC  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+	log.Printf("x panic: %-109v x", err)
+	log.Printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+	fmt.Println("StackTrace >>")
+	rd.PrintStack()
+	fmt.Println()
 }

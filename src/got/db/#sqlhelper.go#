@@ -17,7 +17,6 @@ import (
 	"database/sql"
 	"fmt"
 	"gxl"
-	"reflect"
 	"strings"
 )
 
@@ -240,40 +239,40 @@ func (p *QueryParser) Prepare() *QueryParser {
 
 // not
 // param: use these value parameters to replace default value.
-func (p *QueryParser) QueryOne(receiver func(*sql.Row) error) error {
+func (p *QueryParser) QueryOne(receiver func(*sql.Rows) (bool, error)) error {
 	// query one will throw exceptions, so use query instead
 	// TODO add limit support to QueryBuilder
+	
+	// p.Prepare()
 
-	p.Prepare()
+	// // TODO use values to replace default one.
+	// debuglog("", "---------------------")
+	// debuglog("DB", "%v \"%v\" with parameters %v", p.operation, p.sql, p.values)
 
-	// TODO use values to replace default one.
-	debuglog("", "---------------------")
-	debuglog("DB", "%v \"%v\" with parameters %v", p.operation, p.sql, p.values)
+	// // 1. get connection
+	// conn, err := Connect()
+	// if Err(err) {
+	// 	return err
+	// }
+	// defer conn.Close()
 
-	// 1. get connection
-	conn, err := Connect()
-	if Err(err) {
-		return err
-	}
-	defer conn.Close()
+	// // 2. prepare sql
+	// stmt, err := conn.Prepare(p.sql)
+	// if Err(err) {
+	// 	return err
+	// }
+	// defer stmt.Close()
 
-	// 2. prepare sql
-	stmt, err := conn.Prepare(p.sql)
-	if Err(err) {
-		return err
-	}
-	defer stmt.Close()
+	// // 3. execute
+	// row := stmt.QueryRow(p.values...)
+	// if row != nil {
+	// 	err = receiver(row) // callbacks to receive values.
+	// 	if Err(err) {
+	// 		return err
+	// 	}
+	// }
 
-	// 3. execute
-	row := stmt.QueryRow(p.values...)
-	if row != nil {
-		err = receiver(row) // callbacks to receive values.
-		if Err(err) {
-			return err
-		}
-	}
-
-	return nil
+	// return nil
 }
 
 // query multi-results
@@ -336,9 +335,10 @@ func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 	// execute
 	v := []interface{}{}
 	v = append(v, values...)
+
 	// for update command, use values as where condition.
 	if p.values != nil && len(p.values) > 0 {
-		v = append(v, p.values...)
+		v = append(v, p.values)
 	}
 
 	res, err := stmt.Exec(v...)

@@ -54,30 +54,6 @@ func UpdateProduct(product *model.Product) {
 	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.ShelfNo, product.Note, product.Pictures, time.Now(), product.Id)
 }
 
-// Get product [updated new version]
-func GetProduct(id int) (*model.Product, error) {
-	if logdebug {
-		log.Printf("[dal] Get Product with id %v", id)
-	}
-
-	conn, _ := db.Connect()
-	defer conn.Close()
-
-	stmt, err := conn.Prepare("select * from product where id = ?")
-	defer stmt.Close()
-	if db.Err(err) {
-		return nil, err
-	}
-
-	row := stmt.QueryRow(id)
-	p := new(model.Product)
-	err = row.Scan(&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice, &p.Stock, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime)
-	if db.Err(err) {
-		return nil, err
-	}
-	return p, nil
-}
-
 /*
   List person with type
   TODO pager/range

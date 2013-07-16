@@ -9,6 +9,8 @@ window.OrderCreateDetail =
 class OrderCreateDetail
   constructor: (customerId)->
 
+    @initPage()
+
     ## Create components
     @ops = new OrderProductSelector(customerId)
     @odf = new OrderDetailsForm
@@ -32,3 +34,40 @@ class OrderCreateDetail
       console.log "Edit Product: ", product
       @ops.refresh product
     ,@
+
+    # focus on input box
+    # TODO: auto this?
+    $('.product-trigger').focus()
+
+
+  initPage: ->
+    # express buttons
+    $(".choose_express label").each (idx, obj) ->
+      $(obj).click (e)->
+        $(".choose_express label").removeClass 'checked' # remove checked
+        $(obj).addClass "checked"
+        $(obj).find("input:radio").attr("checked", true)
+
+    # express fee
+    ef = $(".B_fare")
+    ef.find("input:checkbox").click (e)->
+      if $(e.target).prop("checked") == true
+        ef.find("input:text").prop('disabled', true)
+      else
+        ef.find("input:text").prop('disabled', false)
+
+  # express: yto, sf, takeaway
+  setExpress: (express, expressFee) ->
+    $(".choose_express label").each (idx, obj) ->
+      # express
+      if $(obj).find("input:radio").val().toLowerCase() == express.toLowerCase()
+        $(obj).addClass 'checked'
+        $(obj).find("input:radio").attr("checked", true)
+      # expressfee
+      ef = $(".B_fare")
+      if expressFee == -1
+        ef.find(".express-fee").val(0)
+        ef.find("input.daofu").prop('checked', true)
+      else
+        ef.find("express-fee").val(expressFee)
+        ef.find("input.daofu").prop('checked', false)

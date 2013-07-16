@@ -56,7 +56,7 @@ type LifeCircleControl struct {
 	EventName string        // an event call on page, not page render
 
 	// result type:[template|redirect]
-	ResultType string // got.Return_xxx
+	ResultType string // returns manually. if empty, find default tempalte
 	String     string // component html
 	Err        error  // error if something error
 }
@@ -161,23 +161,7 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	//    Support OnSuccess Method.
 	// TODO：只有page才POST，修复component中提交form的bug。设计一个方案。
 	if lcc.R.Method == "POST" && lcc.Kind == "page" {
-		// POST.1 first inject form values
-		lcc.InjectFormValues()
-
-		// POST.2 call success method
-		methodName := "OnSuccess"
-		formName := lcc.R.FormValue("t:form")
-		if formName != "" {
-			methodName = fmt.Sprintf("%v%v", "OnSuccessFrom", formName)
-		}
-
-		if lcc.CallEvent(methodName) {
-			return lcc
-		}
-
-		// something else, validation...
-		// post flows stopd here.
-		return lcc
+		return lcc.PostFlow()
 	}
 
 	// LifeCircle
@@ -188,6 +172,48 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	}
 
 	return lcc // for chain
+}
+
+// ________________________________________________________________________________
+// POST Flow,
+//   Events:
+//     OnSubmit    - Form submitted, called before inject form values.
+//     OnValidate  - Validate form. called after form value injected.
+//                   If returns false, render the current page, with errors
+//     OnSuccess   - Called if OnValidate returns true.
+//
+func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
+	// TODO use another method to retrive FormName. t:form
+	formName := lcc.R.FormValue("t:form")
+	if formName != "" {
+		formName = fmt.Sprintf("From%v", formName)
+	}
+
+	// call OnSubmit() method
+	onSubmitEventName := fmt.Sprintf("%v%v", "OnSubmit", formName)
+	if lcc.CallEvent(onSubmitEventName) {
+		return lcc
+	}
+
+	// inject form values
+	lcc.InjectFormValues()
+
+	// call OnValidate() method
+	onValidateEventName := fmt.Sprintf("%v%v", "OnValidate", formName)
+	if lcc.CallEvent(onValidateEventName) {
+		return lcc
+	}
+
+	// call success method
+	// call OnSuccess() method
+	onSuccessEventName := fmt.Sprintf("%v%v", "OnSuccess", formName)
+	if lcc.CallEvent(onSuccessEventName) {
+		return lcc
+	}
+
+	// something else, validation...
+	// post flows stopd here.
+	return lcc
 }
 
 // event call page flow
@@ -327,7 +353,7 @@ func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
 		// the first type is string. process string return.
 		if kind == reflect.String {
 			stringValue := returnValue.Interface().(string)
-
+			lcc.ResultType = stringValue
 			switch strings.ToLower(stringValue) {
 			case "template":
 				tname, err := extractString(1, returns...)
@@ -356,6 +382,7 @@ func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
 				http.Redirect(lcc.W, lcc.R, url, http.StatusFound)
 			default:
 				debuglog("[Warrning] return type %v not found!", stringValue)
+				panic(fmt.Sprintf("[Warrning] return type %v not found!", stringValue))
 			}
 			return true
 		} else if kind == reflect.Ptr {
@@ -390,7 +417,7 @@ func extractString(index int, data ...reflect.Value) (string, error) {
 // support second parameter type: string, []byte
 func (lcc *LifeCircleControl) return_text(contentType string, data ...reflect.Value) {
 	// now we only return 1 result.
-	lcc.ResultType = data[1].String()
+	// lcc.ResultType = data[1].String()
 	v := data[1]
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()

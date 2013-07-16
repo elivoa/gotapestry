@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"got/debug"
 )
 
 // TODO kill this
@@ -60,7 +59,7 @@ type Filter struct {
 */
 func Err(err error) bool {
 	if err != nil {
-		debug.Error(err)
+		panic(err.Error())
 		return true
 	}
 	return false

@@ -51,11 +51,20 @@ func (fi *FieldInfo) String() string {
 // type must be struct. others has no meanings.
 func (c *Cache) GetnCache(rt reflect.Type) *StructInfo {
 	t := rt
+	// remove ptr
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
+	// remove slice
+	if t.Kind() == reflect.Slice {
+		t = t.Elem()
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		// fmt.Printf("finally i found slice type: %v\n", t)
+	}
 	if t.Kind() != reflect.Struct {
-		panic("got/cache: must be struct")
+		panic(fmt.Sprintf("[got/cache]: %v must be struct.", rt))
 	}
 
 	// get and return

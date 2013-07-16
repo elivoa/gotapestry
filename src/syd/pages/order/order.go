@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"got/core"
+	"got/debug"
 	"got/register"
 	"got/route"
 	"got/templates"
 	"gxl"
 	"strings"
 	"syd/dal"
+	"syd/dal/productdao"
 	"syd/model"
+	"syd/service/orderservice"
 )
 
 /* ________________________________________________________________________________
@@ -40,7 +43,7 @@ func (p *OrderIndex) SetupRender() (string, string) {
 type OrderList struct {
 	core.Page
 
-	Orders *[]model.Order
+	Orders []*model.Order
 	Tab    string `path-param:"1"`
 
 	// customerNames map[int]*model.Person // order-id -> customer names
@@ -53,7 +56,13 @@ func (p *OrderList) Activate() {
 }
 
 func (p *OrderList) SetupRender() {
-	p.Orders = dal.ListOrder(p.Tab)
+	orders, err := orderservice.ListOrder(p.Tab)
+	if err != nil {
+		debug.Error(err)
+		panic(err.Error())
+	}
+	p.Orders = orders
+	// p.Orders = dal.ListOrder(p.Tab)
 }
 
 func (p *OrderList) TabStyle(tab string) string {
@@ -129,7 +138,7 @@ func (p *OrderEdit) SetupRender() (interface{}, string) {
 }
 
 func (p *OrderEdit) ProductDisplayName(id int) string {
-	product, _ := dal.GetProduct(id)
+	product, _ := productdao.Get(id)
 	if product != nil {
 		return product.Name
 	}

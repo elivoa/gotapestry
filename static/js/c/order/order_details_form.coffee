@@ -27,6 +27,11 @@ class OrderDetailsForm
     @data.order.push product.id
     @data.products[product.id] = product
 
+  setData:(json) ->
+    console.log typeof json
+    @data = json
+    console.log typeof @data
+    @refreshOrderForm()
 
   # generate the whole order form
   refreshOrderForm: ->
@@ -95,8 +100,18 @@ class OrderDetailsForm
     nquantity = quantities.length
     htmls = []
     htmls.push "<tr>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'><strong>#{json.name}</strong></td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'><span class='price'>#{json.price}</span></td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "    <strong>#{json.name}</strong>"
+    htmls.push "    <input type='hidden' name='Order.Details.ProductId' value='#{json.id}' />"
+    htmls.push "    <input type='hidden' name='Order.Details.SellingPrice' value='#{json.price}' />"
+    htmls.push "    <input type='hidden' name='Order.Details.Color' value='#{quantities[0][0]}' />"
+    htmls.push "    <input type='hidden' name='Order.Details.Size' value='#{quantities[0][1]}' />"
+    htmls.push "    <input type='hidden' name='Order.Details.Quantity' value='#{quantities[0][2]}' />"
+    htmls.push "    <input type='hidden' name='Order.Details.Note' value='#{json.note}' />"
+    htmls.push "  </td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "    <span class='price'>#{json.price}</span>"
+    htmls.push "  </td>"
     htmls.push "  <td>#{quantities[0][0]}</td>"
     htmls.push "  <td>#{quantities[0][1]}</td>"
     htmls.push "  <td>#{quantities[0][2]}</td>"
@@ -115,40 +130,14 @@ class OrderDetailsForm
       htmls.push "  <td>#{quantity[0]}</td>"
       htmls.push "  <td>#{quantity[1]}</td>"
       htmls.push "  <td>#{quantity[2]}</td>"
+      htmls.push "    <input type='hidden' name='Order.Details.ProductId' value='#{json.id}' />"
+      htmls.push "    <input type='hidden' name='Order.Details.SellingPrice' value='#{json.price}' />"
+      htmls.push "    <input type='hidden' name='Order.Details.Color' value='#{quantity[0]}' />"
+      htmls.push "    <input type='hidden' name='Order.Details.Size' value='#{quantity[1]}' />"
+      htmls.push "    <input type='hidden' name='Order.Details.Quantity' value='#{quantity[2]}' />"
+      htmls.push "    <input type='hidden' name='Order.Details.Note' value='#{json.note}' />"
       htmls.push "</tr>"
     return htmls
-
-
-  ## Old version: no stock means 0 stock.
-  # generate one product. with all it's quantities.
-  # parameter is product json
-  generateTR_oldversion:(json, totalQuantity, totalPrice)->
-    nquantity = json.quantity.length
-    htmls = []
-    htmls.push "<tr>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'><strong>#{json.name}</strong></td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'><span class='price'>#{json.price}</span></td>"
-    htmls.push "  <td>#{json.quantity[0][0]}</td>"
-    htmls.push "  <td>#{json.quantity[0][1]}</td>"
-    htmls.push "  <td>#{json.quantity[0][2]}</td>"
-    htmls.push "  <td valign='top' align='center' rowspan='#{nquantity}'>"
-    htmls.push "      <strong>#{totalQuantity}</strong></td>"
-    htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'>"
-    htmls.push "      <strong class='price'>#{totalPrice}</strong></td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'>#{json.note}</td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
-    htmls.push "      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>"
-    htmls.push "      <a href='#' class='odf-delete'>删除</a>"
-    htmls.push "  </td>"
-    htmls.push "</tr>"
-    for quantity in json.quantity.slice(1, nquantity)
-      htmls.push "<tr>"
-      htmls.push "  <td>#{quantity[0]}</td>"
-      htmls.push "  <td>#{quantity[1]}</td>"
-      htmls.push "  <td>#{quantity[2]}</td>"
-      htmls.push "</tr>"
-    return htmls
-
 
 
   #######################################################

@@ -1,13 +1,13 @@
 @charset "UTF-8";
 /*frame*/
-.order_print{font-size:12pt;line-height:1.4em;width:241mm;}
-.prt_tit{height:10mm;}
-.prt_tit span{float:left;width:33%;font-size:9pt;}
+.order_print{font-size:12pt;line-height:1.4em;}
+.prt_tit{height:10mm;text-align:center;font-size:9pt;}
+.prt_tit span{display:inline-block;width:30%;}
 .prt_tbl{width:100%;}
 .prt_tbl th{border-bottom:2px solid #000;font-weight:normal;}
 .prt_tbl th,.prt_tbl td{padding:3px 25px 3px 5px;}
-.prt_tbl tfoot td{border-top:2px solid #000;font-size:1.2em;}
-.prt_tbl td strong{font-weight:normal;}
+.prt_tbl .total td{border-top:2px solid #000;}
+.prt_tbl td{font-weight:normal;}
 .prt_tbl td.line{height:5px;overflow:hidden;font-size:1px;line-height:1px;}
 .other_info{margin:8mm 0 0;line-height:1.8em;}
 .underline{display:inline-block;border-bottom:1px solid #000;width:20mm;}

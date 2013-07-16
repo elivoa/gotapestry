@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"got/debug"
 	"strings"
-	"syd/dal"
+	"syd/dal/productdao"
 	"syd/service/personservice"
 	"syd/utils"
 )
@@ -77,11 +77,16 @@ func Load() {
 		}
 	}
 
-	products := dal.ListProduct()
-	debug.Log("[suggest] load %v products.", len(*products))
-	productItems := make([]Item, len(*products))
+	products, err := productdao.ListAll()
+	if err != nil {
+		debug.Error(err)
+		panic(err.Error())
+	}
+	// products := dal.ListProduct()
+	debug.Log("[suggest] load %v products.", len(products))
+	productItems := make([]Item, len(products))
 	SuggestCache[Product] = productItems
-	for i, product := range *products {
+	for i, product := range products {
 		productItems[i] = Item{
 			Id:          product.Id,
 			Text:        product.Name,

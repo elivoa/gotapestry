@@ -42,11 +42,6 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	// debug print
 	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
 		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.R.Form)
-		// fmt.Println(lcc.R)
-		// fmt.Println(lcc.R.Form)
-		// fmt.Println(lcc.R.FormValue)
-		// fmt.Println(lcc.R.FormFile)
-		// fmt.Println(lcc.R.UserAgent)
 	}
 
 	// 为了迎合gorilla/schema的奇葩要求，这里需要转换格式为：FormData
@@ -230,13 +225,11 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 
 		// debug print
 		// {
-		// 	if p == "Stocks" {
-		// 		fmt.Println("++++++++  ------------------------------------------  ++++++++")
-		// 		fmt.Printf("++++ DDDDDDDDDDDDDD: path:%-6v piece:%-10v  parentType:%v\n",
-		// 			path, p, parentType)
-		// 		fmt.Printf("++++ DDDDDDDDDDDDDD: typo.Kind() = %v\n", parentType.Kind())
-		// 		fmt.Println("....................................................")
-		// 	}
+		// 	fmt.Println("++++++++  ------------------------------------------  ++++++++")
+		// 	fmt.Printf("++++ DDDDDDDDDDDDDD: path:%-6v piece:%-10v  parentType:%v\n",
+		// 		path, p, parentType)
+		// 	fmt.Printf("++++ DDDDDDDDDDDDDD: typo.Kind() = %v\n", parentType.Kind())
+		// 	fmt.Println("....................................................")
 		// }
 
 		// 3. append path segments to template.
@@ -268,6 +261,8 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 
 		//
 		if ok && fieldInfo != nil {
+			// fmt.Printf("---- set parentType to fieldInfo.Type: %v\n", fieldInfo.Type)
+			// fmt.Printf("---- fieldinfo is: %v\n", fieldInfo)
 			parentType = fieldInfo.Type
 		} else {
 			// no such field, stop.

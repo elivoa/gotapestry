@@ -12,6 +12,7 @@ import (
 	"got/debug"
 	"got/register"
 	"syd/dal"
+	"syd/dal/productdao"
 	"syd/service/personservice"
 	"syd/service/productservice"
 )
@@ -66,7 +67,7 @@ func getCustomerPrice(personId int, productId int) string {
 	}
 
 	// get product price
-	product, err := dal.GetProduct(productId)
+	product, err := productdao.Get(productId)
 	if err == nil && product != nil {
 		productPrice = product.Price
 	}

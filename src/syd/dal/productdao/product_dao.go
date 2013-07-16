@@ -28,9 +28,9 @@ func init() {
 //
 func Get(id int) (*model.Product, error) {
 	p := new(model.Product)
-	err := em.Select().Where("id", id).QueryOne(
-		func(row *sql.Row) error {
-			return row.Scan(
+	err := em.Select().Where("id", id).Query(
+		func(row *sql.Rows) (bool, error) {
+			return false, row.Scan(
 				&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice,
 				&p.Stock, &p.ShelfNo, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime,
 			)

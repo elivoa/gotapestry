@@ -2,7 +2,7 @@ package components
 
 import (
 	"got/core"
-	"syd/dal"
+	"syd/dal/productdao"
 	"syd/service/personservice"
 )
 
@@ -51,7 +51,7 @@ func (c *SuggestControl) initSuggest() {
 			c.DisplayValue = person.Name
 		}
 	case "product":
-		product, err := dal.GetProduct(id)
+		product, err := productdao.Get(id)
 		if err == nil && product != nil {
 			c.DisplayValue = product.Name
 		}

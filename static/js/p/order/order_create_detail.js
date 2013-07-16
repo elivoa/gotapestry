@@ -5,6 +5,7 @@
   window.OrderCreateDetail = OrderCreateDetail = (function() {
 
     function OrderCreateDetail(customerId) {
+      this.initPage();
       this.ops = new OrderProductSelector(customerId);
       this.odf = new OrderDetailsForm;
       this.ops.onSelectProduct = $.proxy(function(productId) {
@@ -25,7 +26,45 @@
         console.log("Edit Product: ", product);
         return this.ops.refresh(product);
       }, this);
+      $('.product-trigger').focus();
     }
+
+    OrderCreateDetail.prototype.initPage = function() {
+      var ef;
+      $(".choose_express label").each(function(idx, obj) {
+        return $(obj).click(function(e) {
+          $(".choose_express label").removeClass('checked');
+          $(obj).addClass("checked");
+          return $(obj).find("input:radio").attr("checked", true);
+        });
+      });
+      ef = $(".B_fare");
+      return ef.find("input:checkbox").click(function(e) {
+        if ($(e.target).prop("checked") === true) {
+          return ef.find("input:text").prop('disabled', true);
+        } else {
+          return ef.find("input:text").prop('disabled', false);
+        }
+      });
+    };
+
+    OrderCreateDetail.prototype.setExpress = function(express, expressFee) {
+      return $(".choose_express label").each(function(idx, obj) {
+        var ef;
+        if ($(obj).find("input:radio").val().toLowerCase() === express.toLowerCase()) {
+          $(obj).addClass('checked');
+          $(obj).find("input:radio").attr("checked", true);
+        }
+        ef = $(".B_fare");
+        if (expressFee === -1) {
+          ef.find(".express-fee").val(0);
+          return ef.find("input.daofu").prop('checked', true);
+        } else {
+          ef.find("express-fee").val(expressFee);
+          return ef.find("input.daofu").prop('checked', false);
+        }
+      });
+    };
 
     return OrderCreateDetail;
 

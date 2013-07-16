@@ -16,7 +16,7 @@ func init() {
 type OrderList struct {
 	core.Component
 
-	Orders *[]model.Order
+	Orders []*model.Order
 
 	// temp values
 	customerNames map[int]*model.Person // order-id -> customer names
@@ -30,10 +30,10 @@ func (p *OrderList) SetupRender() {
 	}
 
 	// Prepare customerNames to display.
-	length := len(*p.Orders)
+	length := len(p.Orders)
 	if length > 0 {
 		p.customerNames = make(map[int]*model.Person, length)
-		for _, o := range *p.Orders {
+		for _, o := range p.Orders {
 			if _, ok := p.customerNames[o.CustomerId]; ok {
 				continue
 			}

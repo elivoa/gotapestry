@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 /*_______________________________________________________________________________
   Create new item in db
   TODO: Add transaction support.
@@ -218,65 +220,6 @@ func deleteDetails(trackNumber int64) error {
 		return err
 	}
 	return nil
-}
-
-/*_______________________________________________________________________________
-  List person with type, default by status.
-  Note: do not contains Details.
-*/
-func ListOrder(status string) *[]model.Order {
-	// debug log
-	if logdebug {
-		log.Printf("[dal] List order with type:%v", status)
-	}
-
-	// header declare
-	var err error
-
-	// connection, // TODO need a connection pool?
-	db.Connect()
-	defer db.Close()
-
-	// 1. query
-	var queryString string
-	if strings.ToLower(status) == "all" {
-		queryString = "select * from `order`"
-	} else {
-		queryString = "select * from `order` where status = ?"
-	}
-
-	// 2. prepare
-	stmt, err := db.DB.Prepare(queryString)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer stmt.Close()
-
-	// 3. query
-	var rows *sql.Rows
-	if strings.ToLower(status) == "all" {
-		rows, err = stmt.Query()
-	} else {
-		rows, err = stmt.Query(status)
-	}
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
-
-	// 4. process results.
-	// big performance issue, maybe. who knows.
-	orders := []model.Order{}
-	for rows.Next() {
-		p := new(model.Order)
-		rows.Scan(
-			&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.CustomerId,
-			&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Note,
-			&p.CreateTime, &p.UpdateTime, &p.CloseTime,
-		)
-		orders = append(orders, *p)
-	}
-	return &orders
 }
 
 func ListOrderByCustomer(personId int, status string) *[]model.Order {

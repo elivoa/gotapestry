@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Saturday, 2013-07-13 13:16:22>
+  Time-stamp: <[person_dao.go] Elivoa @ Saturday, 2013-07-13 17:48:55>
 
   Note: This is the latest Template for dao functions.
 
@@ -39,9 +39,9 @@ func init() {
 //
 func Get(id int) (*model.Person, error) {
 	p := new(model.Person)
-	err := em.Select().Where("id", id).QueryOne(
-		func(row *sql.Row) error {
-			return row.Scan(
+	err := em.Select().Where("id", id).Query(
+		func(rows *sql.Rows) (bool, error) {
+			return false, rows.Scan(
 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
 				&p.Website, &p.Note, &p.CreateTime, &p.UpdateTime,
 			)

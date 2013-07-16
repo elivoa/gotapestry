@@ -13,19 +13,18 @@ func init() {
 
 type Order struct {
 	Id             int
-	TrackNumber    int64
-	Status         string "" // todeliver | delivering | done | canceled | (all)
-	DeliveryMethod string "" // TakeAway | Express(圆通，顺风)
+	TrackNumber    int64  `` // real identification
+	Status         string `` // todeliver | delivering | done | canceled | (all)
+	DeliveryMethod string `` // YTO, SF, TakeAway
+	ExpressFee     int64  `` // -1 means 到付
 
-	CustomerId int // reference
+	CustomerId int            // reference
+	Details    []*OrderDetail `inject:"slice"` // cascated
 
-	// summarization
+	// summarization, not user input, calculated. Persisted in DB.
 	TotalPrice float64
 	TotalCount int
 	PriceCut   float64
-
-	// Not in db
-	Details []*OrderDetail `inject:"slice"`
 
 	Note string
 
@@ -35,17 +34,31 @@ type Order struct {
 	CloseTime  time.Time
 }
 
+// 根据结构，这个应该设计成两个表吧CS信息独立出去，为了省市，重复价格备注字段。
+type OrderDetail struct {
+	Id int
+	// reference
+	OrderTrackNumber int64 // reference
+	ProductId        int   // reference
+	Color            string
+	Size             string
+	Quantity         int
+	SellingPrice     float64 //售价
+	Unit             string  // always 件, NoUse
+
+	Note string
+}
+
 func NewOrder() *Order {
 	order := &Order{
 		TrackNumber:    GenerateOrderId(),
-		Status:         "New",
+		Status:         "todeliver",
 		DeliveryMethod: "Express",
 		CreateTime:     time.Now(),
 	}
 	order.Details = []*OrderDetail{
 		&OrderDetail{},
 	}
-
 	return order
 }
 
@@ -85,19 +98,8 @@ func (order *Order) CalculateOrder() {
 }
 
 /*________________________________________________________________________________
-  Order Details
+  Order Details functions
 */
-type OrderDetail struct {
-	Id int
-	// reference
-	OrderTrackNumber int64 // reference
-	ProductId        int   // reference
-	Quantity         int
-	Unit             string  // always 件, no use
-	SellingPrice     float64 //售价
-	Note             string
-}
-
 // check avaliability
 func (d *OrderDetail) IsValid() bool {
 	if d.ProductId == 0 && d.Quantity == 0 && d.SellingPrice == 0 && d.Note == "" {
@@ -107,6 +109,6 @@ func (d *OrderDetail) IsValid() bool {
 	}
 }
 func (d *OrderDetail) String() string {
-	return fmt.Sprintf("OrderDetail:Id:%v, OrderTrackNumber:%v, ProductId:%v, Note:%v",
-		d.Id, d.OrderTrackNumber, d.ProductId, d.Note)
+	return fmt.Sprintf("OrderDetail(%v), TN:%v, Product:%v_%v_%v quantity:%v, Note:[%v]",
+		d.Id, d.OrderTrackNumber, d.ProductId, d.Color, d.Size, d.Quantity, d.Note)
 }

@@ -18,49 +18,65 @@
     	<h1>新增订单</h1>
         <div class="B_order_step2"></div>
 
-        <!-- 客户信息 -->
-        <div class="unit">
-          <div class="tit"><strong>客户信息</strong></div>
-          <div class="B_person_info">
-            <span class="B_overdraft">累计欠款：
-              <strong class="price">{{.Customer.Accumulated}}TODO</strong>元
-            </span>
-            <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}</div>
-        </div>
+        <form method="POST" id="OrderDetailForm" onkeydown="return(event.keyCode!=13)">
+          <input type="hidden" name="Order.TrackNumber" value="{{.Order.TrackNumber}}" >
+          <input type="hidden" name="Order.Status" value="{{.Order.Status}}" >
+          
+          <!-- 客户信息 -->
+          <div class="unit">
+            <div class="tit"><strong>客户信息</strong></div>
+            <div class="B_person_info">
+              <span class="B_overdraft">累计欠款：
+                <strong class="price">{{.Customer.Accumulated}}TODO</strong>元
+              </span>
+              <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}</div>
+          </div>
 
-        <!-- ------------------------------- -->
-        {{t_order_productselector $ "CustomerId" .Customer.Id}}
+          <!-- ------------------------------- -->
+          {{t_order_productselector $ "CustomerId" .Customer.Id}}
 
-        <div class="">
-          {{t_order_detailsform $}}
-        </div>
-        <!-- ------------------------------- -->
+          <div class="">
+            {{t_order_detailsform $}}
+          </div>
+          <!-- ------------------------------- -->
 
-        <div class="unit">
-          <div class="tit"><strong>发货方式</strong></div>
-          <div class="B_express">
-            <div class="B_choose_express">
-              <label class="checked"><input type="radio"><span class="B_ico_yto"></span></label>
-              <label><input type="radio"><span class="B_ico_sf"></span></label>
-              <label><input type="radio"><span class="B_ico_pickup"></span></label>
-            </div>
-            <div class="B_fare">
-              运费：<input type="text" size="10" value=""> 
-			  <label><input type="checkbox"> 到付</label>
+          <div class="unit">
+            <div class="tit"><strong>发货方式</strong></div>
+            <div class="B_express">
+              <div class="choose_express">
+                <label class="checkedxx">
+                  <input type="radio" name="Order.DeliveryMethod" value="YTO">
+                  <span class="icon_yto"></span>
+                </label>
+                <label>
+                  <input type="radio" name="Order.DeliveryMethod" value="SF">
+                  <span class="icon_sf"></span>
+                </label>
+                <label>
+                  <input type="radio" name="Order.DeliveryMethod" value="TakeAway">
+                  <span class="icon_pickup"></span>
+                </label>
+              </div>
+              <div class="B_fare">
+                运费：<input type="text" size="10" class="express-fee"
+                             name="Order.ExpressFee" value="{{.Order.ExpressFee}}"> 
+				<label><input type="checkbox" class="daofu" name="DaoFu"> 到付</label>
+              </div>
             </div>
           </div>
-        </div>
-		<div class="unit">
-          <div class="tit"><strong>订单备注</strong></div>
-		  <div class="B_order_remark">
-			<textarea rows="4"></textarea>
+          
+		  <div class="unit">
+            <div class="tit"><strong>订单备注</strong></div>
+		    <div class="B_order_remark">
+			  <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
+		    </div>
 		  </div>
-		</div>
-        <div class="btn_content">
-          <input type="button" class="btn_a_l" value="确认下单">
-          <!-- <a class="btn_a_l" href="#">确认下单</a> -->
-        </div>
+          <div class="btn_content">
+            <input type="submit" class="btn_a_l" value="确认下单">
+            <!-- <a class="btn_a_l" href="#">确认下单</a> -->
+          </div>
       </div>
+      </form>
       
     </div>
   </body>
@@ -68,6 +84,13 @@
 
 <script type="text/javascript">
   $(function(){
-    new OrderCreateDetail({{.CustomerId}})
+    ocd = new OrderCreateDetail({{.CustomerId}})
+    
+    {{if .IsEdit}}
+    // Restore information
+    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+    ocd.odf.setData({{.ProductDetailJson}})
+    {{end}}
+    
   });
 </script>
