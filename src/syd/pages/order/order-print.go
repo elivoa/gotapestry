@@ -18,7 +18,7 @@ func init() {
 
 type OrderPrint struct {
 	core.Page
-	TrackNumber string `path-param:"1"`
+	TrackNumber int64 `path-param:"1"`
 
 	Order    *model.Order
 	Customer *model.Person
@@ -26,7 +26,7 @@ type OrderPrint struct {
 }
 
 func (p *OrderPrint) Activate() {
-	if p.TrackNumber == "" {
+	if p.TrackNumber == 0 {
 		panic("Need Tracking Number!")
 	}
 	fmt.Println("Order Print is here")

@@ -13,10 +13,14 @@ func init() {
 	register.Component(Register, &OrderList{})
 }
 
+// ________________________________________________________________________________
+//
+
 type OrderList struct {
 	core.Component
 
 	Orders []*model.Order
+	Tab    string // receive status tabs. TODO A Better way to do this?
 
 	// temp values
 	customerNames map[int]*model.Person // order-id -> customer names

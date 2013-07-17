@@ -132,6 +132,17 @@ func UpdateOrder(order *model.Order) (int64, error) {
 	return res.RowsAffected()
 }
 
+func UpdateOrderStatus(trackNumber int64, status string) (int64, error) {
+	if logdebug {
+		log.Printf("[dal] Update Order %v's Status to %v", trackNumber, status)
+	}
+	res, err := em.Update("status").Where("track_number", trackNumber).Exec(status)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
 // TODO execute many / batch insert
 func createOrderDetail(orderDetails []*model.OrderDetail) error {
 	for _, detail := range orderDetails {

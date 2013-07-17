@@ -107,6 +107,15 @@ func (order *Order) CalculateOrder() {
 	order.TotalCount = count
 }
 
+func (order *Order) IsStatus(status ...string) bool {
+	for _, s := range status {
+		if s == order.Status {
+			return true
+		}
+	}
+	return false
+}
+
 /*________________________________________________________________________________
   Order Details functions
 */
@@ -131,6 +140,6 @@ func (d *OrderDetail) String() string {
 var OrderStatusDisplayMap = map[string]string{
 	"todeliver":  "待发货",  // 新订单默认状态
 	"delivering": "正在发货", // 打印订单之后，转为发货状态。并且取快照状态的累计欠款
-	"done":       "已完成", // 完成订单。
-	"canceled":   "已取消", // 已取消订单，累计欠款不显示。
+	"done":       "已完成",  // 完成订单。
+	"canceled":   "已取消",  // 已取消订单，累计欠款不显示。
 }

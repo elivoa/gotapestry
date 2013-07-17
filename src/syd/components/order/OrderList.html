@@ -23,30 +23,29 @@
       <td>{{.DisplayStatus }}</td>
       <td nowrap>{{.CreateTime | beautytime}}</td>
       <td nowrap>
+        {{if .IsStatus "todeliver"}}
         <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
         <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
-        <a href="">发货</a><span class="vline">|</span>
-        <a href="/order/cancel/{{.Id}}">取消订单</a></td>
+        <a href="/order/list.Deliver/{{.TrackNumber}}/{{$.Tab}}"
+           onclick="return confirm('确定发货么？发货操作不可撤销！');">发货</a>
+        <span class="vline">|</span>
+        <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+           onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+        {{end}}
+        
+        {{if .IsStatus "delivering"}}
+        <a href="/order/list.MarkAsDone/{{.TrackNumber}}/{{$.Tab}}"
+           onclick="return confirm('确定要结款么？此操作不可撤销，除非是喜小乐！');">结款</a>
+        {{end}}
+        
+        {{if .IsStatus "canceled" "done"}}
+        <a href="/order/view/{{.TrackNumber}}">查看订单</a>
+        {{end}}
+      </td>
     </tr>
     {{end}}
 
-    <tr>
-	  <td nowrap><a href="#">TODO</a></td>
-      <td nowrap>高博</td>
-      <td>已发货</td>
-      <td nowrap>2013-05-20</td>
-      <td nowrap><a href="">结款</a></td>
-    </tr>
-	<tr>
-	  <td nowrap><a href="#">TODO Status</a></td>
-      <td nowrap>高博</td>
-      <td>已完成</td>
-      <td nowrap>2013-05-20</td>
-      <td nowrap><a href="">查看订单</a></td>
-    </tr>
-  </table>
-  
-  {{end}}
+    {{end}}
 
-  <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+    <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 </div>

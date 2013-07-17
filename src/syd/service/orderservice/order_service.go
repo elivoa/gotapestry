@@ -1,6 +1,7 @@
 package orderservice
 
 import (
+	"errors"
 	"strconv"
 	"syd/dal"
 	"syd/dal/orderdao"
@@ -50,11 +51,26 @@ func _processOrderCustomerPrice(order *model.Order) {
 	}
 }
 
+func CancelOrder(trackNumber int64) error {
+	return ChangeOrderStatus(trackNumber, "canceled")
+}
+
+func ChangeOrderStatus(trackNumber int64, status string) error {
+	rowsAffacted, err := orderdao.UpdateOrderStatus(trackNumber, status)
+	if err != nil {
+		return err
+	}
+	if rowsAffacted == 0 {
+		return errors.New("No rows affacted!")
+	}
+	return nil
+}
+
 func GetOrder(id int) (*model.Order, error) {
 	return orderdao.GetOrder("id", id)
 }
 
-func GetOrderByTrackingNumber(trackingNumber string) (*model.Order, error) {
+func GetOrderByTrackingNumber(trackingNumber int64) (*model.Order, error) {
 	return orderdao.GetOrder("track_number", trackingNumber)
 }
 

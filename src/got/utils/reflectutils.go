@@ -72,6 +72,12 @@ func Coercion(value string, t reflect.Type) (reflect.Value, error) {
 			return nilValue, err
 		}
 		return reflect.ValueOf(intvalue), nil
+	case reflect.Int64:
+		intvalue, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return nilValue, err
+		}
+		return reflect.ValueOf(intvalue), nil
 	default:
 		panic(fmt.Sprintf("Coercion error, type %vnot supported.", t))
 	}

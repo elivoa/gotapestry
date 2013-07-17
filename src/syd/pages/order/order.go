@@ -68,6 +68,29 @@ func (p *OrderList) TabStyle(tab string) string {
 	return ""
 }
 
+// EVENT: cancel order.
+// TODO: put this on component.
+// TODO: return null to refresh the current page.
+func (p *OrderList) OnCancelOrder(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "canceled", tab)
+}
+
+func (p *OrderList) OnDeliver(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "delivering", tab)
+}
+
+func (p *OrderList) OnMarkAsDone(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "done", tab)
+}
+
+func (p *OrderList) _onStatusEvent(trackNumber int64, status string, tab string) (string, string) {
+	err := orderservice.ChangeOrderStatus(trackNumber, status)
+	if err != nil {
+		panic(err.Error())
+	}
+	return "redirect", "/order/list/" + tab
+}
+
 /* ________________________________________________________________________________
    Order Detail
 */
