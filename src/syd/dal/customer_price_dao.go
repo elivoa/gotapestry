@@ -2,7 +2,6 @@ package dal
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
