@@ -22,9 +22,10 @@ type Order struct {
 	Details    []*OrderDetail `inject:"slice"` // cascated
 
 	// summarization, not user input, calculated. Persisted in DB.
-	TotalPrice float64
-	TotalCount int
-	PriceCut   float64
+	TotalPrice  float64
+	TotalCount  int
+	PriceCut    float64
+	Accumulated float64 // 上期累计欠款快照（不包含本期订单价格以及代发费用）
 
 	Note string
 
@@ -72,6 +73,15 @@ func GenerateOrderId() int64 {
 	return value
 }
 
+func (order *Order) DisplayStatus() string {
+	display, ok := OrderStatusDisplayMap[order.Status]
+	if ok {
+		return display
+	} else {
+		return order.Status
+	}
+}
+
 func (order *Order) CalculateOrder() {
 	// loop to assign valuesmroe
 	var (
@@ -108,7 +118,19 @@ func (d *OrderDetail) IsValid() bool {
 		return true
 	}
 }
+
 func (d *OrderDetail) String() string {
 	return fmt.Sprintf("OrderDetail(%v), TN:%v, Product:%v_%v_%v quantity:%v, Note:[%v]",
 		d.Id, d.OrderTrackNumber, d.ProductId, d.Color, d.Size, d.Quantity, d.Note)
+}
+
+/*________________________________________________________________________________
+  Order Status DisplayMap
+  TODO: a better place to show this?
+*/
+var OrderStatusDisplayMap = map[string]string{
+	"todeliver":  "待发货",  // 新订单默认状态
+	"delivering": "正在发货", // 打印订单之后，转为发货状态。并且取快照状态的累计欠款
+	"done":       "已完成", // 完成订单。
+	"canceled":   "已取消", // 已取消订单，累计欠款不显示。
 }

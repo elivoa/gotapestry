@@ -97,7 +97,15 @@ func (p *PersonEdit) Setup() {
 	}
 }
 
-func (p *PersonEdit) OnSuccessFromPersonForm() (string, string) {
+func (p *PersonEdit) OnSubmit() {
+	if p.Id != nil {
+		p.Person = personservice.GetPerson(p.Id.Int)
+	} else {
+		// No Need to edit.
+	}
+}
+
+func (p *PersonEdit) OnSuccess() (string, string) {
 	if p.Id != nil {
 		personservice.Update(p.Person)
 	} else {

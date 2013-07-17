@@ -21,7 +21,7 @@
           <form method="POST" id="PersonForm" action="">
             <input type="hidden" name="Person.Id" value="{{.Person.Id}}" />
             {{/* TODO: [tmp] support redirect to form */}}
-            <input type="hidden" name="t:form" value="PersonForm" />
+            <!-- <input type="hiddenya" name="t:form" value="PersonForm" /> -->
 
             <dl class="clearfix">
               <dt><i>*</i>姓名：</dt>
@@ -101,6 +101,14 @@
               <dd><textarea name="Person.Note">{{.Person.Note}}</textarea></dd>
               <dd></dd>
             </dl>
+
+            <dl class="clearfix">
+              <dt>累计欠款：</dt>
+              <dd>{{.Person.AccountBallance | beautycurrency}}</dd>
+              <dd></dd>
+            </dl>
+
+            
             <dl class="clearfix">
               <dt></dt>
               <dd><input type="submit" value="提交"></dd>

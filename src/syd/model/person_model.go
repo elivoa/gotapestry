@@ -11,7 +11,7 @@ import (
 type Person struct {
 	Id         int    // id
 	Name       string // pesron name
-	Type       string "enum(客户|厂家)" // person type
+	Type       string "enum(客户Customer|厂家Factory)" // person type
 	Phone      string
 	City       string
 	Address    string
@@ -20,16 +20,25 @@ type Person struct {
 	Website    string
 	Note       string
 
+	// Customer: 存储累计欠款; Factory: TODO
+	AccountBallance float64
+
 	CreateTime time.Time
 	UpdateTime time.Time
 
 	// TODO ++
 	/* favorite delivery method: TakeAway|SFExpress|物流 */
 	DeliveryMethod string
+
+	// Fax        string
 }
 
 func NewPerson() *Person {
 	return &Person{Name: "", Type: "customer", Note: ""}
+}
+
+func (p *Person) Accomulated() float64 {
+	return -p.AccountBallance
 }
 
 //
@@ -38,7 +47,7 @@ func NewPerson() *Person {
 type Customer struct {
 	Person
 	// advanced properties
-	Accumulated float64 // 累计欠款
+	Accumulated float64 // 累计欠款 // TODO replaced by AccountBallance
 }
 
 type Producer struct {

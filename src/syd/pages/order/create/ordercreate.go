@@ -83,7 +83,7 @@ func (p *OrderCreateDetail) Setup() {
 	}
 }
 
-// before submit
+// before inject submit values, init fields.
 func (p *OrderCreateDetail) OnSubmit() {
 	if p.Id == nil {
 		// if create
@@ -102,13 +102,17 @@ func (p *OrderCreateDetail) OnSubmit() {
 
 // after submit
 func (p *OrderCreateDetail) OnSuccess() (string, string) {
-	// order
+	// order, update details
 	for _, detail := range p.Order.Details {
 		detail.OrderTrackNumber = p.Order.TrackNumber
 	}
+	// daofu flag
 	if p.DaoFu == "on" {
 		p.Order.ExpressFee = -1
 	}
+
+	// set new & edited order's status to 'todeliver'
+	p.Order.Status = "todeliver"
 
 	// update
 	if p.Id != nil {

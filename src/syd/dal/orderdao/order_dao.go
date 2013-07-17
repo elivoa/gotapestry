@@ -14,7 +14,7 @@ import (
 var logdebug = true
 var orderFields = []string{
 	"track_number", "status", "delivery_method", "express_fee", "customer_id", "total_price",
-	"total_count", "price_cut", "note", "create_time", "update_time", "close_time",
+	"total_count", "price_cut", "Accumulated", "note", "create_time", "update_time", "close_time",
 }
 var em = &db.Entity{
 	Table:        "order",
@@ -54,7 +54,7 @@ func ListOrder(status string) ([]*model.Order, error) {
 			p := new(model.Order)
 			err := rows.Scan(
 				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.ExpressFee,
-				&p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Note,
+				&p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated, &p.Note,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)
 			orders = append(orders, p)
@@ -89,7 +89,7 @@ func CreateOrder(order *model.Order) error {
 	res, err := em.Insert().Exec(
 		order.TrackNumber, order.Status, order.DeliveryMethod, order.ExpressFee,
 		order.CustomerId, order.TotalPrice, order.TotalCount, order.PriceCut,
-		order.Note, time.Now(), time.Now(), time.Now(),
+		order.Accumulated, order.Note, time.Now(), time.Now(), time.Now(),
 	)
 	if err != nil {
 		return err
@@ -123,7 +123,7 @@ func UpdateOrder(order *model.Order) (int64, error) {
 	res, err := em.Update().Exec(
 		order.TrackNumber, order.Status, order.DeliveryMethod, order.ExpressFee,
 		order.CustomerId, order.TotalPrice, order.TotalCount, order.PriceCut,
-		order.Note, order.CreateTime, time.Now(), order.CloseTime,
+		order.Accumulated, order.Note, order.CreateTime, time.Now(), order.CloseTime,
 		order.Id,
 	)
 	if err != nil {
@@ -165,7 +165,8 @@ func GetOrder(id int) (*model.Order, error) {
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.ExpressFee,
-				&p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Note,
+				&p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
+				&p.Accumulated, &p.Note,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)
 		},

@@ -20,7 +20,7 @@
     <tr>
 	  <td nowrap><a href="#">{{.TrackNumber}}</a></td>
       <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
-      <td>{{.Status}}</td>
+      <td>{{.DisplayStatus }}</td>
       <td nowrap>{{.CreateTime | beautytime}}</td>
       <td nowrap>
         <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
