@@ -213,8 +213,8 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 	hasSlice := false
 
 	// debug print
-	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	fmt.Printf("++ CREATE TRANSLATE_INFO: PATH:%v on Type:%v --> %v\n", path, t, pieces)
+	// fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	// fmt.Printf("++ CREATE TRANSLATE_INFO: PATH:%v on Type:%v --> %v\n", path, t, pieces)
 
 	// last node's type, if slice, it's slice's element type.
 	// NOTE:!! for now only return slice element's type.

@@ -3,7 +3,6 @@ package orderdao
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
@@ -136,7 +135,7 @@ func UpdateOrder(order *model.Order) (int64, error) {
 // TODO execute many / batch insert
 func createOrderDetail(orderDetails []*model.OrderDetail) error {
 	for _, detail := range orderDetails {
-		fmt.Printf(">>> detail: %v=n", detail)
+		// fmt.Printf(">>> detail: %v=n", detail)
 		if detail == nil {
 			continue
 		}

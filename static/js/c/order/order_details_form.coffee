@@ -16,16 +16,24 @@ class OrderDetailsForm
       order: []
       products: {}
     }
-    # @addTestData() # no test data
     @refreshOrderForm()
 
 
   # Append product
-  appendProduct:(product) ->
+  # Return true - if success, false - if conflict with existing.
+  addProduct:(product) ->
     return if not product
-    # allow duplicated?
+    if @data.products[product.id]
+      alert "已经添加了这件商品，不能重复添加！如需添加或修改，请点击下面对应商品的编辑按钮！谢谢合作！"
+      return false
     @data.order.push product.id
     @data.products[product.id] = product
+    return true
+
+  editProduct:(product) ->
+    return if not product
+    @data.products[product.id] = product
+    return true
 
   setData:(json) ->
     console.log typeof json
@@ -159,10 +167,10 @@ class OrderDetailsForm
         ["蓝色", "M", 204]
       ]
     }
-    @appendProduct(testproduct)
+    @addProduct(testproduct)
 
     # product 2
-    @appendProduct {
+    @addProduct {
       id:2,
       name:"鲸鱼宝宝",
       price:138,

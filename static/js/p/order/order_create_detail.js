@@ -17,14 +17,24 @@
         }
       }, this);
       this.ops.onAddToOrder = $.proxy(function(product) {
-        console.log(product);
-        this.odf.appendProduct(product);
-        this.odf.refreshOrderForm();
-        return this.ops.clear();
+        var success;
+        success = false;
+        console.log("isedit is", this.ops.isEdit);
+        if (this.ops.isEdit) {
+          success = this.odf.editProduct(product);
+        } else {
+          success = this.odf.addProduct(product);
+        }
+        if (success) {
+          this.odf.refreshOrderForm();
+          return this.ops.clear();
+        }
       }, this);
       this.odf.onEdit = $.proxy(function(product) {
         console.log("Edit Product: ", product);
-        return this.ops.refresh(product);
+        this.ops.refresh(product);
+        console.log("set isedit ", true);
+        return this.ops.setEdit(true);
       }, this);
       $('.product-trigger').focus();
     }

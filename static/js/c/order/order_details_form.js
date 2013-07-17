@@ -15,12 +15,25 @@
       this.refreshOrderForm();
     }
 
-    OrderDetailsForm.prototype.appendProduct = function(product) {
+    OrderDetailsForm.prototype.addProduct = function(product) {
       if (!product) {
         return;
       }
+      if (this.data.products[product.id]) {
+        alert("已经添加了这件商品，不能重复添加！如需添加或修改，请点击下面对应商品的编辑按钮！谢谢合作！");
+        return false;
+      }
       this.data.order.push(product.id);
-      return this.data.products[product.id] = product;
+      this.data.products[product.id] = product;
+      return true;
+    };
+
+    OrderDetailsForm.prototype.editProduct = function(product) {
+      if (!product) {
+        return;
+      }
+      this.data.products[product.id] = product;
+      return true;
     };
 
     OrderDetailsForm.prototype.setData = function(json) {
@@ -173,8 +186,8 @@
         sizes: ["S", "M"],
         quantity: [["红色", "S", 101], ["红色", "M", 102], ["蓝色", "S", 203], ["蓝色", "M", 204]]
       };
-      this.appendProduct(testproduct);
-      return this.appendProduct({
+      this.addProduct(testproduct);
+      return this.addProduct({
         id: 2,
         name: "鲸鱼宝宝",
         price: 138,

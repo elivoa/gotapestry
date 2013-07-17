@@ -60,16 +60,20 @@ func (p *OrderCreateDetail) Setup() {
 		panic("Can't find order to edit!")
 	}
 
-	// V121alidate Privileges.
+	// Validate Privileges.
 	if p.Id != nil {
+		// edit mode
 		order, err := orderservice.GetOrder(p.Id.Int)
 		if err != nil {
 			panic(err.Error())
 		}
 		p.Order = order
 		p.CustomerId = p.Order.CustomerId
+
 	} else {
+		// create mode
 		p.Order = model.NewOrder()
+		p.Order.CustomerId = p.CustomerId
 	}
 
 	// init person
@@ -77,24 +81,28 @@ func (p *OrderCreateDetail) Setup() {
 	if p.Customer == nil {
 		panic(fmt.Sprintf("customer not found: id: %v", p.CustomerId))
 	}
-
 }
 
 // before submit
 func (p *OrderCreateDetail) OnSubmit() {
-	p.Order = model.NewOrder()
+	if p.Id == nil {
+		// if create
+		p.Order = model.NewOrder()
+		p.Order.CustomerId = p.CustomerId
+	} else {
+		// if edit
+		// for security reason, TODO security check here.
+		o, err := orderservice.GetOrder(p.Id.Int)
+		if err != nil {
+			panic(err.Error())
+		}
+		p.Order = o
+	}
 }
 
 // after submit
 func (p *OrderCreateDetail) OnSuccess() (string, string) {
-	fmt.Println("********************************************************************************")
-	fmt.Println("on order form sugmit")
-	fmt.Println(p.Order.DeliveryMethod)
-	fmt.Println(p.Order.ExpressFee)
-	fmt.Println(p.DaoFu)
-
 	// order
-	p.Order.CustomerId = p.CustomerId
 	for _, detail := range p.Order.Details {
 		detail.OrderTrackNumber = p.Order.TrackNumber
 	}

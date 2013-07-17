@@ -2,6 +2,7 @@ package orderservice
 
 import (
 	"strconv"
+	"syd/dal"
 	"syd/dal/orderdao"
 	"syd/model"
 	"syd/service/productservice"
@@ -12,11 +13,41 @@ func ListOrder(status string) ([]*model.Order, error) {
 }
 
 func CreateOrder(order *model.Order) error {
+	_processOrderCustomerPrice(order)
 	return orderdao.CreateOrder(order)
 }
 
 func UpdateOrder(order *model.Order) (int64, error) {
+	_processOrderCustomerPrice(order)
 	return orderdao.UpdateOrder(order)
+}
+
+func _processOrderCustomerPrice(order *model.Order) {
+	if order.Details == nil {
+		return
+	}
+	sets := map[int]bool{}
+	for _, detail := range order.Details {
+		if _, ok := sets[detail.ProductId]; ok {
+			continue
+		}
+		sets[detail.ProductId] = true
+
+		product := productservice.GetProduct(detail.ProductId)
+		if product == nil {
+			panic("can not find product")
+		}
+		if detail.SellingPrice != product.Price {
+			// if different, update
+			cp := dal.GetCustomerPrice(order.CustomerId, detail.ProductId)
+			if cp == nil || cp.Price != detail.SellingPrice {
+				if err := dal.SetCustomerPrice(order.CustomerId, detail.ProductId,
+					detail.SellingPrice); err != nil {
+					panic(err.Error())
+				}
+			}
+		}
+	}
 }
 
 func GetOrder(id int) (*model.Order, error) {

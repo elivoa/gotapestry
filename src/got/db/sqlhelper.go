@@ -17,7 +17,6 @@ import (
 	"database/sql"
 	"fmt"
 	"gxl"
-	"reflect"
 	"strings"
 )
 
@@ -318,7 +317,7 @@ func (p *QueryParser) Query(receiver func(*sql.Rows) (bool, error)) error {
 func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 	p.Prepare()
 
-	debuglog("Exec", "Insert: \"%v\" with parameters %v", p.sql, p.values)
+	debuglog("Exec", "\"%v\"", p.sql)
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -340,6 +339,8 @@ func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 	if p.values != nil && len(p.values) > 0 {
 		v = append(v, p.values...)
 	}
+
+	debuglog("Exec", "with parameters %v", v)
 
 	res, err := stmt.Exec(v...)
 	if Err(err) {

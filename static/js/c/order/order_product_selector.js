@@ -8,13 +8,14 @@
       this.customerId = customerId;
       this.containerClass = "product-selector";
       this.product = {};
+      this.isEdit = false;
       this.onSelectProduct;
       this.onAddToOrder;
       this.init();
     }
 
     OrderProductSelector.prototype.init = function() {
-      var _;
+      var priceobj, _;
       _ = this;
       this.sc = new SuggestControl({
         parentClass: ".product-selector",
@@ -29,11 +30,38 @@
         }, this)
       });
       this.sc.init();
-      return $(".ops-add").bind('click', $.proxy(this.onAddToOrderClick, this));
+      $(".ops-add").bind('click', $.proxy(this.onAddToOrderClick, this));
+      priceobj = $("." + this.containerClass + " .price");
+      return priceobj.dblclick($.proxy(function(e) {
+        var input;
+        if (this.product === void 0 || this.product.id === void 0) {
+          return;
+        }
+        input = $("<input type='text' style='width:40px;'>");
+        input.val(this.product.price);
+        input.blur($.proxy(function(e) {
+          console.log('blur');
+          this.product.price = e.target.value;
+          return this.updatePriceDisplay();
+        }, this));
+        priceobj.html("");
+        return priceobj.append(input);
+      }, this));
+    };
+
+    OrderProductSelector.prototype.setEdit = function(edit) {
+      if (edit) {
+        $("." + this.containerClass + " .ops-add").val("修改订单");
+        return this.isEdit = true;
+      } else {
+        $("." + this.containerClass + " .ops-add").val("加入订单");
+        return this.isEdit = false;
+      }
     };
 
     OrderProductSelector.prototype.onProductSelect = function(line, suggestion) {
       var newproduct, productId, url, _;
+      this.setEdit(false);
       _ = this;
       newproduct = {};
       productId = suggestion.data;
@@ -53,7 +81,7 @@
               sizes: data.Sizes
             };
           }
-          urlprice = "/api/customer_price/" + this.customerId + "/" + productId;
+          urlprice = "/api/customer_price/" + _.customerId + "/" + productId;
           return $.ajax({
             url: urlprice,
             context: document.body,
@@ -90,13 +118,17 @@
       } else {
         $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
       }
+      this.updatePriceDisplay();
+      return this.fillQuantities();
+    };
+
+    OrderProductSelector.prototype.updatePriceDisplay = function() {
       $("." + this.containerClass + " .price").html(this.product.price);
       if (this.product.productPrice - this.product.price === 0) {
-        $("." + this.containerClass + " .info").html("");
+        return $("." + this.containerClass + " .info").html("");
       } else {
-        $("." + this.containerClass + " .info").html(("原价：" + this.product.productPrice) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠");
+        return $("." + this.containerClass + " .info").html(("原价：" + this.product.productPrice) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠");
       }
-      return this.fillQuantities();
     };
 
     OrderProductSelector.prototype.fillQuantities = function() {

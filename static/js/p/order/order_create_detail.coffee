@@ -24,15 +24,22 @@ class OrderCreateDetail
     ,@
 
     @ops.onAddToOrder = $.proxy (product) ->
-      console.log product
-      @odf.appendProduct product
-      @odf.refreshOrderForm()
-      @ops.clear()
+      success = false
+      console.log "isedit is", @ops.isEdit
+      if @ops.isEdit
+        success = @odf.editProduct product
+      else
+        success = @odf.addProduct product
+      if success
+        @odf.refreshOrderForm()
+        @ops.clear()
     ,@
 
     @odf.onEdit = $.proxy (product)->
       console.log "Edit Product: ", product
       @ops.refresh product
+      console.log "set isedit ", true
+      @ops.setEdit true
     ,@
 
     # focus on input box

@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
@@ -9,40 +11,57 @@ import (
 )
 
 /* Set customer private price */
-func SetCustomerPrice(personId int, productId int, price float64) {
-	db.Connect()
-	defer db.Close()
-
+func SetCustomerPrice(personId int, productId int, price float64) error {
 	if logdebug {
 		log.Printf("[dal] Set customer price for %v on %v, $%v", personId, productId, price)
 	}
 
-	// first get price xxx. TODO performance.
-	customerPrice := GetCustomerPrice(personId, productId)
-	if customerPrice == nil {
-
-		// create
-		stmt, err := db.DB.Prepare("insert into customer_special_price " +
-			"(person_id, product_id, price, create_time, last_used_time) " +
-			"values(?,?,?,?,?)")
-		if err != nil {
-			panic(err.Error())
-		}
-		defer stmt.Close()
-		stmt.Exec(personId, productId, price, time.Now(), nil)
-
-	} else {
-
-		// update
-		stmt, err := db.DB.Prepare("update customer_special_price set " +
-			"person_id=?, product_id=?, price=?, last_used_time=? " +
-			"where id = ?")
-		if err != nil {
-			panic(err.Error())
-		}
-		defer stmt.Close()
-		stmt.Exec(personId, productId, price, time.Now(), customerPrice.Id)
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return err
 	}
+	defer conn.Close()
+
+	// first get price xxx. TODO performance.
+	// customerPrice := GetCustomerPrice(personId, productId)
+	// if customerPrice == nil {
+	if stmt, err = conn.Prepare("insert into customer_special_price " +
+		"(person_id, product_id, price, create_time, last_use_time) " +
+		"values(?,?,?,?,?)"); err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(personId, productId, price, time.Now(), nil)
+	if err != nil {
+		return err
+	}
+	return nil
+	// } else {
+	// 	if stmt, err = conn.Prepare("insert into customer_special_price " +
+	// 		"(person_id, product_id, price, create_time, last_use_time) " +
+	// 		"values(?,?,?,?,?)"); err != nil {
+	// 		return err
+	// 	}
+	// 	defer stmt.Close()
+	// 	_, err := stmt.Exec(personId, productId, price, time.Now(), nil)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return nil
+
+	// 	// update
+	// 	stmt, err := db.DB.Prepare("update customer_special_price set " +
+	// 		"person_id=?, product_id=?, price=?, last_use_time=? " +
+	// 		"where id = ?")
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// 	defer stmt.Close()
+	// 	stmt.Exec(personId, productId, price, time.Now(), customerPrice.Id)
+	// }
 
 }
 

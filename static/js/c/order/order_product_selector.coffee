@@ -8,11 +8,11 @@
 window.OrderProductSelector =
 class OrderProductSelector
   constructor:(customerId) ->
-
     # fields
     @customerId = customerId
     @containerClass = "product-selector"
     @product = {} # product json of this table.
+    @isEdit = false
 
     # callbacks (on basically means after)
     @onSelectProduct # callback after user select a product
@@ -26,7 +26,6 @@ class OrderProductSelector
   ## Initialize
   init: ->
     _=@
-
     # Suggest on Product
     @sc = new SuggestControl({
       parentClass : ".product-selector",
@@ -43,11 +42,50 @@ class OrderProductSelector
     # bind action on AddToOrder button
     $(".ops-add").bind 'click', $.proxy @onAddToOrderClick,@
 
+    # bind double click on price control.
+    priceobj = $(".#{@containerClass} .price")
+    priceobj.dblclick $.proxy (e)->
+      if @product == undefined || @product.id == undefined
+        return
+      input = $("<input type='text' style='width:40px;'>")
+      input.val(@product.price)
+      input.blur $.proxy (e)->
+        console.log 'blur'
+        @product.price = e.target.value
+        @updatePriceDisplay()
+        ## ...
+        # priceobj.html(@product.price)
+        # if @product.productPrice - @product.price == 0
+        #   $(".#{@containerClass} .info").html("")
+        # else
+        #   $(".#{@containerClass} .info").html("原价：#{@product.productPrice}"+
+        #     "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠")
+      ,@
+      priceobj.html("")
+      priceobj.append(input)
+    ,@
+
+
+    #  .html(@product.price)
+    # if @product.productPrice - @product.price == 0
+    #   $(".#{@containerClass} .info").html("")
+    # else
+
+  setEdit:(edit) ->
+    if edit
+      $(".#{@containerClass} .ops-add").val("修改订单")
+      @isEdit=true
+    else
+      $(".#{@containerClass} .ops-add").val("加入订单")
+      @isEdit=false
+
+
 
   ## ________________________________________
   ## on suggest select
   ## crate the new json
   onProductSelect:(line, suggestion) ->
+    @setEdit(false)
     _=@
     newproduct = {}
     # get customer id. TODO bad design
@@ -69,7 +107,7 @@ class OrderProductSelector
 
         ## 2nd ajax. ajax get price
         ## update customer price & product price.
-        urlprice = "/api/customer_price/#{@customerId}/#{productId}"
+        urlprice = "/api/customer_price/#{_.customerId}/#{productId}"
         $.ajax({
           url: urlprice
           context: document.body
@@ -108,6 +146,13 @@ class OrderProductSelector
       $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!")
 
     # 2/3 update price
+    @updatePriceDisplay()
+
+    # 3/3 refresh stock if has
+    @fillQuantities()
+
+
+  updatePriceDisplay: ()->
     $(".#{@containerClass} .price").html(@product.price)
     if @product.productPrice - @product.price == 0
       $(".#{@containerClass} .info").html("")
@@ -115,8 +160,6 @@ class OrderProductSelector
       $(".#{@containerClass} .info").html("原价：#{@product.productPrice}"+
       "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠")
 
-    # 3/3 refresh stock if has
-    @fillQuantities()
 
   ## ________________________________________
   fillQuantities: ->
@@ -125,8 +168,6 @@ class OrderProductSelector
         o = $("#cs-container #csq_#{q[0]}__#{q[1]}") # TODO hardcode
         if o != undefined
           o.val q[2]
-
-
 
 
   ## ________________________________________
