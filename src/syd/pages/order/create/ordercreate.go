@@ -134,5 +134,5 @@ func (p *OrderCreateDetail) IsEdit() bool {
 }
 
 func (p *OrderCreateDetail) ProductDetailJson() interface{} {
-	return orderservice.ProductDetailJson(p.Order)
+	return orderservice.OrderDetailsJson(p.Order)
 }

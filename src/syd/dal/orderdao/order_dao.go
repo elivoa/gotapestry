@@ -159,9 +159,9 @@ func createOrderDetail(orderDetails []*model.OrderDetail) error {
 /*_______________________________________________________________________________
   Get order
 */
-func GetOrder(id int) (*model.Order, error) {
+func GetOrder(field string, value interface{}) (*model.Order, error) {
 	p := new(model.Order)
-	if err := em.Select().Where("id", id).Query(
+	if err := em.Select().Where(field, value).Query(
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.ExpressFee,

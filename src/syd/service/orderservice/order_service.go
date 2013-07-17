@@ -51,12 +51,16 @@ func _processOrderCustomerPrice(order *model.Order) {
 }
 
 func GetOrder(id int) (*model.Order, error) {
-	return orderdao.GetOrder(id)
+	return orderdao.GetOrder("id", id)
+}
+
+func GetOrderByTrackingNumber(trackingNumber string) (*model.Order, error) {
+	return orderdao.GetOrder("track_number", trackingNumber)
 }
 
 // ________________________________________________________________________________
 // ProductJson generator
-func ProductDetailJson(order *model.Order) *OrderDetailJson {
+func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 	orders := []int{}
 	products := map[string]*ProductDetalJsonStruct{}
 
@@ -109,6 +113,7 @@ type OrderDetailJson struct {
 	Products map[string]*ProductDetalJsonStruct `json:"products"`
 }
 
+// todo rename
 type ProductDetalJsonStruct struct {
 	Id           int             `json:"id"` // product id
 	Name         string          `json:"name"`

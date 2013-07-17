@@ -29,9 +29,7 @@
     	<h1>打印订单</h1>
         <div class="B_order_step3"></div>
 		<div class="B_print_content">
-		  <div class="B_btn_print">
-            <a class="btn_b_s print-order" href="javascript:printOrder();">打印订单</a>
-          </div>
+		  <div class="B_btn_print"><a class="btn_b_s" href="javascript:printOrder();">打印订单</a></div>
 		  <div class="order_print">
 			<div id="orderTop">
 			  <div class="prt_tit">
@@ -74,17 +72,15 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 运费：<span class="underline"></span>
               </div>
-              <div>
-                合计：{{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>
-              </div>
-              <div>代发货款：TODO 392.00</div>
-              <div>累计欠款：{{.Sumprice}} + TODO392.00 + <span class="underline"></span> = <span class="underline"></span> </div>
+              <div>合计：3,920 + <span class="underline"></span> = <span class="underline"></span></div>
+              <div>代发货款：392.00</div>
+              <div>累计欠款：2,046.00 + 392.00 + <span class="underline"></span> = <span class="underline"></span> </div>
             </div>
           </div>
         </div>
         <div class="btn_content">
-          <a class="btn_a_l" href="/order/list/all">返回订单列表</a> 
-          <a class="btn_a_l" href="/order/create">继续新增订单</a>
+          <a class="btn_a_l" href="#">返回订单列表</a> 
+          <a class="btn_a_l" href="#">继续新增订单</a>
         </div>
         
       </div>
