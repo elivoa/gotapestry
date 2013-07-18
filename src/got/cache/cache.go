@@ -77,7 +77,7 @@ func (c *Cache) GetnCache(rt reflect.Type) *StructInfo {
 
 	// not cached, generate StructInfo
 	si = c.create(t)
-	fmt.Printf(".... [CACHE] Create StructInfo for [%v]\n", t)
+	// fmt.Printf(".... [CACHE] Create StructInfo for [%v]\n", t)
 
 	// set back
 	c.l.Lock()

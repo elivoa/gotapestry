@@ -12,11 +12,12 @@ func init() {
 }
 
 type Order struct {
-	Id             int
-	TrackNumber    int64  `` // real identification
-	Status         string `` // todeliver | delivering | done | canceled | (all)
-	DeliveryMethod string `` // YTO, SF, TakeAway
-	ExpressFee     int64  `` // -1 means 到付
+	Id                     int
+	TrackNumber            int64  `` // real identification
+	Status                 string `` // todeliver | delivering | done | canceled | (all)
+	DeliveryMethod         string `` // YTO, SF, TakeAway
+	DeliveryTrackingNumber string `` // 快递单号
+	ExpressFee             int64  `` // -1 means 到付
 
 	CustomerId int            // reference
 	Details    []*OrderDetail `inject:"slice"` // cascated

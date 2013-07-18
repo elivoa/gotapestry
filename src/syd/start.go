@@ -72,9 +72,6 @@ func sydModule(r *mux.Router) {
 
 // register simple router module into GOT.
 func simpleModule(r *mux.Router) {
-	// person.New().Mapping(r)
-	// product.New().Mapping(r)
-	// order.New().Mapping(r)
 	ajax.New().Mapping(r)
 }
 

@@ -68,10 +68,12 @@
         ef = $(".B_fare");
         if (expressFee === -1) {
           ef.find(".express-fee").val(0);
-          return ef.find("input.daofu").prop('checked', true);
+          ef.find("input.daofu").prop('checked', true);
+          return ef.find("input:text").prop('disabled', true);
         } else {
           ef.find("express-fee").val(expressFee);
-          return ef.find("input.daofu").prop('checked', false);
+          ef.find("input.daofu").prop('checked', false);
+          return ef.find("input:text").prop('disabled', false);
         }
       });
     };

@@ -216,13 +216,12 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	// BUG: param segment not used?
 	segment := s // loop channel object
 	for level, seg = range segments {
-		logLookup("- - - [Lookup] Step: Level %v Seg:[ %-10v ] segment:[ %-20v ]\n",
-			level, seg, segment)
-
 		// skip the first / segment.
 		if level == 0 && seg == "" {
 			continue
 		}
+		logLookup("- - - [Lookup] Step: Level %v Seg:[ %-10v ] segment:[ %-20v ]\n",
+			level, seg, segment)
 
 		// If contains ".", this is an event call.
 		// and match stops here, others are parameters of event.
@@ -240,16 +239,16 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 			logLookup("- - - [Lookup] match finished.")
 			break
 		} else {
-			segment = segment.Children[seg]
-		}
-	}
+			// {
+			// 	fmt.Printf(">>>  Get [%v] from [%v]:\n", seg, segment)
+			// 	fmt.Printf(">>>  IS  [%v] \n", segment.Children[seg])
+			// 	for k, v := range segment.Children {
+			// 		fmt.Printf("> %v : %v\n", k, v)
+			// 	}
+			// }
+			segment = segment.Children[strings.ToLower(seg)]
 
-	{
-		// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-		// fmt.Printf("+ segments: \n")
-		// for idx, s := range segments {
-		// 	fmt.Printf("%v:%v\n", idx, s)
-		// }
+		}
 	}
 
 	// get page url

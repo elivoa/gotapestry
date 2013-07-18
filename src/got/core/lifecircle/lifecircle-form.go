@@ -30,14 +30,7 @@ var c = cache.StructCache
   BUG:
 */
 func (lcc *LifeCircleControl) InjectFormValues() {
-
-	// add ParseForm to fix bugs in go1.1.1
-	err := lcc.R.ParseForm()
-	if err != nil {
-		lcc.Err = err
-		return
-		// panic(err.Error())
-	}
+	fmt.Println("++++  Inject Form Values  ++++++++>---")
 
 	// debug print
 	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
@@ -86,18 +79,18 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 		}
 		// ---- END ----
 
-		{ // DEBUG PRINT
-			var k string
-			if leafType == nil {
-				k = "nil"
-			} else {
-				k = leafType.Kind().String()
-			}
-			fmt.Printf(" ~~ processing key-path [%-20v],"+
-				" leafKind:[%v], template:[%-20v] v.type: %v\n",
-				path, k, template, v.Type(),
-			)
-		} // ---- END DEBUG ----
+		// { // DEBUG PRINT
+		// 	var k string
+		// 	if leafType == nil {
+		// 		k = "nil"
+		// 	} else {
+		// 		k = leafType.Kind().String()
+		// 	}
+		// 	fmt.Printf(" ~~ processing key-path [%-20v],"+
+		// 		" leafKind:[%v], template:[%-20v] v.type: %v\n",
+		// 		path, k, template, v.Type(),
+		// 	)
+		// } // ---- END DEBUG ----
 
 		// issue #4 in github.com/gorilla/schema
 		// this is just a fix. filter out all empty string.
@@ -131,8 +124,8 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 
 	// debug print
 	if debug.FLAG_print_form_submit_details {
-		fmt.Printf("++++++++++ lcc.Proton = %v=n", lcc.Proton)
-		fmt.Println("\n+END FORM SUBMIT LOG+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
+		// fmt.Printf("++++++++++ lcc.Proton = %v=n", lcc.Proton)
+		fmt.Println("\n++++  END FORM SUBMIT LOG  +++<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
 			"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 	}
 }
@@ -284,8 +277,8 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 	i.types[path] = leafType
 	i.l.Unlock()
 
-	fmt.Printf("**** Create template for %v is: %v\n", path, template)
-	fmt.Printf("**** Final type is: %v\n\n", leafType)
+	// fmt.Printf("**** Create template for %v is: %v\n", path, template)
+	// fmt.Printf("**** Final type is: %v\n\n", leafType)
 	return template, leafType
 
 }

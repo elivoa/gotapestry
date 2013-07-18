@@ -28,7 +28,7 @@ type OrderList struct {
 
 func (p *OrderList) SetupRender() {
 	// fetch customer names
-	// TODO batch it
+	// TODO b'atch it
 	if p.Orders == nil {
 		return
 	}
@@ -58,3 +58,4 @@ func (p *OrderList) ShowCustomerName(customerId int) string {
 		return fmt.Sprintf("_[ p%v ]_", customerId)
 	}
 }
+

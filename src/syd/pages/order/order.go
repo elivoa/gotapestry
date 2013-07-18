@@ -1,12 +1,10 @@
 package order
 
 import (
-	"github.com/gorilla/mux"
+	"fmt"
 	"got/core"
 	"got/debug"
 	"got/register"
-	"got/route"
-	"got/templates"
 	"strings"
 	"syd/model"
 	"syd/service/orderservice"
@@ -16,7 +14,7 @@ import (
    Register all pages under /order
 */
 func init() {
-	register.Page(Register, &OrderList{}, &OrderIndex{})
+	register.Page(Register, &OrderList{}, &OrderIndex{}, &ButtonSubmitHere{})
 }
 func Register() {}
 
@@ -91,106 +89,31 @@ func (p *OrderList) _onStatusEvent(trackNumber int64, status string, tab string)
 	return "redirect", "/order/list/" + tab
 }
 
+// ________________________________________________________________________________
+// ________________________________________________________________________________
+// EVNET: Form submits here
+// TODO: 功能按钮的表单暂时提交到这里，因为组件内提交暂时还没做好。TODO 快吧组件功能实现了吧。
+//
+type ButtonSubmitHere struct {
+	core.Page
+	Order  *model.Order
+	Source string
+}
+
+func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
+	fmt.Println(p.Order)
+	// To Be Continued.....
+
+	if p.Source != "" {
+		return "redirect", p.Source
+	} else {
+		return "redirect", "/order/list/all"
+	}
+}
+
 /* ________________________________________________________________________________
    Order Detail
 */
 type OrderDetail struct {
 	core.Page
 }
-
-/* ________________________________________________________________________________
-   Order Create/Edit
-*/
-func New() *OrderPage {
-	// templates.Add("order-edit")
-	// templates.Add("order-list")
-	templates.Add("order-detail")
-	return &OrderPage{}
-}
-
-type OrderPage struct{}
-
-func (p *OrderPage) Mapping(r *mux.Router) {
-	// r.HandleFunc("/order/", route.RedirectHandler("/order/list"))
-	// r.HandleFunc("/order/list", route.PageHandler(&OrderList{}))
-	r.HandleFunc("/order/{id:[0-9]+}", route.PageHandler(&OrderDetail{}))
-
-	// editHandler := route.PageHandler(&OrderEdit{})
-	// r.HandleFunc("/order/create", editHandler)
-	// r.HandleFunc("/order/edit/{id:[0-9]+}", editHandler)
-}
-
-// /* ________________________________________________________________________________
-//    Order Edit
-// */
-// type OrderEdit struct {
-// 	core.Page
-// 	Title       string // `path-param:"2"`
-// 	SubTitle    string
-// 	SubmitLabel string
-
-// 	Id    *gxl.Int     `path-param:"1"` // is this param useful?
-// 	Order *model.Order ``
-// }
-
-// // func (p *OrderEdit) Activate(id int64) {
-// // 	p.Id = big.NewInt(id)
-// // }
-
-// func (p *OrderEdit) SetupRender() (interface{}, string) {
-// 	var err error
-// 	if p.Id != nil {
-// 		p.Order, err = orderservice.dal.GetOrder(p.Id.Int)
-// 		if err != nil {
-// 			return err, ""
-// 		}
-// 		p.Title = "编辑订单"
-// 		p.SubTitle = "编辑"
-// 		p.SubmitLabel = "保存"
-// 	} else {
-// 		p.Order = model.NewOrder()
-// 		p.Title = "新建订单"
-// 		p.SubTitle = "新建"
-// 		p.SubmitLabel = "保存"
-// 	}
-// 	return nil, ""
-// }
-
-// func (p *OrderEdit) ProductDisplayName(id int) string {
-// 	product, _ := productdao.Get(id)
-// 	if product != nil {
-// 		return product.Name
-// 	}
-// 	return "【error】"
-// }
-
-// func (p *OrderEdit) AfterRender() (interface{}, string) {
-// 	return "template", "order-edit"
-// }
-
-// func (p *OrderEdit) OnSuccessFromOrderForm() (string, string) {
-
-// 	// debug log
-// 	fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-// 	fmt.Printf("+ OrderDetails %v\n", len(p.Order.Details))
-// 	for idx, o := range p.Order.Details {
-// 		fmt.Printf("+ %v: %v\n", idx, o)
-// 	}
-// 	fmt.Println()
-
-// 	// modify logic
-// 	switch p.Order.DeliveryMethod {
-// 	case "Express":
-// 		p.Order.Status = "New"
-// 	case "TakeAway":
-// 		p.Order.Status = "Delivering"
-// 	}
-
-// 	// update
-// 	if p.Id != nil {
-// 		dal.UpdateOrder(p.Order)
-// 	} else {
-// 		dal.CreateOrder(p.Order)
-// 	}
-// 	return "redirect", "/order/list"
-// }

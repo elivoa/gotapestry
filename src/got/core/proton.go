@@ -20,8 +20,8 @@ type Proton struct {
 	W http.ResponseWriter
 	R *http.Request
 
-	// field that successfully injected
-	injected map[string]bool
+	injected   map[string]bool     // field that successfully injected
+	components map[string]*IProton // embed components TODO
 }
 
 func (p *Proton) Request() *http.Request {

@@ -183,12 +183,20 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 //     OnSuccess   - Called if OnValidate returns true.
 //
 func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
-	// TODO use another method to retrive FormName. t:form
-	formName := lcc.R.FormValue("t:form")
+	// add ParseForm to fix bugs in go1.1.1
+	err := lcc.R.ParseForm()
+	if err != nil {
+		lcc.Err = err
+		return lcc
+	}
+
+	// TODO use another method to retrive FormName. t:id
+	formName := lcc.R.PostFormValue("t:id")
 	if formName != "" {
 		formName = fmt.Sprintf("From%v", formName)
 	}
-
+	fmt.Println("********************************************************************************")
+	fmt.Println(formName)
 	// call OnSubmit() method
 	onSubmitEventName := fmt.Sprintf("%v%v", "OnSubmit", formName)
 	if lcc.CallEvent(onSubmitEventName) {
@@ -207,6 +215,9 @@ func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
 	// call success method
 	// call OnSuccess() method
 	onSuccessEventName := fmt.Sprintf("%v%v", "OnSuccess", formName)
+	fmt.Println("********************************************************************************")
+	fmt.Println(onSuccessEventName)
+
 	if lcc.CallEvent(onSuccessEventName) {
 		return lcc
 	}

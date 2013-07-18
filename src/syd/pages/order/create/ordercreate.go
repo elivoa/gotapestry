@@ -67,6 +67,10 @@ func (p *OrderCreateDetail) Setup() {
 		if err != nil {
 			panic(err.Error())
 		}
+		if !order.IsStatus("todeliver") {
+			panic(fmt.Sprintf("Order are not allow to edit in this status[%v]", order.Status))
+		}
+
 		p.Order = order
 		p.CustomerId = p.Order.CustomerId
 
