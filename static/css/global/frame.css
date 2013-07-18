@@ -58,8 +58,7 @@ select{padding:2px;}
 .icon_pickup{background-position:-200px 0;}
 
 /*联想下拉单*/
-.autocomplete-w1 {position:absolute; }
-.autocomplete { border:1px solid #ccc; background:#FFF; cursor:default; text-align:left; max-height:350px; overflow:auto; /* IE6 specific: */ _height:350px; _overflow-x:hidden;border-radius:0 0 4px 4px;box-shadow:0 2px 2px rgba(0,0,0,.3);}
-.autocomplete .selected { background:#f2f2f2; }
-.autocomplete div { padding:3px 5px; white-space:nowrap; overflow:hidden; }
-.autocomplete strong { font-weight:normal; color:#3399FF; }
+.autocomplete-suggestions { position:absolute; border:1px solid #ccc; background:#FFF; cursor:default; text-align:left; max-height:350px; overflow:auto; /* IE6 specific: */ _height:350px; _overflow-x:hidden;border-radius:0 0 4px 4px;box-shadow:0 2px 2px rgba(0,0,0,.3);}
+.autocomplete-suggestion{ padding:3px 5px; white-space:nowrap; overflow:hidden; }
+.autocomplete-suggestion strong { font-weight:normal; color:#3399FF; }
+.autocomplete-selected{ background:#f2f2f2; }
