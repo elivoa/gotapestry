@@ -120,16 +120,20 @@ func (p *ProductEdit) OnSuccessFromProductForm() (string, string) {
 type ProductList struct {
 	core.Page
 	Products []*model.Product
+	Capital  string `path-param:"1"`
 }
 
 func (p *ProductList) Setup() {
 	var err error
-	p.Products, err = productservice.ListProducts()
+	p.Capital = strings.ToLower(p.Capital)
+	if p.Capital == "" || p.Capital == "all" {
+		p.Products, err = productservice.ListProducts()
+	} else {
+		p.Products, err = productservice.ListProductsByCapital(p.Capital)
+	}
 	if nil != err {
 		panic(err.Error())
-		// Goto error page
 	}
-	// p.Products = dal.ListProduct()
 }
 
 // display: total stocks

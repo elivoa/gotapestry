@@ -6,7 +6,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
 	"log"
-	"strings"
 	"syd/model"
 	"time"
 )
@@ -230,58 +229,30 @@ func deleteDetails(trackNumber int64) (int64, error) {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ListOrderByCustomer(personId int, status string) *[]model.Order {
-	if logdebug {
-		log.Printf("[dal] List order by person %v, with type:%v", personId, status)
-	}
-
-	// header declare
-	var err error
-
-	// connection, // TODO need a connection pool?
-	db.Connect()
-	defer db.Close()
-
-	// 1. query`
-	var queryString string
-	if strings.ToLower(status) == "all" {
-		queryString = "select * from `order` where customer_id = ?"
+func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
+	orders := make([]*model.Order, 0)
+	var query *db.QueryParser
+	if status == "all" {
+		query = em.Select().Where("customer_id", personId)
 	} else {
-		queryString = "select * from `order` where customer_id = ? and status = ?"
+		query = em.Select().Where("customer_id", personId, "status", status)
 	}
-
-	// 2. prepare
-	stmt, err := db.DB.Prepare(queryString)
-	if err != nil {
-		panic(err.Error())
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			p := new(model.Order)
+			err := rows.Scan(
+				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
+				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
+				&p.Accumulated, &p.Note,
+				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
+			)
+			orders = append(orders, p)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
 	}
-	defer stmt.Close()
-
-	// 3. query
-	var rows *sql.Rows
-	if strings.ToLower(status) == "all" {
-		rows, err = stmt.Query(personId)
-	} else {
-		rows, err = stmt.Query(personId, status)
-	}
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
-
-	// 4. process results.
-	// big performance issue, maybe. who knows.
-	orders := []model.Order{}
-	for rows.Next() {
-		p := new(model.Order)
-		rows.Scan(
-			&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.CustomerId,
-			&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Note,
-			&p.CreateTime, &p.UpdateTime, &p.CloseTime,
-		)
-		orders = append(orders, *p)
-	}
-	return &orders
+	return orders, nil
 }
 
 // later

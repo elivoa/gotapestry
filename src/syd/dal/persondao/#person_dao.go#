@@ -1,10 +1,9 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Friday, 2013-07-19 18:23:59>
+  Time-stamp: <[person_dao.go] Elivoa @ Friday, 2013-07-19 18:23:36>
 
   Note: This is the latest Template for dao functions.
-
 */
 package persondao
 
@@ -22,11 +21,11 @@ var em = &db.Entity{
 	Table: "person",
 	PK:    "id",
 	Fields: []string{"id", "name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "createtime", "updatetime"},
+		"postalcode", "qq", "website", "capital", "note", "AccountBallance", "createtime", "updatetime"},
 	CreateFields: []string{"name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "createtime", "updatetime"},
+		"postalcode", "qq", "website", "capital", "note", "AccountBallance", "createtime", "updatetime"},
 	UpdateFields: []string{"name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "updatetime"},
+		"postalcode", "qq", "website", "capital", "note", "AccountBallance", "updatetime"},
 }
 
 func init() {
@@ -42,7 +41,7 @@ func Get(id int) (*model.Person, error) {
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+				&p.Website, &p.Capital, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
 			)
 		},
 	)
@@ -63,7 +62,7 @@ func ListAll(personType string) ([]*model.Person, error) {
 			p := new(model.Person)
 			err := rows.Scan(
 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+				&p.Website, &p.Capital, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
 			)
 			persons = append(persons, p)
 			return true, err
@@ -81,7 +80,7 @@ func ListAll(personType string) ([]*model.Person, error) {
 func Create(person *model.Person) error {
 	res, err := em.Insert().Exec(
 		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode,
-		person.QQ, person.Website, person.Note, person.AccountBallance, time.Now(), time.Now(),
+		person.QQ, person.Website,per person.Note, person.AccountBallance, time.Now(), time.Now(),
 	)
 	if err != nil {
 		return err

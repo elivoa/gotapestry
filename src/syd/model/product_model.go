@@ -17,9 +17,10 @@ type Product struct {
 	FactoryPrice float64
 	Stock        int    // 库存量 || not used again?
 	ShelfNo      string // 货架号
-	Note         string
-	CreateTime   time.Time
-	UpdateTime   time.Time
+	Capital      string // captical letter to quick access.
+	Note       string
+	CreateTime time.Time
+	UpdateTime time.Time
 
 	Pictures string // picture keys splited by ';' filenamne can't contain ';'
 

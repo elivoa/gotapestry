@@ -1,22 +1,21 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title></title>
-
-    {{t_layout_header $}}
-
+  <head>
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `客户资料` }}
   </head>
-  <body>
-    <div class="header">
-	  <h1>进销存管理</h1>
-    </div>
+  <body class="PG_create_order">
+
+    {{t_layout_headernav $}}
+
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      {{t_layout_leftnav $ "CurPage" `/person/list/customer`}}
 
-      <div class="content">
-    	<h2>客户资料</h2>
+      <div class="main_content">
+	    <h1>客户资料 TODO 无页面 TODO 供货商资料</h1>
+
         <div class="person_list">
 		  <table>
             <tr>
@@ -41,9 +40,10 @@
               </td>
             </tr>
             {{end}}
-
           </table>
 
+          <h2>账户余额: {{.Person.AccountBallance}}</h2>
+          
           <hr />
           
           {{t_order_list $ "orders" .Orders}}

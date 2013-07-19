@@ -5,6 +5,7 @@ import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"got/db"
+	"log"
 	"syd/model"
 	"time"
 )
@@ -14,9 +15,11 @@ var em = &db.Entity{
 	Table: "product",
 	PK:    "id",
 	Fields: []string{"id", "name", "productId", "brand", "price", "supplier", "factoryPrice",
-		"stock", "shelfno", "note", "pictures", "createtime", "updatetime"},
+		"stock", "shelfno", "capital", "note", "pictures", "createtime", "updatetime"},
 	CreateFields: []string{"name", "productId", "brand", "price", "supplier", "factoryPrice",
-		"stock", "shelfno", "note", "pictures", "createtime", "updatetime"}, // CreateFields
+		"stock", "shelfno", "capital", "note", "pictures", "createtime", "updatetime"},
+	UpdateFields: []string{"name", "productId", "brand", "price", "supplier", "factoryPrice",
+		"stock", "shelfno", "capital", "note", "pictures", "createtime", "updatetime"},
 }
 
 func init() {
@@ -32,7 +35,7 @@ func Get(id int) (*model.Product, error) {
 		func(row *sql.Rows) (bool, error) {
 			return false, row.Scan(
 				&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice,
-				&p.Stock, &p.ShelfNo, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime,
+				&p.Stock, &p.ShelfNo, &p.Capital, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime,
 			)
 		},
 	)
@@ -45,15 +48,22 @@ func Get(id int) (*model.Product, error) {
 	return nil, errors.New("Product not found!")
 }
 
-// personType: customer, factory
 func ListAll() ([]*model.Product, error) {
+	return _listProducts(em.Select())
+}
+
+func ListByCapital(capital string) ([]*model.Product, error) {
+	return _listProducts(em.Select().Where("capital", capital))
+}
+
+func _listProducts(queryparser *db.QueryParser) ([]*model.Product, error) {
 	products := make([]*model.Product, 0)
-	err := em.Select().Query(
+	err := queryparser.Query(
 		func(rows *sql.Rows) (bool, error) {
 			p := new(model.Product)
 			err := rows.Scan(
 				&p.Id, &p.Name, &p.ProductId, &p.Brand, &p.Price, &p.Supplier, &p.FactoryPrice,
-				&p.Stock, &p.ShelfNo, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime,
+				&p.Stock, &p.ShelfNo, &p.Capital, &p.Note, &p.Pictures, &p.CreateTime, &p.UpdateTime,
 			)
 			products = append(products, p)
 			return true, err
@@ -70,8 +80,9 @@ func ListAll() ([]*model.Product, error) {
 //
 func Create(product *model.Product) (*model.Product, error) {
 	res, err := em.Insert().Exec(
-		product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice,
-		product.Stock, product.ShelfNo, product.Note, product.Pictures, time.Now(), time.Now(),
+		product.Name, product.ProductId, product.Brand, product.Price, product.Supplier,
+		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
+		product.Note, product.Pictures, time.Now(), time.Now(),
 	)
 	if err != nil {
 		return nil, err
@@ -79,4 +90,21 @@ func Create(product *model.Product) (*model.Product, error) {
 	liid, err := res.LastInsertId()
 	product.Id = int(liid)
 	return product, nil
+}
+
+func UpdateProduct(product *model.Product) (int64, error) {
+	if logdebug {
+		log.Printf("[dal] Update Product: %v", product)
+	}
+	// update order
+	res, err := em.Update().Exec(
+		product.Name, product.ProductId, product.Brand, product.Price, product.Supplier,
+		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
+		product.Note, product.Pictures, time.Now(), time.Now(),
+		product.Id,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
 }

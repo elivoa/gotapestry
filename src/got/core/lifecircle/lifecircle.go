@@ -241,7 +241,7 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 
 	// call event. TODO add parameters.
 	fmt.Println("\n\n\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-	fmt.Println("Call event %v with parameters.", event)
+	fmt.Printf("Call event [%v] with parameters.\n", "On"+event)
 	if ret := lcc.CallEventWithURLParameters("On" + event); ret {
 		return lcc
 	}

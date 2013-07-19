@@ -3,6 +3,7 @@ package syd
 import (
 	// pages & components' import
 	index_pages "syd/pages"
+	p_admin "syd/pages/admin"
 	api_pages "syd/pages/api"
 	person_pages "syd/pages/person"
 	product_pages "syd/pages/product"
@@ -60,7 +61,7 @@ func sydModule(r *mux.Router) {
 	person_pages.Register()
 	product_pages.Register()
 	api_pages.Register()
-
+	p_admin.Register()
 	pages_order.Register()
 	pages_order_create.Register()
 

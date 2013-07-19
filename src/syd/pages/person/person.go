@@ -5,7 +5,7 @@ import (
 	"got/core"
 	"got/register"
 	"gxl"
-	"syd/dal"
+	"syd/dal/orderdao"
 	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/personservice"
@@ -123,7 +123,7 @@ type PersonDetail struct {
 	Id *gxl.Int `path-param:"1"`
 
 	Person *model.Person
-	Orders *[]model.Order
+	Orders []*model.Order
 }
 
 func (p *PersonDetail) Setup() {
@@ -132,6 +132,10 @@ func (p *PersonDetail) Setup() {
 	}
 	p.Person = personservice.GetPerson(p.Id.Int)
 	if p.Person != nil {
-		p.Orders = dal.ListOrderByCustomer(p.Person.Id, "all")
+		orders, err := orderdao.ListOrderByCustomer(p.Person.Id, "all")
+		if err != nil {
+			panic(err.Error())
+		}
+		p.Orders = orders
 	}
 }

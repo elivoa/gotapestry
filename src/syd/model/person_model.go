@@ -18,7 +18,7 @@ type Person struct {
 	PostalCode int
 	QQ         int
 	Website    string
-	Note       string
+	Note       string 
 
 	// Customer: 存储累计欠款; Factory: TODO
 	AccountBallance float64

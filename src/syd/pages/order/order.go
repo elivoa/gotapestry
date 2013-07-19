@@ -46,7 +46,7 @@ type OrderList struct {
 
 func (p *OrderList) Activate() {
 	if p.Tab == "" {
-		p.Tab = "all"
+		p.Tab = "todeliver" // default go in todeliver
 	}
 }
 

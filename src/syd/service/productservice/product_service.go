@@ -1,11 +1,13 @@
 package productservice
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"syd/dal"
 	"syd/dal/productdao"
 	"syd/model"
+	"syd/utils"
 )
 
 //
@@ -15,6 +17,8 @@ func CreateProduct(product *model.Product) (*model.Product, error) {
 	if product == nil {
 		panic("Product can't be null!")
 	}
+
+	product.Capital = getCapital(product.Name)
 	newProduct, err := productdao.Create(product)
 	if err != nil {
 		return nil, err
@@ -34,7 +38,10 @@ func UpdateProduct(product *model.Product) {
 		return
 	}
 	// update product information
-	dal.UpdateProduct(product)
+	product.Capital = getCapital(product.Name)
+	if _, err := productdao.UpdateProduct(product); err != nil {
+		panic(err.Error())
+	}
 
 	// update it's properties
 	if product.Colors != nil {
@@ -84,4 +91,33 @@ func ProductPictrues(product *model.Product) []string {
 
 func ListProducts() ([]*model.Product, error) {
 	return productdao.ListAll()
+}
+
+func ListProductsByCapital(capital string) ([]*model.Product, error) {
+	return productdao.ListByCapital(capital)
+}
+
+func RebuildProductPinyinCapital() {
+	fmt.Println("________________________________________________________________________________")
+	fmt.Println("Rebuild Product Capital")
+	products, err := ListProducts()
+	if err != nil {
+		panic(err.Error())
+	}
+	for _, product := range products {
+		product.Capital = getCapital(product.Name)
+		if _, err := productdao.UpdateProduct(product); err != nil {
+			panic(err.Error())
+		}
+		fmt.Printf("> processing %v capital is: %v\n", product.Name, product.Capital)
+	}
+	fmt.Println("all done")
+}
+
+func getCapital(text string) string {
+	s := utils.ParsePinyin(text)
+	if len(s) > 0 {
+		return s[0:1]
+	}
+	return "-"
 }

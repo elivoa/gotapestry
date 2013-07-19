@@ -374,7 +374,6 @@ func fieldString(fields []string) string {
 func appendWhereClouse(sql *bytes.Buffer, where ...interface{}) []interface{} {
 	values := []interface{}{}
 	for i := 0; i < len(where); i = i + 2 {
-		fmt.Println("------------------------------------------------------------------------------------------")
 		k, v := where[i].(string), where[i+1]
 		sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
 		values = append(values, v)

@@ -34,7 +34,9 @@
             <span class="B_overdraft">累计欠款：
               <strong class="price">{{.Order.Accumulated | beautycurrency}}</strong>元
             </span>
-            <strong>{{.Customer.Name}}</strong>，
+            <strong>
+              <a href="/person/detail/{{.Customer.Id}}" target="_blank">{{.Customer.Name}}</a>
+            </strong>，
             {{.Customer.City}}, {{.Customer.Address}} {{.Customer.Phone}}
           </div>
         </div>
