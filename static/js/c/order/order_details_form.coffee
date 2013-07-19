@@ -5,8 +5,11 @@
 
 window.OrderDetailsForm =
 class OrderDetailsForm
-  constructor:(config) ->
+  constructor:(hideOperation) ->
     @containerClass = ".order-form-container"
+    @hideOperation = if hideOperation != undefined then hideOperation else false
+    console.log hideOperation
+    console.log @hideOperation
 
     @onDelete = @defaultOnDelete # delete line callback
     @onEdit # edit line callback
@@ -128,10 +131,11 @@ class OrderDetailsForm
     htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'>"
     htmls.push "      <strong class='price'>#{totalPrice}</strong></td>"
     htmls.push "  <td valign='top' rowspan='#{nquantity}'>#{json.note}</td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
-    htmls.push "      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>"
-    htmls.push "      <a href='#' class='odf-delete'>删除</a>"
-    htmls.push "  </td>"
+    if not @hideOperation
+      htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+      htmls.push "      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>"
+      htmls.push "      <a href='#' class='odf-delete'>删除</a>"
+      htmls.push "  </td>"
     htmls.push "</tr>"
     for quantity in quantities.slice(1, nquantity)
       htmls.push "<tr>"

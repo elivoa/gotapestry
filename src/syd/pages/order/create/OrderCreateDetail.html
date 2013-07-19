@@ -30,7 +30,9 @@
                 <strong class="price">{{.Customer.Accomulated | beautycurrency}}</strong>元
                 <input type="hidden" name="Order.Accumulated" value="{{.Customer.Accomulated}}" />
               </span>
-              <strong>{{.Customer.Name}}</strong>，{{.Customer.Address}} {{.Customer.Phone}}</div>
+              <strong>{{.Customer.Name}}</strong>，
+              {{.Customer.City}}, {{.Customer.Address}} {{.Customer.Phone}}
+            </div>
           </div>
 
           <!-- ------------------------------- -->

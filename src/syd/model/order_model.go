@@ -120,6 +120,10 @@ func (order *Order) IsStatus(status ...string) bool {
 	return false
 }
 
+func (order *Order) DeliveryMethodIs(deliveryMethod string) bool {
+	return deliveryMethod == order.DeliveryMethod
+}
+
 func (order *Order) HasAccumulated() bool {
 	return order.Accumulated > 0
 }

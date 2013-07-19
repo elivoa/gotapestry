@@ -1,1 +1,75 @@
-  dd
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href="/static/css/pages/pg_detail_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `查看订单详情`}}
+  </head>
+  <body class="PG_detail_order">
+
+    {{t_layout_headernav $}}
+
+    <div class="container">
+
+      {{t_layout_leftnav $ "CurPage" `/order/list`}}
+
+      <div class="main_content">
+    	<h1>订单编号：{{.Order.TrackNumber}} </h1>
+
+        <div class="tips_content tips_content_b">
+          <span class="icon_warning"></span>
+          {{if .Order.IsStatus "todeliver"}}
+          <strong>待发货订单，</strong>商品等待发货，累计欠款为当前该客户欠款，你还可以修改订单。发货后状态锁定！
+          {{end}} {{if .Order.IsStatus "delivering"}}
+          <strong>已发货订单，</strong>商品已经发出，订单详情页为该订单快照，累计欠款及商品单价为订单创建时的状态！
+          {{end}} {{if .Order.IsStatus "done"}}
+          <strong>已完成订单，</strong>订单详情页为该订单快照，累计欠款及商品单价为订单创建时的状态！
+          {{end}} {{if .Order.IsStatus "canceled"}}
+          <strong>已取消订单，</strong>订单已经取消！
+          {{end}}
+        </div>
+        
+        <div class="unit">
+          <div class="tit"><strong>客户信息</strong></div>
+          <div class="B_person_info">
+            <span class="B_overdraft">累计欠款：
+              <strong class="price">{{.Order.Accumulated | beautycurrency}}</strong>元
+            </span>
+            <strong>{{.Customer.Name}}</strong>，
+            {{.Customer.City}}, {{.Customer.Address}} {{.Customer.Phone}}
+          </div>
+        </div>
+
+        <div class="">
+          {{t_order_detailsform $}}
+        </div>
+        
+        <div class="unit">
+          <div class="tit"><strong>发货方式</strong></div>
+          <div class="B_express">
+			<span class="B_shipping_method">
+              {{if .Order.DeliveryMethodIs "YTO"}}<span class="icon_yto"></span>{{end}}
+              {{if .Order.DeliveryMethodIs "SF"}}<span class="icon_sf"></span>{{end}}
+              {{if .Order.DeliveryMethodIs "TakeAway"}}<span class="icon_pickup"></span>{{end}}
+            </span>
+			<span class="B_shipping_price">运费：<span class="price">{{.Order.ExpressFee}}</span>元</span>
+			<span class="B_order_num">运单号：{{.Order.DeliveryTrackingNumber}}</span>
+          </div>
+        </div>
+		<div class="unit">
+          <div class="tit"><strong>订单备注</strong></div>
+		  <div class="B_order_remark">
+			abcde
+		  </div>
+		</div>
+        <div class="btn_content"><a class="btn_b_l" href="#">返回订单列表</a></div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script type="text/javascript">
+  $(function(){
+    odf = new OrderDetailsForm(false)
+    odf.setData({{.ProductDetailJson}})
+  });
+</script>

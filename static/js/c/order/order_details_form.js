@@ -4,8 +4,11 @@
 
   window.OrderDetailsForm = OrderDetailsForm = (function() {
 
-    function OrderDetailsForm(config) {
+    function OrderDetailsForm(hideOperation) {
       this.containerClass = ".order-form-container";
+      this.hideOperation = hideOperation !== void 0 ? hideOperation : false;
+      console.log(hideOperation);
+      console.log(this.hideOperation);
       this.onDelete = this.defaultOnDelete;
       this.onEdit;
       this.data = {
@@ -151,10 +154,12 @@
       htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
       htmls.push("      <strong class='price'>" + totalPrice + "</strong></td>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>" + json.note + "</td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
-      htmls.push("      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>");
-      htmls.push("      <a href='#' class='odf-delete'>删除</a>");
-      htmls.push("  </td>");
+      if (!this.hideOperation) {
+        htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+        htmls.push("      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>");
+        htmls.push("      <a href='#' class='odf-delete'>删除</a>");
+        htmls.push("  </td>");
+      }
       htmls.push("</tr>");
       _ref1 = quantities.slice(1, nquantity);
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
