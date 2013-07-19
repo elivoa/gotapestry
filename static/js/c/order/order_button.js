@@ -19,9 +19,9 @@
 
     OrderDeliverButton.prototype.init = function() {
       $("#" + this.param.id + "_trigger").click($.proxy(function(e) {
-        e.preventDefaults;
-        this.m.on('show', $.proxy(function() {
-          return console.log("onshow");
+        e.preventDefault();
+        this.m.on('shown', $.proxy(function() {
+          return this.m.find("input.tracking-number").focus();
         }, this));
         return this.m.modal({
           keyboard: true

@@ -4,10 +4,9 @@ CloseOrderModal -- open modal box to close order
 ---------------------------------------------------------------------------
 */}}
 
-<!-- TODO GOT: JS remove duplicate -->
-<script type="text/javascript" src="/static/js/c/order/order_button.js"></script>
+<!-- <script type="text/javascript" src="/static/js/c/order/order_button.js"></script> -->
 
-<a id="{{.Id}}_trigger" href="#{{.Id}}_modal" data-toggle="modal">结款</a>
+<a id="{{.Id}}_trigger" href="#{{.Id}}_modal" data-toggle-x="modal">结款</a>
 
 <div id="{{.Id}}_modal" class="layer_box modal hide fade">
   <div class="layer_top modal-header">
@@ -16,7 +15,7 @@ CloseOrderModal -- open modal box to close order
   </div>
   <div class="layer_content L_fast_cash modal-body">
 
-    <form action="/order/ButtonSubmitHere" method="POST" onsubmit="return validateCloseForm();">
+    <form action="/order/ButtonSubmitHere" method="POST" onsubmit="return validateCloseForm('{{.Id}}');">
       <input type="hidden" name="t:id" value="CloseForm" />
       <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />      
       <input type="hidden" name="Source" value="{{.Source}}" />
@@ -38,8 +37,8 @@ CloseOrderModal -- open modal box to close order
 	    <dl class="clearfix">
 		  <dt>结账：</dt>
 		  <dd>
-		    <input type="text" size="16" name="Money" value=""> 
-		    <!--<label><input type="checkbox"> 已结清</label>-->
+		    <input type="text" size="16" class="money" name="Money" value=""> 
+		    <label><input type="checkbox" class="money-clear"> 已结清</label>
 		  </dd>
 	    </dl>
 	    <dl class="clearfix">
@@ -52,9 +51,10 @@ CloseOrderModal -- open modal box to close order
   </div>
 </div>
 <script type="text/javascript">
-  function validateCloseForm(){
+  // inline javascript example
+  function validateCloseForm(id){
     if (confirm("确认结款么？")){
-      o = $("input.money")
+      o = $("#"+id+"_modal input.money")
       if (o.val() == "") {
         alert('必须填写结账金额！')
         o.focus()
@@ -65,4 +65,30 @@ CloseOrderModal -- open modal box to close order
       return false
     }
   }
+
+$(function(){
+  // bind xxx
+  trigger = $("#{{.Id}}_trigger")
+  m = $("#{{.Id}}_modal")
+
+  // trigger click
+  trigger.click(function(e){
+    e.preventDefault()
+    m.on('shown', function(){
+      m.find("input.money").focus()
+    });
+    m.modal("show")
+  })
+
+  // btn
+  clearbtn = m.find(".money-clear")
+  clearbtn.click(function(){
+    if(clearbtn.prop('checked') == true){
+      m.find("input.money").val("{{.Order.SumOrderPrice}}")
+    }else{
+      m.find("input.money").focus()
+    }
+  })
+
+});
 </script>

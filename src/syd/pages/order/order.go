@@ -15,7 +15,7 @@ import (
    Register all pages under /order
 */
 func init() {
-	register.Page(Register, &OrderList{}, &OrderIndex{}, &ButtonSubmitHere{})
+	register.Page(Register, &OrderList{}, &OrderIndex{}, &ButtonSubmitHere{}, &ViewOrder{})
 }
 func Register() {}
 
@@ -184,6 +184,11 @@ func (p *ButtonSubmitHere) returnDispatch() (string, string) {
 /* ________________________________________________________________________________
    Order Detail
 */
-type OrderDetail struct {
+type ViewOrder struct {
 	core.Page
+	Order *model.Order
+}
+
+func (p *ViewOrder) Setup() {
+	
 }

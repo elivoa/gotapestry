@@ -53,6 +53,10 @@ type OrderCreateDetail struct {
 	DaoFu    string       // on
 
 	SourceUrl string `query:"source"` // redirect url
+
+	// page msg resources
+	SubTitle     string // create or edit? TODO i18n resource file.
+	SubmitButton string // 确认下单？ 修改订单
 }
 
 func (p *OrderCreateDetail) Setup() {
@@ -73,11 +77,14 @@ func (p *OrderCreateDetail) Setup() {
 
 		p.Order = order
 		p.CustomerId = p.Order.CustomerId
-
+		p.SubTitle = "编辑"
+		p.SubmitButton = "修改订单"
 	} else {
 		// create mode
 		p.Order = model.NewOrder()
 		p.Order.CustomerId = p.CustomerId
+		p.SubTitle = "新建"
+		p.SubmitButton = "确认下单"
 	}
 
 	// init person

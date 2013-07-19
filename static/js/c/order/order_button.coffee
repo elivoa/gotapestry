@@ -16,11 +16,16 @@ class OrderDeliverButton
 
   init:->
     $("##{@param.id}_trigger").click $.proxy (e)->
-      e.preventDefaults
-      @m.on 'show', $.proxy ->
-        # TODO ajax init modal
-        console.log "onshow"
+      e.preventDefault()
+      # @m.on 'show', $.proxy ->
+      #   # TODO ajax init modal
+      #   console.log "onshow"
+      # ,@
+      @m.on 'shown', $.proxy ->
+        # focus on express button
+        @m.find("input.tracking-number").focus()
       ,@
+
       @m.modal {
         keyboard: true
       }

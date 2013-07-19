@@ -23,7 +23,7 @@ function printOrder(){
 	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
 	LODOP.PRINT_INIT("销货清单打印");
 	LODOP.SET_PRINT_PAGESIZE(0,2410,1400,"销货清单");	 
-	var strStyleCSS = "<link href='../../css/pages/order-print.css' type='text/css' rel='stylesheet'>";
+	var strStyleCSS = "<link href='/static/css/pages/order-print.css' type='text/css' rel='stylesheet'>";
 	var orderTop = strStyleCSS+"<body>"+document.getElementById("orderTop").innerHTML+"</body>";
 	var orderTable = strStyleCSS+"<body>"+document.getElementById("orderTable").innerHTML+"</body>";
 	var orderTotal=strStyleCSS+"<body>"+document.getElementById("orderTotal").innerHTML+"</body>";

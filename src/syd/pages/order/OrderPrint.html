@@ -5,8 +5,9 @@
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
     {{t_layout_header $ "Title" `打印订单` }}
 
-    <link rel="stylesheet" type="text/css" media="screen" href="/static/css/pages/order-print.css" />
-    <link rel="stylesheet" type="text/css" media="print" href="/static/css/pages/order-print.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/pages/order-print.css" />
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="/static/css/pages/order-print.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" media="print" href="/static/css/pages/order-print.css" /> -->
 
     <script language="javascript" src="/static/js/p/order/order_print.js"></script>
     <script language="javascript" src="/static/js/native/LodopFuncs.js"></script>
@@ -106,9 +107,9 @@
   </body>
 </html>
 <script type="text/javascript">
-                       $(function(){
-                         op  = new OrderPrint()
-                         op.setData({{.ProductDetailJson}})
-                       });
-                       </script>
+  $(function(){
+    op  = new OrderPrint()
+    op.setData({{.ProductDetailJson}})
+  });
+</script>
 

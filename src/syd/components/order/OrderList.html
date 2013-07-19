@@ -20,7 +20,7 @@
 
     {{range .Orders}}
     <tr>
-	  <td nowrap><a href="#">{{.TrackNumber}}</a></td>
+	  <td nowrap><a href="/order/view/{{.TrackNumber}}">{{.TrackNumber}}</a></td>
       <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
       <td>{{.DisplayStatus }}</td>
       <td nowrap>{{.CreateTime | beautytime}}</td>
