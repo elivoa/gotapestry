@@ -28,26 +28,21 @@
         {{if .IsStatus "todeliver"}}
         <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
         <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
-        
-        {{t_order_deliverbutton $ "id" `deliver` "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
-        <!-- { {(print "/order/list/" $.Tab)}} -->
-
+        {{t_order_deliverbutton $ "id" (print `deliver` .TrackNumber `_`) "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
         <span class="vline">|</span>
         <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
            onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
         {{end}}
         
         {{if .IsStatus "delivering"}}
-        <a href="#closeModal" data-toggle="modal">结款</a>
-        <!-- <a href="/order/list.MarkAsDone/{{.TrackNumber}}/{{$.Tab}}"
-                onclick="return confirm('确定要结款么？此操作不可撤销，除非是喜小乐！');">结款</a> -->
+        {{t_order_closebutton $ "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
         {{end}}
         
         {{if .IsStatus "canceled" "done"}}
         <a href="/order/view/{{.TrackNumber}}">查看订单</a>
         {{end}}
 
-        <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a>
+        <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
 
       </td>
     </tr>

@@ -70,15 +70,13 @@
 
             </div>
             <div id="orderTotal" class="other_info">
-              <div>运输方式：{{.DeliveryMethodDisplay }}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                运费：<span class="underline"></span>
+              <div>运输方式：{{.DeliveryMethodHtml | html}}
               </div>
               <div>
                 合计：{{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>
               </div>
-              <div>代发货款：TODO 392.00</div>
-              <div>累计欠款：{{.Sumprice}} + TODO392.00 + <span class="underline"></span> = <span class="underline"></span> </div>
+              <!-- <div>代发货款：TODO 392.00</div> -->
+              <div>累计欠款：{{.Sumprice}} + (代发TODO) + <span class="underline"></span> = <span class="underline"></span> </div>
             </div>
           </div>
         </div>

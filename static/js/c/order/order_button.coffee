@@ -37,7 +37,7 @@ class OrderDeliverButton
     _.DeliveryTrackingNumber = $("##{@param.id}_modal .tracking-number").val()
 
     # submit form
-    # TODO this is ajax submit, use form submit first
+    # TODO later: this is ajax submit, use form submit first
     $.ajax {
       type: "POST"
       url: "/order/ButtonSubmitHere"

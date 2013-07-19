@@ -1,8 +1,8 @@
-<!--{{/*
-  ----------------------------------------------------------------------
-    DeliverModal -- open modal box to close order
-  ----------------------------------------------------------------------
-    */}}-->
+{{/*
+----------------------------------------------------------------------
+DeliverModal -- open modal box to deliver order
+----------------------------------------------------------------------
+*/}}
 
 <!-- TODO GOT: JS remove duplicate -->
 <script type="text/javascript" src="/static/js/c/order/order_button.js"></script>
@@ -18,6 +18,7 @@
 
     <form action="/order/ButtonSubmitHere" method="POST">
       <input type="hidden" name="t:id" value="DeliverForm" />
+      <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />      
       <input type="hidden" name="Source" value="{{.Source}}" />
       
 	  <div class="form_main">
@@ -25,15 +26,15 @@
 		  <dt class="L_method">发货方式：</dt>
           <div class="choose_express">
             <label class="checkedxx">
-              <input type="radio" name="Order.DeliveryMethod" value="YTO">
+              <input type="radio" name="DeliveryMethod" value="YTO">
               <span class="icon_yto"></span>
             </label>
             <label>
-              <input type="radio" name="Order.DeliveryMethod" value="SF">
+              <input type="radio" name="DeliveryMethod" value="SF">
               <span class="icon_sf"></span>
             </label>
             <label>
-              <input type="radio" name="Order.DeliveryMethod" value="TakeAway">
+              <input type="radio" name="DeliveryMethod" value="TakeAway">
               <span class="icon_pickup"></span>
             </label>
           </div>
@@ -42,14 +43,14 @@
 		  <dt>运单号：</dt>
 		  <dd>
 		    <input type="text" size="40" class="tracking-number"
-                   name="Order.DeliveryTrackingNumber" value="{{.DeliveryTrackingNumber}}">
+                   name="DeliveryTrackingNumber" value="{{.DeliveryTrackingNumber}}">
 		  </dd>
 	    </dl>
 	    <dl class="clearfix B_fare">
 		  <dt>运费：</dt>
 		  <dd>
             <input type="text" size="10" class="express-fee"
-                   name="Order.ExpressFee" value="{{.ExpressFee}}">
+                   name="ExpressFee" value="{{.ExpressFee}}">
 		    <label><input type="checkbox" class="daofu" name="DaoFu"> 到付</label>
 		  </dd>
 	    </dl>
@@ -75,7 +76,4 @@
     ol.setExpress({{.DeliveryMethod}}, {{.ExpressFee}})
   });
 </script>
-
-<!-- <a href="/order/list.Deliver/{ {.TrackNumber}}/{ {$.Tab}}" -->
-<!--    onclick="return confirm('确定发货么？发货操作不可撤销！');">发货</a> -->
 

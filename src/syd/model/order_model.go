@@ -11,6 +11,9 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+// ________________________________________________________________________________
+// Order 的Status 涉及到累计欠款，因此状态绝对不能乱改。必须严格按照流程走。
+//
 type Order struct {
 	Id                     int
 	TrackNumber            int64  `` // real identification
@@ -23,9 +26,9 @@ type Order struct {
 	Details    []*OrderDetail `inject:"slice"` // cascated
 
 	// summarization, not user input, calculated. Persisted in DB.
-	TotalPrice  float64
+	TotalPrice  float64 // not include expressfee
 	TotalCount  int
-	PriceCut    float64
+	PriceCut    float64 // currently not used.
 	Accumulated float64 // 上期累计欠款快照（不包含本期订单价格以及代发费用）
 
 	Note string
@@ -115,6 +118,15 @@ func (order *Order) IsStatus(status ...string) bool {
 		}
 	}
 	return false
+}
+
+func (order *Order) SumOrderPrice() float64 {
+	var sum float64
+	sum += order.TotalPrice
+	if order.ExpressFee > 0 {
+		sum += float64(order.ExpressFee)
+	}
+	return sum
 }
 
 /*________________________________________________________________________________

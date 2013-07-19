@@ -20,13 +20,13 @@ func registerHelperFuncs() {
   Tempalte Functions
 */
 
-// {{showtime .CreateTime "2006-01-02 03:04:05"}}
+// {{showtime .CreateTime "2006-01-02 15:04:05"}}
 func FormatTime(t time.Time, format string) string {
 	return t.Format(format)
 }
 
 func BeautyTime(t time.Time) string {
-	return t.Format("2006-01-02 03:04:05")
+	return t.Format("2006-01-02 15:04:05")
 }
 
 func BeautyCurrency(d float64) string {

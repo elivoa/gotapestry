@@ -1,6 +1,7 @@
 package order
 
 import (
+	"bytes"
 	"fmt"
 	"got/core"
 	"got/register"
@@ -44,15 +45,6 @@ func (p *OrderPrint) Setup() {
 	p.Sumprice = p.sumprice()
 }
 
-func (p *OrderPrint) DeliveryMethodDisplay() string {
-	dis, ok := deliveryMethodDisplayMap[p.Order.DeliveryMethod]
-	if ok {
-		return dis
-	} else {
-		return p.Order.DeliveryMethod
-	}
-}
-
 func (p *OrderPrint) sumprice() float64 {
 	var sum float64
 	if p.Order.Details != nil {
@@ -62,8 +54,40 @@ func (p *OrderPrint) sumprice() float64 {
 	}
 	return sum
 }
+
 func (p *OrderPrint) ProductDetailJson() interface{} {
 	return orderservice.OrderDetailsJson(p.Order)
+}
+
+func (p *OrderPrint) DeliveryMethodHtml() string {
+	var html bytes.Buffer
+	html.WriteString(p.DeliveryMethodDisplay())
+	html.WriteString("        ")
+	if p.Order.ExpressFee == -1 {
+		html.WriteString("到付")
+	} else {
+		html.WriteString("运费: ")
+		if p.Order.ExpressFee == 0 {
+			// html.WriteString("<span class=\"underline\"></span>")
+			html.WriteString("______________")
+		} else {
+			html.WriteString(fmt.Sprintf("%v", p.Order.ExpressFee))
+		}
+	}
+	return html.String()
+}
+
+func (p *OrderPrint) DeliveryMethodDisplay() string {
+	dis, ok := deliveryMethodDisplayMap[p.Order.DeliveryMethod]
+	if ok {
+		return dis
+	} else {
+		return p.Order.DeliveryMethod
+	}
+}
+
+func (p *OrderPrint) IsDaofu() bool {
+	return p.Order.ExpressFee == -1
 }
 
 var deliveryMethodDisplayMap = map[string]string{
