@@ -117,8 +117,6 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-	fmt.Println(order)
 	order.DeliveryTrackingNumber = p.DeliveryTrackingNumber
 	order.DeliveryMethod = p.DeliveryMethod
 	if p.DaoFu == "on" {
@@ -127,9 +125,6 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 		order.ExpressFee = p.ExpressFee
 	}
 	order.Status = "delivering"
-	fmt.Println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-	fmt.Println(order)
-	fmt.Println()
 	_, err = orderservice.UpdateOrder(order)
 	if err != nil {
 		panic(err.Error())

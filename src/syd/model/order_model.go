@@ -120,6 +120,10 @@ func (order *Order) IsStatus(status ...string) bool {
 	return false
 }
 
+func (order *Order) HasAccumulated() bool {
+	return order.Accumulated > 0
+}
+
 func (order *Order) SumOrderPrice() float64 {
 	var sum float64
 	sum += order.TotalPrice
