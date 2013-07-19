@@ -68,9 +68,10 @@
                   <td valign="top">&nbsp;</td>
                 </tr>
               </table>
-
             </div>
-            <div id="orderTotal" class="other_info">
+
+            <!-- 隐藏：如果有运费就显示  -->
+            <div id="orderTotal" class="other_info" style="display:none">
               <div>运输方式：{{.DeliveryMethodDisplay }}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{if .DeliveryMethodIs "TakeAway"}} 到付 {{end}}
@@ -93,8 +94,23 @@
                 + (代发<span class="underline"></span>)
                 = <span class="underline"></span>
               </div> {{end}}
-              
             </div>
+
+            <!-- 先用这个版本，隐藏代发，运费始终显示下划线; 订单状态为todeliver，使用实时累计欠款；-->
+            <div id="orderTotal" class="other_info">
+              <div>运输方式：{{.DeliveryMethodDisplay }}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span> {{end}}
+              </div>
+              <div>
+                合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>
+              </div>
+              {{if .Order.HasAccumulated }} <div>
+                累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
+                = <span class="underline"></span>
+              </div> {{end}}
+            </div>
+            
           </div>
         </div>
         <div class="btn_content">
