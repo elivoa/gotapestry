@@ -8,9 +8,9 @@ Inject values when submit.
 package lifecircle
 
 import (
-	"errors"
 	"fmt"
 	"got/cache"
+	"got/core"
 	"got/debug"
 	"got/utils"
 	"reflect"
@@ -18,14 +18,13 @@ import (
 	"sync"
 )
 
-// quick access
-var c = cache.StructCache
-
 /*
   Parse values submited from Form. (use gorilla/schema)
+  Note: Now only support Page.
   TODO:
     . Support parse repeated values.
     . Support File upload
+    . Support Submit to Component
 
   BUG:
 */
@@ -33,7 +32,7 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	fmt.Println("++++  Inject Form Values  ++++++++>---")
 
 	// debug print
-	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
+	if debug.FLAG_print_form_submit_details && lcc.Kind == core.PAGE {
 		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.R.Form)
 	}
 
@@ -43,24 +42,16 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 
 	// 1) Precondition
 	v := lcc.V
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-		lcc.Err = errors.New("got/lifecircle: interface must be a pointer to struct")
-		return
-	}
+	// if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+	// 	lcc.Err = errors.New("got/lifecircle: interface must be a pointer to struct")
+	// 	return
+	// }
 
-	// ---------------------------------
 	// 2) Parse array in form
 	data := map[string][]string{} // stores transfered FormData
 
-	// don't import multipart form.
-	// err = lcc.R.ParseMultipartForm(1024 * 1024 * 10) // MOVE CONFIG OUT
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
 	for path, formValue := range lcc.R.Form {
 
-		// ------------------------------------------------------------
 		// Get something from cache.
 		// is path in name Attribute need translate to "x.y.1.z" format
 		var (
@@ -68,12 +59,13 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 			template string
 			ok       bool
 		)
-		ti := tcache.getTranslateInfo(v.Type())
-		ti.l.Lock()
-		template, ok = ti.templates[path]
-		ti.l.Unlock()
+		ti := tcache.translateInfo(v.Type())
+		if ti == nil {
+			panic(fmt.Sprintf("translateInfo for %v is nil!", v.Type()))
+		}
+		template, ok = ti.template(path)
 		if !ok {
-			template, leafType = ti.Create(path, v.Type())
+			template, leafType = ti.create(path, v.Type())
 		} else {
 			leafType = ti.types[path]
 		}
@@ -92,7 +84,7 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 		// 	)
 		// } // ---- END DEBUG ----
 
-		// issue #4 in github.com/gorilla/schema
+		// issue #4: in github.com/gorilla/schema
 		// this is just a fix. filter out all empty string.
 		if leafType != nil && leafType.Kind() == reflect.Slice {
 			switch leafType.Elem().Kind() {
@@ -115,7 +107,7 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	}
 
 	// debug print
-	if debug.FLAG_print_form_submit_details && lcc.Kind == "page" {
+	if debug.FLAG_print_form_submit_details && lcc.Kind == core.PAGE {
 		debug.PrintFormMap("~ 2 ~ gorilla/schema Data", data)
 	}
 
@@ -124,7 +116,6 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 
 	// debug print
 	if debug.FLAG_print_form_submit_details {
-		// fmt.Printf("++++++++++ lcc.Proton = %v=n", lcc.Proton)
 		fmt.Println("\n++++  END FORM SUBMIT LOG  +++<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
 			"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 	}
@@ -151,6 +142,8 @@ func translateRequestFromIntoGorillaForm(
 // ________________________________________________________________________________
 // The Cache part. L2Cache (L1Cache is got/cache)
 //
+var scache = cache.StructCache
+
 var tcache = NewTranslateCache()
 
 func NewTranslateCache() *translateCache {
@@ -174,19 +167,29 @@ type translateInfo struct {
 }
 
 // get translateInfo from cache, if nil, create an empty one.
-func (c *translateCache) getTranslateInfo(t reflect.Type) *translateInfo {
+func (c *translateCache) translateInfo(t reflect.Type) *translateInfo {
 	c.l.Lock()
 	ti := c.m[t]
+	c.l.Unlock()
+
 	if ti == nil {
 		// init new translateInfo
 		ti = &translateInfo{
 			templates: make(map[string]string),
 			types:     make(map[string]reflect.Type),
 		}
+		c.l.Lock()
 		c.m[t] = ti
+		c.l.Unlock()
 	}
-	c.l.Unlock()
 	return ti
+}
+
+func (ti *translateInfo) template(path string) (template string, ok bool) {
+	ti.l.Lock()
+	template, ok = ti.templates[path]
+	ti.l.Unlock()
+	return
 }
 
 /*
@@ -199,7 +202,7 @@ func (c *translateCache) getTranslateInfo(t reflect.Type) *translateInfo {
   TODO:
     for now, only support 1 slice objects in it.
 */
-func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Type) {
+func (ti *translateInfo) create(path string, t reflect.Type) (string, reflect.Type) {
 	var parentType = t
 	pieces := strings.Split(path, ".")
 	segs := make([]string, 0)
@@ -230,13 +233,20 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 		segs = append(segs, p)
 
 		// 1. get StructInfo from cache.
-		structInfo := c.GetnCache(parentType)
+		// first must be a page. following must be something else.
+		// TODO how to detect component?
+		var structInfo *cache.StructInfo
+		if idx == 0 {
+			structInfo = scache.GetPageX(parentType)
+		} else {
+			structInfo = scache.GetX(parentType)
+		}
 		if nil == structInfo {
-			panic("struct info is null for " + parentType.String())
+			panic("struct info is nil for " + parentType.String())
 		}
 
-		fieldInfo, ok := structInfo.Fields[p]
-		if ok && fieldInfo != nil {
+		fieldInfo := structInfo.FieldInfo(p)
+		if fieldInfo != nil {
 			leafType = fieldInfo.Type
 			if fieldInfo.IsSlice {
 				// if leafe node && is slice, stop here.
@@ -252,8 +262,8 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 			}
 		}
 
-		//
-		if ok && fieldInfo != nil {
+		// next round!
+		if fieldInfo != nil {
 			// fmt.Printf("---- set parentType to fieldInfo.Type: %v\n", fieldInfo.Type)
 			// fmt.Printf("---- fieldinfo is: %v\n", fieldInfo)
 			parentType = fieldInfo.Type
@@ -272,13 +282,10 @@ func (i *translateInfo) Create(path string, t reflect.Type) (string, reflect.Typ
 	}
 
 	// set to TranslateInfo
-	i.l.Lock()
-	i.templates[path] = template
-	i.types[path] = leafType
-	i.l.Unlock()
-
-	// fmt.Printf("**** Create template for %v is: %v\n", path, template)
-	// fmt.Printf("**** Final type is: %v\n\n", leafType)
+	ti.l.Lock()
+	ti.templates[path] = template
+	ti.types[path] = leafType
+	ti.l.Unlock()
 	return template, leafType
 
 }

@@ -350,7 +350,7 @@ func (p *QueryParser) Exec(values ...interface{}) (sql.Result, error) {
 }
 
 // ________________________________________________________________________________
-var logEnabled = true
+var logEnabled = false
 
 func debuglog(method string, format string, params ...interface{}) {
 	if logEnabled {

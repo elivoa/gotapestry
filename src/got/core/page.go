@@ -1,14 +1,11 @@
 package core
 
-import ()
-
-import ()
-
 /*
-   Interfaces of pages/components
+   Interfaces of pages/component
+   TODO: change interface to Pager/Protoner/Componenter
 */
 type IPage interface {
-	IProton
+	Protoner
 }
 
 /*
@@ -16,4 +13,8 @@ type IPage interface {
 */
 type Page struct {
 	Proton
+}
+
+func (p *Page) Kind() Kind {
+	return PAGE
 }

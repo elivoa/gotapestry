@@ -11,8 +11,8 @@ func init() {
 
 type OrderDeliverButton struct {
 	core.Component
-	Id  string // client id
-	Tid string // component id
+	Id string // client id
+	// Tid string // component id
 
 	Source string // return to this place
 

@@ -143,14 +143,18 @@ func printAccessHeader(r *http.Request) {
 
 func printAccessFooter(r *http.Request) {
 	//debug.Log("^ ^ ^ ^ ^ ^ ^ ^ PAGE RENDER END ^ ^ ^ ^ ^ ^ ^ ^ ^ ^")
-	fmt.Println("-----------------------------^         PAGE RENDER END           -----------------------------------")
-	fmt.Println("....................................................................................................")
+	fmt.Println("-----------------------------^         PAGE RENDER END           " +
+		"-----------------------------------")
+	fmt.Println("................................................................." +
+		"...................................")
 }
 
 func processPanic(err interface{}) {
-	log.Printf("xxxxxxxx  PANIC  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+	log.Printf("xxxxxxxx  PANIC  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
+		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	log.Printf("x panic: %-109v x", err)
-	log.Printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+	log.Printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
+		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	fmt.Println("StackTrace >>")
 	rd.PrintStack()
 	fmt.Println()

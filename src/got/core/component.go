@@ -19,9 +19,14 @@ package core
   Component
 */
 type IComponent interface {
-	IProton
+	Protoner
 }
 
 type Component struct {
 	Proton
+	Tid string // component id
+}
+
+func (c *Component) Kind() Kind {
+	return COMPONENT
 }

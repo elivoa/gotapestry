@@ -19,7 +19,7 @@ type ProtonSegment struct {
 	Children map[string]*ProtonSegment //
 	Src      string                    // source package, used to select app
 	Level    int                       // depth
-	Proton   core.IProton              // Proton
+	Proton   core.Protoner             // Proton
 
 	l sync.Mutex // TODO used to synchronized, also in page?
 }
@@ -40,8 +40,9 @@ func (s *ProtonSegment) Remove() {
 	// TODO
 }
 
-var pathMap map[string]string = map[string]string{
-	"page": "pages", "component": "components",
+var pathMap = map[string]string{
+	"page":      "pages",
+	"component": "components",
 }
 
 // ________________________________________________________________________________
@@ -52,7 +53,7 @@ var pathMap map[string]string = map[string]string{
 //   order, orderlist
 //   order/create/OrderCreateDetail
 //
-func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) (selectors [][]string) {
+func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) (selectors [][]string) {
 
 	src, segments := trimPathSegments(baseUrl, pathMap[protonType])
 
@@ -62,7 +63,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) (
 	var (
 		currentSeg = s
 		prevSeg    = "//nothing//" // previous lowercase seg
-		prevSegs   = []string{}    // previous lowercase seg
+		prevSegs   = []string{}    // previous lowercase seg[]
 		isPage     = (protonType == "page")
 
 		selectorPrefix = []string{} // tempvalue
@@ -190,6 +191,8 @@ func (s *ProtonSegment) Add(baseUrl string, p core.IProton, protonType string) (
 	return
 }
 
+// ----------------------------------------------------------------------------------------------------
+
 type LookupResult struct {
 	Segment   *ProtonSegment
 	PageUrl   string
@@ -239,15 +242,7 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 			logLookup("- - - [Lookup] match finished.")
 			break
 		} else {
-			// {
-			// 	fmt.Printf(">>>  Get [%v] from [%v]:\n", seg, segment)
-			// 	fmt.Printf(">>>  IS  [%v] \n", segment.Children[seg])
-			// 	for k, v := range segment.Children {
-			// 		fmt.Printf("> %v : %v\n", k, v)
-			// 	}
-			// }
 			segment = segment.Children[strings.ToLower(seg)]
-
 		}
 	}
 

@@ -18,40 +18,21 @@ import (
    TODO:
    . Callback functions
 */
-const (
-	// TemplateKey = "template-key"
-	PageKey  = "page-key"
-	debugLog = true
 
-	PAGE      = "page"
-	COMPONENT = "component"
-)
-
-func debuglog(format string, params ...interface{}) {
-	if debugLog {
-		log.Printf(format, params...)
-	}
-}
-
-var (
-	emptyParameters = []reflect.Value{}
-	emptyString     = ""
-)
-
-/* ______________________________
-   Control Struct
-*/
+// ______________________________
+// Control Struct
+//
 type LifeCircleControl struct {
 	// basic service
 	W http.ResponseWriter
 	R *http.Request
 
 	// target
-	Proton    core.IProton  // IPage or IComponent value
+	Proton    core.Protoner // IPage or IComponent value
+	Kind      core.Kind     // enum: page|component
 	V         reflect.Value // Value of page
 	Name      string        // page name or component name
 	Path      string        // ???
-	Kind      string        // enum: page|component
 	PageUrl   string        // matched page url, Activate parameter part
 	EventName string        // an event call on page, not page render
 
@@ -61,57 +42,79 @@ type LifeCircleControl struct {
 	Err        error  // error if something error
 }
 
-/* ______________________________
-   Create
-*/
-func newLifeCircleControl(
-	w http.ResponseWriter, r *http.Request,
-	kind string, proton core.IProton) *LifeCircleControl {
-
-	lcc := &LifeCircleControl{W: w, R: r, Kind: kind}
-	baseValue := reflect.ValueOf(proton)
-	method := baseValue.MethodByName("New")
-	if method.IsValid() {
-		// create by calling New
-		returns := method.Call(emptyParameters)
-		lcc.V = returns[0]
-	} else {
-		// create an empty page value
-		lcc.V = reflect.New(reflect.TypeOf(proton).Elem())
-	}
-	lcc.Proton = lcc.V.Interface().(core.IProton)
-	lcc.Name = fmt.Sprint(reflect.TypeOf(lcc.Proton).Elem())
-
-	debuglog("-710- [flow] New LifeCircleControl: %v[%v].",
-		lcc.Kind, lcc.Name)
-
-	return lcc
-}
-
+// --------------------------------------------------------------------------------
 // Create new page value with the same type as proton (page or component).
 // by calling New method or use reflect.
-func NewPageFlow(
-	w http.ResponseWriter, r *http.Request, proton core.IPage) *LifeCircleControl {
+func NewPageFlow(w http.ResponseWriter, r *http.Request, page core.IPage) *LifeCircleControl {
+	// maintaince structCache
+	if si := scache.GetPageX(reflect.TypeOf(page)); si == nil {
+		panic("Can't parse page!")
+	}
 
-	lcc := newLifeCircleControl(w, r, PAGE, proton)
-	return lcc
+	return newLifeCircleControl(w, r, core.PAGE, page)
 }
 
-// Method to create a new Component value.
-func NewComponentFlow(
-	container core.IProton, component core.IComponent,
+// Create a new Component Flow.
+// param:
+//   container - the container proton.
+//   component - the current component.
+//   params - parameters in the component grammar.
+//
+// Note: I maintain StructCache here in the flow create func. This occured only when
+//       page or component are rendered. Directly post to a page can not invoke structcache init.
+//
+func NewComponentFlow(container core.Protoner, component core.IComponent,
 	params []interface{}) *LifeCircleControl {
 
-	fmt.Println(".................... [Cretae Component Flow]" +
-		" ---------------------------------------------------------------")
+	debuglog("----- [Create Component flowcontroller] ------------------------%v",
+		"----------------------------------------")
 	debug.Log("- C - [Component Container] Type: %v, ComponentType:%v,\n",
 		reflect.TypeOf(container), reflect.TypeOf(component))
 
-	lcc := newLifeCircleControl(container.ResponseWriter(), container.Request(),
-		COMPONENT, component)
-	// inject component parameters
+	// maintaince struct cache
+	{
+		si := scache.GetCreate(reflect.TypeOf(container), container.Kind())
+		if si == nil {
+			panic("Can't parse page!")
+		}
+		debuglog("---- set container.xxx to type component; %v ", container.Kind())
 
-	lcc.InjectComponentParameters(params)
+		// find tid in parameters call
+		var tid string
+		for idx, p := range params {
+			if idx%2 == 0 && strings.ToLower(p.(string)) == "tid" {
+				tid = params[idx+1].(string)
+			}
+		}
+		si.CacheEmbedProton(reflect.TypeOf(component), tid)
+	}
+
+	// create flow object
+	lcc := newLifeCircleControl(container.ResponseWriter(), container.Request(),
+		core.COMPONENT, component)
+	lcc.InjectComponentParameters(params) // inject component parameters
+	return lcc
+}
+
+func newLifeCircleControl(w http.ResponseWriter, r *http.Request,
+	kind core.Kind, proton core.Protoner) *LifeCircleControl {
+
+	lcc := &LifeCircleControl{W: w, R: r, Kind: kind}
+	baseValue := reflect.ValueOf(proton)
+
+	// try to create new value of proton
+	method := baseValue.MethodByName("New")
+	if method.IsValid() {
+		returns := method.Call(emptyParameters)
+		lcc.V = returns[0]
+	} else {
+		lcc.V = reflect.New(reflect.TypeOf(proton).Elem())
+	}
+	lcc.Proton = lcc.V.Interface().(core.Protoner)
+	lcc.Name = fmt.Sprint(reflect.TypeOf(lcc.Proton).Elem())
+
+	debuglog("-710- [flow] New LifeCircleControl: %v[%v].", lcc.Kind, lcc.Name)
+
 	return lcc
 }
 
@@ -143,24 +146,18 @@ var flowEvents = []string{
 func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 	lcc.InjectValue()
 
-	// ____________________________________________________________________
-	// if false { // disable Activte, this has difficult to implement.
-	if lcc.Kind == "page" {
+	// Only Page has Activate event.
+	if lcc.Kind == core.PAGE {
 		// Life Circle: Activate (TODO extract function)
 		// if ret := lcc.CallEventWithURLParameters("Activate"); ret {
 		if ret := lcc.CallEvent("Activate"); ret {
 			return lcc
 		}
 	}
-	// }
 
-	// On form submit, execute above to create page value.
-	// ignore the following and call OnSuccess event.
-	// fmt.Printf("r.Method is %v\n", r.Method)
-	// TODO:
-	//    Support OnSuccess Method.
+	// On form submit, go to another flow.
 	// TODO：只有page才POST，修复component中提交form的bug。设计一个方案。
-	if lcc.R.Method == "POST" && lcc.Kind == "page" {
+	if lcc.R.Method == "POST" && lcc.Kind == core.PAGE {
 		return lcc.PostFlow()
 	}
 
@@ -170,8 +167,7 @@ func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
 			return lcc
 		}
 	}
-
-	return lcc // for chain
+	return lcc
 }
 
 // ________________________________________________________________________________
@@ -227,13 +223,12 @@ func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
 	return lcc
 }
 
+// ________________________________________________________________________________
 // event call page flow
 // TODO support component event call
 func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 	lcc.InjectValue()
-	if lcc.Kind == "page" {
-		// Life Circle: Activate (TODO extract function)
-		// if ret := lcc.CallEventWithURLParameters("Activate"); ret {
+	if lcc.Kind == core.PAGE {
 		if ret := lcc.CallEvent("Activate"); ret {
 			return lcc
 		}
@@ -248,7 +243,9 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 	return lcc // for chain
 }
 
+// ________________________________________________________________________________
 // Call Events, and other events.
+//
 func (lcc *LifeCircleControl) CallEvent(name string) bool {
 	method := lcc.V.MethodByName(name)
 	if method.IsValid() {
@@ -461,7 +458,7 @@ func (lcc *LifeCircleControl) return_template(templateName string) error {
 	debuglog("-980- Render Tempalte %v.", templateName)
 
 	var err error
-	if lcc.Kind == "component" {
+	if lcc.Kind == core.COMPONENT {
 		var buffer bytes.Buffer
 		err = templates.RenderTemplate(&buffer, templateName, lcc.Proton)
 		lcc.String = buffer.String()
@@ -475,4 +472,21 @@ func (lcc *LifeCircleControl) return_template(templateName string) error {
 		return err
 	}
 	return nil
+}
+
+// --------------------------------------------------------------------------------
+
+const (
+	debugLog = true
+)
+
+var (
+	emptyParameters = []reflect.Value{}
+	emptyString     = ""
+)
+
+func debuglog(format string, params ...interface{}) {
+	if debugLog {
+		log.Printf(format, params...)
+	}
 }

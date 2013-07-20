@@ -5,13 +5,25 @@ import (
 	"net/http"
 )
 
+// GOT Kind
+
+type Kind uint
+
+const (
+	INVALID Kind = iota
+	PAGE
+	COMPONENT
+	MIXIN
+	STRUCT
+)
+
 /*_______________________________________________________________________________
   Proton
 */
-
-type IProton interface {
+type Protoner interface {
 	Request() *http.Request
 	ResponseWriter() http.ResponseWriter
+	Kind() Kind // [page|component|mixin]
 }
 
 // Common object which Page and Component both has.
@@ -20,8 +32,8 @@ type Proton struct {
 	W http.ResponseWriter
 	R *http.Request
 
-	injected   map[string]bool     // field that successfully injected
-	components map[string]*IProton // embed components TODO
+	injected   map[string]bool      // field that successfully injected
+	components map[string]*Protoner // embed components TODO
 }
 
 func (p *Proton) Request() *http.Request {
@@ -57,12 +69,3 @@ func (p *Proton) ShowInjected() {
 		fmt.Printf(" %v --> %v\n", k, v)
 	}
 }
-
-// func (p *Proton) String() string {
-// 	return fmt.Sprintf("Proton[[type:%v]]",
-// 		reflect.TypeOf(p))
-// }
-
-/*_______________________________________________________________________________
-  Proton Registry
-*/
