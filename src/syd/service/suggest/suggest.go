@@ -117,6 +117,7 @@ func parseQuickText(text string) string {
 
 func Add(category string, text string, id int) {
 	EnsureLoaded()
+	l.Lock()
 	item := &Item{
 		Id:          id,
 		Text:        text,
@@ -129,6 +130,7 @@ func Add(category string, text string, id int) {
 		SuggestCache[category] = items
 	}
 	items = append(items, item) // Performance?
+	l.Unlock()
 }
 
 func Delete(category string, id int) {
@@ -150,10 +152,8 @@ func Delete(category string, id int) {
 
 func Update(category string, text string, id int) {
 	EnsureLoaded()
-	l.Lock()
 	Delete(category, id)
 	Add(category, text, id)
-	l.Unlock()
 }
 
 func PrintAll() {

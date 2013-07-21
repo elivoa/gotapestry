@@ -2,6 +2,7 @@ package orderservice
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"syd/dal"
 	"syd/dal/orderdao"
@@ -36,7 +37,7 @@ func _processOrderCustomerPrice(order *model.Order) {
 
 		product := productservice.GetProduct(detail.ProductId)
 		if product == nil {
-			panic("can not find product")
+			panic(fmt.Sprint("Can not find product ", detail.ProductId))
 		}
 		if detail.SellingPrice != product.Price {
 			// if different, update
@@ -72,6 +73,11 @@ func GetOrder(id int) (*model.Order, error) {
 
 func GetOrderByTrackingNumber(trackingNumber int64) (*model.Order, error) {
 	return orderdao.GetOrder("track_number", trackingNumber)
+}
+
+func DeleteOrder(trackNumber int64) (affacted int64, err error) {
+	affacted, err = orderdao.DeleteOrder(trackNumber)
+	return
 }
 
 // ________________________________________________________________________________

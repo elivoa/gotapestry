@@ -86,18 +86,11 @@ func (p *Proton) ShowInjected() {
 }
 
 func (p *Proton) Embed(name string) (Protoner, bool) {
-	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-	for k,v :=range p.embed{
-		fmt.Printf("%v --> %v\n", k,v)
-	}
-	fmt.Println(name)
 	proton, ok := p.embed[name]
 	return proton, ok
 }
 
 func (p *Proton) SetEmbed(name string, proton Protoner) {
-	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-	fmt.Println(name)
 	if p.embed == nil {
 		p.embed = make(map[string]Protoner)
 	}

@@ -33,3 +33,12 @@ func newInstance(rt reflect.Type) reflect.Value {
 func _extractParameters(url string, pageUrl string, eventName string) []string {
 	return nil
 }
+
+func SetInjected(v reflect.Value, fields ...string) {
+	method := v.MethodByName("SetInjected")
+	if method.IsValid() {
+		for _, f := range fields {
+			method.Call([]reflect.Value{reflect.ValueOf(f), reflect.ValueOf(true)})
+		}
+	}
+}

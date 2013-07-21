@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"got/core"
-	"got/debug"
 	"got/register"
 	"gxl"
 	"strings"
-	"syd/dal"
 	"syd/model"
 	"syd/service/personservice"
 	"syd/service/productservice"
@@ -134,27 +132,6 @@ func (p *ProductList) Setup() {
 	if nil != err {
 		panic(err.Error())
 	}
-}
-
-// display: total stocks
-func (p *ProductList) NStock(productId int) (sum int) {
-	stockmap := dal.ListProductStocks(productId)
-	if stockmap != nil {
-		for _, stock := range *stockmap {
-			if stock > 0 {
-				sum += stock
-			}
-		}
-	}
-	return
-}
-
-// NOTE: event name is case sensitive. Kill this when add cache.
-func (p *ProductList) Ondelete(productId int) (string, string) {
-	debug.Log("Delete Product %d", productId)
-	dal.DeleteProduct(productId)
-	// TODO make this default redirect.
-	return "redirect", "/product/list"
 }
 
 // ________________________________________________________________________________

@@ -45,38 +45,15 @@
           <a href="/product/list/Y">Y</a>
           <a href="/product/list/Z">Z</a>
         </div>
+
         <div class="list_product">
-          <table class="tbl_main">
-            <tr>
-              <th align="left">商品名称</th>
-              <th align="right">销售单价</th>
-              <th align="left">产品规格</th>
-              <th align="left">操作</th>
-            </tr>
-
-
-            {{with $:=.}}
-            {{range .Products}}
-            <tr>
-              <td nowrap><a href="/product/detail/{{.Id}}">{{.Name}}</a></td>
-              <td align="right"><span class="price">{{.Price | formatcurrency}}</span></td>
-              <td nowrap>
-                TODO:红色：S / M / L<span class="vline">|</span>
-                黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
-                <span class="vline">|</span>绿色：S / M / L / XL
-              </td>
-              <td nowrap>
-                <a href="#TODO">填写入库信息</a><span class="vline">|</span>
-                <a href="/product/edit/{{.Id}}">修改商品</a><span class="vline">|</span>
-                <a href="/product/list.delete/{{.Id}}" onclick="return confirm('确认删除?')">删除</a>
-              </td>
-            </tr>
-            {{end}}
-            {{end}}
-
-          </table>
+          
+          {{t_product_list $ "Products" .Products "Source" (print `/product/list/` .Capital) }}
+          
           <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+
         </div>
+        
       </div>
     </div>
   </body>

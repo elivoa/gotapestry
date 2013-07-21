@@ -3,6 +3,7 @@ package lifecircle
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"got/core"
 	"got/debug"
 	"got/utils"
 	"reflect"
@@ -16,12 +17,6 @@ import (
      Request, ResponseWriter
 */
 func (lcc *LifeCircleControl) InjectValue() {
-
-	// fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-	// fmt.Println(reflect.TypeOf(lcc.Proton))
-	// fmt.Printf(">>>> %v\n", reflect.TypeOf(lcc.W))
-	// fmt.Printf(">>>> %v\n", reflect.TypeOf(lcc.R))
-	// fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 	// 1. inject static values. (TODO: test performance)
 	injectField(lcc.V, "W", lcc.W) // proton.W
@@ -227,10 +222,127 @@ func injectField(target reflect.Value, fieldName string, value interface{}) {
 }
 
 func (lcc *LifeCircleControl) SetInjected(fields ...string) {
-	method := lcc.V.MethodByName("SetInjected")
-	if method.IsValid() {
-		for _, f := range fields {
-			method.Call([]reflect.Value{reflect.ValueOf(f), reflect.ValueOf(true)})
+	SetInjected(lcc.V, fields...)
+	// method := lcc.V.MethodByName("SetInjected")
+	// if method.IsValid() {
+	// 	for _, f := range fields {
+	// 		method.Call([]reflect.Value{reflect.ValueOf(f), reflect.ValueOf(true)})
+	// 	}
+	// }
+}
+
+// ________________________________________________________________________________
+// Inject values to object, use values in lcc, but not modify any value in lcc.
+// TODO: organize this, add cache of this.
+//
+func (lcc *LifeCircleControl) InjectValueTo(proton core.Protoner) {
+	w, r := lcc.W, lcc.R
+	v := reflect.ValueOf(proton)
+	pageUrl := lcc.PageUrl
+
+	// 1. inject static values. (TODO: test performance)
+	injectField(v, "W", w)
+	injectField(v, "R", r)
+	proton.SetInjected("W", true)
+	proton.SetInjected("R", true)
+
+	// 2. inject parameter
+	// 2.1 get value
+	values := make(map[string][]string)
+	t, _ := utils.RemovePointer(reflect.TypeOf(proton), false)
+
+	vars := mux.Vars(lcc.R)
+	queries := r.URL.Query()
+
+	// 2.2 prepare url parameters
+	url := r.URL.Path
+	if !strings.HasPrefix(url, pageUrl) {
+		panic(fmt.Sprintf("%v should has prefix %v", url, pageUrl))
+	}
+
+	// 2.3 parepare parameters
+	paramsString := url[len(pageUrl):]
+	if lcc.EventName != "" {
+		index := strings.Index(paramsString, "/")
+		if index > 0 {
+			paramsString = paramsString[index:]
 		}
+	}
+	var strParams []string
+	if len(paramsString) > 0 {
+		if strings.HasPrefix(paramsString, "/") {
+			paramsString = paramsString[1:]
+		}
+		strParams = strings.Split(paramsString, "/")
+	}
+	debug.Log("-   - [injection] URL:%v, parameters:%v", url, strParams)
+	// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
+	// fmt.Printf("+ url: %v\n", url)
+	// fmt.Printf("+ lcc.PageUrl: %v\n", lcc.PageUrl)
+	// fmt.Printf("+ paramsString: %v\n", paramsString)
+	// fmt.Printf("+ strParams: %v\n", strParams)
+
+	// ...
+	for i := 0; i < t.NumField(); i++ {
+		f := t.FieldByIndex([]int{i})
+
+		// debug.Log("-dbg- [InjectFields] %v'th field '%v' of type %v",
+		// 	i, f.Name, f.Type,
+		// )
+
+		// process gxl.objects
+		var gxlSuffix string = analysisTranslateSuffix(f.Type)
+		var fieldKey = f.Name
+		if gxlSuffix != "" {
+			fieldKey += gxlSuffix
+		}
+
+		var tagValue string
+
+		// parse TAG: param [updated: this is not used anymore in got]
+		tagValue = f.Tag.Get("param")
+		if tagValue != "" {
+			if tagValue == "." {
+				tagValue = f.Name
+			}
+			v, ok := vars[tagValue]
+			if ok {
+				lcc.SetInjected(f.Name)
+				values[fieldKey] = []string{v}
+				continue
+			}
+		}
+
+		// parse TAG: path-param
+		tagValue = f.Tag.Get("path-param")
+		if tagValue != "" {
+			pathParamIndex, err := strconv.Atoi(tagValue)
+			if err != nil {
+				panic(fmt.Sprintf("TAG path-param must be numbers. not %v.", tagValue))
+			}
+			if pathParamIndex <= len(strParams) {
+				// fmt.Printf("\t>>>>>> pathParamIndexis %v, len(strParams) = %v\n",
+				// 	pathParamIndex, len(strParams))
+				values[fieldKey] = []string{strParams[pathParamIndex-1]}
+				lcc.SetInjected(f.Name)
+			}
+		}
+
+		// query param: in url query
+		tagValue = f.Tag.Get("query")
+		if tagValue != "" {
+			if tagValue == "." {
+				tagValue = f.Name
+			}
+			v, ok := queries[tagValue]
+			if ok {
+				lcc.SetInjected(f.Name)
+				values[f.Name] = v
+				continue
+			}
+		}
+	}
+	if len(values) > 0 {
+		utils.SchemaDecoder.Decode(proton, values)
 	}
 }

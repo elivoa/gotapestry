@@ -227,8 +227,6 @@ func deleteDetails(trackNumber int64) (int64, error) {
 	}
 }
 
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	orders := make([]*model.Order, 0)
 	var query *db.QueryParser
@@ -255,27 +253,20 @@ func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	return orders, nil
 }
 
-// later
-func DeleteOrder(id int) error {
-	if logdebug {
-		log.Printf("[dal] delete person %n", id)
+// ________________________________________________________________________________
+// Delete an order
+//
+
+// TODO transaction
+func DeleteOrder(trackNumber int64) (int64, error) {
+	aff, erro := deleteDetails(trackNumber)
+	if erro != nil {
+		return aff, erro
 	}
 
-	// 1. TODO delete details
-	// deleteDetails()
-
-	conn, _ := db.Connect()
-	defer conn.Close()
-
-	stmt, err := db.DB.Prepare("delete from person where id = ?")
-	defer stmt.Close()
-	if db.Err(err) {
-		return err
+	res, err := em.Delete().Where("track_number", trackNumber).Exec()
+	if err != nil {
+		return 0, err
 	}
-
-	_, err = stmt.Exec(id)
-	if db.Err(err) {
-		return err
-	}
-	return nil
+	return res.RowsAffected()
 }

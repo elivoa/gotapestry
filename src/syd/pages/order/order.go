@@ -142,7 +142,7 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	if _, err = personservice.Update(customer); err != nil {
 		panic(err.Error())
 	}
-
+	fmt.Println("_____ on deliver from devliver from --- success --- ")
 	return p.returnDispatch()
 }
 

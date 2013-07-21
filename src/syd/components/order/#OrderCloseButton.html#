@@ -68,17 +68,18 @@ CloseOrderModal -- open modal box to close order
   }
 
 $(function(){
-  // TODO make these only appear once. use this in js files and control js import.
+  // TODO make 
   $("#{{.ClientId}}_trigger").click(function(){
     var m = $("#{{.ClientId}}_modal")
+    console.log(m)
     return $.proxy(function(e){
+      console.log(m)
       e.preventDefault()
       m.on('shown', function(){
         m.find("input.money").focus()
       });
       m.modal("show")
-      
-      clearbtn = m.find(".money-clear")
+
       m.find(".money-clear").click(function(){
         if(clearbtn.prop('checked') == true){
           m.find("input.money").val("{{.Order.SumOrderPrice}}")

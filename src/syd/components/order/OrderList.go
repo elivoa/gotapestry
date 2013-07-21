@@ -5,6 +5,7 @@ import (
 	"got/core"
 	"got/register"
 	"syd/model"
+	"syd/service/orderservice"
 	"syd/service/personservice"
 )
 
@@ -65,5 +66,8 @@ func (p *OrderList) ShowCustomerName(customerId int) string {
 func (p *OrderList) Ondelete(trackNumber int64) (string, string) {
 	fmt.Println("--------------------------------------------------------------------------------")
 	fmt.Printf("Delete order %v \n", trackNumber)
+	if _, err := orderservice.DeleteOrder(trackNumber); err != nil {
+		panic(err.Error())
+	}
 	return "redirect", "/order/list"
 }

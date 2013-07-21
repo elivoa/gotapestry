@@ -30,8 +30,9 @@ type LifeCircleControl struct {
 
 	// target
 	Proton    core.Protoner // Pager or Componenter value
+	RootType  reflect.Type  // proton's root type
+	V         reflect.Value // proton's reflect.Value
 	Kind      core.Kind     // enum: page|component
-	V         reflect.Value // Value of page
 	Name      string        // page name or component name
 	Path      string        // ???
 	PageUrl   string        // matched page url, Activate parameter part
@@ -97,12 +98,13 @@ func NewComponentFlow(container core.Protoner, component core.Componenter,
 	} else {
 		// If proton in a loop, we use the same proton instance.
 		lcc = &LifeCircleControl{
-			W:      container.ResponseWriter(),
-			R:      container.Request(),
-			Kind:   core.COMPONENT,
-			Proton: proton,
-			V:      reflect.ValueOf(proton),
-			Name:   fmt.Sprint(reflect.TypeOf(proton).Elem()),
+			W:        container.ResponseWriter(),
+			R:        container.Request(),
+			Kind:     core.COMPONENT,
+			Proton:   proton,
+			RootType: utils.RootType(proton),
+			V:        reflect.ValueOf(proton),
+			Name:     fmt.Sprint(reflect.TypeOf(proton).Elem()),
 		}
 		proton.IncEmbed() // increase loop index. Used by ClientId()
 	}
@@ -132,6 +134,7 @@ func newLifeCircleControl(w http.ResponseWriter, r *http.Request,
 	lcc.V = newProtonInstance(proton)
 	lcc.Proton = lcc.V.Interface().(core.Protoner)
 	lcc.Name = fmt.Sprint(reflect.TypeOf(lcc.Proton).Elem())
+	lcc.RootType = utils.RootType(proton)
 
 	debuglog("-710- [flow] New LifeCircleControl: %v[%v].", lcc.Kind, lcc.Name)
 
@@ -290,6 +293,7 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 				newProton = newInstance.Interface().(core.Protoner)      //
 				si.CacheEmbedProton(field.Type, piece, newProton.Kind()) // cache
 			}
+			lcc.InjectValueTo(newProton)      // inject into
 			proton.SetEmbed(piece, newProton) // store newInstance into proton
 			proton = newProton                // next round
 
