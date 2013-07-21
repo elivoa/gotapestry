@@ -120,7 +120,7 @@ func RedirectHandler(url string) func(http.ResponseWriter, *http.Request) {
 }
 
 // register each page and cache them.
-func PageHandler(basePage core.IPage) func(http.ResponseWriter, *http.Request) {
+func PageHandler(basePage core.Pager) func(http.ResponseWriter, *http.Request) {
 	log.Printf("[building] Init page '%v'", reflect.TypeOf(basePage))
 
 	return func(w http.ResponseWriter, r *http.Request) {

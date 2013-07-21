@@ -19,7 +19,7 @@ import (
 */
 var Components = ProtonSegment{Name: "/"}
 
-func Component(f func(), components ...core.IComponent) int {
+func Component(f func(), components ...core.Componenter) int {
 	for _, c := range components {
 		url := makeUrl(f, c)
 		selectors := Components.Add(url, c, "component")

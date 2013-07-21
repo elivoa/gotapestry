@@ -10,6 +10,7 @@ import (
 	"got/utils"
 	"log"
 	"net/http"
+	"path"
 	"reflect"
 	"strings"
 )
@@ -28,7 +29,7 @@ type LifeCircleControl struct {
 	R *http.Request
 
 	// target
-	Proton    core.Protoner // IPage or IComponent value
+	Proton    core.Protoner // Pager or Componenter value
 	Kind      core.Kind     // enum: page|component
 	V         reflect.Value // Value of page
 	Name      string        // page name or component name
@@ -45,7 +46,7 @@ type LifeCircleControl struct {
 // --------------------------------------------------------------------------------
 // Create new page value with the same type as proton (page or component).
 // by calling New method or use reflect.
-func NewPageFlow(w http.ResponseWriter, r *http.Request, page core.IPage) *LifeCircleControl {
+func NewPageFlow(w http.ResponseWriter, r *http.Request, page core.Pager) *LifeCircleControl {
 	// maintaince structCache
 	if si := scache.GetPageX(reflect.TypeOf(page)); si == nil {
 		panic("Can't parse page!")
@@ -56,14 +57,14 @@ func NewPageFlow(w http.ResponseWriter, r *http.Request, page core.IPage) *LifeC
 
 // Create a new Component Flow.
 // param:
-//   container - the container proton.
-//   component - the current component.
+//   container - real container object.
+//   component - current component base object.
 //   params - parameters in the component grammar.
 //
 // Note: I maintain StructCache here in the flow create func. This occured only when
 //       page or component are rendered. Directly post to a page can not invoke structcache init.
 //
-func NewComponentFlow(container core.Protoner, component core.IComponent,
+func NewComponentFlow(container core.Protoner, component core.Componenter,
 	params []interface{}) *LifeCircleControl {
 
 	debuglog("----- [Create Component flowcontroller] ------------------------%v",
@@ -71,45 +72,64 @@ func NewComponentFlow(container core.Protoner, component core.IComponent,
 	debug.Log("- C - [Component Container] Type: %v, ComponentType:%v,\n",
 		reflect.TypeOf(container), reflect.TypeOf(component))
 
-	// maintaince struct cache
-	{
-		si := scache.GetCreate(reflect.TypeOf(container), container.Kind())
-		if si == nil {
-			panic("Can't parse page!")
-		}
-		debuglog("---- set container.xxx to type component; %v ", container.Kind())
+	// Store type in StructCache, Store instance in ProtonObject.
+	// Warrning: What if use component in page/component but it's not initialized?
+	// Tid= xxx in template must the same with fieldname in .go file.
+	//
 
-		// find tid in parameters call
-		var tid string
-		for idx, p := range params {
-			if idx%2 == 0 && strings.ToLower(p.(string)) == "tid" {
-				tid = params[idx+1].(string)
-			}
+	// 1. cache in StructInfoCache. (application scope)
+	si := scache.GetCreate(reflect.TypeOf(container), container.Kind())
+	if si == nil {
+		panic(fmt.Sprintf("StructInfo for %v can't be null!", reflect.TypeOf(container)))
+	}
+	t, _ := utils.RemovePointer(reflect.TypeOf(component), false)
+	tid, _ := determinComponentTid(params, t)
+	si.CacheEmbedProton(t, tid, component.Kind())
+
+	// 2. store in proton's embed field. (request scope)
+	proton, ok := container.Embed(tid)
+	var lcc *LifeCircleControl
+	if !ok {
+		// The first create new component object.
+		lcc = newLifeCircleControl(container.ResponseWriter(), container.Request(),
+			core.COMPONENT, component)
+		container.SetEmbed(tid, lcc.Proton)
+	} else {
+		// If proton in a loop, we use the same proton instance.
+		lcc = &LifeCircleControl{
+			W:      container.ResponseWriter(),
+			R:      container.Request(),
+			Kind:   core.COMPONENT,
+			Proton: proton,
+			V:      reflect.ValueOf(proton),
+			Name:   fmt.Sprint(reflect.TypeOf(proton).Elem()),
 		}
-		si.CacheEmbedProton(reflect.TypeOf(component), tid)
+		proton.IncEmbed() // increase loop index. Used by ClientId()
 	}
 
-	// create flow object
-	lcc := newLifeCircleControl(container.ResponseWriter(), container.Request(),
-		core.COMPONENT, component)
 	lcc.InjectComponentParameters(params) // inject component parameters
 	return lcc
+}
+
+// return name, is setManually; t must not be ptr.
+func determinComponentTid(params []interface{}, t reflect.Type) (tid string, setManually bool) {
+	for idx, p := range params {
+		if idx%2 == 0 && strings.ToLower(p.(string)) == "tid" {
+			tid = params[idx+1].(string)
+		}
+	}
+	if tid == "" {
+		setManually = true
+		tid = path.Ext(t.String())[1:]
+	}
+	return
 }
 
 func newLifeCircleControl(w http.ResponseWriter, r *http.Request,
 	kind core.Kind, proton core.Protoner) *LifeCircleControl {
 
 	lcc := &LifeCircleControl{W: w, R: r, Kind: kind}
-	baseValue := reflect.ValueOf(proton)
-
-	// try to create new value of proton
-	method := baseValue.MethodByName("New")
-	if method.IsValid() {
-		returns := method.Call(emptyParameters)
-		lcc.V = returns[0]
-	} else {
-		lcc.V = reflect.New(reflect.TypeOf(proton).Elem())
-	}
+	lcc.V = newProtonInstance(proton)
 	lcc.Proton = lcc.V.Interface().(core.Protoner)
 	lcc.Name = fmt.Sprint(reflect.TypeOf(lcc.Proton).Elem())
 
@@ -227,20 +247,62 @@ func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
 // event call page flow
 // TODO support component event call
 func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
+	// 1. Inject values into root page
 	lcc.InjectValue()
+
+	// 2. Call Activate method on root page
 	if lcc.Kind == core.PAGE {
 		if ret := lcc.CallEvent("Activate"); ret {
 			return lcc
 		}
 	}
 
-	// call event. TODO add parameters.
-	fmt.Println("\n\n\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-	fmt.Printf("Call event [%v] with parameters.\n", "On"+event)
-	if ret := lcc.CallEventWithURLParameters("On" + event); ret {
-		return lcc
+	proton := lcc.Proton // proton is father node.
+	eventPaths := strings.Split(event, ".")
+	for idx, piece := range eventPaths {
+		if idx < len(eventPaths)-1 { // call path
+			// 1. get from proton cache; !!!This can't be happened!!!
+			c, ok := proton.Embed(piece)
+			if ok && c != nil {
+				proton = c
+				continue
+			}
+
+			// 2. Is Cached in StructInfo
+			si := scache.GetCreate(reflect.TypeOf(proton), proton.Kind()) // root page
+			if si == nil {
+				panic(fmt.Sprintf("StructInfo for %v can't be null!", reflect.TypeOf(proton)))
+			}
+
+			var newProton core.Protoner
+			fi := si.FieldInfo(piece)
+			if fi != nil {
+				newInstance := newInstance(fi.Type)
+				newProton = newInstance.Interface().(core.Protoner)
+			} else {
+				// If not cached fieldInfo, create FieldInfo
+				containerType, _ := utils.RemovePointer(reflect.TypeOf(proton), false)
+				field, ok := containerType.FieldByName(piece)
+				if !ok {
+					panic(fmt.Sprintf("Can't get field in path: %v", piece))
+				}
+				newInstance := newInstance(field.Type)                   // create new instance
+				newProton = newInstance.Interface().(core.Protoner)      //
+				si.CacheEmbedProton(field.Type, piece, newProton.Kind()) // cache
+			}
+			proton.SetEmbed(piece, newProton) // store newInstance into proton
+			proton = newProton                // next round
+
+		} else { // last node
+			// Call event. TODO add parameters.
+			fmt.Println("\n----------    EVENT CALL    ----------------")
+			fmt.Printf("Call event [%v] with parameters.\n", event)
+			if ret := lcc._callEventWithURLParameters("On"+piece, reflect.ValueOf(proton)); ret {
+				return lcc
+			}
+		}
 	}
-	return lcc // for chain
+	return lcc
 }
 
 // ________________________________________________________________________________
@@ -261,6 +323,10 @@ func (lcc *LifeCircleControl) CallEvent(name string) bool {
 // Call Events, with parameters. only used by Activate for now.
 // TODO performance
 func (lcc *LifeCircleControl) CallEventWithURLParameters(name string) bool {
+	return lcc._callEventWithURLParameters(name, lcc.V)
+}
+
+func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base reflect.Value) bool {
 	fmt.Println("______________________________________________________________")
 	// fmt.Println(lcc.R.URL.Path)
 
@@ -278,15 +344,15 @@ func (lcc *LifeCircleControl) CallEventWithURLParameters(name string) bool {
 		}
 	}
 
-	fmt.Printf("-0- params is %v\n", paramsString)
 	strParams := strings.Split(paramsString, "/")
-	for _, strParam := range strParams {
+	for idx, strParam := range strParams {
 		// TODO inject values.
-		fmt.Printf("-1- param is: %v\n", strParam)
+		fmt.Printf("-1- param #%d is: %v\n", idx, strParam)
 	}
 
 	//reflect.TypeOf(method).NumIn
-	method := lcc.V.MethodByName(name)
+	// method := lcc.V.MethodByName(name)
+	method := base.MethodByName(name)
 	if method.IsValid() {
 		t := method.Type()
 		fmt.Printf("-2- method is: %v\n", method)

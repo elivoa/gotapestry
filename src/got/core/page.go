@@ -4,7 +4,7 @@ package core
    Interfaces of pages/component
    TODO: change interface to Pager/Protoner/Componenter
 */
-type IPage interface {
+type Pager interface {
 	Protoner
 }
 

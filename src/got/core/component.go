@@ -15,16 +15,17 @@ TODO:
 
 package core
 
+import ()
+
 /*_______________________________________________________________________________
   Component
 */
-type IComponent interface {
+type Componenter interface {
 	Protoner
 }
 
 type Component struct {
 	Proton
-	Tid string // component id
 }
 
 func (c *Component) Kind() Kind {

@@ -1,12 +1,12 @@
 package order
 
 import (
+	"fmt"
 	"got/core"
 	"got/register"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
-	"fmt"
 )
 
 func init() {
@@ -16,8 +16,6 @@ func init() {
 type OrderCloseButton struct {
 	core.Component
 
-	Id          string // client id
-	Tid         string // component id
 	TrackNumber int64
 	Source      string // return to this place
 
@@ -36,5 +34,4 @@ func (p *OrderCloseButton) Setup() {
 		panic(fmt.Sprintf("Customer not found, id: %v", order.CustomerId))
 	}
 	p.Customer = person
-
 }

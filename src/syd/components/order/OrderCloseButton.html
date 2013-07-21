@@ -6,16 +6,17 @@ CloseOrderModal -- open modal box to close order
 
 <!-- <script type="text/javascript" src="/static/js/c/order/order_button.js"></script> -->
 
-<a id="{{.Id}}_trigger" href="#{{.Id}}_modal" data-toggle-x="modal">结款</a>
+<a id="{{.ClientId}}_trigger" href="#{{.ClientId}}_modal" data-toggle-x="modal">结款</a>
 
-<div id="{{.Id}}_modal" class="layer_box modal hide fade">
+<div id="{{.ClientId}}_modal" class="layer_box modal hide fade">
   <div class="layer_top modal-header">
     <a class="layer_close" title="关闭" href="#" data-dismiss="modal" aria-hidden="true"></a>
     <span>快速结款</span>
   </div>
   <div class="layer_content L_fast_cash modal-body">
 
-    <form action="/order/ButtonSubmitHere" method="POST" onsubmit="return validateCloseForm('{{.Id}}');">
+    <form action="/order/ButtonSubmitHere" method="POST"
+          onsubmit="return validateCloseForm('{{.ClientId}}');">
       <input type="hidden" name="t:id" value="CloseForm" />
       <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />      
       <input type="hidden" name="Source" value="{{.Source}}" />
@@ -68,8 +69,8 @@ CloseOrderModal -- open modal box to close order
 
 $(function(){
   // bind xxx
-  trigger = $("#{{.Id}}_trigger")
-  m = $("#{{.Id}}_modal")
+  trigger = $("#{{.ClientId}}_trigger")
+  m = $("#{{.ClientId}}_modal")
 
   // trigger click
   trigger.click(function(e){

@@ -86,3 +86,24 @@ func Coercion(value string, t reflect.Type) (reflect.Value, error) {
 func CoercionNil(t reflect.Type) reflect.Value {
 	return nilValue
 }
+
+// ________________________________________________________________________________
+// used by got/cache
+//
+
+func RemovePointer(typo reflect.Type, removeSlice bool) (t reflect.Type, isSlice bool) {
+	t = typo
+	if t.Kind() == reflect.Ptr { // remove ptr
+		t = t.Elem()
+	}
+	if removeSlice {
+		if isSlice = t.Kind() == reflect.Slice; isSlice { // remove slice
+			t = t.Elem()
+			if t.Kind() == reflect.Ptr { // remove slice.elem's ptr
+				t = t.Elem()
+			}
+		}
+	}
+	return
+}
+

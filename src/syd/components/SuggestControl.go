@@ -18,7 +18,7 @@ import (
 type SuggestControl struct {
 	core.Component
 
-	ClientId     string // client id, in html.
+	ClientIdd    string // client id, in html.
 	Name         string // form submit key
 	Value        int    // value. should be id in this case
 	DisplayValue string // value to show
@@ -28,11 +28,10 @@ type SuggestControl struct {
 }
 
 func (c *SuggestControl) Setup() { // (string, string) {
-	if !c.Injected("ClientId") {
-		c.ClientId = "factory_suggest"
+	if !c.Injected("ClientIdd") {
+		c.ClientIdd = "factory_suggest"
 	}
 	c.initSuggest()
-
 	// return "template", "SuggestControl"
 }
 

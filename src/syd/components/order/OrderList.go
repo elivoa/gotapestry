@@ -59,3 +59,11 @@ func (p *OrderList) ShowCustomerName(customerId int) string {
 	}
 }
 
+// ________________________________________________________________________________
+// Events
+//
+func (p *OrderList) Ondelete(trackNumber int64) (string, string) {
+	fmt.Println("--------------------------------------------------------------------------------")
+	fmt.Printf("Delete order %v \n", trackNumber)
+	return "redirect", "/order/list"
+}

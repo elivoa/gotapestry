@@ -28,7 +28,7 @@
         {{if .IsStatus "todeliver"}}
         <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
         <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
-        {{t_order_deliverbutton $  "Tid" `DeliverButton` "id" (print `deliver` .TrackNumber `_`) "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
+        {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
         <span class="vline">|</span>
         <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
            onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
@@ -43,6 +43,8 @@
         {{end}}
 
         <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
+        <span class="vline">|</span>
+        <a href="/order/list.orderlist.delete/{{.TrackNumber}}">[喜小乐可以删除订单]</a>
 
       </td>
     </tr>

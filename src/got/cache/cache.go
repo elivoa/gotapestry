@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Saturday, 2013-07-20 16:50:25>
+  Time-stamp: <[cache.go] Elivoa @ Sunday, 2013-07-21 12:10:16>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"got/core"
 	"got/debug"
-	"path"
+	"got/utils"
 	"reflect"
 	"strings"
 	"sync"
@@ -94,7 +94,6 @@ func (si *StructInfo) Deep(field string) *StructInfo {
 // ________________________________________________________________________________
 // functions for Cache
 //
-
 func (c *Cache) GetX(rt reflect.Type) *StructInfo {
 	return c.GetCreate(rt, core.STRUCT)
 }
@@ -110,7 +109,7 @@ func (c *Cache) GetComopnentX(rt reflect.Type) *StructInfo {
 // Type must be struct. Other type has no meanings.
 func (c *Cache) GetCreate(rt reflect.Type, kind core.Kind) *StructInfo {
 	// 1. prepare
-	t, _ := removePointer(rt, true) // remove ptr and slice of type
+	t, _ := utils.RemovePointer(rt, true) // remove ptr and slice of type
 	if t.Kind() != reflect.Struct {
 		panic(fmt.Sprintf("[got/cache]: %v must be struct.", rt))
 	}
@@ -140,8 +139,11 @@ func (c *Cache) GetCreate(rt reflect.Type, kind core.Kind) *StructInfo {
 }
 
 // creat creates a structInfo with meta-data about a struct.
+// For Embed Components: When cache page struct, embed components's kind is unknown.
+//     store all field as unknown. Modify Kind when render component(Call CacheEmbedProton)
+//
 func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
-	t, _ := removePointer(rt, false) // already removed, no need to remove again?
+	t, _ := utils.RemovePointer(rt, false) // already removed, no need to remove again?
 	si := &StructInfo{
 		t:      t,
 		Fields: make(map[string]*FieldInfo),
@@ -154,7 +156,7 @@ func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
 			continue
 		}
 
-		ft, isSlice := removePointer(field.Type, true)
+		ft, isSlice := utils.RemovePointer(field.Type, true)
 		if isStruct := ft.Kind() == reflect.Struct; !isStruct {
 			// GB: don't check if it's supported.
 			/*
@@ -167,10 +169,10 @@ func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
 		fi := &FieldInfo{
 			Index:   i,
 			Type:    field.Type,
-			IsSlice: isSlice, // && isStruct,
-			// Kind:    kind,
+			IsSlice: isSlice,
+			Kind:    core.UNKNOWN, // unknown if it's that.
 		}
-		// if is component, jia
+		// TODO here judge if it's a page or component, store the type.
 
 		si.l.Lock()
 		si.Fields[alias] = fi
@@ -183,22 +185,31 @@ func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
 // Use component's as field name. panic if conflict with other field names.
 // TODO: support mixins.
 // TODO: conflict with id version
+// Note: tid must has meaningful value.
 //
-func (si *StructInfo) CacheEmbedProton(rt reflect.Type, tid string) *FieldInfo {
+// Return fieldInfo if cached, modify kind if cached or not cached.
+//
+func (si *StructInfo) CacheEmbedProton(rt reflect.Type, tid string, kind core.Kind) *FieldInfo {
 	debug.Log("-759- [Embed Component] register embed component %v with id %v.", rt, tid)
 
-	t, _ := removePointer(rt, false)
-	if tid == "" {
-		tid = path.Ext(t.String())[1:]
-	}
-
+	t, _ := utils.RemovePointer(rt, false)
 	if fi := si.FieldInfo(tid); fi != nil {
-		if fi.Kind != core.COMPONENT && fi.Type != t {
-			panic(fmt.Sprintf("Component Tid '%v' conflict with others!", tid))
+		// validate kind
+		if fi.Kind == kind {
+			return fi
+		}
+		// panic if type mismatch
+		if t != fi.Type {
+			panic(fmt.Sprintf("Type mismatch, Conflict of proton's ID %v", tid))
+		}
+		// pass validation, update field
+		if fi.Kind == core.UNKNOWN {
+			fi.Kind = kind
 		}
 		return fi
 	}
 
+	// if not cached. create FieldInfo and cache.
 	fi := &FieldInfo{
 		Tid:     tid,
 		Kind:    core.COMPONENT,
@@ -238,22 +249,6 @@ func (fi *FieldInfo) String() string {
 // __________________________________________________________________________________________
 // helper
 //
-
-func removePointer(typo reflect.Type, removeSlice bool) (t reflect.Type, isSlice bool) {
-	t = typo
-	if t.Kind() == reflect.Ptr { // remove ptr
-		t = t.Elem()
-	}
-	if removeSlice {
-		if isSlice = t.Kind() == reflect.Slice; isSlice { // remove slice
-			t = t.Elem()
-			if t.Kind() == reflect.Ptr { // remove slice.elem's ptr
-				t = t.Elem()
-			}
-		}
-	}
-	return
-}
 
 // fieldAlias parses a field tag to get a field alias.
 func fieldAlias(field reflect.StructField) string {

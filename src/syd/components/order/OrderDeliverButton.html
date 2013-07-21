@@ -7,9 +7,9 @@ DeliverModal -- open modal box to deliver order
 <!-- TODO GOT: JS remove duplicate -->
 <script type="text/javascript" src="/static/js/c/order/order_button.js"></script>
 
-<a id="{{.Id}}_trigger" href="#{{.Id}}_modal" data-toggle-disabled="modal">发货</a>
+<a id="{{.ClientId}}_trigger" href="#{{.ClientId}}_modal" data-toggle-disabled="modal">发货</a>
 
-<div id="{{.Id}}_modal" class="layer_box modal hide fade" >
+<div id="{{.ClientId}}_modal" class="layer_box modal hide fade" >
   <div class="layer_top modal-header">
     <a class="layer_close" title="关闭" href="#" data-dismiss="modal" aria-hidden="true"></a>
     <span>发货</span>
@@ -68,7 +68,7 @@ DeliverModal -- open modal box to deliver order
   $(function(){
     console.log("init deliver button")
     ol = new OrderDeliverButton({
-      id: "{{.Id}}",
+      id: "{{.ClientId}}",
       DeliveryMethod : {{.DeliveryMethod}},
       DeliveryTrackingNumber: {{.DeliveryTrackingNumber}},
       ExpressFee : {{.ExpressFee}},
