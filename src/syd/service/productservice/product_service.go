@@ -7,6 +7,7 @@ import (
 	"syd/dal"
 	"syd/dal/productdao"
 	"syd/model"
+	"syd/service/suggest"
 	"syd/utils"
 )
 
@@ -30,6 +31,10 @@ func CreateProduct(product *model.Product) (*model.Product, error) {
 	if product.Sizes != nil {
 		dal.UpdateProductProperties(newProduct.Id, "size", product.Sizes...)
 	}
+
+	// update suggest
+	suggest.Add(suggest.Product, newProduct.Name, newProduct.Id)
+
 	return newProduct, nil
 }
 
@@ -62,6 +67,10 @@ func UpdateProduct(product *model.Product) {
 			dal.SetProductStock(product.Id, ps[0], ps[1], stock)
 		}
 	}
+
+	// update suggest
+	suggest.Update(suggest.Product, product.Name, product.Id)
+
 }
 
 //
@@ -120,4 +129,11 @@ func getCapital(text string) string {
 		return s[0:1]
 	}
 	return "-"
+}
+
+func DeleteProduct(id int) (affacted int64, err error) {
+	if affacted, err = productdao.Delete(id); err == nil {
+		suggest.Delete(suggest.Product, id)
+	}
+	return
 }

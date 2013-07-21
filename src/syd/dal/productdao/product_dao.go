@@ -108,3 +108,14 @@ func UpdateProduct(product *model.Product) (int64, error) {
 	}
 	return res.RowsAffected()
 }
+
+// ________________________________________________________________________________
+// Delete a product
+//
+func Delete(id int) (int64, error) {
+	res, err := em.Delete().Exec(id)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}

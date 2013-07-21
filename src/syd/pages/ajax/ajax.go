@@ -42,8 +42,8 @@ func (p *AjaxSuggest) SetupRender() (interface{}, interface{}) {
 	}
 	// translate
 	sj := &SuggestJson{Query: p.Query}
-	sj.Suggestions = make([]SuggestionJsonItem, len(*items))
-	for idx, item := range *items {
+	sj.Suggestions = make([]SuggestionJsonItem, len(items))
+	for idx, item := range items {
 		sj.Suggestions[idx] = SuggestionJsonItem{
 			Value: item.QuickString + "||" + item.Text,
 			Data:  fmt.Sprint(item.Id),

@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"got/debug"
 	"strings"
+	"syd/dal/persondao"
 	"syd/dal/productdao"
-	"syd/service/personservice"
 	"syd/utils"
+	"sync"
 )
 
 var (
 	loaded = false
+	l      sync.Mutex
 )
 
 // var suggestCache
@@ -29,14 +31,19 @@ const (
 )
 
 // a simple version, match
-var SuggestCache map[string][]Item // type->[]Item
+var SuggestCache map[string][]*Item // type->[]Item
 
 func EnsureLoaded() {
+	if loaded {
+		return
+	}
+	l.Lock()
 	if !loaded {
 		Load()
 		PrintAll()
 		loaded = true
 	}
+	l.Unlock()
 }
 
 func IsLoaded() bool {
@@ -44,17 +51,18 @@ func IsLoaded() bool {
 }
 
 func Load() {
-	SuggestCache = make(map[string][]Item, 100)
+	SuggestCache = make(map[string][]*Item, 100)
 
-	persons, err := personservice.ListCustomer()
+	persons, err := persondao.ListAll("customer")
+	// persons, err := personservice.ListCustomer()
 	if err != nil {
-		debug.Error(err)
+		panic(err.Error())
 	} else {
 		debug.Log("[suggest] load %v customers.", len(persons))
-		personItems := make([]Item, len(persons))
+		personItems := make([]*Item, len(persons))
 		SuggestCache[Customer] = personItems
 		for i, person := range persons {
-			personItems[i] = Item{
+			personItems[i] = &Item{
 				Id:          person.Id,
 				Text:        person.Name,
 				QuickString: parseQuickText(person.Name),
@@ -62,14 +70,16 @@ func Load() {
 		}
 	}
 
-	factories, err := personservice.ListFactory()
+	factories, err := persondao.ListAll("factory")
+	// factories, err := personservice.ListFactory()
 	if err != nil {
+		panic(err.Error())
 	} else {
 		debug.Log("[suggest] load %v factories.", len(factories))
-		factoryItems := make([]Item, len(factories))
+		factoryItems := make([]*Item, len(factories))
 		SuggestCache[Factory] = factoryItems
 		for i, factory := range factories {
-			factoryItems[i] = Item{
+			factoryItems[i] = &Item{
 				Id:          factory.Id,
 				Text:        factory.Name,
 				QuickString: parseQuickText(factory.Name), // TODO
@@ -84,10 +94,10 @@ func Load() {
 	}
 	// products := dal.ListProduct()
 	debug.Log("[suggest] load %v products.", len(products))
-	productItems := make([]Item, len(products))
+	productItems := make([]*Item, len(products))
 	SuggestCache[Product] = productItems
 	for i, product := range products {
-		productItems[i] = Item{
+		productItems[i] = &Item{
 			Id:          product.Id,
 			Text:        product.Name,
 			QuickString: parseQuickText(product.Name), // TODO
@@ -106,7 +116,8 @@ func parseQuickText(text string) string {
 }
 
 func Add(category string, text string, id int) {
-	item := Item{
+	EnsureLoaded()
+	item := &Item{
 		Id:          id,
 		Text:        text,
 		QuickString: parseQuickText(text),
@@ -114,14 +125,36 @@ func Add(category string, text string, id int) {
 
 	items, ok := SuggestCache[category]
 	if !ok {
-		items = []Item{}
+		items = []*Item{}
 		SuggestCache[category] = items
 	}
 	items = append(items, item) // Performance?
 }
 
-func Delete() {} // TODO
-func Update() {} // TODO
+func Delete(category string, id int) {
+	EnsureLoaded()
+	l.Lock()
+	items, ok := SuggestCache[category]
+	if !ok {
+		items = []*Item{}
+		SuggestCache[category] = items
+	}
+	for i := 0; i < len(items); i++ {
+		if items[i].Id == id {
+			items[i] = nil
+			break
+		}
+	}
+	l.Unlock()
+}
+
+func Update(category string, text string, id int) {
+	EnsureLoaded()
+	l.Lock()
+	Delete(category, id)
+	Add(category, text, id)
+	l.Unlock()
+}
 
 func PrintAll() {
 	fmt.Println("------ Print All Suggest Items ---------------")
@@ -137,7 +170,7 @@ func LookupAll(q string) *[]Item {
 	return nil
 }
 
-func Lookup(q string, category string) (*[]Item, error) {
+func Lookup(q string, category string) ([]*Item, error) {
 	items, ok := SuggestCache[category]
 	if !ok {
 		err := errors.New(fmt.Sprintf("Category '%v' not found.", category))
@@ -147,7 +180,7 @@ func Lookup(q string, category string) (*[]Item, error) {
 	var (
 		N        = 50
 		idx      = 0
-		filtered = make([]Item, N, N)
+		filtered = make([]*Item, N, N)
 		found    = 0
 	)
 	for _, item := range items {
@@ -161,5 +194,5 @@ func Lookup(q string, category string) (*[]Item, error) {
 		}
 	}
 	result := filtered[:found]
-	return &result, nil
+	return result, nil
 }
