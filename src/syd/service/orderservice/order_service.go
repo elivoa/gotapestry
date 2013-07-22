@@ -119,7 +119,7 @@ func BatchCloseOrder(money float64, customerId int) {
 		Incoming:  money,
 	})
 	// modify customer's accountballance
-	person.AccountBallance += totalmoney
+	person.AccountBallance += money
 	persondao.Update(person)
 }
 
