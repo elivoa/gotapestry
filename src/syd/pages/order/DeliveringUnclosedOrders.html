@@ -1,0 +1,19 @@
+<table class="tbl_s">
+  <tbody><tr>
+	  <th align="left">订单号</th>
+	  <th align="left">日期</th>
+	  <th align="left">订单金额</th>
+	</tr>
+    {{range .Orders}}
+	<tr class="order" money="{{.SumOrderPrice}}">
+	  <td>{{.TrackNumber}}</td>
+	  <td>{{.CreateTime | formattime "2006-01-02"}}</td>
+	  <td><span class="price">{{.SumOrderPrice | prettycurrency}}</span></td>
+	</tr>
+    {{end}}
+  </tbody>
+</table>
+<div class="L_pager_content">
+  <a class="btn_c_s" href="#">上一页</a>
+  <a class="btn_c_s" href="#">下一页</a>
+</div>

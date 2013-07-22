@@ -128,9 +128,9 @@ func (order *Order) HasAccumulated() bool {
 	return order.Accumulated > 0
 }
 
+// Total price + express fee
 func (order *Order) SumOrderPrice() float64 {
-	var sum float64
-	sum += order.TotalPrice
+	var sum float64 = order.TotalPrice
 	if order.ExpressFee > 0 {
 		sum += float64(order.ExpressFee)
 	}

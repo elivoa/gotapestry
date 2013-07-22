@@ -3,9 +3,12 @@ package orderservice
 import (
 	"errors"
 	"fmt"
+	"got/debug"
 	"strconv"
 	"syd/dal"
+	"syd/dal/accountdao"
 	"syd/dal/orderdao"
+	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/productservice"
 )
@@ -78,6 +81,46 @@ func GetOrderByTrackingNumber(trackingNumber int64) (*model.Order, error) {
 func DeleteOrder(trackNumber int64) (affacted int64, err error) {
 	affacted, err = orderdao.DeleteOrder(trackNumber)
 	return
+}
+
+func BatchCloseOrder(money float64, customerId int) {
+	debug.Log("Incoming Money: %v", money)
+	person, err := persondao.Get(customerId)
+	if err != nil {
+		panic(err.Error())
+	}
+	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// collect totalorder price
+	var totalOrderPrice float64
+	for _, o := range orders {
+		totalOrderPrice += o.SumOrderPrice()
+	}
+
+	// money used as total shouldbe: inputmoney + (accountballance - allorder's price)
+	totalmoney := money + (person.AccountBallance + totalOrderPrice)
+
+	// TODO ..... finish
+	for _, order := range orders {
+		if totalmoney-order.SumOrderPrice() >= 0 {
+			err := ChangeOrderStatus(order.TrackNumber, "done")
+			if err != nil {
+				panic(err.Error())
+			}
+			totalmoney -= order.SumOrderPrice()
+		}
+	}
+	// TODO store money into
+	accountdao.CreateIncoming(&model.AccountIncoming{
+		CustomeId: person.Id,
+		Incoming:  money,
+	})
+	// modify customer's accountballance
+	person.AccountBallance += totalmoney
+	persondao.Update(person)
 }
 
 // ________________________________________________________________________________

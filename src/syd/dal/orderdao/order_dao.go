@@ -137,7 +137,9 @@ func UpdateOrderStatus(trackNumber int64, status string) (int64, error) {
 	if logdebug {
 		log.Printf("[dal] Update Order %v's Status to %v", trackNumber, status)
 	}
-	res, err := em.Update("status").Where("track_number", trackNumber).Exec(status)
+	now := time.Now()
+	res, err := em.Update("status", "update_time", "close_time").Where(
+		"track_number", trackNumber).Exec(status, now, now)
 	if err != nil {
 		return 0, err
 	}
@@ -227,6 +229,22 @@ func deleteDetails(trackNumber int64) (int64, error) {
 	}
 }
 
+// TODO transaction
+func DeleteOrder(trackNumber int64) (int64, error) {
+	aff, erro := deleteDetails(trackNumber)
+	if erro != nil {
+		return aff, erro
+	}
+
+	res, err := em.Delete().Where("track_number", trackNumber).Exec()
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+// --------------------------------------------------------------------------------
+
 func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	orders := make([]*model.Order, 0)
 	var query *db.QueryParser
@@ -253,20 +271,23 @@ func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	return orders, nil
 }
 
-// ________________________________________________________________________________
-// Delete an order
-//
-
-// TODO transaction
-func DeleteOrder(trackNumber int64) (int64, error) {
-	aff, erro := deleteDetails(trackNumber)
-	if erro != nil {
-		return aff, erro
+func DeliveringUnclosedOrdersByCustomer(personId int) ([]*model.Order, error) {
+	orders := make([]*model.Order, 0)
+	query := em.Select().Where("customer_id", personId, "status", "delivering")
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			p := new(model.Order)
+			err := rows.Scan(
+				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
+				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
+				&p.Accumulated, &p.Note,
+				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
+			)
+			orders = append(orders, p)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
 	}
-
-	res, err := em.Delete().Where("track_number", trackNumber).Exec()
-	if err != nil {
-		return 0, err
-	}
-	return res.RowsAffected()
+	return orders, nil
 }

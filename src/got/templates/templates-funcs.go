@@ -9,10 +9,15 @@ import (
 func registerHelperFuncs() {
 	// init functions
 	Templates.Funcs(template.FuncMap{
-		"formattime":     FormatTime,
+		// deprecated
 		"beautytime":     BeautyTime,
-		"formatcurrency": BeautyCurrency,
 		"beautycurrency": BeautyCurrency,
+
+		// new
+		"formattime":     FormatTime,
+		"formatcurrency": BeautyCurrency,
+		"prettycurrency": BeautyCurrency,
+		"prettytime":     BeautyTime,
 	})
 }
 
@@ -21,7 +26,7 @@ func registerHelperFuncs() {
 */
 
 // {{showtime .CreateTime "2006-01-02 15:04:05"}}
-func FormatTime(t time.Time, format string) string {
+func FormatTime(format string, t time.Time) string {
 	return t.Format(format)
 }
 

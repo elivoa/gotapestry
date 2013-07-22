@@ -1,23 +1,50 @@
+<!DOCTYPE HTML>
 <html>
   <head>
-    <title>{{.Title}}</title>
-    {{t_layout_header $}}
+    <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/layer/layer.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `SYD 圣衣蝶神奇喜大乐系统` }}
+
   </head>
-  <body>
-    <h1>{{.Title}}</h1>
-    ---------------------------------
+  <body class="PG_list_person">
+    {{t_layout_headernav $}}
+    <div class="container">
+      {{t_layout_leftnav $ "CurPage" `/person/list`}}
 
-    <p>[<a href="/order/list">订单</a>]</p>
-    <p>[<a href="/person/list/customer">客户列表</a>]</p>
-    <p>[<a href="/product/list">产品列表</a>]</p>
-    <p>[<a href="/product/create">创建产品</a>]</p>
+      <div class="main_content">
+    	<h1>圣衣蝶喜大乐系统</h1>
 
-    <hr/>
-    <h5>QuickInput:</h5>
-    <a href="#">QuickInput</a>
+        <h2>客户快速结账通道</h2>
+        
+        <div class="list_person">
+          <table class="tbl_main">
+            <tr>
+              <th align="left">客户姓名</th>
+              <th align="left">城市</th>
+              <th align="left">网店</th>
+              <th align="left">备注</th>
+              <th align="left">账户余额</th>
+              <th align="left">操作</th>
+            </tr>
 
+            {{range .Customers}}
+            <tr>
+              <td><a href="/person/detail/{{.Id}}" >{{.Name}}</a></td>
+              <td>{{.City}}</td>
+              <td><a href="{{.Website}}">{{.Website}}</a></td>
+              <td>{{.Note}}</td>
+              <td>{{.AccountBallance}}</td>
+              <td>
+                {{/* TODO: ajax get latest value. */}}
+                {{t_order_batchclose $ "CustomerId" .Id "Customer" . }}
+              </td>
+            </tr>
+            {{end}}
 
-    {{t_layout_leftnav $}}
-
+          </table>
+          <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

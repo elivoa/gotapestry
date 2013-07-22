@@ -102,14 +102,14 @@
             <div id="orderTotal" class="other_info">
               <div>运输方式：{{.DeliveryMethodDisplay }}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span> {{end}}
+                {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span>元 {{end}}
               </div>
               <div>
-                合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>
+                合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>元
               </div>
               {{if .Order.HasAccumulated }} <div>
                 累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
-                = <span class="underline"></span>
+                = <span class="underline"></span>元
               </div> {{end}}
             </div>
             
