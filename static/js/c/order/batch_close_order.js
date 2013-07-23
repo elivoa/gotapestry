@@ -6,8 +6,12 @@
 
     function BatchCloseOrder(param) {
       this.param = param;
-      this.t = $("#" + this.param.clientId + "_trigger");
-      this.m = $("#" + this.param.clientId + "_modal");
+      this.clientId = this.param.ClientId;
+      this.customerId = this.param.CustomerId;
+      this.selectedTrackNumbers = void 0;
+      this.onTriggerClick;
+      this.t = $("#" + this.clientId + "_trigger");
+      this.m = $("#" + this.clientId + "_modal");
       this.money = this.m.find("input.money");
       this.t.click($.proxy(this.onclick, this));
       this.money.on("keyup", $.proxy(this.liveMatch, this));
@@ -17,6 +21,11 @@
     BatchCloseOrder.prototype.onclick = function(e) {
       var clearbtn;
       e.preventDefault();
+      if (this.onTriggerClick) {
+        if (!this.onTriggerClick(e)) {
+          return false;
+        }
+      }
       this.m.on('shown', $.proxy(this.onshown, this));
       this.m.on('hide', $.proxy(function() {
         return this.m.find(".unclosed-orders tbody").html("");
@@ -34,9 +43,24 @@
     };
 
     BatchCloseOrder.prototype.onshown = function() {
+      var url;
       $.ajax({
         type: "GET",
-        url: "/order/deliveringunclosedorders/" + this.param.customerId,
+        url: "/api/person/" + this.customerId,
+        dataType: "json",
+        success: $.proxy(function(json) {
+          this.m.find(".customer strong").html(json.Name);
+          this.m.find(".customer .price").html(json.AccountBallance);
+          return this.param.accountBallance = json.AccountBallance;
+        }, this)
+      });
+      url = "/order/deliveringunclosedorders/" + this.customerId;
+      if (this.selectedTrackNumbers !== void 0 && this.selectedTrackNumbers.length > 0) {
+        url = "/order/deliveringunclosedorders.byTrackingNumber/" + this.selectedTrackNumbers.join(",");
+      }
+      $.ajax({
+        type: "GET",
+        url: url,
         dataType: "json",
         success: $.proxy(function(data) {
           return this.applyJson(data);
@@ -46,7 +70,7 @@
     };
 
     BatchCloseOrder.prototype.applyJson = function(json) {
-      var order, tb, tn, tr, _i, _len, _ref, _results;
+      var abafter, order, tb, tn, tr, _i, _len, _ref;
       this.TotalOrderPrice = json.TotalOrderPrice;
       tb = this.m.find(".unclosed-orders tbody");
       tb.find("tr.order").each(function(index, tr) {
@@ -64,7 +88,6 @@
         }
       });
       _ref = json.Order;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tn = _ref[_i];
         order = json.Orders[tn];
@@ -75,12 +98,13 @@
           tr.push("  <td>" + order.time + "</td>");
           tr.push("  <td><span class=\"price\">" + order.price + "</span></td>");
           tr.push("</tr>");
-          _results.push($(tr.join("\n")).appendTo(tb));
-        } else {
-          _results.push(void 0);
+          $(tr.join("\n")).appendTo(tb);
         }
       }
-      return _results;
+      abafter = this.TotalOrderPrice + this.param.accountBallance;
+      if (abafter !== 0) {
+        return this.m.find(".customer .bad-account").html("结后余额:" + abafter);
+      }
     };
 
     BatchCloseOrder.prototype.liveMatch = function(e) {
@@ -114,7 +138,7 @@
       }
       return $.ajax({
         type: "GET",
-        url: "/order/deliveringunclosedorders.batchclose/" + totalmoney + "/" + this.param.customerId,
+        url: "/order/deliveringunclosedorders.batchclose/" + totalmoney + "/" + this.customerId,
         dataType: "json",
         success: $.proxy(function(data) {
           this.applyJson(data);

@@ -1,58 +1,99 @@
 <!DOCTYPE HTML>
+<html>
+  <head>
+    <t:import>
+      <script type="text/javascript" src="/static/js/c/order/order_list.js"></script>
+    </t:import>
+  </head>
+  <body>
 
-<script type="text/javascript" src="/static/js/c/order/order_list.js"></script>
+    <div id="{{.ClientId}}">
+      
+      {{if len .Orders | not}}
+      <div class="tips_content"><i class="icon_warning"></i> 无记录</div>
+      {{else}}
 
-
-<div class="list_order">
-
-  {{if len .Orders | not}}
-  <span>无记录</span>
-  {{else}}
-
-  <table class="tbl_main">
-    <tr>
-      <th align="left">订单号</th>
-      <th align="left">客户</th>
-      <th align="left">订单状态</th>
-      <th align="left">日期</th>
-      <th align="left">操作</th>
-    </tr>
-
-    {{range .Orders}}
-    <tr>
-	  <td nowrap><a href="/order/view/{{.TrackNumber}}">{{.TrackNumber}}</a></td>
-      <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
-      <td>{{.DisplayStatus }}</td>
-      <td nowrap>{{.CreateTime | beautytime}}</td>
-      <td nowrap>
-        {{if .IsStatus "todeliver"}}
-        <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
-        <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
-        {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
-        <span class="vline">|</span>
-        <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
-           onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
-        {{end}}
+      {{/* ----- 批量结款 ----- */}}
+      <div class="batch_content">
+        {{/* ----
         
-        {{if .IsStatus "delivering"}}
-        {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
-        {{end}}
+        {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
         
-        {{if .IsStatus "canceled" "done"}}
-        <a href="/order/view/{{.TrackNumber}}">查看订单</a>
+        ---- */}}
+      </div>
+
+      <table class="tbl_main">
+        <tr>
+          <th width="10" align="left">
+            <input type="checkbox" class="check-all">
+          </th> 
+          <th align="left">客户</th>
+          <th align="left">订单号</th>
+          <th align="left">订单金额</th>
+          <th align="left">订单状态</th>
+          <th align="left">日期</th>
+          <th align="left">操作</th>
+        </tr>
+
+        {{range .Orders}}
+        <tr>
+          <td align="left">
+            <input type="checkbox" class="order-check"
+                   value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
+          </td>
+          <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
+          <td nowrap><a href="/order/view/{{.TrackNumber}}">{{.TrackNumber}}</a></td>
+          <td>
+            {{if .IsStatus "todeliver"}}
+            <strong class="price">{{.TotalPrice}}</strong>
+            <span class="txt_c">(不含运费)</span>
+            {{else}}
+            {{if .DeliveryMethodIs "TakeAway"}}<span class="txt_c">(自提)</span>
+            {{else}}
+            <strong class="price">{{.SumOrderPrice}}</strong>
+            <span class="txt_c">(含运费{{.ExpressFee}}元)</span>
+            {{end}}
+            {{end}}
+          </td>
+          <td>{{.DisplayStatus }}</td>
+          <td nowrap>{{.CreateTime | beautytime}}</td>
+          <td nowrap>
+            {{if .IsStatus "todeliver"}}
+            <a href="/order/create/detail/{{.Id}}">修改订单</a><span class="vline">|</span>
+            <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
+            {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
+            <span class="vline">|</span>
+            <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+               onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+            {{end}}
+            
+            {{if .IsStatus "delivering"}}
+            {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
+            {{end}}
+            
+            {{if .IsStatus "canceled" "done"}}
+            <a href="/order/view/{{.TrackNumber}}">查看订单</a>
+            {{end}}
+
+            <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
+            <span class="vline">|</span>
+            <a href="/order/list.orderlist.delete/{{.TrackNumber}}">[喜小乐可以删除订单]</a>
+
+          </td>
+        </tr>
         {{end}}
+      </table>
+      {{end}}
 
-        <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
-        <span class="vline">|</span>
-        <a href="/order/list.orderlist.delete/{{.TrackNumber}}">[喜小乐可以删除订单]</a>
 
-      </td>
-    </tr>
-    {{end}}
-    {{end}}
-
-    <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
-</div>
-
-<script type="text/javascript">
+      <script type="text/javascript">
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
 </script>
+
+    </div>
+  </body>
+</html>

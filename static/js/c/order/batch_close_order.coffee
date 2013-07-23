@@ -1,18 +1,28 @@
-
-
+##
+## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Wednesday, 2013-07-24 00:28:41>
+##
 window.BatchCloseOrder =
 class BatchCloseOrder
   constructor:(param) -> # clientId, customerId, accountBallance
     @param = param
-    @t = $("##{@param.clientId}_trigger")
-    @m = $("##{@param.clientId}_modal")
+    @clientId = @param.ClientId
+    @customerId = @param.CustomerId
+    @selectedTrackNumbers = undefined # if not empty, use this instead of customerid
+    # events
+    @onTriggerClick
+
+    @t = $("##{@clientId}_trigger")
+    @m = $("##{@clientId}_modal")
     @money = @m.find("input.money")
     @t.click $.proxy @onclick,@
     @money.on "keyup", $.proxy @liveMatch,@
     @m.find(".submit").click $.proxy @submit,@
 
+
   onclick:(e) ->
     e.preventDefault()
+    (return false if not @onTriggerClick(e)) if @onTriggerClick # call event
+
     @m.on 'shown', $.proxy @onshown,@
     @m.on 'hide', $.proxy ->
       @m.find(".unclosed-orders tbody").html("")
@@ -29,9 +39,25 @@ class BatchCloseOrder
     ,@
 
   onshown: ->
+    # load person
     $.ajax {
       type:"GET"
-      url:"/order/deliveringunclosedorders/#{@param.customerId}"
+      url:"/api/person/#{@customerId}"
+      dataType:"json"
+      success: $.proxy (json) ->
+        @m.find(".customer strong").html(json.Name)
+        @m.find(".customer .price").html(json.AccountBallance)
+        @param.accountBallance=json.AccountBallance
+      ,@
+    }
+
+    # load list
+    url = "/order/deliveringunclosedorders/#{@customerId}" # customer version
+    if @selectedTrackNumbers != undefined && @selectedTrackNumbers.length > 0
+      url = "/order/deliveringunclosedorders.byTrackingNumber/" + @selectedTrackNumbers.join(",")
+    $.ajax {
+      type:"GET"
+      url: url
       dataType: "json"
       success: $.proxy (data) ->
         @applyJson(data)
@@ -67,6 +93,12 @@ class BatchCloseOrder
         tr.push("</tr>")
         $(tr.join("\n")).appendTo(tb)
 
+    # bad-account display
+    abafter = @TotalOrderPrice + @param.accountBallance
+    if abafter != 0
+      @m.find(".customer .bad-account").html("结后余额:#{abafter}")
+
+
   liveMatch:(e) ->
     # money used as total shouldbe: inputmoney + (accountballance - allorder's price)
     totalmoney = parseFloat(@money.val()) + (@param.accountBallance + @TotalOrderPrice)
@@ -92,7 +124,7 @@ class BatchCloseOrder
     # submit to batch clear
     $.ajax {
       type:"GET"
-      url:"/order/deliveringunclosedorders.batchclose/#{totalmoney}/#{@param.customerId}"
+      url:"/order/deliveringunclosedorders.batchclose/#{totalmoney}/#{@customerId}"
       dataType: "json"
       success: $.proxy (data) ->
         @applyJson(data)

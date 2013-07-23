@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"got/core"
 	"got/register"
+	"strconv"
+	"strings"
 	"syd/dal/orderdao"
 	"syd/model"
 	"syd/service/orderservice"
@@ -21,15 +23,57 @@ type DeliveringUnclosedOrders struct {
 	Orders     []*model.Order
 }
 
+// default: get all orders of one person
 func (p *DeliveringUnclosedOrders) Setup() (string, string) {
-	return ordersJson(p.CustomerId)
+	return ordersJsonByCustomerid(p.CustomerId)
 }
 
+// close action
+func (p *DeliveringUnclosedOrders) OnbyTrackingNumber(tns string) (string, string) {
+	return ordersJsonByTrackNumbers(tns)
+	// TODO SYD: strict privileges validation
+	// orderservice.BatchCloseOrder(money, customerId)
+	// return ordersJsonByTrackNumbers(customerId)
+}
+
+// close orders, and return new orderlist with the same parameters.
 // TODO::GOT: add t:ac="xxx" to restore activate parameters.
 func (p *DeliveringUnclosedOrders) Onbatchclose(money float64, customerId int) (string, string) {
 	// TODO SYD: strict privileges validation
 	orderservice.BatchCloseOrder(money, customerId)
-	return ordersJson(customerId)
+	return ordersJsonByCustomerid(customerId)
+}
+
+// // close orders by trackingnumbers, and return new orderlist with the same parameters.
+// func (p *DeliveringUnclosedOrders) Onbatchclose(money float64, trackNumbers string) (string, string) {
+// 	// TODO SYD: strict privileges validation
+// 	orderservice.BatchCloseOrderByTrackNumbers(money, trackNumbers)
+// 	return ordersJson(customerId)
+// }
+
+func ordersJsonByTrackNumbers(tns string) (string, string) {
+	orders := []*model.Order{}
+	pieces := strings.Split(tns, ",")
+	for _, piece := range pieces {
+		tn, err := strconv.ParseInt(strings.Trim(piece, " "), 10, 64)
+		if err != nil {
+			panic(err.Error())
+		}
+		order, err := orderservice.GetOrderByTrackingNumber(tn)
+		if err != nil {
+			panic(err.Error())
+		}
+		orders = append(orders, order)
+	}
+	return toJsonList(orders)
+}
+
+func ordersJsonByCustomerid(customerId int) (string, string) {
+	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
+	if err != nil {
+		panic(err.Error())
+	}
+	return toJsonList(orders)
 }
 
 // ________________________________________________________________________________
@@ -48,13 +92,7 @@ type SimpleOrder struct {
 	OrderPrice  float64   `json:"price"`
 }
 
-func ordersJson(customerId int) (string, string) {
-	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
-	fmt.Println("-----------------", customerId)
-	fmt.Println(orders)
-	if err != nil {
-		panic(err.Error())
-	}
+func toJsonList(orders []*model.Order) (string, string) {
 	order := []int64{}
 	ordermap := map[string]*SimpleOrder{}
 	var totalOrderPrice float64

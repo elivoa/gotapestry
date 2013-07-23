@@ -14,18 +14,31 @@
 
       <div class="main_content">
     	<h1>订单列表</h1>
-		<div class="tab_main"><div class="bg">
-			<ul class="clearfix">
-			  <li class="{{$.TabStyle `todeliver`}}"><a href="/order/list/todeliver">待发货订单</a></li>
-			  <li class="{{$.TabStyle `delivering`}}"><a href="/order/list/delivering">已发货订单</a></li>
-			  <li class="{{$.TabStyle `done`}}"><a href="/order/list/done">已完成订单</a></li>
-			  <li class="{{$.TabStyle `canceled`}}"><a href="/order/list/canceled">已取消订单</a></li>
-			  <li class="{{$.TabStyle `all`}}"><a href="/order/list/all">全部订单</a></li>
-			</ul>
-		</div></div>
+	    <div class="tab_main">
+          <div class="bg">
+	        <ul class="clearfix">
+	          <li class="{{$.TabStyle `todeliver`}}"><a href="/order/list/todeliver">待发货订单</a></li>
+	          <li class="{{$.TabStyle `delivering`}}"><a href="/order/list/delivering">已发货订单</a></li>
+	          <li class="{{$.TabStyle `done`}}"><a href="/order/list/done">已完成订单</a></li>
+	          <li class="{{$.TabStyle `canceled`}}"><a href="/order/list/canceled">已取消订单</a></li>
+	          <li class="{{$.TabStyle `all`}}"><a href="/order/list/all">全部订单</a></li>
+	        </ul>
+	      </div>
+        </div>
 
-        {{t_order_list $ "tid" `orderlist` "orders" .Orders "Tab" .Tab}}
+        <div class="list_order">
 
+          {{t_order_list $ "tid" `orderlist` "orders" .Orders "Tab" .Tab}}
+
+          <div class="pager_main">
+            <a class="btn_c_s" href="#">首页</a>
+            <span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a>
+              <a href="#">4</a><a href="#">5</a></span>
+            <a class="btn_c_s" href="#">末页</a>
+          </div>
+
+        </div>
+        
       </div>
     </div>
   </body>

@@ -1,11 +1,7 @@
-{{/*
-<html></html>
-*/}}
-
-
 <script type="text/javascript" src="/static/js/c/order/batch_close_order.js"></script>
-<a id="{{.ClientId}}_trigger" href="#{{.ClientId}}_modal" data-toggle-x="modal">批量结款</a>
 
+<a id="{{.ClientId}}_trigger" href="#{{.ClientId}}_modal" data-toggle-x="modal"
+   class="{{.Class}}">批量结款</a>
 
 <div id="{{.ClientId}}_modal" class="layer_box modal hide fade">
   <div class="layer_top modal-header">
@@ -14,16 +10,20 @@
   </div>
   <div class="layer_content L_bat_cash modal-body">
     
-	<div class="L_account_info clearfix">
-	  <strong>{{.Customer.Name}}</strong>
-	  <span class="L_overage">账户余额：<span class="price">{{.Customer.AccountBallance}}</span> 元</span>
+	<div class="L_account_info clearfix customer">
+	  <strong> - </strong>
+	  <span class="L_overage">账户余额：<span class="price"> - </span> 元</span>
+      <span class="bad-account"></span>
 	</div>
+    
 	<div class="form_main">
 	  <dl class="clearfix">
 		<dt>结账金额：</dt>
 		<dd>
-		  <input type="text" size="16" value="" class="money"> 
+		  <input type="text" size="16" value="" class="money">
+          {{if .QuickClearButton}}
 		  <label><input type="checkbox" class="money-clear"> 已结清</label>
+          {{end}}
 		</dd>
 	  </dl>
 	</div>
@@ -36,9 +36,7 @@
 	        <th align="left">订单金额</th>
 	      </tr>
         </thead>
-        <tbody>
-
-        </tbody>
+        <tbody></tbody>
       </table>
       <div class="L_pager_content">
         <a class="btn_c_s" href="#">上一页</a>
@@ -52,6 +50,7 @@
 </div>
 <script type="text/javascript">
   // inline javascript example
+  // TODO move to js file.
   function validateCloseForm(id){
     if (confirm("确认结款么？")){
       o = $("#"+id+"_modal input.money")
@@ -66,11 +65,13 @@
     }
   }
 
+{{if .JSInit}}
 $(function(){
   bco = new BatchCloseOrder({
-    "clientId": {{.ClientId}},
-    "customerId" : {{.Customer.Id}},
-    "accountBallance": {{.Customer.AccountBallance }},
+    "ClientId": {{.ClientId}},
+    "CustomerId" : {{.CustomerId}},
+    // "AccountBallance": { {.Customer.AccountBallance }},
   })
 });
+{{end}}
 </script>

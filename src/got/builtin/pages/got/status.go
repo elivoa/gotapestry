@@ -5,6 +5,8 @@ import (
 	"got/register"
 	"got/templates"
 	"html/template"
+	"syd/service/suggest"
+	"fmt"
 )
 
 func Register() {}
@@ -26,4 +28,9 @@ func (p *Status) SetupRender() {
 	p.Tpls = templates.Templates.Templates()
 	p.Apps = register.Apps
 	p.Pages = &register.Pages
+}
+
+func (p *Status) AfterRender(){
+	fmt.Println("\n\n---------------------------\n\n")
+	suggest.PrintAll()
 }

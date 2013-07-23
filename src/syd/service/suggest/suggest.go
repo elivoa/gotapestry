@@ -130,6 +130,7 @@ func Add(category string, text string, id int) {
 		SuggestCache[category] = items
 	}
 	items = append(items, item) // Performance?
+	SuggestCache[category] = items
 	l.Unlock()
 }
 
@@ -142,6 +143,7 @@ func Delete(category string, id int) {
 		SuggestCache[category] = items
 	}
 	for i := 0; i < len(items); i++ {
+		fmt.Println(i)
 		if items[i].Id == id {
 			items[i] = nil
 			break
@@ -161,7 +163,11 @@ func PrintAll() {
 	for key, value := range SuggestCache {
 		fmt.Printf("> %v\n", key)
 		for i, item := range value {
-			fmt.Printf("\t%v: %v | %v\n", i, item.Text, item.QuickString)
+			if item == nil {
+				fmt.Printf("\t%v: deleted\n", i)
+			} else {
+				fmt.Printf("\t%v: %v | %v\n", i, item.Text, item.QuickString)
+			}
 		}
 	}
 }
@@ -184,6 +190,9 @@ func Lookup(q string, category string) ([]*Item, error) {
 		found    = 0
 	)
 	for _, item := range items {
+		if item == nil {
+			continue
+		}
 		if strings.HasPrefix(item.QuickString, q) {
 			filtered[idx] = item
 			found++
