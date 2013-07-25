@@ -108,6 +108,7 @@ type QueryParser struct {
 	conditions []*condition // where 'id' = 1
 	limit      *gxl.Int     // limit 4
 	n          *gxl.Int     // limit 'limit','n'
+	orderby    string
 
 	prepared          bool
 	useCustomerFields bool
@@ -164,6 +165,21 @@ func (p *QueryParser) Or(field string, values ...interface{}) *QueryParser {
 	return p
 }
 
+func (p *QueryParser) OrderBy(orderby string) *QueryParser {
+	p.orderby = orderby
+	return p
+}
+
+func (p *QueryParser) Limit(limit ...int) *QueryParser {
+	if len(limit) >= 1 {
+		p.limit = gxl.NewInt(limit[0])
+	}
+	if len(limit) >= 2 {
+		p.n = gxl.NewInt(limit[1])
+	}
+	return p
+}
+
 // pin sql and cache them
 func (p *QueryParser) Prepare() *QueryParser {
 	if p.prepared {
@@ -191,9 +207,20 @@ func (p *QueryParser) Prepare() *QueryParser {
 			sql.WriteString(" WHERE ")
 			p.values = appendWhereClouse(&sql, p.conditions...)
 		}
-		// TODO order by
-		// TODO limit
 
+		if p.orderby != "" {
+			sql.WriteString(" order by ")
+			sql.WriteString(p.orderby)
+		}
+
+		if p.limit != nil {
+			sql.WriteString(" limit ")
+			sql.WriteString(p.limit.String())
+			if p.n != nil {
+				sql.WriteString(",")
+				sql.WriteString(p.n.String())
+			}
+		}
 	case "insert":
 		// em.Insert().Exec(name, class, ...)
 		sql.WriteString("insert into `")

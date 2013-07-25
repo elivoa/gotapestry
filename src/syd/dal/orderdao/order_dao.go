@@ -226,9 +226,14 @@ func DeleteOrder(trackNumber int64) (int64, error) {
 func ListOrder(status string) ([]*model.Order, error) {
 	var query *db.QueryParser
 	if status == "all" {
-		query = em.Select().Where().Or("type", model.Wholesale, model.ShippingInstead)
+		query = em.Select().Where().
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
 	} else {
-		query = em.Select().Where("status", status).Or("type", model.Wholesale, model.ShippingInstead)
+		query = em.Select().
+			Where("status", status).
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
 	}
 	return _listOrder(query)
 }

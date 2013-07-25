@@ -132,15 +132,6 @@ func (order *Order) CalculateOrder() {
 
 // ----  Show Helper  ----------------------------------------------------------------------------
 
-func (order *Order) TypeIs(status ...OrderType) bool {
-	for _, s := range status {
-		if s == OrderType(order.Type) {
-			return true
-		}
-	}
-	return false
-}
-
 func (order *Order) IsStatus(status ...string) bool {
 	for _, s := range status {
 		if s == order.Status {
