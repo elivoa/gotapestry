@@ -71,3 +71,13 @@ func (p *OrderList) Ondelete(trackNumber int64) (string, string) {
 	}
 	return "redirect", "/order/list"
 }
+
+func (p *OrderList) EditLink(order *model.Order) string {
+	switch model.OrderType(order.Type) {
+	case model.Wholesale:
+		return fmt.Sprintf("/order/create/detail/%v", order.Id)
+	case model.ShippingInstead:
+		return fmt.Sprintf("/order/create/shippinginstead/%v", order.TrackNumber)
+	}
+	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
+}

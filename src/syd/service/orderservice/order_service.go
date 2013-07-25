@@ -19,14 +19,32 @@ func ListOrder(status string) ([]*model.Order, error) {
 
 func CreateOrder(order *model.Order) error {
 	_processOrderCustomerPrice(order)
+	_calculateOrder(order)
 	return orderdao.CreateOrder(order)
 }
 
 func UpdateOrder(order *model.Order) (int64, error) {
 	_processOrderCustomerPrice(order)
+	_calculateOrder(order)
 	return orderdao.UpdateOrder(order)
 }
 
+// calculate order by type
+func _calculateOrder(order *model.Order) {
+	switch model.OrderType(order.Type) {
+	case model.SubOrder, model.Wholesale:
+		if order.Details != nil && len(order.Details) > 0 {
+			order.CalculateOrder()
+		}
+	case model.ShippingInstead:
+		// this type of order's total price is calculated by sub
+		// orders, which is difficult to calculate, so I calclate sum
+		// in page, and then submit to the parent order. So, here do
+		// nothing.
+	}
+}
+
+// save customerized price for order
 func _processOrderCustomerPrice(order *model.Order) {
 	if order.Details == nil {
 		return
@@ -34,6 +52,9 @@ func _processOrderCustomerPrice(order *model.Order) {
 	sets := map[int]bool{}
 	for _, detail := range order.Details {
 		if _, ok := sets[detail.ProductId]; ok {
+			continue
+		}
+		if detail.ProductId == 0 { // pass invalid detail item
 			continue
 		}
 		sets[detail.ProductId] = true
@@ -81,6 +102,25 @@ func GetOrderByTrackingNumber(trackingNumber int64) (*model.Order, error) {
 func DeleteOrder(trackNumber int64) (affacted int64, err error) {
 	affacted, err = orderdao.DeleteOrder(trackNumber)
 	return
+}
+
+// load all suborders, with all details. set to order
+func LoadSubOrders(order *model.Order) ([]*model.Order, error) {
+	// now := time.Now()
+	suborders, err := orderdao.ListSubOrders(order.TrackNumber)
+	if err != nil {
+		return nil, err
+	}
+	// load all details. cascaded.
+	for _, o := range suborders {
+		details, err := orderdao.GetOrderDetails(o.TrackNumber)
+		if err != nil {
+			return nil, err
+		}
+		o.Details = details
+	}
+	// fmt.Println()
+	return suborders, nil
 }
 
 func BatchCloseOrder(money float64, customerId int) {

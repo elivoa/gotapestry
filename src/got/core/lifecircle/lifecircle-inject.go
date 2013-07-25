@@ -129,6 +129,7 @@ func (lcc *LifeCircleControl) InjectValue() {
 	}
 }
 
+// TODO Coercion: make an interface to auto translate this into it.
 func analysisTranslateSuffix(t reflect.Type) string {
 	switch t.String() {
 	case "*gxl.Int":

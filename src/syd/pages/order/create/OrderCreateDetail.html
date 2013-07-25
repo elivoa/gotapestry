@@ -21,21 +21,12 @@
         <form method="POST" id="OrderDetailForm" onkeydown="return(event.keyCode!=13)">
           <input type="hidden" name="Order.TrackNumber" value="{{.Order.TrackNumber}}" >
           <input type="hidden" name="Order.Status" value="{{.Order.Status}}" >
+          {{/* TODO Here, too many hidden fields, some of these are parsed through url */}}
+          <input type="hidden" name="Order.Type" value="{{.Order.Type}}" >
+          <input type="hidden" name="Order.ParentTrackNumber" value="{{.Order.ParentTrackNumber}}" >
           
           <!-- 客户信息 -->
-          <div class="unit">
-            <div class="tit"><strong>客户信息</strong></div>
-            <div class="B_person_info">
-              <span class="B_overdraft">累计欠款：
-                <strong class="price">{{.Customer.Accomulated | beautycurrency}}</strong>元
-                <input type="hidden" name="Order.Accumulated" value="{{.Customer.Accomulated}}" />
-              </span>
-              <strong>
-                <a href="/person/detail/{{.Customer.Id}}" target="_blank">{{.Customer.Name}}</a>
-              </strong>，
-              {{.Customer.City}}, {{.Customer.Address}} {{.Customer.Phone}}
-            </div>
-          </div>
+          {{t_order_customerinfo $ "Customer" .Customer}}
 
           <!-- ------------------------------- -->
           {{t_order_productselector $ "CustomerId" .Customer.Id}}
@@ -68,6 +59,14 @@
 				<label><input type="checkbox" class="daofu" name="DaoFu"> 到付</label>
               </div>
               -------------------------------------------------------------------------------- */}}
+              {{if .ShowAddress}}
+              <div class="B_fare">
+                发货地址：
+                <textarea rows="2" cols="80" class="express-fee"
+                          name="Order.ShippingAddress">{{.Order.ShippingAddress}}</textarea> 
+              </div>
+              {{end}}
+              
             </div>
           </div>
           

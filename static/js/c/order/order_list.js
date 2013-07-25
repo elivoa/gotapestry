@@ -13,10 +13,12 @@
     }
 
     OrderList.prototype.initBatchCloseButton = function() {
-      this.bco = new BatchCloseOrder({
-        ClientId: "" + this.param.ClientId + "_close"
-      });
-      return this.bco.onTriggerClick = $.proxy(this.closeButtonClick, this);
+      if (window['BatchCloseOrder']) {
+        this.bco = new BatchCloseOrder({
+          ClientId: "" + this.param.ClientId + "_close"
+        });
+        return this.bco.onTriggerClick = $.proxy(this.closeButtonClick, this);
+      }
     };
 
     OrderList.prototype.initAction = function() {

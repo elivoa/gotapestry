@@ -12,8 +12,10 @@ import (
 
 var logdebug = true
 var orderFields = []string{
-	"track_number", "status", "delivery_method", "delivery_tracking_number", "express_fee",
-	"customer_id", "total_price", "total_count", "price_cut", "Accumulated", "note",
+	"track_number", "status", "type", "customer_id",
+	"delivery_method", "delivery_tracking_number", "express_fee", "shipping_address",
+	"total_price", "total_count", "price_cut", "Accumulated",
+	"note", "parent_track_number",
 	"create_time", "update_time", "close_time",
 }
 var em = &db.Entity{
@@ -41,32 +43,6 @@ func init() {
 	db.RegisterEntity("orderdetail", detailem)
 }
 
-func ListOrder(status string) ([]*model.Order, error) {
-	orders := make([]*model.Order, 0)
-	var query *db.QueryParser
-	if status == "all" {
-		query = em.Select()
-	} else {
-		query = em.Select().Where("status", status)
-	}
-	if err := query.Query(
-		func(rows *sql.Rows) (bool, error) {
-			p := new(model.Order)
-			err := rows.Scan(
-				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
-				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
-				&p.Accumulated, &p.Note,
-				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
-			)
-			orders = append(orders, p)
-			return true, err
-		},
-	); err != nil {
-		return nil, err
-	}
-	return orders, nil
-}
-
 /*_______________________________________________________________________________
   Create new item in db
   TODO: Add transaction support.
@@ -78,9 +54,6 @@ func CreateOrder(order *model.Order) error {
 
 	// special 000. create order.Details
 	if order.Details != nil && len(order.Details) > 0 {
-		order.CalculateOrder()
-
-		// insert into db
 		if err := createOrderDetail(order.Details); err != nil {
 			return err
 		}
@@ -88,9 +61,10 @@ func CreateOrder(order *model.Order) error {
 
 	// 1. create connection.
 	res, err := em.Insert().Exec(
-		order.TrackNumber, order.Status, order.DeliveryMethod, order.DeliveryTrackingNumber,
-		order.ExpressFee, order.CustomerId, order.TotalPrice, order.TotalCount, order.PriceCut,
-		order.Accumulated, order.Note, time.Now(), time.Now(), time.Now(),
+		order.TrackNumber, order.Status, order.Type, order.CustomerId,
+		order.DeliveryMethod, order.DeliveryTrackingNumber, order.ExpressFee, order.ShippingAddress,
+		order.TotalPrice, order.TotalCount, order.PriceCut, order.Accumulated,
+		order.Note, order.ParentTrackNumber, time.Now(), time.Now(), time.Now(),
 	)
 	if err != nil {
 		return err
@@ -112,8 +86,6 @@ func UpdateOrder(order *model.Order) (int64, error) {
 
 	// special 000. create order.Details
 	if order.Details != nil && len(order.Details) > 0 {
-		order.CalculateOrder()
-
 		// insert into db
 		if err := createOrderDetail(order.Details); err != nil {
 			return 0, err
@@ -122,9 +94,10 @@ func UpdateOrder(order *model.Order) (int64, error) {
 
 	// update order
 	res, err := em.Update().Exec(
-		order.TrackNumber, order.Status, order.DeliveryMethod, order.DeliveryTrackingNumber,
-		order.ExpressFee, order.CustomerId, order.TotalPrice, order.TotalCount, order.PriceCut,
-		order.Accumulated, order.Note, order.CreateTime, time.Now(), order.CloseTime,
+		order.TrackNumber, order.Status, order.Type, order.CustomerId,
+		order.DeliveryMethod, order.DeliveryTrackingNumber, order.ExpressFee, order.ShippingAddress,
+		order.TotalPrice, order.TotalCount, order.PriceCut, order.Accumulated,
+		order.Note, order.ParentTrackNumber, order.CreateTime, time.Now(), order.CloseTime,
 		order.Id,
 	)
 	if err != nil {
@@ -178,9 +151,10 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 	if err := em.Select().Where(field, value).Query(
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
-				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
-				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
-				&p.Accumulated, &p.Note,
+				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
+				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
+				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
+				&p.Note, &p.ParentTrackNumber,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)
 		},
@@ -189,8 +163,8 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 	}
 	if p.Id > 0 {
 		// cascade
-		details, err := getOrderDetails(p.TrackNumber)
-		if db.Err(err) {
+		details, err := GetOrderDetails(p.TrackNumber)
+		if err != nil {
 			return nil, err
 		}
 		p.Details = details
@@ -201,7 +175,7 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 
 // list interface
 // TODO Order by id asc
-func getOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
+func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
 	orders := make([]*model.OrderDetail, 0)
 	err := detailem.Select().Where("order_track_number", trackNumber).Query(
 		func(rows *sql.Rows) (bool, error) {
@@ -243,23 +217,32 @@ func DeleteOrder(trackNumber int64) (int64, error) {
 	return res.RowsAffected()
 }
 
-// --------------------------------------------------------------------------------
+//
+// --------  Special List Order    --------------------------------------------------------------------
+//
 
-func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
-	orders := make([]*model.Order, 0)
+// in most list order func, SubOrder is Excluded.
+
+func ListOrder(status string) ([]*model.Order, error) {
 	var query *db.QueryParser
 	if status == "all" {
-		query = em.Select().Where("customer_id", personId)
+		query = em.Select().Where().Or("type", model.Wholesale, model.ShippingInstead)
 	} else {
-		query = em.Select().Where("customer_id", personId, "status", status)
+		query = em.Select().Where("status", status).Or("type", model.Wholesale, model.ShippingInstead)
 	}
+	return _listOrder(query)
+}
+
+func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
+	orders := make([]*model.Order, 0)
 	if err := query.Query(
 		func(rows *sql.Rows) (bool, error) {
 			p := new(model.Order)
 			err := rows.Scan(
-				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
-				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
-				&p.Accumulated, &p.Note,
+				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
+				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
+				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
+				&p.Note, &p.ParentTrackNumber,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)
 			orders = append(orders, p)
@@ -271,23 +254,22 @@ func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	return orders, nil
 }
 
-func DeliveringUnclosedOrdersByCustomer(personId int) ([]*model.Order, error) {
-	orders := make([]*model.Order, 0)
-	query := em.Select().Where("customer_id", personId, "status", "delivering")
-	if err := query.Query(
-		func(rows *sql.Rows) (bool, error) {
-			p := new(model.Order)
-			err := rows.Scan(
-				&p.Id, &p.TrackNumber, &p.Status, &p.DeliveryMethod, &p.DeliveryTrackingNumber,
-				&p.ExpressFee, &p.CustomerId, &p.TotalPrice, &p.TotalCount, &p.PriceCut,
-				&p.Accumulated, &p.Note,
-				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
-			)
-			orders = append(orders, p)
-			return true, err
-		},
-	); err != nil {
-		return nil, err
+func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
+	var query *db.QueryParser
+	if status == "all" {
+		query = em.Select().Where("customer_id", personId)
+	} else {
+		query = em.Select().Where("customer_id", personId).And("status", status)
 	}
-	return orders, nil
+	return _listOrder(query)
+}
+
+func ListSubOrders(trackNumber int64) ([]*model.Order, error) {
+	var query = em.Select().Where("parent_track_number", trackNumber).And("type", model.SubOrder)
+	return _listOrder(query)
+}
+
+func DeliveringUnclosedOrdersByCustomer(personId int) ([]*model.Order, error) {
+	query := em.Select().Where("customer_id", personId).And("status", "delivering").Or("type", model.Wholesale, model.ShippingInstead)
+	return _listOrder(query)
 }

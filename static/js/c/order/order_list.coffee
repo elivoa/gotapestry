@@ -1,6 +1,6 @@
 ##
 ## Component
-## Elivoa @ Time-stamp: <[order_list.coffee] Elivoa @ Tuesday, 2013-07-23 18:51:33>
+## Elivoa @ Time-stamp: <[order_list.coffee] Elivoa @ Wednesday, 2013-07-24 13:34:46>
 ##
 window.OrderList=
 class OrderList
@@ -12,8 +12,9 @@ class OrderList
     @initAction()
 
   initBatchCloseButton:->
-    @bco = new BatchCloseOrder {ClientId : "#{@param.ClientId}_close"}
-    @bco.onTriggerClick = $.proxy @closeButtonClick,@
+    if window['BatchCloseOrder']
+      @bco = new BatchCloseOrder {ClientId : "#{@param.ClientId}_close"}
+      @bco.onTriggerClick = $.proxy @closeButtonClick,@
 
   initAction:->
     @checkall_btn = $("##{@clientId} .check-all")

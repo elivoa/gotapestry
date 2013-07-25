@@ -17,7 +17,9 @@ import (
 	"database/sql"
 	"fmt"
 	"gxl"
+	"reflect"
 	"strings"
+	"syd/model"
 )
 
 // ________________________________________
@@ -253,16 +255,14 @@ func (p *QueryParser) Prepare() *QueryParser {
 		if p.conditions == nil || len(p.conditions) == 0 {
 			sql.WriteString(fmt.Sprintf(" `%v` = ?", e.PK))
 		} else {
-			p.values = appendWhereClouse(&sql, p.conditions...)
-			// // TODO ... to be condinued....
-			// for i := 0; i < len(p.conditions); i = i + 2 {
-			// 	k, v := p.where[i].(string), p.where[i+1]
-			// 	sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
-			// 	p.values = append(p.values, v)
-			// 	if i < len(p.where)-3 {
-			// 		sql.WriteString(" and ")
-			// 	}
-			// }
+			for i := 0; i < len(p.where); i = i + 2 {
+				k, v := p.where[i].(string), p.where[i+1]
+				sql.WriteString(fmt.Sprintf(" `%v` = ?", k))
+				p.values = append(p.values, v)
+				if i < len(p.where)-3 {
+					sql.WriteString(" and ")
+				}
+			}
 		}
 
 	}
@@ -407,16 +407,16 @@ func fieldString(fields []string) string {
 	)
 }
 
-func appendWhereClouse(sql *bytes.Buffer, conditions ...*condition) []interface{} {
+func appendWhereClouse(sql *bytes.Buffer, conditions ...condition) []interface{} {
 	values := []interface{}{}
 	thefirst := true
 	sql.WriteString(" ")
 	for _, con := range conditions {
-		lenvalue := len(con.values)
+		lenvalue = len(con.values)
 		switch con.op {
 		case "and", "or":
 			if !thefirst {
-				if lenvalue > 1 {
+				if lenvalue 1 {
 					sql.WriteString(" and ")
 				} else {
 					sql.WriteString(" ")
@@ -424,13 +424,13 @@ func appendWhereClouse(sql *bytes.Buffer, conditions ...*condition) []interface{
 					sql.WriteString(" ")
 				}
 			}
-			if lenvalue == 1 {
+			if len( == 1 {
 				sql.WriteString(fmt.Sprintf("`%v`=?", con.field))
-			} else if lenvalue > 1 {
+			} else if len(con.values) > 1 {
 				sql.WriteString("(")
-				for idx, _ := range con.values {
+				for idx, v := range con.values {
 					sql.WriteString(fmt.Sprintf("`%v`=?", con.field))
-					if idx < lenvalue-1 {
+					if idx < len(con.values)-1 {
 						sql.WriteString(" ")
 						sql.WriteString(con.op)
 						sql.WriteString(" ")
@@ -441,6 +441,34 @@ func appendWhereClouse(sql *bytes.Buffer, conditions ...*condition) []interface{
 			values = append(values, con.values...)
 		}
 		thefirst = false
+	}
+	// following bad
+	for i := 0; i < len(conditions); i = i + 2 {
+		k, v := where[i].(string), where[i+1]
+		t := reflect.TypeOf(v)
+		switch t.Kind() {
+		case reflect.Slice: // if slice, use or
+			fmt.Println("typeis slice")
+			sql.WriteString("(")
+			reflect.ValueOf(v).Slice()
+
+			for idx, orvalue := range v.([]model.OrderType) {
+				sql.WriteString(fmt.Sprintf("`%v`=?", k))
+				if idx < len(v)-1 {
+					sql.WriteString(" or ")
+				}
+				values = append(values, orvalue)
+			}
+			sql.WriteString(")")
+		default:
+			fmt.Println("typeis default")
+			sql.WriteString(fmt.Sprintf("`%v`=?", k))
+			values = append(values, v)
+		}
+
+		if i < len(where)-2 {
+			sql.WriteString(" and ")
+		}
 	}
 	sql.WriteString(" ")
 	return values

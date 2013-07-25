@@ -10,49 +10,27 @@ import (
 	"syd/service/personservice"
 )
 
-/* ________________________________________________________________________________
-   Register all pages under /order
-*/
 func init() {
-	register.Page(Register,
-		&OrderCreateIndex{},
-		&OrderCreateDetail{},
-	)
-}
-func Register() {}
-
-// ____ Order Create Index ___________________________________________________________
-// BUG: OrderCreate here can't fallback to /order/create
-//
-type OrderCreateIndex struct {
-	core.Page
-	CustomerId int `param:"."`
+	register.Page(Register, &OrderCreateDetail{})
 }
 
-func (p *OrderCreateIndex) Setup() {
-	// enter person create order.
-}
+// --------  Order Create Details  -----------------------------------------------------------------------
 
-func (p *OrderCreateIndex) OnSuccessFromCustomerForm() (string, string) {
-	if p.CustomerId > 0 {
-		url := fmt.Sprintf("/order/create/detail?customer=%v", p.CustomerId)
-		return "redirect", url
-	}
-	return "redirect", "thispage"
-}
-
-// ____ Order Create Details _______________________________________________________________
-//
 type OrderCreateDetail struct {
 	core.Page
 	CustomerId int      `query:"customer"`
-	Id         *gxl.Int `path-param:"1"` // order id
+	Id         *gxl.Int `path-param:"1"` // OrderId, used when edit.
 
 	Customer *model.Customer
 	Order    *model.Order // submit the big table.
 	DaoFu    string       // on
 
-	SourceUrl string `query:"source"` // redirect url
+	SourceUrl         string `query:"source"` // redirect url
+	ParentTrackNumber int64  `query:"parent"` // parent tn if subproject
+
+	// TODO Customized type coercion.
+	// Temp Solution: coercion:".CoercionMethod(string)"
+	Type uint `query:"type"` // order type
 
 	// page msg resources
 	SubTitle     string // create or edit? TODO i18n resource file.
@@ -87,6 +65,11 @@ func (p *OrderCreateDetail) Setup() {
 		p.SubmitButton = "确认下单"
 	}
 
+	// set order type; trick: no set is 0, 0 is default Wholesale type.
+	fmt.Println("````````````````````````````````````````````````````````````````````````````````")
+	fmt.Println(p.Type)
+	p.Order.Type = p.Type
+	p.Order.ParentTrackNumber = p.ParentTrackNumber
 	// init person
 	p.Customer = personservice.GetCustomer(p.CustomerId)
 	if p.Customer == nil {
@@ -146,4 +129,13 @@ func (p *OrderCreateDetail) IsEdit() bool {
 
 func (p *OrderCreateDetail) ProductDetailJson() interface{} {
 	return orderservice.OrderDetailsJson(p.Order)
+}
+
+func (p *OrderCreateDetail) ShowAddress() bool {
+	switch model.OrderType(p.Order.Type) {
+	case model.SubOrder:
+		return true
+	default:
+		return false
+	}
 }

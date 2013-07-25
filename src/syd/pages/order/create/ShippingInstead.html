@@ -1,0 +1,137 @@
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `代发订单` }}
+  </head>
+  <body class="PG_create_order">
+
+    {{t_layout_headernav $}}
+
+    <div class="container">
+
+      {{t_layout_leftnav $ "CurPage" `/order/create`}}
+
+      <div class="main_content">
+    	<h1>代发订单</h1>
+        
+        {{t_order_customerinfo $ "Customer" .Customer}}
+
+        <div class="B_tbl_agent">
+		  <div class="B_btn_print">
+            <a class="btn_a_s" href="{{.CreateSubOrderLink}}">新建代发信息</a>
+          </div>
+          <table class="tbl_main">
+            <tr>
+              <th align="left" nowrap>商品名称<br>商品规格</th>
+              <th align="left" nowrap>单价</th>
+              <th align="center" nowrap>数量</th>
+			  <th align="left" nowrap>快递信息</th>
+			  <th align="right" nowrap>合计金额</th>
+              <th align="left" nowrap>备注</th>
+              <th align="left" nowrap>操作</th>
+            </tr>
+
+            {{range $order := .SubOrders}}
+			<tbody class="hover">
+			  <tr class="B_tbid_info">
+				<td colspan="7">地址: {{.ShippingAddress}}</td>
+			  </tr>
+              
+              {{with $.FirstDetail $order}}
+			  <tr>
+				<td nowrap>
+				  <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
+				  <div class="B_sub_info">
+                    <span class="B_spacer">颜色：{{.Color}}</span>
+                    <span class="B_spacer">尺码：{{.Size}}</span>
+                    <span class="B_spacer">数量：{{.Quantity}}</span>
+                  </div>
+				</td>
+				<td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
+				<td align="center" rowspan="{{len $order.Details}}" nowrap>
+                  <strong>{{$order.TotalCount}}</strong>
+                  <!-- <strong>{{.Quantity}}</strong> -->
+                </td>
+				<td nowrap rowspan="{{len $order.Details}}">
+                  <div class="B_sub_info">
+                    {{$order.DeliveryMethod}}<br>
+                    运费<span class="price">{{$order.ExpressFee}}</span> 元<br>
+                    {{if $order.DeliveryTrackingNumber}} 运单号:{{$order.DeliveryTrackingNumber}} {{end}}
+                  </div>
+                </td>
+				<td align="right" rowspan="{{len $order.Details}}" >
+                  <strong class="price">{{$order.TotalPrice | prettycurrency}}</strong>
+                  <!-- <strong class="price">{{.TotalPrice | prettycurrency}}</strong> -->
+                </td>
+				<td valign="top"><div class="B_sub_info">{{.Note}}</div></td>
+				<td valign="top" nowrap rowspan="{{len $order.Details}}">
+                  <a href="{{$.EditLink $order}}">编辑</a><span class="vline">|</span>
+
+                  <a href="#">打印快递单</a><span class="vline">|</span>
+
+                  <a href="#">发货</a><span class="vline">|</span>
+                  {{t_order_deliverbutton $ "tid" `deliverButton` "TrackNumber" $order.TrackNumber "DeliveryMethod" $order.DeliveryMethod "DeliveryTrackingNumber" $order.DeliveryTrackingNumber "ExpressFee" $order.ExpressFee "Source" $.ThisPage}}
+
+                  <a href="#" onclick="if(msg('确认要取消这个代发订单么？ 本操作不可撤销！');){alert('哈哈！这个功能还没做好啊，我逗你玩呢!!!')}return false;">取消</a>
+                </td>
+			  </tr>
+              {{end}}
+              
+              {{range $.OtherDetails $order}}
+			  <tr>
+				<td nowrap>
+				  <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
+				  <div class="B_sub_info">
+                    <span class="B_spacer">颜色：{{.Color}}</span>
+                    <span class="B_spacer">尺码：{{.Size}}</span>
+                    <span class="B_spacer">数量：{{.Quantity}}</span>
+                  </div>
+				</td>
+				<td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
+				<td valign="top" rowspan="1"><div class="B_sub_info">{{.Note}}</div></td>
+			  </tr>
+              {{end}}
+
+			</tbody>
+            {{end}}
+            
+            <tr class="total">
+              <td valign="top" align="right"><strong>总计</strong></td>
+              <td valign="top">&nbsp;</td>
+              <td valign="top">{{$.Order.TotalCount}}</td>
+              <td valign="top">总运费：{{$.Order.ExpressFee}}</td>
+              <td valign="top" align="right">
+                <strong class="price">
+                  {{$.Order.TotalPrice}}
+                </strong>
+              </td>
+              <td valign="top">&nbsp;</td>
+              <td valign="top">&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+
+        <form action="" method="POST">
+          <input type="hidden" name="Order.TotalPrice" value="{{$.Order.TotalPrice}}">
+          <input type="hidden" name="Order.TotalCount" value="{{$.Order.TotalCount}}">
+          <input type="hidden" name="Order.ExpressFee" value="{{$.Order.ExpressFee}}">
+          
+		  <div class="unit">
+            <div class="tit"><strong>订单备注</strong></div>
+		    <div class="B_order_remark">
+			  <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
+		    </div>
+		  </div>
+          
+          <div class="btn_content">
+            <input type="submit" class="btn_a_l" value="确认代发订单">
+            <a class="btn_b_l" href="#">打印订单</a>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </body>
+</html>

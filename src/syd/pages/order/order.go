@@ -3,7 +3,6 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/debug"
 	"got/register"
 	"strings"
 	"syd/model"
@@ -53,7 +52,6 @@ func (p *OrderList) Activate() {
 func (p *OrderList) SetupRender() {
 	orders, err := orderservice.ListOrder(p.Tab)
 	if err != nil {
-		debug.Error(err)
 		panic(err.Error())
 	}
 	p.Orders = orders
