@@ -3,25 +3,35 @@ package register
 import (
 	"errors"
 	"fmt"
+	"got/config"
 	"got/core"
 	"log"
+	"path/filepath"
 	"strings"
 	"sync"
 )
+
+var conf = config.Config
 
 /* ________________________________________________________________________________
    Segment, like a trie.
 */
 type ProtonSegment struct {
 	Name     string                    // segment name
-	Path     string                    // TODO: URL path
+	Path     string                    // TODO: URL path; TODO use appconfig
 	Parent   *ProtonSegment            //
 	Children map[string]*ProtonSegment //
 	Src      string                    // source package, used to select app
 	Level    int                       // depth
 	Proton   core.Protoner             // Proton
 
-	l sync.Mutex // TODO used to synchronized, also in page?
+	identity     string // cache identity
+	templatePath string // cache template path.
+
+	// TODO cache structure info.
+	// TODO add pointer to proton?
+
+	l sync.Mutex // TODO used to synchronized, use channel version to support multiwrite.
 }
 
 func (s *ProtonSegment) AddChild(seg *ProtonSegment) {
@@ -37,12 +47,51 @@ func (s *ProtonSegment) HasChild(seg string) bool {
 
 // used to update register
 func (s *ProtonSegment) Remove() {
-	// TODO
+	// TODO implement this. used in auto reload.
 }
 
-var pathMap = map[string]string{
-	"page":      "pages",
-	"component": "components",
+// ----  Identity & Template path  ---------------------------------------------------------------
+
+var pathMap = map[core.Kind]string{
+	core.PAGE:      "pages",
+	core.COMPONENT: "components",
+	core.MIXIN:     "mixins",
+}
+
+var identityPrefixMap = map[core.Kind]string{
+	core.PAGE:      "",
+	core.COMPONENT: "c_",
+	core.MIXIN:     "x_",
+}
+
+func (s *ProtonSegment) Identity() string {
+	if s.identity == "" {
+		appConfig := Apps.Get(s.Src)
+		if appConfig == nil {
+			panic(fmt.Sprintf("Can't find APP Config %v", s.Src))
+		}
+		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()], s.Src, s.Path)
+	}
+	return s.identity
+}
+
+func (s *ProtonSegment) TemplatePath() (string, string) {
+	if s.identity == "" {
+		appConfig := Apps.Get(s.Src)
+		if appConfig == nil {
+			panic(fmt.Sprintf("Can't find APP Config %v", s.Src))
+		}
+		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()], s.Src, s.Path)
+
+		if s.templatePath == "" {
+			s.templatePath = filepath.Join(
+				appConfig.FilePath,
+				pathMap[s.Proton.Kind()], // "pages","components"
+				s.Path,
+			) + conf.TemplateFileExtension // TODO Configthis
+		}
+	}
+	return s.identity, s.templatePath
 }
 
 // ________________________________________________________________________________
@@ -53,18 +102,17 @@ var pathMap = map[string]string{
 //   order, orderlist
 //   order/create/OrderCreateDetail
 //
-func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) (selectors [][]string) {
+func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]string) {
 
-	src, segments := trimPathSegments(baseUrl, pathMap[protonType])
+	src, segments := trimPathSegments(baseUrl, pathMap[p.Kind()])
 
-	dlog("-___- [Register %v] %v::%v url:%v", protonType, src, segments, baseUrl)
+	dlog("-___- [Register %v] %v::%v url:%v", pathMap[p.Kind()], src, segments, baseUrl)
 
 	// add to registerc
 	var (
 		currentSeg = s
 		prevSeg    = "//nothing//" // previous lowercase seg
 		prevSegs   = []string{}    // previous lowercase seg[]
-		isPage     = (protonType == "page")
 
 		selectorPrefix = []string{} // tempvalue
 	)
@@ -98,12 +146,10 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) 
 	}
 
 	// 2. process last node
-	// > the last node.
-
 	// log.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
 	// log.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
 
-	// ~ 2 ~ overlap keywords: i.e.: order/OrderEdit ==> order/edit
+	// ~ 2 ~ overlapped keywords: i.e.: order/OrderEdit ==> order/edit
 	var (
 		seg           string   = segments[len(segments)-1]
 		lowerSeg      string   = strings.ToLower(seg)
@@ -145,7 +191,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) 
 	// judge empty/index
 
 	// /order/Order[Index] - fall back to /order/
-	if isPage {
+	if p.Kind() == core.PAGE {
 		if strings.HasSuffix(shortLowerSeg, "index") {
 			dlog("+++ Match Index, \n") // ------------------------------------------
 
@@ -167,8 +213,9 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) 
 		}
 	}
 
-	// 4. finally add segment struct to chains.
 	dlog(">>>>> FinalSegs: %v\n", finalSegs) // ------------------------------------------
+
+	// 4. finally add segment struct to chains.
 	for _, s := range finalSegs {
 		// link segment together.
 		segment := &ProtonSegment{
@@ -191,7 +238,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner, protonType string) 
 	return
 }
 
-// ----------------------------------------------------------------------------------------------------
+// ----  Lookup & Results  ------------------------------------------------------------------------------
 
 type LookupResult struct {
 	Segment   *ProtonSegment

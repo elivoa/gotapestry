@@ -37,7 +37,7 @@
 			<div id="orderTop">
 			  <div class="prt_tit">
 				<span>收货单位：{{.Customer.Name}}</span>
-				<span>日期：{{.Order.CreateTime|beautytime}}</span>
+				<span>日期：{{.Order.CreateTime | formattime "2006-01-02"}}</span>
 				<span>订单号：{{.Order.TrackNumber}}</span>
 			  </div>
 			</div>

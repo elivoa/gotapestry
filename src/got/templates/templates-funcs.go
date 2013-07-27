@@ -1,3 +1,6 @@
+/*
+   Time-stamp: <[templates-funcs.go] Elivoa @ Saturday, 2013-07-27 12:42:42>
+*/
 package templates
 
 import (
@@ -6,7 +9,8 @@ import (
 	"time"
 )
 
-func registerHelperFuncs() {
+// TODO open this to developer to register global functions.
+func registerBuiltinFuncs() {
 	// init functions
 	Templates.Funcs(template.FuncMap{
 		// deprecated

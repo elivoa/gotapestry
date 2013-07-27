@@ -24,6 +24,9 @@ type Configure struct {
 	BasePackages      []string `Packages that contains Pages and Components etc`
 	PagePackages      []string `no use`
 	ComponentPackages []string `...`
+
+	// other system config
+	TemplateFileExtension string
 }
 
 func NewConfigure() Configure {
@@ -42,5 +45,7 @@ func NewConfigure() Configure {
 
 		SrcPath:    path.Join(basePath, "src"),
 		StaticPath: path.Join(basePath, "static"),
+
+		TemplateFileExtension: ".html",
 	}
 }

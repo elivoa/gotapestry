@@ -11,11 +11,11 @@ import (
 type Kind uint
 
 const (
-	UNKNOWN Kind = iota
+	UNKNOWN Kind = iota // invalid
 	PAGE
 	COMPONENT
 	MIXIN
-	STRUCT
+	STRUCT // invalid proton
 )
 
 /*_______________________________________________________________________________

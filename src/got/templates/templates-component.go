@@ -1,3 +1,7 @@
+/*
+   Time-stamp: <[templates-component.go] Elivoa @ Saturday, 2013-07-27 18:50:52>
+*/
+
 package templates
 
 import (
@@ -16,6 +20,7 @@ func registerComponentFuncs() {
 	Templates.Funcs(template.FuncMap{})
 }
 
+// register components as template function call.
 func RegisterComponent(name string, f interface{}) {
 	funcName := fmt.Sprintf("t_%v", strings.Replace(name, "/", "_", -1))
 	debuglog("-108- [RegisterComponent] %v", funcName)

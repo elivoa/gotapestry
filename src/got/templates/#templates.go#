@@ -25,8 +25,8 @@ func init() {
 	// 	LocatePath("nothing"),
 	// ))
 	Templates = template.New("Got-Template")
-	registerBuiltinFuncs()   // Register built-in templates.
-	registerComponentFuncs() // no use?
+	registertodo maBuiltinFuncs()   // Register built-in templates.
+	registertodo maComponentFuncs() // no use?
 }
 
 /*

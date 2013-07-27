@@ -18,7 +18,7 @@ var Pages = ProtonSegment{Name: "/"}
 func Page(f func(), pages ...core.Pager) int {
 	for _, p := range pages {
 		url := makeUrl(f, p)
-		Pages.Add(url, p, "page")
+		Pages.Add(url, p)
 	}
 	return len(pages)
 }

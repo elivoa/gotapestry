@@ -3,14 +3,12 @@ package route
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"got/core"
 	"got/core/lifecircle"
 	"got/debug"
 	"got/register"
 	"got/templates"
 	"log"
 	"net/http"
-	"path/filepath"
 	"reflect"
 	rd "runtime/debug"
 )
@@ -66,8 +64,16 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 		// event call
 		lcc.EventCall(result.EventName)
 
-		// when call event, process common return ('redirect', "...")
-		// TODO 1: default return the current page.
+		// TODO wrong here. this is wrong. sudo refactor lifecircle-return.
+		// if lcc not returned, return the current page.
+		if lcc.Err != nil {
+			panic(lcc.Err.Error())
+		}
+		// default return the current page.
+		if result.Segment != nil && lcc.ResultType == "" {
+			url := lcc.R.URL.Path
+			http.Redirect(lcc.W, lcc.R, url, http.StatusFound)
+		}
 	}
 }
 
@@ -86,66 +92,28 @@ func lookup(url string) *register.LookupResult {
 	return result
 }
 
+// handle return
 func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment) {
 	// no error, no templates return or redirect.
 	if seg != nil && lcc.Err == nil && lcc.ResultType == "" {
 		// find default tempalte to return
-		key, tplPath := LocateGOTTemplate(seg.Src, seg.Path)
+		identity, templatePath := seg.TemplatePath()
 		// debug.Log("-755- [TemplateSelect] %v -> %v", key, tplPath)
-		_, err := templates.GotTemplateCache.Get(key, tplPath)
-		if nil != err {
+		if _, err := templates.GotTemplateCache.Get(identity, templatePath); err != nil {
 			lcc.Err = err
 		} else {
-			// fmt.Println("render tempalte " + key)
-			e := templates.RenderGotTemplate(lcc.W, key, lcc.Proton)
-			if e != nil {
-				lcc.Err = e
+			if err := templates.RenderGotTemplate(lcc.W, identity, lcc.Proton); err != nil {
+				lcc.Err = err
 			}
 		}
 	}
-
+	// panic here if has errors.
 	if lcc.Err != nil {
 		panic(lcc.Err.Error())
 	}
 }
 
-// ________________________________________________________________________________
-// Locate Templates
-
-// performance issue
-// return (template-key, template-file-path)
-func LocateGOTTemplate(src string, path string) (string, string) {
-	// println("\n >> locate template")
-	appConfig := register.Apps.Get(src)
-	if appConfig == nil {
-		panic(fmt.Sprintf("Can't find APP Config %v", src))
-	}
-	key := fmt.Sprintf("%v:%v", src, path)
-	templateFilePath := filepath.Join(appConfig.FilePath, "pages", path) + ".html"
-	return key, templateFilePath
-}
-
 // --------------------------------------------------------------------------------
-// -------- Simple Handler --------
-// --------------------------------------------------------------------------------
-
-func RedirectHandler(url string) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, url, http.StatusFound)
-	}
-}
-
-// register each page and cache them.
-func PageHandler(basePage core.Pager) func(http.ResponseWriter, *http.Request) {
-	log.Printf("[building] Init page '%v'", reflect.TypeOf(basePage))
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		printAccessHeader(r)
-		lcc := lifecircle.NewPageFlow(w, r, basePage).Flow()
-		handleReturn(lcc, nil)
-		printAccessFooter(r)
-	}
-}
 
 // helper
 func printAccessHeader(r *http.Request) {
@@ -170,9 +138,31 @@ func processPanic(err interface{}, r *http.Request) {
 	log.Printf("x URL: %-109v x", r.URL.Path)
 	log.Printf("x panic: %-109v x", err)
 	log.Print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", yibaix)
-	fmt.Println("> StackTrace >>")
+	fmt.Println("StackTrace >>")
 	rd.PrintStack()
 	fmt.Println()
 }
 
 var yibaix = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+// --------------------------------------------------------------------------------
+// -------- Simple Handler --------
+// --------------------------------------------------------------------------------
+
+// func RedirectHandler(url string) func(http.ResponseWriter, *http.Request) {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		http.Redirect(w, r, url, http.StatusFound)
+// 	}
+// }
+
+// // register each page and cache them.
+// func PageHandler(basePage core.Pager) func(http.ResponseWriter, *http.Request) {
+// 	log.Printf("[building] Init page '%v'", reflect.TypeOf(basePage))
+
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		printAccessHeader(r)
+// 		lcc := lifecircle.NewPageFlow(w, r, basePage).Flow()
+// 		handleReturn(lcc, nil)
+// 		printAccessFooter(r)
+// 	}
+// }

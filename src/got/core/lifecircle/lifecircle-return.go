@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Friday, 2013-07-26 19:19:06>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Saturday, 2013-07-27 13:32:00>
 */
 package lifecircle
 
@@ -163,7 +163,6 @@ func (lcc *LifeCircleControl) return_template(templateName string) error {
 	}
 
 	if err != nil {
-		// TODO redirect to error page.
 		lcc.Err = err
 		return err
 	}

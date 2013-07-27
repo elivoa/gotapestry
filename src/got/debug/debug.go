@@ -2,7 +2,9 @@ package debug
 
 import (
 	"fmt"
+	"got/utils"
 	"log"
+	"reflect"
 	"runtime/debug"
 )
 
@@ -75,4 +77,24 @@ func PrintAllFieldTags(target interface{}, fieldName string) {
 func test() {
 	fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
 	fmt.Printf("+ %v\n", nil)
+}
+
+// print all things.
+func PrintEntrails(target interface{}) string {
+	fmt.Println("~~~~~ [GOT DEBUG TOOL] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	v := reflect.ValueOf(target)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	t := utils.GetRootType(target)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		fmt.Printf("> Field[%v] : %v = %v\n", i, field.Name, v.Field(i))
+	}
+	for i := 0; i < t.NumMethod(); i++ {
+		method := t.Method(i)
+		fmt.Printf("> Field[%v] : %v = %v\n", i, method.Name, v.Method(i))
+	}
+	fmt.Println("~~~~~ END ~~~~~...............")
+	return "x"
 }
