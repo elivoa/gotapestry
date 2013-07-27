@@ -1,43 +1,30 @@
-package ajax
+package api
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"got/core"
 	"got/debug"
-	"got/route"
+	"got/register"
 	"syd/service/suggest"
 )
 
-type AjaxPage struct{}
+func Register() {}
 
-func New() *AjaxPage {
-	fmt.Println("Creating Ajax Page Module.")
-	// templates.Add("person-list")
-	return &AjaxPage{}
-}
+func init() { register.Page(Register, &Suggest{}) }
 
-func (p *AjaxPage) Mapping(r *mux.Router) {
-	r.HandleFunc("/ajax/suggest/{type}",
-		route.PageHandler(&AjaxSuggest{}))
-}
-
-type AjaxSuggest struct {
+type Suggest struct {
 	core.Page
-
-	Query       string `query:"query"`
-	SuggestType string `param:"type"`
+	Type  string `path-param:"1"`
+	Query string `query:"query"`
 }
 
-func (p *AjaxSuggest) SetupRender() (interface{}, interface{}) {
+func (p *Suggest) Setup() (interface{}, interface{}) {
 	suggest.EnsureLoaded()
-	// suggest.PrintAll()
 
 	// search
-	items, err := suggest.Lookup(p.Query, p.SuggestType)
+	items, err := suggest.Lookup(p.Query, p.Type)
 	if err != nil {
-		debug.Error(err)
 		return err, nil
 	}
 	// translate
@@ -59,6 +46,7 @@ func (p *AjaxSuggest) SetupRender() (interface{}, interface{}) {
 	jsonstr := string(jsonbytes)
 	fmt.Println(jsonstr)
 	return "json", jsonbytes
+
 }
 
 /* struct to json */

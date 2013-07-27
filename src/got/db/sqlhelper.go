@@ -306,10 +306,6 @@ func (p *QueryParser) QueryOne(receiver func(*sql.Row) error) error {
 
 	p.Prepare()
 
-	// TODO use values to replace default one.
-	debuglog("", "---------------------")
-	debuglog("DB", "%v \"%v\" with parameters %v", p.operation, p.sql, p.values)
-
 	// 1. get connection
 	conn, err := Connect()
 	if Err(err) {
@@ -341,9 +337,8 @@ func (p *QueryParser) Query(receiver func(*sql.Rows) (bool, error)) error {
 	p.Prepare()
 
 	// TODO use values to replace default one.
-	fmt.Println("--------------------------------------------------------------------------------")
-	fmt.Println(p.sql)
-	debuglog("Exec", "Query \"%v\" with parameters %v", p.sql, p.values)
+	// fmt.Println("--------  SQL  ------------------------------------------------------------------------")
+	// fmt.Printf("    Query \"%v\" \n    with parameters %v\n", p.sql, p.values)
 
 	// 1. get connection
 	conn, err := Connect()

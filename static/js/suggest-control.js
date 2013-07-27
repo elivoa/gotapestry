@@ -45,7 +45,7 @@
       console.log('init suggest');
       _ = this;
       this.params = {
-        serviceUrl: "/ajax/suggest/" + _.param.category,
+        serviceUrl: "/api/suggest/" + _.param.category,
         onSearchStart: function(query) {
           var parent;
           parent = $(this).parents(_.param["parentClass"]);

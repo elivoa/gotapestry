@@ -31,18 +31,47 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if error occured
 	printAccessHeader(r)
+
+	// --------  Error Handling  --------------------------------------------------------------
 	defer func() {
 		if err := recover(); err != nil {
-			processPanic(err)
-			// TODO render 500 page.
+			processPanic(err, r)
+			// TODO Render error page 500/404 page.
 			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
 		}
 		printAccessFooter(r)
 	}()
 
-	// 1. let's find the right pages.
+	// --------  Routing...  --------------------------------------------------------------
+
+	// 3. let's find the right pages.
+	result := lookup(url)
+	if result == nil {
+		// TODO goto 404 page.
+		// TODO all path-parameter parse error goes to 404, not 500.
+	}
+	debug.Log("-601- [RouteFind] %v", result.Segment)
+
+	// TODO: Create New page object every request? howto share some page object? see tapestry5.
+	lcc := lifecircle.NewPageFlow(w, r, result.Segment.Proton)
+	lcc.SetPageUrl(result.PageUrl)
+	lcc.SetEventName(result.EventName)
+
+	if result.EventName == "" {
+		// page render flow
+		lcc.Flow()
+		handleReturn(lcc, result.Segment)
+	} else {
+		// event call
+		lcc.EventCall(result.EventName)
+
+		// when call event, process common return ('redirect', "...")
+		// TODO 1: default return the current page.
+	}
+}
+
+func lookup(url string) *register.LookupResult {
 	result, err := register.Pages.Lookup(url)
 	if nil != err {
 		panic(err.Error())
@@ -54,20 +83,7 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 		// TODO redirect to 404 page.
 		panic(fmt.Sprintf("~~~~ Page not found ~~~~"))
 	}
-
-	debug.Log("-601- [RouteFind] %v", result.Segment)
-
-	// go through lifecircle
-	lcc := lifecircle.NewPageFlow(w, r, result.Segment.Proton)
-	lcc.SetPageUrl(result.PageUrl).SetEventName(result.EventName)
-	if result.EventName == "" {
-		lcc.Flow() // normal flow
-		handleReturn(lcc, result.Segment)
-	} else {
-		lcc.EventCall(result.EventName) // event call
-		// when call event, process common return ('redirect', "...")
-		// TODO 1: default return the current page.
-	}
+	return result
 }
 
 func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment) {
@@ -149,13 +165,14 @@ func printAccessFooter(r *http.Request) {
 		"...................................")
 }
 
-func processPanic(err interface{}) {
-	log.Printf("xxxxxxxx  PANIC  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
-		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+func processPanic(err interface{}, r *http.Request) {
+	log.Print("xxxxxxxx  PANIC  xxxxxxxxxxxxx", yibaix)
+	log.Printf("x URL: %-109v x", r.URL.Path)
 	log.Printf("x panic: %-109v x", err)
-	log.Printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
-		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	fmt.Println("StackTrace >>")
+	log.Print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", yibaix)
+	fmt.Println("> StackTrace >>")
 	rd.PrintStack()
 	fmt.Println()
 }
+
+var yibaix = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

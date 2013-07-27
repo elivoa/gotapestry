@@ -39,7 +39,7 @@ class SuggestControl
 
     _ = @
     @params = {
-      serviceUrl: "/ajax/suggest/" + _.param.category
+      serviceUrl: "/api/suggest/" + _.param.category
       # lookup: this.countries,
 
       onSearchStart: (query)->

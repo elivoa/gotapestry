@@ -11,6 +11,187 @@ import (
 	"strings"
 )
 
+// --------------------------------------------------------------------------------
+const (
+	PathInjectionTag string = "path-param"
+	URLInjectionTag  string = "query" // TODO change to url
+)
+
+func (lcc *LifeCircleControl) injectBasic() *LifeCircleControl {
+	lcc.injectBasicTo(lcc.Proton)
+	return lcc
+}
+
+// InjectBasicTo will inject R & W into proton, this is not necessary, make this an option.
+func (lcc *LifeCircleControl) injectBasicTo(proton core.Protoner) {
+	proton.SetRequest(lcc.R)
+	proton.SetResponseWriter(lcc.W)
+}
+
+func (lcc *LifeCircleControl) injectPath() *LifeCircleControl {
+	lcc.injectPathTo(lcc.Proton)
+	return lcc
+}
+
+// value must be Proton struct, not ptr
+// everything in lcc is belong to the root page. parameter proton is inject target.
+func (lcc *LifeCircleControl) injectPathTo(proton core.Protoner) {
+	value := reflect.ValueOf(proton)
+	t, _ := utils.RemovePointer(value.Type(), false)
+
+	values := make(map[string][]string) // used to inject
+	pathParams := extractPathParameters(lcc.R.URL.Path, lcc.PageUrl, lcc.EventName)
+
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		var fieldKey = f.Name
+
+		// if type is gxl.*; i.e.: a -> a.Int
+		var gxlSuffix string = analysisTranslateSuffix(f.Type)
+		if gxlSuffix != "" {
+			fieldKey += gxlSuffix
+		}
+
+		// parse TAG: path-param | TODO Cache this.
+		tagValue := f.Tag.Get(PathInjectionTag)
+		if tagValue != "" {
+			pathParamIndex, err := strconv.Atoi(tagValue)
+			if err != nil {
+				panic(fmt.Sprintf("TAG path-param must be numbers. not %v.", tagValue))
+			}
+			if pathParamIndex <= len(pathParams) {
+				values[fieldKey] = []string{pathParams[pathParamIndex-1]}
+				proton.SetInjected(f.Name, true)
+			}
+		}
+	}
+	if len(values) > 0 {
+		utils.SchemaDecoder.Decode(proton, values)
+	}
+}
+
+func (lcc *LifeCircleControl) injectURLParameter() *LifeCircleControl {
+	lcc.injectURLParameterTo(lcc.Proton)
+	return lcc
+}
+
+func (lcc *LifeCircleControl) injectURLParameterTo(proton core.Protoner) {
+	t := utils.GetRootType(proton)
+
+	values := make(map[string][]string) // used to inject
+	queries := lcc.R.URL.Query()
+
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		var fieldKey = f.Name
+
+		// if type is gxl.*; i.e.: a -> a.Int
+		var gxlSuffix string = analysisTranslateSuffix(f.Type)
+		if gxlSuffix != "" {
+			fieldKey += gxlSuffix
+		}
+
+		// query param: in url query
+		tagValue := f.Tag.Get(URLInjectionTag)
+		if tagValue != "" {
+			if tagValue == "." {
+				tagValue = f.Name
+			}
+			if v, ok := queries[tagValue]; ok {
+				values[f.Name] = v
+				proton.SetInjected(f.Name, true)
+				continue
+			}
+		}
+
+	}
+	if len(values) > 0 {
+		utils.SchemaDecoder.Decode(proton, values)
+	}
+}
+func (lcc *LifeCircleControl) injectComponentParameters(params []interface{}) *LifeCircleControl {
+	lcc.injectComponentParametersTo(lcc.Proton, params)
+	return lcc
+}
+
+func (lcc *LifeCircleControl) injectComponentParametersTo(proton core.Protoner, params []interface{}) {
+	// log.Printf("-621- Component [%v]'s params is: ", seg.Name)
+	debugprint := false
+	if debugprint {
+		for i, p := range params {
+			fmt.Printf("\t%3v: %v\n", i, p)
+		}
+		fmt.Println("\t~ END Params ~")
+	}
+
+	data := make(map[string][]string)
+	var key string // key is also field name.
+	for i, param := range params {
+		if i%2 == 0 {
+			if k, ok := param.(string); ok {
+				key = fmt.Sprintf("%v%v", strings.ToUpper(k[0:1]), k[1:]) // Capitalized
+				proton.SetInjected(key, true)
+			} else {
+				panic("component parameter must be name,value pair.")
+			}
+		} else {
+			if key == "" || param == nil {
+				// panic("value is nil")
+				fmt.Println("value is nil", key, param)
+				continue
+			}
+
+			// value, then set key to struct.
+			switch param.(type) {
+			case string:
+				data[key] = []string{param.(string)}
+			default: // other situation
+				v := utils.GetRootValue(proton)
+				injectField(v, key, param) // TO be continued....
+			}
+		}
+	}
+	if debugprint {
+		debug.PrintFormMap("~ Component ~ inject component data", data)
+	}
+
+	if len(data) > 0 {
+		utils.SchemaDecoder.Decode(proton, data)
+	}
+}
+
+// inject utils
+
+func injectField(target reflect.Value, fieldName string, value interface{}) {
+	// target
+	t := target
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	// field
+	// fmt.Printf(")))))))))))) : %v\n", fieldName)
+	field := t.FieldByName(fieldName)
+	if !field.IsValid() {
+		panic(fmt.Sprintf("Inject Error: Can't set '%v' to %v's%v field, type:'%v'.",
+			reflect.TypeOf(value), target.Kind(), fieldName, field.Kind()))
+	}
+	v := reflect.ValueOf(value)
+
+	if field.Kind() != reflect.Interface &&
+		field.Kind() != reflect.Ptr &&
+		v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	// fmt.Printf(">>>>>>>>>>>>>>>>> Inject %v::%v t:%v  <--  %v\n",
+	// 	t, fieldName, field.Kind(), reflect.TypeOf(value),
+	// )
+	t.FieldByName(fieldName).Set(v)
+}
+
+// *********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+
 /* ________________________________________________________________________________
    Inject Services or Parameters into proton value.
    Including:
@@ -129,99 +310,6 @@ func (lcc *LifeCircleControl) InjectValue() {
 	}
 }
 
-// TODO Coercion: make an interface to auto translate this into it.
-func analysisTranslateSuffix(t reflect.Type) string {
-	switch t.String() {
-	case "*gxl.Int":
-		return ".Int"
-	}
-	return ""
-}
-
-func (lcc *LifeCircleControl) InjectComponentParameters(params []interface{}) *LifeCircleControl {
-	// debug log .....
-	// log.Printf("-621- Component [%v]'s params is: ", seg.Name)
-	debug := false
-	if debug {
-		for i, p := range params {
-			fmt.Printf("\t%3v: %v\n", i, p)
-		}
-		fmt.Println("\t~ END Params ~")
-	}
-
-	data := make(map[string][]string)
-	var key string
-	for i, param := range params {
-		if i%2 == 0 {
-			var ok bool
-			key, ok = param.(string)
-			if !ok {
-				panic("component parameter must be name,value pair.")
-			}
-			key = fmt.Sprintf("%v%v", strings.ToUpper(key[0:1]), key[1:])
-
-			// set flag
-			lcc.SetInjected(key)
-		} else {
-			if debug {
-				fmt.Printf(">>>> param: %10v = %v\n", key, param)
-			}
-			if key == "" || param == nil {
-				// panic("value is nil")
-				continue
-			}
-
-			// value, then set key to struct.
-			v := reflect.ValueOf(param)
-			if v.Kind() == reflect.Ptr {
-				v = v.Elem()
-			}
-
-			if v.Kind() == reflect.String {
-				// auto convert string into values.
-				data[key] = []string{param.(string)}
-			} else {
-				// assign values into field.
-				// TODO performance, cache this.
-				injectField(lcc.V, key, param)
-			}
-		}
-	}
-
-	if len(data) > 0 {
-		utils.SchemaDecoder.Decode(lcc.Proton, data)
-	}
-	return lcc
-}
-
-func injectField(target reflect.Value, fieldName string, value interface{}) {
-	// target
-	t := target
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-
-	// field
-	// fmt.Printf(")))))))))))) : %v\n", fieldName)
-	field := t.FieldByName(fieldName)
-	if !field.IsValid() {
-		panic(fmt.Sprintf("Inject Error: Can't set '%v' to %v's%v field, type:'%v'.",
-			reflect.TypeOf(value), target.Kind(), fieldName, field.Kind()))
-	}
-	v := reflect.ValueOf(value)
-
-	if field.Kind() != reflect.Interface &&
-		field.Kind() != reflect.Ptr &&
-		v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	// fmt.Printf(">>>>>>>>>>>>>>>>> Inject %v::%v t:%v  <--  %v\n",
-	// 	t, fieldName, field.Kind(), reflect.TypeOf(value),
-	// )
-	t.FieldByName(fieldName).Set(v)
-}
-
 func (lcc *LifeCircleControl) SetInjected(fields ...string) {
 	SetInjected(lcc.V, fields...)
 	// method := lcc.V.MethodByName("SetInjected")
@@ -239,7 +327,6 @@ func (lcc *LifeCircleControl) SetInjected(fields ...string) {
 func (lcc *LifeCircleControl) InjectValueTo(proton core.Protoner) {
 	w, r := lcc.W, lcc.R
 	v := reflect.ValueOf(proton)
-	pageUrl := lcc.PageUrl
 
 	// 1. inject static values. (TODO: test performance)
 	injectField(v, "W", w)
@@ -256,32 +343,7 @@ func (lcc *LifeCircleControl) InjectValueTo(proton core.Protoner) {
 	queries := r.URL.Query()
 
 	// 2.2 prepare url parameters
-	url := r.URL.Path
-	if !strings.HasPrefix(url, pageUrl) {
-		panic(fmt.Sprintf("%v should has prefix %v", url, pageUrl))
-	}
-
-	// 2.3 parepare parameters
-	paramsString := url[len(pageUrl):]
-	if lcc.EventName != "" {
-		index := strings.Index(paramsString, "/")
-		if index > 0 {
-			paramsString = paramsString[index:]
-		}
-	}
-	var strParams []string
-	if len(paramsString) > 0 {
-		if strings.HasPrefix(paramsString, "/") {
-			paramsString = paramsString[1:]
-		}
-		strParams = strings.Split(paramsString, "/")
-	}
-	debug.Log("-   - [injection] URL:%v, parameters:%v", url, strParams)
-	// fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
-	// fmt.Printf("+ url: %v\n", url)
-	// fmt.Printf("+ lcc.PageUrl: %v\n", lcc.PageUrl)
-	// fmt.Printf("+ paramsString: %v\n", paramsString)
-	// fmt.Printf("+ strParams: %v\n", strParams)
+	pathParams := extractPathParameters(lcc.R.URL.Path, lcc.PageUrl, lcc.EventName)
 
 	// ...
 	for i := 0; i < t.NumField(); i++ {
@@ -321,10 +383,8 @@ func (lcc *LifeCircleControl) InjectValueTo(proton core.Protoner) {
 			if err != nil {
 				panic(fmt.Sprintf("TAG path-param must be numbers. not %v.", tagValue))
 			}
-			if pathParamIndex <= len(strParams) {
-				// fmt.Printf("\t>>>>>> pathParamIndexis %v, len(strParams) = %v\n",
-				// 	pathParamIndex, len(strParams))
-				values[fieldKey] = []string{strParams[pathParamIndex-1]}
+			if pathParamIndex <= len(pathParams) {
+				values[fieldKey] = []string{pathParams[pathParamIndex-1]}
 				lcc.SetInjected(f.Name)
 			}
 		}

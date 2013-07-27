@@ -4,7 +4,8 @@ import (
 	// pages & components' import
 	index_pages "syd/pages"
 	p_admin "syd/pages/admin"
-	api_pages "syd/pages/api"
+	p_api "syd/pages/api"
+	p_api_suggest "syd/pages/api/suggest"
 	person_pages "syd/pages/person"
 	product_pages "syd/pages/product"
 
@@ -21,7 +22,6 @@ import (
 	"got"
 	"got/config"
 	"got/register"
-	"syd/pages/ajax"
 )
 
 func Start() {
@@ -30,7 +30,6 @@ func Start() {
 
 	g := got.Init()
 	g.Module(
-		simpleModule,
 		sydModule,
 	)
 
@@ -60,7 +59,8 @@ func sydModule(r *mux.Router) {
 	index_pages.Register()
 	person_pages.Register()
 	product_pages.Register()
-	api_pages.Register()
+	p_api.Register()
+	p_api_suggest.Register()
 	p_admin.Register()
 	pages_order.Register()
 	pages_order_create.Register()
@@ -69,11 +69,6 @@ func sydModule(r *mux.Router) {
 	layout_components.Register()
 	order_components.Register()
 	c_product.Register()
-}
-
-// register simple router module into GOT.
-func simpleModule(r *mux.Router) {
-	ajax.New().Mapping(r)
 }
 
 func welcome() {

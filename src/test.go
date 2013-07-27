@@ -4,19 +4,9 @@ import (
 	"fmt"
 )
 
-type OrderType uint
-
-func (t OrderType) Coercion(from string) OrderType {
-	return t
-}
-
 func main() {
-	var a OrderType
-	fmt.Println(a)
-	var b uint = 3
-	a = uint(b)
-	fmt.Println(a)
-	// fmt.Println(Wholesale)
-	// fmt.Println(Wholesale.Coercion("44"))
-	// fmt.Println(Wholesale.Coercion("44"))
+	a := []int{1, 2, 3, 4}
+	fmt.Println(a[0 : len(a)-2])
+	fmt.Println(a[len(a)-1])
+	
 }

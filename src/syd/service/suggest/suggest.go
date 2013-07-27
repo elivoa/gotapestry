@@ -89,7 +89,6 @@ func Load() {
 
 	products, err := productdao.ListAll()
 	if err != nil {
-		debug.Error(err)
 		panic(err.Error())
 	}
 	// products := dal.ListProduct()
@@ -109,10 +108,7 @@ func Load() {
 
 // convert to pinyin
 func parseQuickText(text string) string {
-	s := utils.ParsePinyin(text)
-	fmt.Println(s)
-	return s
-	//return text
+	return utils.ParsePinyin(text)
 }
 
 func Add(category string, text string, id int) {

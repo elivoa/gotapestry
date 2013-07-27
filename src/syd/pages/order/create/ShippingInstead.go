@@ -59,13 +59,15 @@ func (p *ShippingInstead) Setup() {
 	}
 	p.SubOrders = subOrders
 
-	// calculate order statistics. f(x) = Sum(suborder.quantity * unit-price + order.expressfee)
+	// calculate statistics to parent order
+	//   f(x) = Sum(suborder.quantity * unit-price + order.expressfee)
+	//
 	var totalPrice float64 = 0
 	var totalExpressFee int64 = 0
 	var totalCount int = 0
 	for _, so := range subOrders {
 		totalCount += so.TotalCount
-		totalPrice += so.TotalPrice
+		totalPrice += so.SumOrderPrice()
 		if so.ExpressFee > 0 {
 			totalExpressFee += so.ExpressFee
 		}

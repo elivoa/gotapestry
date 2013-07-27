@@ -96,10 +96,6 @@ func CoercionNil(t reflect.Type) reflect.Value {
 // ________________________________________________________________________________
 // used by got/cache
 //
-func RootType(s interface{}) reflect.Type {
-	t, _ := RemovePointer(reflect.TypeOf(s), false)
-	return t
-}
 
 func RemovePointer(typo reflect.Type, removeSlice bool) (t reflect.Type, isSlice bool) {
 	t = typo
@@ -115,4 +111,20 @@ func RemovePointer(typo reflect.Type, removeSlice bool) (t reflect.Type, isSlice
 		}
 	}
 	return
+}
+
+func GetRootType(obj interface{}) reflect.Type {
+	t := reflect.TypeOf(obj)
+	if t.Kind() == reflect.Ptr { // remove ptr
+		t = t.Elem()
+	}
+	return t
+}
+
+func GetRootValue(obj interface{}) reflect.Value {
+	v := reflect.ValueOf(obj)
+	if v.Kind() == reflect.Ptr { // remove ptr
+		v = v.Elem()
+	}
+	return v
 }

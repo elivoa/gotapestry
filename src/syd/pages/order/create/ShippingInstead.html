@@ -62,18 +62,20 @@
                   </div>
                 </td>
 				<td align="right" rowspan="{{len $order.Details}}" >
-                  <strong class="price">{{$order.TotalPrice | prettycurrency}}</strong>
+                  <strong class="price">{{$order.SumOrderPrice | prettycurrency}}</strong>
                   <!-- <strong class="price">{{.TotalPrice | prettycurrency}}</strong> -->
                 </td>
 				<td valign="top"><div class="B_sub_info">{{.Note}}</div></td>
 				<td valign="top" nowrap rowspan="{{len $order.Details}}">
                   <a href="{{$.EditLink $order}}">编辑</a><span class="vline">|</span>
 
-                  <a href="#">打印快递单</a><span class="vline">|</span>
+                  <a href="#">打印快递单</a>
 
-                  <a href="#">发货</a><span class="vline">|</span>
+                  {{/* 发货 */}}
                   {{t_order_deliverbutton $ "tid" `deliverButton` "TrackNumber" $order.TrackNumber "DeliveryMethod" $order.DeliveryMethod "DeliveryTrackingNumber" $order.DeliveryTrackingNumber "ExpressFee" $order.ExpressFee "Source" $.ThisPage}}
+                  <span class="vline">|</span>
 
+                  
                   <a href="#" onclick="if(msg('确认要取消这个代发订单么？ 本操作不可撤销！');){alert('哈哈！这个功能还没做好啊，我逗你玩呢!!!')}return false;">取消</a>
                 </td>
 			  </tr>
@@ -100,8 +102,8 @@
             <tr class="total">
               <td valign="top" align="right"><strong>总计</strong></td>
               <td valign="top">&nbsp;</td>
-              <td valign="top">{{$.Order.TotalCount}}</td>
-              <td valign="top">总运费：{{$.Order.ExpressFee}}</td>
+              <td valign="top" align="center"><strong>{{$.Order.TotalCount}}</strong></td>
+              <td valign="top">{{/* 总运费：{{$.Order.ExpressFee}} */}}</td>
               <td valign="top" align="right">
                 <strong class="price">
                   {{$.Order.TotalPrice}}

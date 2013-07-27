@@ -24,6 +24,8 @@ const (
 type Protoner interface {
 	Request() *http.Request
 	ResponseWriter() http.ResponseWriter
+	SetRequest(*http.Request)
+	SetResponseWriter(http.ResponseWriter)
 	Kind() Kind
 	Injected(fieldName string) bool
 	SetInjected(fieldName string, b bool)
@@ -53,6 +55,16 @@ func (p *Proton) Request() *http.Request {
 
 func (p *Proton) ResponseWriter() http.ResponseWriter {
 	return p.W
+}
+
+func (p *Proton) SetRequest(r *http.Request) {
+	p.R = r
+	p.SetInjected("R", true)
+}
+
+func (p *Proton) SetResponseWriter(w http.ResponseWriter) {
+	p.W = w
+	p.SetInjected("W", true)
 }
 
 func (p *Proton) Kind() Kind {
