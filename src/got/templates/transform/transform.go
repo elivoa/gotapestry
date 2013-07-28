@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Sunday, 2013-07-28 18:16:17>
+  Time-stamp: <[transform.go] Elivoa @ Sunday, 2013-07-28 18:51:50>
 */
 
 package transform
@@ -34,6 +34,7 @@ func (t *Transformater) Parse(reader io.Reader) error {
 	// 1. read import node.
 	t.tree.Walk(func(n *html.Node) {
 		text := strings.TrimSpace(n.Data)
+
 		fmt.Printf("---- %v ---- %v\n", n.Type, text)
 
 		if n.Type == html.ElementNode {

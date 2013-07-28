@@ -1,47 +1,50 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <t:import type="once" stack="false">
-      <script type="text/javascript" src="/static/js/c/order/order_list.js"></script>
-    </t:import>
+    <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/layer/layer.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `SYD 圣衣蝶神奇喜大乐系统` }}
+
   </head>
-  <body>
+  <body class="PG_list_person">
+    {{t_layout_headernav $}}
+    <div class="container">
+      {{t_layout_leftnav $ "CurPage" `/person/list`}}
 
-    <div1 id="{{.ClientId}}">
-      {{/* ----- 对比生成的组件 ----- */}}
-      <div class="batch_content">
-        <t:order_batchclose tid="(print .ClientId '_close')" class="btn_b_s" jsinit="false"
-                            QuickClearButton="false" />
+      <div class="main_content">
+    	<h1>圣衣蝶喜大乐系统</h1>
+
+        <h2>客户快速结账通道</h2>
+        
+        <div class="list_person">
+          <table class="tbl_main">
+            <tr>
+              <th align="left">客户姓名</th>
+              <th align="left">城市</th>
+              <th align="left">网店</th>
+              <th align="left">备注</th>
+              <th align="left">账户余额</th>
+              <th align="left">操作</th>
+            </tr>
+
+            {{range .Customers}}
+            <tr>
+              <td><a href="/person/detail/{{.Id}}" >{{.Name}}</a></td>
+              <td>{{.City}}</td>
+              <td><a href="{{.Website}}">{{.Website}}</a></td>
+              <td>{{.Note}}</td>
+              <td>{{.AccountBallance}}</td>
+              <td>
+                {{/* TODO: ajax get latest value. */}}
+                {{t_order_batchclose $ "CustomerId" .Id }}
+              </td>
+            </tr>
+            {{end}}
+
+          </table>
+          <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+        </div>
       </div>
-      
-      <div class="batch_content">
-        {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
-      </div>
-
-      <table>
-        <tr>
-          <th width="10" align="left">
-            <input type="checkbox" class="check-all">
-          </th> 
-          <th align="left">客户</th>
-          <th align="left">订单号</th>
-          <th align="left">订单金额</th>
-          <th align="left">订单状态</th>
-          <th align="left">日期</th>
-          <th align="left">操作</th>
-        </tr>
-        {{end}}
-      </table>
-      {{end}}
-      <div1>
-
-        <script type="text/javascript">
-  $(function(){
-    orderlist = new OrderList({
-      ClientId: {{.ClientId}}
-    })
-  });
-</script>
-
+    </div>
   </body>
 </html>

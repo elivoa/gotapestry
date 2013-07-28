@@ -19,6 +19,7 @@ func main() {
 			panic(err)
 		}
 	}()
+	fmt.Println("********************************************************************************")
 	// make a read buffer
 	r := bufio.NewReader(fi)
 

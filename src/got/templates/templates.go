@@ -1,12 +1,14 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-07-28 00:08:38>
+   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-07-28 18:47:53>
 */
 package templates
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"got/debug"
+	"got/templates/transform"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -33,6 +35,66 @@ func init() {
    template - when tempalte available and parse successful.
    nil      - when template not exists or error occurs.
 */
+func AddGOTTemplate_(key string, filename string) (*template.Template, error) {
+
+	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
+
+	// borrowed from html/tempate
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		return nil, nil // file not exist, don't panic.
+	}
+
+	// open input file
+	fi, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	// close fi on exit and check for its returned error
+	defer func() {
+		if err := fi.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	// make a read buffer
+	r := bufio.NewReader(fi)
+
+	// transform
+	trans := transform.NewTransformer()
+	trans.Parse(r)
+	html := trans.RenderToString()
+	fmt.Println("--------------------------------------------------------------------------------------")
+	fmt.Println("------------------", filename, "--------------------------------------")
+	fmt.Println(html)
+	fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
+
+	// Old version uses filename as key, I make my own key. not
+	// filepath.Base(filename) First template becomes return value if
+	// not already defined, and we use that one for subsequent New
+	// calls to associate all the templates together. Also, if this
+	// file has the same name as t, this file becomes the contents of
+	// t, so t, err := New(name).Funcs(xxx).ParseFiles(name)
+	// works. Otherwise we create a new template associated with t.
+	name := key
+
+	// Add to template
+	t := Templates
+	var tmpl *template.Template
+	if t == nil {
+		t = template.New(name)
+	}
+	if name == t.Name() {
+		tmpl = t
+	} else {
+		tmpl = t.New(name)
+	}
+
+	_, err = tmpl.Parse(html)
+	if err != nil {
+		return nil, err
+	}
+	return tmpl, nil
+}
+
 func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 
 	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
