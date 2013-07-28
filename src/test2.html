@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <t:import type="once" stack="false">
+      <script type="text/javascript" src="/static/js/c/order/order_list.js"></script>
+    </t:import>
+  </head>
+  <body>
+
+    <div id="{{.ClientId}}">
+      
+      {{if len .Orders | not}}
+      <div class="tips_content"><i class="icon_warning"></i> 无记录</div>
+      {{else}}
+
+      {{/* ----- 对比生成的组件 ----- */}}
+      <div class="batch_content">
+        <t:order_batchclose tid=".ClientId + '_close'" class="btn_b_s" jsinit="false"
+                            QuickClearButton="false" />
+      </div>
+      
+      <div class="batch_content">
+        {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
+      </div>
+
+      <table class="tbl_main">
+        <tr>
+          <th width="10" align="left">
+            <input type="checkbox" class="check-all">
+          </th> 
+          <th align="left">客户</th>
+          <th align="left">订单号</th>
+          <th align="left">订单金额</th>
+          <th align="left">订单状态</th>
+          <th align="left">日期</th>
+          <th align="left">操作</th>
+        </tr>
+        {{end}}
+      </table>
+      {{end}}
+
+
+      <script type="text/javascript">
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+      </script>
+
+    </div>
+  </body>
+</html>

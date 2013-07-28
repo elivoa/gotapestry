@@ -1,14 +1,11 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Saturday, 2013-07-27 13:32:00>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Sunday, 2013-07-28 00:06:13>
 */
 package lifecircle
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"got/core"
-	"got/templates"
 	"net/http"
 	"reflect"
 	"strings"
@@ -59,14 +56,14 @@ func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
 			stringValue := returnValue.Interface().(string)
 			lcc.ResultType = stringValue
 			switch strings.ToLower(stringValue) {
-			case "template":
-				tname, err := extractString(1, returns...)
-				if err != nil {
-					lcc.Err = err
-					return true
-				}
-				debuglog("-900- [route:return] parse template '%v'", tname)
-				lcc.return_template(tname)
+			// case "template":
+			// 	tname, err := extractString(1, returns...)
+			// 	if err != nil {
+			// 		lcc.Err = err
+			// 		return true
+			// 	}
+			// 	debuglog("-900- [route:return] parse template '%v'", tname)
+			// 	lcc.return_template(tname)
 
 			case "text":
 				debuglog("-902- [route:return] return plain string")
@@ -142,29 +139,29 @@ func (lcc *LifeCircleControl) return_text(contentType string, data ...reflect.Va
 	}
 }
 
-func (lcc *LifeCircleControl) return_template(templateName string) error {
-	if templateName == "" {
-		lcc.Err = errors.New(fmt.Sprintf(
-			"%v %v must has an associated template or other return.",
-			lcc.Kind, lcc.Name,
-		))
-		return lcc.Err
-	}
+// func (lcc *LifeCircleControl) return_template(templateName string) error {
+// 	if templateName == "" {
+// 		lcc.Err = errors.New(fmt.Sprintf(
+// 			"%v %v must has an associated template or other return.",
+// 			lcc.Kind, lcc.Name,
+// 		))
+// 		return lcc.Err
+// 	}
 
-	debuglog("-980- Render Tempalte %v.", templateName)
+// 	debuglog("-980- Render Tempalte %v.", templateName)
 
-	var err error
-	if lcc.Kind == core.COMPONENT {
-		var buffer bytes.Buffer
-		err = templates.RenderTemplate(&buffer, templateName, lcc.Proton)
-		lcc.String = buffer.String()
-	} else {
-		err = templates.RenderTemplate(lcc.W, templateName, lcc.Proton)
-	}
+// 	var err error
+// 	if lcc.Kind == core.COMPONENT {
+// 		var buffer bytes.Buffer
+// 		err = templates.RenderTemplate(&buffer, templateName, lcc.Proton)
+// 		lcc.String = buffer.String()
+// 	} else {
+// 		err = templates.RenderTemplate(lcc.W, templateName, lcc.Proton)
+// 	}
 
-	if err != nil {
-		lcc.Err = err
-		return err
-	}
-	return nil
-}
+// 	if err != nil {
+// 		lcc.Err = err
+// 		return err
+// 	}
+// 	return nil
+// }

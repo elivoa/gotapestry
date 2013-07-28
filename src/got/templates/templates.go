@@ -1,7 +1,6 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Saturday, 2013-07-27 17:04:38>
+   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-07-28 00:08:38>
 */
-
 package templates
 
 import (
@@ -137,11 +136,11 @@ func (t *TemplateCache) Get(key string, templatePath string) (*template.Template
 	return nil, nil
 }
 
-// used by lifecircle-component
-func RenderTemplate(w io.Writer, tmpl string, p interface{}) error {
-	err := Templates.ExecuteTemplate(w, tmpl+".html", p)
-	if err != nil {
-		panic(err)
-	}
-	return nil
-}
+// // used by lifecircle-component
+// func RenderTemplate(w io.Writer, tmpl string, p interface{}) error {
+// 	err := Templates.ExecuteTemplate(w, tmpl+".html", p)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return nil
+// }
