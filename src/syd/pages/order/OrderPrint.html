@@ -104,9 +104,15 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span>元 {{end}}
               </div>
+
+              {{if .DeliveryMethodIs "TakeAway"}}
+              <div>合计： {{.Sumprice}} 元</div>
+              {{else}}
               <div>
                 合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>元
               </div>
+              {{end}}
+              
               {{if .Order.HasAccumulated }} <div>
                 累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
                 = <span class="underline"></span>元

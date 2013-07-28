@@ -57,6 +57,16 @@
 			<span class="B_order_num">运单号：{{.Order.DeliveryTrackingNumber}}</span>
           </div>
         </div>
+
+        <div class="unit">
+          <div class="tit"><strong>合计</strong></div>
+          <div class="B_express">
+            <span>{{.Order.TotalPrice}}</span> + 
+            <span>{{.Order.ExpressFee}}</span> =
+            <span class="price">{{.Order.SumOrderPrice}}</span>
+          </div>
+        </div>
+        
 		<div class="unit">
           <div class="tit"><strong>订单备注</strong></div>
 		  <div class="B_order_remark">
