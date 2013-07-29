@@ -145,6 +145,10 @@ func (order *Order) DeliveryMethodIs(deliveryMethod string) bool {
 	return deliveryMethod == order.DeliveryMethod
 }
 
+func (order *Order) TypeIs(t uint) bool {
+	return order.Type == t
+}
+
 func (order *Order) HasAccumulated() bool {
 	return order.Accumulated > 0
 }

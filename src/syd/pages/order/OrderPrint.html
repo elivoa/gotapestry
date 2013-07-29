@@ -24,7 +24,7 @@
 
     <div class="container">
 
-      {{t_layout_leftnav $ "CurPage" `/order/create`}}
+      {{t_layout_leftnav $ "CurPage" `/order/list`}}
 
       <div class="main_content">
     	<h1>打印订单</h1>
@@ -113,10 +113,13 @@
               </div>
               {{end}}
               
-              {{if .Order.HasAccumulated }} <div>
+              {{if .Order.HasAccumulated }}
+              <div>
                 累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
                 = <span class="underline"></span>元
-              </div> {{end}}
+              </div>
+              {{end}}
+              
             </div>
             
           </div>

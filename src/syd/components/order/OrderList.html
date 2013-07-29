@@ -42,7 +42,11 @@
                    value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
           </td>
           <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
-          <td nowrap><a href="/order/view/{{.TrackNumber}}">{{.TrackNumber}}</a></td>
+          <td nowrap>
+            <a href="{{$.ViewLink .}}">
+              {{if .TypeIs 1}}D{{end}}{{.TrackNumber}}
+            </a>
+          </td>
           <td>
             {{if .IsStatus "todeliver"}}
             <strong class="price">{{.TotalPrice}}</strong>
@@ -61,7 +65,7 @@
             
             {{if .IsStatus "todeliver"}}
             <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-            <a href="/order/print/{{.TrackNumber}}">打印订单</a><span class="vline">|</span>
+            <a href="{{$.PrintOrderLink .}}" target="_blank">打印订单</a><span class="vline">|</span>
             {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
             <span class="vline">|</span>
             <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
@@ -73,17 +77,13 @@
             {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
             {{end}}
 
-            
             {{if .IsStatus "canceled" "done"}}
-            <a href="/order/view/{{.TrackNumber}}">查看订单</a>
+            <a href="{{$.ViewLink .}}">查看订单</a>
             {{end}}
-
 
             <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
             <span class="vline">|</span>
             <a href="/order/list.orderlist.delete/{{.TrackNumber}}">[喜小乐可以删除订单]</a>
-            [{{.Type}}]
-            
           </td>
         </tr>
         {{end}}
@@ -92,12 +92,12 @@
 
 
       <script type="text/javascript">
-             $(function(){
-               orderlist = new OrderList({
-                 ClientId: {{.ClientId}}
-               })
-             });
-             </script>
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+      </script>
 
     </div>
   </body>

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Sunday, 2013-07-28 00:06:13>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Monday, 2013-07-29 00:27:03>
 */
 package lifecircle
 
@@ -63,7 +63,7 @@ func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
 			// 		return true
 			// 	}
 			// 	debuglog("-900- [route:return] parse template '%v'", tname)
-			// 	lcc.return_template(tname)
+			// 	lcc.TemplateName = tname
 
 			case "text":
 				debuglog("-902- [route:return] return plain string")

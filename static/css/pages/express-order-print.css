@@ -1,5 +1,10 @@
 @charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
 html,body{margin:0;padding:0;font-size:12pt;font-family:"SimSun";}
 .Prnt_all{border:1px solid #ccc;background:#eee;}
 .Prnt_name{width:18mm;}
 .Prnt_area{width:28mm;}
+.toolbar{top:0;left:0;position:absolute;z-index:99;width:100%;background:rgba(0,0,0,.9);height:73px;color:#fff;}
+.toolbar .t{margin:5px;font-size:14px;border-bottom:1px dashed rgba(255,255,255,.4);padding-bottom:5px;}
+.toolbar .b{margin:5px;font-size:12px;}

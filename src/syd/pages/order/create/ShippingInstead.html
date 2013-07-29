@@ -20,7 +20,9 @@
 
         <div class="B_tbl_agent">
 		  <div class="B_btn_print">
+            {{if not .ReadonlyMode}}
             <a class="btn_a_s" href="{{.CreateSubOrderLink}}">新建代发信息</a>
+            {{end}}
           </div>
           <table class="tbl_main">
             <tr>
@@ -66,10 +68,12 @@
                   <!-- <strong class="price">{{.TotalPrice | prettycurrency}}</strong> -->
                 </td>
 				<td valign="top"><div class="B_sub_info">{{.Note}}</div></td>
+                
 				<td valign="top" nowrap rowspan="{{len $order.Details}}">
                   <a href="{{$.EditLink $order}}">编辑</a><span class="vline">|</span>
 
-                  <a href="#">打印快递单</a>
+                  <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}"
+                     target="_blank">打印快递单</a>
 
                   {{/* 发货 */}}
                   {{t_order_deliverbutton $ "tid" `deliverButton` "TrackNumber" $order.TrackNumber "DeliveryMethod" $order.DeliveryMethod "DeliveryTrackingNumber" $order.DeliveryTrackingNumber "ExpressFee" $order.ExpressFee "Source" $.ThisPage}}
@@ -128,8 +132,10 @@
 		  </div>
           
           <div class="btn_content">
+            {{if not .ReadonlyMode}}
             <input type="submit" class="btn_a_l" value="确认代发订单">
-            <a class="btn_b_l" href="#">打印订单</a>
+            {{end}}
+            <a href="/order/list" class="btn_a_l">返回订单列表</a>
           </div>
         </form>
         

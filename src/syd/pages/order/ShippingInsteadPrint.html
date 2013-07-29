@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    {{t_layout_header $ "Title" `打印代发订单` }}
+    <script language="javascript" src="/static/js/LodopFuncs.js"></script>
+    <script language="javascript" src="/static/js/instead-print.js"></script>
+    <object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width="0" height="0"> 
+      <embed id="LODOP_EM" type="application/x-print-lodop" width="0" height="0"></embed>
+    </object>
+    
+  </head>
+  <body class="PG_create_order">
+
+    {{t_layout_headernav $}}
+
+    <div class="container">
+
+      {{t_layout_leftnav $ "CurPage" `/order/list`}}
+
+      <div class="main_content">
+    	<h1>打印代发订单</h1>
+        <div class="print_instead_order" id="instead">
+		  <table class="tbl_instead_order">
+			<thead>
+			  <tr>
+				<th colspan="4">代发货清单</th>
+			  </tr>
+			</thead>
+			<tr>
+			  <td colspan="4">
+				<div class="prt_tit">
+				  <span>代发单位：{{.Customer.Name}}</span>
+				  <span>日期：{{.Order.CreateTime | formattime "2006-01-02"}}</span>
+				  <span>订单号：{{.Order.TrackNumber}}</span>
+				</div>
+			  </td>
+			</tr>
+            
+            {{range $order := .SubOrders}}
+			<tr>
+			  <td class="address" colspan="4">{{.ShippingAddress}}</td>
+			</tr>
+            {{range $order.Details}}
+			<tr>
+			  <td width="1%" nowrap class="name">{{$.ShowProductName .ProductId}}</td>
+			  <td width="1%" nowrap>{{.Color}} {{.Size}}</td>
+			  <td width="1%" nowrap> *{{.Quantity}} </td>
+			  <td>{{.SellingPrice}}元</td>
+			</tr>
+            {{end}}
+			<tr>
+              <td class="hr" colspan="4">
+                <span>订单件数：{{$order.TotalCount}}件</span>
+                <span>运单号：{{$order.DeliveryTrackingNumber}}（{{$order.DeliveryMethod}}）</span>
+                <span>运费：{{$order.ExpressFee}}元</span>
+                订单合计：<strong>{{$order.SumOrderPrice}}元</strong>
+              </td>
+            </tr>
+            {{end}}
+
+			<tr>
+			  <td class="total" colspan="4">
+				<span>总计代发订单：{{len $.SubOrders}}个</span>
+				<span>总计代发件数：{{$.Order.TotalCount}}件</span>
+				<span>总计金额：{{$.Order.TotalPrice}}元（含运费）</span>
+			  </td>
+			</tr>
+		  </table>
+        </div>
+        <div class="btn_content">
+          <a class="btn_a_l" href="/order/list">返回订单列表</a>
+          <a class="btn_b_l" href="javascript:printOrder();">打印订单</a>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
+<script type="text/javascript">
+  $(function(){
+  op  = new OrderPrint()
+  op.setData({{.ProductDetailJson}})
+  });
+</script>
+

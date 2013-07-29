@@ -27,7 +27,8 @@ type ShippingInstead struct {
 	SubOrders []*model.Order // Sub orders
 	Customer  *model.Customer
 
-	SourceUrl string `query:"source"` // redirect url
+	SourceUrl    string `query:"source"`   // redirect url
+	ReadonlyMode bool   `query:"readonly"` // hide edit button.
 
 	// caches
 	productcache map[int]*model.Product

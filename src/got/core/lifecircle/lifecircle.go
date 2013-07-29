@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2013-07-27 10:51:22>
+   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2013-07-29 00:26:52>
 */
 
 package lifecircle
@@ -48,9 +48,10 @@ type LifeCircleControl struct {
 	EventName string        // an event call on page, not page render
 
 	// result type:[template|redirect]
-	ResultType string // returns manually. if empty, find default tempalte
-	String     string // component html
-	Err        error  // error if something error. TODO change to MultiError.
+	ResultType   string // returns manually. if empty, find default tempalte
+	// TemplateName string // customized template name // not used
+	String       string // component html
+	Err          error  // error if something error. TODO change to MultiError.
 }
 
 // TODO kill this

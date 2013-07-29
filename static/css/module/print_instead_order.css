@@ -1,0 +1,13 @@
+@charset "utf-8";
+.print_instead_order{border:1px solid #000;padding:10mm;}
+.tbl_instead_order{font-size:10pt;}
+.tbl_instead_order thead th{font-size:12pt;font-weight:bold;padding:0 0 2mm;}
+.tbl_instead_order .name{font-weight:bold;padding-left:10mm;}
+.tbl_instead_order td{padding:1mm;}
+.tbl_instead_order .hr{padding-bottom:3mm;}
+.tbl_instead_order .hr span{padding-right:8mm;}
+.tbl_instead_order .address{border-top:1px dashed #000;padding-top:3mm;}
+.tbl_instead_order .prt_tit{text-align:center;font-size:9pt;padding:0 0 1.5mm;}
+.tbl_instead_order .prt_tit span{display:inline-block;width:30%;}
+.tbl_instead_order .total{border-top:2px solid #000;font-size:12pt;}
+.tbl_instead_order .total span{padding-right:8mm;}
