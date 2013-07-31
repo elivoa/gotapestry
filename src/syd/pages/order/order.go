@@ -111,6 +111,8 @@ type ButtonSubmitHere struct {
 // **** important logic ****
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 1/2 update delivery informantion to order.
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................")
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
 		panic(err.Error())
@@ -128,6 +130,8 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 		panic(err.Error())
 	}
 
+	fmt.Println(">>>>>>>>>>>>>>>>>>>> update pesron......................")
+
 	// 2/2 update customer's AccountBallance
 	customer := personservice.GetPerson(order.CustomerId)
 	if customer == nil {
@@ -140,6 +144,8 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	if _, err = personservice.Update(customer); err != nil {
 		panic(err.Error())
 	}
+	fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
+
 	fmt.Println("_____ on deliver from devliver from --- success --- ")
 	return p.returnDispatch()
 }

@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-07-31 12:58:09>
+  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-07-31 18:52:59>
 */
 package transform
 
@@ -48,8 +48,12 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 	t.z = z
 	for {
 		tt := z.Next()
-		var ()
 
+		// after call something all tag is lowercased. but here with case.
+		zraw := z.Raw()
+		raw := make([]byte, len(zraw))
+		copy(raw[:], zraw[:])
+		var ()
 		switch tt {
 		case html.TextToken:
 			// here may contains {{ }}
@@ -57,15 +61,15 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 			if compressHtml {
 				t.b.Write(TrimTextNode(z.Raw())) // trimed spaces
 			} else {
-				t.b.Write(z.Raw())
+				t.b.Write(raw)
 			}
 		case html.StartTagToken:
 			if b := t.processStartTag(); !b {
-				t.b.Write(z.Raw())
+				t.b.Write(raw)
 			}
 		case html.SelfClosingTagToken:
 			if b := t.processStartTag(); !b {
-				t.b.Write(z.Raw())
+				t.b.Write(raw)
 			}
 		case html.EndTagToken:
 			k, _ := z.TagName()
@@ -73,7 +77,7 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 			case "range", "with", "if":
 				t.b.WriteString("{{end}}")
 			default:
-				t.b.Write(z.Raw())
+				t.b.Write(raw)
 			}
 		// case html.CommentToken:
 		// 	// ignore all comments
@@ -85,12 +89,8 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 				panic(z.Err().Error())
 			}
 		default:
-			t.b.Write(z.Raw())
+			t.b.Write(raw)
 		}
-
-		// Process the current token.
-		// fmt.Println(">> ", tt)
-		// fmt.Println(string(z.Text()))
 	}
 	return t
 }
