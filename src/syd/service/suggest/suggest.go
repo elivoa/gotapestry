@@ -1,3 +1,6 @@
+/**
+  Time-stamp: <[suggest.go] Elivoa @ Thursday, 2013-08-01 01:21:16>
+*/
 package suggest
 
 import (
@@ -11,10 +14,15 @@ import (
 	"sync"
 )
 
-var (
-	loaded = false
-	l      sync.Mutex
+const (
+	Customer = "customer"
+	Factory  = "factory"
+	Product  = "product"
 )
+
+var l sync.RWMutex
+var cache map[string][]*Item
+var loaded bool
 
 // var suggestCache
 type Item struct {
@@ -24,34 +32,31 @@ type Item struct {
 	Type        string
 }
 
-const (
-	Customer = "customer"
-	Factory  = "factory"
-	Product  = "product"
-)
-
-// a simple version, match
-var SuggestCache map[string][]*Item // type->[]Item
+func init() {
+	cache = make(map[string][]*Item, 10)
+}
 
 func EnsureLoaded() {
 	if loaded {
 		return
 	}
+	println("lock")
 	l.Lock()
 	if !loaded {
-		Load()
-		PrintAll()
+		load()
 		loaded = true
 	}
+	println("unlock")
 	l.Unlock()
+	PrintAll()
 }
 
 func IsLoaded() bool {
 	return loaded
 }
 
-func Load() {
-	SuggestCache = make(map[string][]*Item, 100)
+func load() {
+	cache = make(map[string][]*Item, 100)
 
 	persons, err := persondao.ListAll("customer")
 	// persons, err := personservice.ListCustomer()
@@ -60,7 +65,7 @@ func Load() {
 	} else {
 		debug.Log("[suggest] load %v customers.", len(persons))
 		personItems := make([]*Item, len(persons))
-		SuggestCache[Customer] = personItems
+		cache[Customer] = personItems
 		for i, person := range persons {
 			personItems[i] = &Item{
 				Id:          person.Id,
@@ -77,7 +82,7 @@ func Load() {
 	} else {
 		debug.Log("[suggest] load %v factories.", len(factories))
 		factoryItems := make([]*Item, len(factories))
-		SuggestCache[Factory] = factoryItems
+		cache[Factory] = factoryItems
 		for i, factory := range factories {
 			factoryItems[i] = &Item{
 				Id:          factory.Id,
@@ -94,7 +99,7 @@ func Load() {
 	// products := dal.ListProduct()
 	debug.Log("[suggest] load %v products.", len(products))
 	productItems := make([]*Item, len(products))
-	SuggestCache[Product] = productItems
+	cache[Product] = productItems
 	for i, product := range products {
 		productItems[i] = &Item{
 			Id:          product.Id,
@@ -113,50 +118,54 @@ func parseQuickText(text string) string {
 
 func Add(category string, text string, id int) {
 	EnsureLoaded()
-	l.Lock()
 	item := &Item{
 		Id:          id,
 		Text:        text,
 		QuickString: parseQuickText(text),
 	}
 
-	items, ok := SuggestCache[category]
+	println("lock")
+	l.Lock()
+	items, ok := cache[category]
 	if !ok {
-		items = []*Item{}
-		SuggestCache[category] = items
+		cache[category] = []*Item{item}
+	} else {
+		items = append(items, item)
+		cache[category] = items
 	}
-	items = append(items, item) // Performance?
-	SuggestCache[category] = items
+	println("unlock")
 	l.Unlock()
 }
 
 func Delete(category string, id int) {
 	EnsureLoaded()
+	println("lock")
 	l.Lock()
-	items, ok := SuggestCache[category]
+	items, ok := cache[category]
 	if !ok {
 		items = []*Item{}
-		SuggestCache[category] = items
+		cache[category] = items
 	}
 	for i := 0; i < len(items); i++ {
-		fmt.Println(i)
-		if items[i].Id == id {
+		if items[i] != nil && items[i].Id == id {
 			items[i] = nil
 			break
 		}
 	}
+	println("unlock")
 	l.Unlock()
 }
 
 func Update(category string, text string, id int) {
-	EnsureLoaded()
 	Delete(category, id)
 	Add(category, text, id)
 }
 
 func PrintAll() {
 	fmt.Println("------ Print All Suggest Items ---------------")
-	for key, value := range SuggestCache {
+	println("r-lock")
+	l.RLock()
+	for key, value := range cache {
 		fmt.Printf("> %v\n", key)
 		for i, item := range value {
 			if item == nil {
@@ -166,14 +175,17 @@ func PrintAll() {
 			}
 		}
 	}
-}
-
-func LookupAll(q string) *[]Item {
-	return nil
+	println("r-unlock")
+	l.RUnlock()
 }
 
 func Lookup(q string, category string) ([]*Item, error) {
-	items, ok := SuggestCache[category]
+
+	println("lookup r-lock")
+	l.RLock()
+	items, ok := cache[category]
+	println("lookup r-unlock")
+	l.RUnlock()
 	if !ok {
 		err := errors.New(fmt.Sprintf("Category '%v' not found.", category))
 		return nil, err
@@ -185,6 +197,8 @@ func Lookup(q string, category string) ([]*Item, error) {
 		filtered = make([]*Item, N, N)
 		found    = 0
 	)
+	println("r-lock")
+	l.RLock()
 	for _, item := range items {
 		if item == nil {
 			continue
@@ -198,6 +212,8 @@ func Lookup(q string, category string) ([]*Item, error) {
 			idx++
 		}
 	}
+	println("r-unlock")
+	l.RUnlock()
 	result := filtered[:found]
 	return result, nil
 }
