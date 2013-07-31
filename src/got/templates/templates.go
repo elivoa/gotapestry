@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-07-28 18:47:53>
+   Time-stamp: <[templates.go] Elivoa @ Tuesday, 2013-07-30 13:01:54>
 */
 package templates
 
@@ -35,7 +35,7 @@ func init() {
    template - when tempalte available and parse successful.
    nil      - when template not exists or error occurs.
 */
-func AddGOTTemplate_(key string, filename string) (*template.Template, error) {
+func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 
 	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
 
@@ -60,12 +60,11 @@ func AddGOTTemplate_(key string, filename string) (*template.Template, error) {
 
 	// transform
 	trans := transform.NewTransformer()
-	trans.Parse(r)
-	html := trans.RenderToString()
-	fmt.Println("--------------------------------------------------------------------------------------")
-	fmt.Println("------------------", filename, "--------------------------------------")
-	fmt.Println(html)
-	fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
+	html := trans.Parse(r).Render()
+	// fmt.Println("--------------------------------------------------------------------------------------")
+	// fmt.Println("------------------", filename, "--------------------------------------")
+	// fmt.Println(html)
+	// fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
 
 	// Old version uses filename as key, I make my own key. not
 	// filepath.Base(filename) First template becomes return value if
@@ -95,7 +94,7 @@ func AddGOTTemplate_(key string, filename string) (*template.Template, error) {
 	return tmpl, nil
 }
 
-func AddGOTTemplate(key string, filename string) (*template.Template, error) {
+func AddGOTTemplate__go_tempaltes_parser(key string, filename string) (*template.Template, error) {
 
 	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
 
@@ -131,6 +130,7 @@ func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 		tmpl = t.New(name)
 	}
 
+	// old
 	_, err = tmpl.Parse(html)
 	if err != nil {
 		return nil, err

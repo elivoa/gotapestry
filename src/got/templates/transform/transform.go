@@ -1,185 +1,263 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Sunday, 2013-07-28 18:51:50>
+  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-07-31 12:58:09>
 */
-
 package transform
 
 import (
 	"bytes"
-	"code.google.com/p/go-html-transform/h5"
 	"code.google.com/p/go.net/html"
 	"fmt"
 	"io"
-	"strings"
 )
 
 // ---- Transform template ------------------------------------------
 type Transformater struct {
-	tree        *h5.Tree
-	deleteQueue []*html.Node
+	nodes []*Node
+	b     bytes.Buffer
+	z     *html.Tokenizer
+}
+
+type Node struct {
+	text string
 }
 
 func NewTransformer() *Transformater {
-	return &Transformater{
-		deleteQueue: []*html.Node{},
-	}
+	return &Transformater{}
 }
 
-// Transform tempalte fiels. functions:
-// translate <t:some_component ... /> into {{t_some_component ...}}
+/*
+  Transform tempalte fiels. functions:
+  translate <t:some_component ... /> into {{t_some_component ...}}
+
+TODO:
+  . Support t:block
+  . Range Tag
+
+TODOs:
+---- 1 --------------------------------------------------------------------------------
+<div t:type="xx"... >some <b>bold text</b></div>
+ there will remaining: some meaningful text</div>
+ now I ignore these, TODO make this a block and render it.
+
+---- N --------------------------------------------------------------------------------
+*/
+var compressHtml bool = false
+
+func (t *Transformater) Parse(reader io.Reader) *Transformater {
+	z := html.NewTokenizer(reader)
+	t.z = z
+	for {
+		tt := z.Next()
+		var ()
+
+		switch tt {
+		case html.TextToken:
+			// here may contains {{ }}
+			// trim spaces?
+			if compressHtml {
+				t.b.Write(TrimTextNode(z.Raw())) // trimed spaces
+			} else {
+				t.b.Write(z.Raw())
+			}
+		case html.StartTagToken:
+			if b := t.processStartTag(); !b {
+				t.b.Write(z.Raw())
+			}
+		case html.SelfClosingTagToken:
+			if b := t.processStartTag(); !b {
+				t.b.Write(z.Raw())
+			}
+		case html.EndTagToken:
+			k, _ := z.TagName()
+			switch string(k) {
+			case "range", "with", "if":
+				t.b.WriteString("{{end}}")
+			default:
+				t.b.Write(z.Raw())
+			}
+		// case html.CommentToken:
+		// 	// ignore all comments
+		// // case html.DoctypeToken:
+		case html.ErrorToken:
+			if z.Err().Error() == "EOF" {
+				return t
+			} else {
+				panic(z.Err().Error())
+			}
+		default:
+			t.b.Write(z.Raw())
+		}
+
+		// Process the current token.
+		// fmt.Println(">> ", tt)
+		// fmt.Println(string(z.Text()))
+	}
+	return t
+}
+
+// processing every start tag()
+// return
+//   - true if already write to buffer.
+//   - false if need to write Raw() to buffer.
 //
-func (t *Transformater) Parse(reader io.Reader) error {
-	t.tree, _ = h5.New(reader)
+func (t *Transformater) processStartTag() bool {
+	bname, hasAttr := t.z.TagName()
 
-	// 1. read import node.
-	t.tree.Walk(func(n *html.Node) {
-		text := strings.TrimSpace(n.Data)
+	var (
+		iscomopnent   bool
+		componentName []byte
+		elementName   []byte
+	)
+	if len(bname) >= 2 && bname[0] == 't' && bname[1] == ':' {
+		iscomopnent = true
+		componentName = bname[2:]
+	}
 
-		fmt.Printf("---- %v ---- %v\n", n.Type, text)
-
-		if n.Type == html.ElementNode {
-			if strings.HasPrefix(n.Data, "t:") {
-				cmd := n.Data[2:]
-				switch cmd {
-				case "import":
-					t.replaceNode(n, nil) // remove node
-				default:
-					// components
-					componentText := transformComponent(cmd, n)
-					t.replaceNode(n, UnescapedText(componentText))
-				}
+	var attrs map[string][]byte
+	// var attrs [][][]byte
+	if hasAttr {
+		attrs = map[string][]byte{}
+		for {
+			key, val, more := t.z.TagAttr()
+			if len(key) == 6 && bytes.Equal(key, []byte("t:type")) {
+				iscomopnent = true
+				componentName = val
+				elementName = bname
+				// ignore t:type attr
+			} else {
+				attrs[string(key)] = val // = append(attrs, [][]byte{key, val})
+			}
+			if !more {
+				break
 			}
 		}
-		if n.Type == html.TextNode {
-			if text != "" {
-				// fmt.Printf(" %v: %v  Data: %v\n", n.DataAtom, n.Namespace, text)
-				// print node
-				// str := RenderNodesToString([]*html.Node{n})
-				// fmt.Println("---- ", str)
+	}
+	if iscomopnent {
+		t.transformComponent(componentName, elementName, attrs)
+		return true
+	}
+
+	// --------------------------------------------------------------------------------
+	// not a component, process if tag is command
+	switch string(bname) {
+	case "range":
+		t.renderRange(attrs)
+		return true
+	case "if":
+		t.renderIf(attrs)
+		return true
+	case "else":
+		t.b.WriteString("{{else}}")
+		return true
+	default:
+		return false
+	}
+}
+
+func (t *Transformater) renderRange(attrs map[string][]byte) {
+	t.b.WriteString("{{range ")
+	if nil != attrs {
+		if _var, ok := attrs["var"]; ok {
+			t.b.Write(_var)
+			t.b.WriteString(":=")
+		}
+		if source, ok := attrs["source"]; ok {
+			t.b.Write(source)
+		}
+	}
+	t.b.WriteString("}}")
+}
+
+func (t *Transformater) renderIf(attrs map[string][]byte) {
+	t.b.WriteString("{{if ")
+	if nil != attrs {
+		var (
+			_var []byte
+			ok   bool
+		)
+		if _var, ok = attrs["t"]; !ok {
+			if _var, ok = attrs["test"]; !ok {
+				panic("`If` must have attribute test or t!")
 			}
 		}
-	})
-
-	t.deleteQueueNodes() // delete node here.
-
-	return nil
-}
-
-func (t *Transformater) replaceNode(node *html.Node, newNode *html.Node) {
-	if newNode != nil {
-		node.Parent.InsertBefore(newNode, node)
+		t.b.Write(_var)
 	}
-	// node.Parent.RemoveChild(node) // remove later
-	t.deleteQueue = append(t.deleteQueue, node)
+	t.b.WriteString("}}")
 }
 
-func (t *Transformater) deleteQueueNodes() {
-	for _, node := range t.deleteQueue {
-		node.Parent.RemoveChild(node)
+func (t *Transformater) transformComponent(componentName []byte, elementName []byte,
+	attrs map[string][]byte) {
+
+	t.b.WriteString("{{t_")
+	t.b.Write(componentName)
+	t.b.WriteString(" $")
+
+	// elementName
+	if elementName != nil {
+		t.b.WriteString(" \"elementName\" `")
+		t.b.Write(elementName)
+		t.b.WriteString("`")
 	}
-}
 
-// ---- Transformation ------------------------------------------
+	if attrs != nil {
+		for key, val := range attrs {
+			// write key, all capitlize
+			t.b.WriteString(" \"")
+			t.b.WriteString(key)
+			// t.b.WriteString(strings.ToUpper(string(attr[0][0:1])))
+			// t.b.Write(attr[0][1:])
+			t.b.WriteString("\" ")
 
-// replace node, return node to remove.
-
-// name is component lookup key
-func transformComponent(name string, n *html.Node) string {
-	fmt.Println("---- Transform Componnet [", name, "] ------------------------")
-
-	var t bytes.Buffer
-	t.WriteString("{{t_") // prefix
-	t.WriteString(name)   // component lookup key
-	t.WriteString(" $ ")  // the first parameter, context
-
-	for _, attr := range n.Attr {
-		// key:
-		t.WriteString(" \"")
-		t.WriteString(strings.ToUpper(attr.Key[0:1]))
-		t.WriteString(attr.Key[1:])
-		t.WriteString("\" ")
-
-		// Value transform: for name="_some_value_", we transform it into:
-		//   ~ before ~           ~ after ~             ~ note ~
-		//   ".Name"              .Name                // start form . or $
-		//   "literal:....."      "...."               // literal prefix
-		//	 "abcd"               "abcd"               // auto detect plan text
-		//	 ".Name+'_'+.Id"      (print .Name '_' .Id)// special
-		//
-		//   TODO support more prefix...
-		//
-		// if value starts from . or $ , treate this as property. others as string
-		if strings.HasPrefix(attr.Val, ".") || strings.HasPrefix(attr.Val, "$") ||
-			strings.HasPrefix(attr.Val, "(") {
-			t.WriteString(attr.Val)
-		} else if strings.HasPrefix(attr.Val, "print ") {
-			t.WriteString("(")
-			t.WriteString(attr.Val[5:])
-			t.WriteString(")")
-		} else if strings.HasPrefix(attr.Val, "literal:") {
-			t.WriteString(" `")
-			t.WriteString(attr.Val[8:])
-			t.WriteString("`")
-		} else { // default
-			t.WriteString(attr.Val)
-			// // if no space, this is literal.
-			// if strings.Contains(attr.Val, " ") {
-			// 	t.WriteString(attr.Val)
-			// } else {
-			// 	t.WriteString(" `")
-			// 	t.WriteString(attr.Val)
-			// 	t.WriteString("`")
-			// }
+			// TODO: Auto-detect literal or functional
+			// Value transform: for name="_some_value_", we transform it into:
+			//   ~ before ~           ~ after ~             ~ note ~
+			//   ".Name"              .Name                // start form . or $
+			//   "literal:....."      "...."               // literal prefix
+			//	 "abcd"               "abcd"               // auto detect plan text
+			//	 ".Name+'_'+.Id"      (print .Name '_' .Id)// special
+			//
+			//   TODO support more prefix...
+			//
+			// if value starts from . or $ , treate this as property. others as string
+			if len(val) > 0 && (val[0] == '.' || val[0] == '$' || val[0] == '(') {
+				t.b.Write(val)
+			} else if len(val) > 5 && bytes.Equal(val[0:5], []byte("print")) {
+				t.b.WriteString("(")
+				t.b.Write(val)
+				t.b.WriteString(")")
+			} else if len(val) > 8 && bytes.Equal(val[0:8], []byte("literal:")) {
+				t.b.WriteString(" \"")
+				t.b.Write(bytes.Replace(val[8:], []byte{'"'}, []byte{'\\', '"'}, 0))
+				t.b.WriteString("\"")
+			} else { // default
+				t.b.WriteString(" \"")
+				t.b.Write(bytes.Replace(val, []byte{'"'}, []byte{'\\', '"'}, 0))
+				t.b.WriteString("\"")
+			}
 		}
 	}
-	t.WriteString("}}")
-	return t.String()
+	t.b.WriteString("}}")
 }
 
-func writeFunctionalValue(t bytes.Buffer, value string) {
-	fmt.Println(">>>> ", value)
-	t.WriteString(value)
+func (t *Transformater) Render() string {
+	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println(t.b.String())
+	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+++")
+	return t.b.String()
 }
 
-func writePrintValue(t bytes.Buffer, value string) {
-	t.WriteString("(")
-	t.WriteString(value)
-	t.WriteString(")")
-}
+// ---- utils --------------------------------------------------------------------------------
 
-func writeLiteralValue(t bytes.Buffer, value string) {
-	t.WriteString(" `")
-	t.WriteString(value)
-	t.WriteString("`")
-
-}
-
-// ---- Render Nodes to html ------------------------------------------
-
-func (t *Transformater) RenderToString() string {
-	return t.RenderNodesToString([]*html.Node{t.tree.Top()})
-}
-
-func (t *Transformater) RenderNodesToString(ns []*html.Node) string {
-	buf := bytes.NewBufferString("")
-	RenderNodes(buf, ns)
-	return string(buf.Bytes())
-}
-
-func RenderNodes(w io.Writer, ns []*html.Node) error {
-	for _, n := range ns {
-		err := Render(w, n)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// create unescaped text node
-func UnescapedText(str string) *html.Node {
-	return &html.Node{
-		Data: str,
-		Type: html.TextNode,
-	}
+// TODO trim node function not finished.
+func TrimTextNode(text []byte) []byte {
+	// var (
+	// 	addSpaceLeft    bool = false
+	// 	addSpaceRight   bool = false
+	// 	addNewLineLeft  bool = false
+	// 	addNewLineRight bool = false
+	// )
+	// for _, b := range bytes {
+	// 	// if b
+	// }
+	return bytes.Trim(text, " ")
 }
