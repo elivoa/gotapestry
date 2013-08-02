@@ -6,11 +6,11 @@ package order
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 )
 
 func init() {
-	register.Component(Register, &OrderProductSelector{})
+	route.Component(Register, &OrderProductSelector{})
 }
 
 type OrderProductSelector struct {

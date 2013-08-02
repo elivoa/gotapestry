@@ -22,11 +22,24 @@ const (
 type OrderStatus uint
 
 const (
-	ToDeliver OrderStatus = iota
+	ToPrint   OrderStatus = iota // new order
+	ToDeliver                    //
 	Delivering
 	Done
 	Canceled
 )
+
+/*________________________________________________________________________________
+  Order Status DisplayMap
+  TODO: a better place to show this?
+*/
+var OrderStatusDisplayMap = map[string]string{
+	"toprint":    "待打印",  // 新订单默认状态， 等待打印
+	"todeliver":  "待发货",  // 大货订单打印之后进入代发货状态，代发订单进入正在发货状态
+	"delivering": "正在发货", // 打印订单之后，转为发货状态。并且取快照状态的累计欠款
+	"done":       "已完成",  // 完成订单。
+	"canceled":   "已取消",  // 已取消订单，累计欠款不显示。
+}
 
 // ________________________________________________________________________________
 // Order 的Status 涉及到累计欠款，因此状态绝对不能乱改。必须严格按照流程走。
@@ -79,7 +92,7 @@ type OrderDetail struct {
 func NewOrder() *Order {
 	order := &Order{
 		TrackNumber: GenerateOrderId(),
-		Status:      "todeliver",
+		Status:      "toprint",
 		CreateTime:  time.Now(),
 	}
 	order.Details = []*OrderDetail{
@@ -131,8 +144,11 @@ func (order *Order) CalculateOrder() {
 }
 
 // ----  Show Helper  ----------------------------------------------------------------------------
-
 func (order *Order) IsStatus(status ...string) bool {
+	return order.StatusIs(status...)
+}
+
+func (order *Order) StatusIs(status ...string) bool {
 	for _, s := range status {
 		if s == order.Status {
 			return true
@@ -181,15 +197,4 @@ func (d *OrderDetail) TotalPrice() float64 {
 func (d *OrderDetail) String() string {
 	return fmt.Sprintf("OrderDetail(%v), TN:%v, Product:%v_%v_%v quantity:%v, Note:[%v]",
 		d.Id, d.OrderTrackNumber, d.ProductId, d.Color, d.Size, d.Quantity, d.Note)
-}
-
-/*________________________________________________________________________________
-  Order Status DisplayMap
-  TODO: a better place to show this?
-*/
-var OrderStatusDisplayMap = map[string]string{
-	"todeliver":  "待发货",  // 新订单默认状态
-	"delivering": "正在发货", // 打印订单之后，转为发货状态。并且取快照状态的累计欠款
-	"done":       "已完成",  // 完成订单。
-	"canceled":   "已取消",  // 已取消订单，累计欠款不显示。
 }

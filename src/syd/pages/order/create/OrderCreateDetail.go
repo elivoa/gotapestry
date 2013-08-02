@@ -37,6 +37,7 @@ type OrderCreateDetail struct {
 	SubmitButton string // 确认下单？ 修改订单
 }
 
+// init page
 func (p *OrderCreateDetail) Setup() {
 	if p.Id == nil && p.CustomerId == 0 {
 		panic("Can't find order to edit!")
@@ -49,7 +50,7 @@ func (p *OrderCreateDetail) Setup() {
 		if err != nil {
 			panic(err.Error())
 		}
-		if !order.IsStatus("todeliver") {
+		if !order.IsStatus("toprint") {
 			panic(fmt.Sprintf("Order are not allow to edit in this status[%v]", order.Status))
 		}
 
@@ -66,8 +67,6 @@ func (p *OrderCreateDetail) Setup() {
 	}
 
 	// set order type; trick: no set is 0, 0 is default Wholesale type.
-	fmt.Println("````````````````````````````````````````````````````````````````````````````````")
-	fmt.Println(p.Type)
 	p.Order.Type = p.Type
 	p.Order.ParentTrackNumber = p.ParentTrackNumber
 	// init person
@@ -94,7 +93,7 @@ func (p *OrderCreateDetail) OnSubmit() {
 	}
 }
 
-// after submit
+// after inject values, do submit.
 func (p *OrderCreateDetail) OnSuccess() (string, string) {
 	// order, update details
 	for _, detail := range p.Order.Details {
@@ -105,8 +104,8 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 		p.Order.ExpressFee = -1
 	}
 
-	// set new & edited order's status to 'todeliver'
-	p.Order.Status = "todeliver"
+	// set new & edited order's status.
+	p.Order.Status = "toprint"
 
 	// update
 	if p.Id != nil {
@@ -117,7 +116,7 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 
 	// return source?
 	if p.SourceUrl == "" {
-		return "redirect", fmt.Sprintf("/order/print/%v", p.Order.TrackNumber)
+		return "redirect", "/order/list/toprint"
 	} else {
 		return "redirect", p.SourceUrl
 	}

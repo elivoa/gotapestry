@@ -1,11 +1,11 @@
 package components
 
 import (
-	"got/register"
+	"got/route"
 )
 
 func Register() {} // Used to locate package, any better approach?
 
 func init() {
-	register.Component(Register, &SuggestControl{}, &OrderDetailsEditor{})
+	route.Component(Register, &SuggestControl{}, &OrderDetailsEditor{})
 }

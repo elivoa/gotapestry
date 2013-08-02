@@ -2,12 +2,12 @@ package order
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 	"syd/model"
 )
 
 func init() {
-	register.Component(Register, &CustomerInfo{})
+	route.Component(Register, &CustomerInfo{})
 }
 
 // --------  Customer Info BLock  -----------------------------------------------------------------------

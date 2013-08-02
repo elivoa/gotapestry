@@ -2,14 +2,14 @@ package product
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 	"syd/model"
 	"syd/service/productservice"
 )
 
 func Register() {}
 func init() {
-	register.Component(Register, &ProductColorSizeTable{})
+	route.Component(Register, &ProductColorSizeTable{})
 }
 
 // ________________________________________________________________________________

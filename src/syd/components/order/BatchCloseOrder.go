@@ -2,11 +2,11 @@ package order
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 )
 
 func init() {
-	register.Component(Register, &BatchCloseOrder{})
+	route.Component(Register, &BatchCloseOrder{})
 }
 
 type BatchCloseOrder struct {

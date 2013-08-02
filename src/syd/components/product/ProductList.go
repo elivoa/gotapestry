@@ -3,7 +3,6 @@ package product
 import (
 	"got/core"
 	"got/debug"
-	"got/register"
 	"got/route"
 	"syd/dal"
 	"syd/model"
@@ -11,7 +10,7 @@ import (
 )
 
 func init() {
-	register.Component(Register, &ProductList{})
+	route.Component(Register, &ProductList{})
 }
 
 type ProductList struct {

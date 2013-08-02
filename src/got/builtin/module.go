@@ -15,8 +15,10 @@ import (
 
 	// components import
 	c_builtin "got/builtin/components"
+	"got/core"
 )
 
+// todo change this.
 func GotBuiltinModule(r *mux.Router) {
 
 	//
@@ -42,4 +44,23 @@ func GotBuiltinModule(r *mux.Router) {
 	//
 	r.HandleFunc("/got/fileupload/", p_fileupload.FU)
 
+}
+
+// --------------------------------------------------------------------------------
+// TODO Make this presents like this:
+
+type BuiltinModule struct {
+	core.Module
+}
+
+func (m *BuiltinModule) Pages() {
+	// TODO ...
+}
+
+func (m *BuiltinModule) Components() {
+	// TODO ...
+}
+
+func (m *BuiltinModule) Mixins() {
+	// TODO ...
 }

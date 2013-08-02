@@ -15,7 +15,7 @@ import (
 
 // join two part of url.
 // TODO performance here is bad. design is bad.
-func makeUrl(f func(), p interface{}) string {
+func MakeUrl(f func(), p interface{}) string {
 	fName := GetFunctionName(f)
 	prefix := fName[:strings.LastIndex(fName, ".")]
 	suffix := reflect.TypeOf(p).String()

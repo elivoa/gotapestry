@@ -17,6 +17,10 @@ func ListOrder(status string) ([]*model.Order, error) {
 	return orderdao.ListOrder(status)
 }
 
+func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, error) {
+	return orderdao.ListOrderByType(orderType, status)
+}
+
 func CreateOrder(order *model.Order) error {
 	_processOrderCustomerPrice(order)
 	_calculateOrder(order)

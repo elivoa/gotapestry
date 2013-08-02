@@ -1,7 +1,7 @@
 package components
 
 import (
-	"got/register"
+	"got/route"
 )
 
 func Register() {
@@ -9,5 +9,5 @@ func Register() {
 }
 
 func init() {
-	register.Component(Register, &Select{}, &ProvinceSelect{})
+	route.Component(Register, &Select{}, &ProvinceSelect{})
 }

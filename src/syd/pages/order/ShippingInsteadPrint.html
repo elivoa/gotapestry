@@ -69,7 +69,7 @@
 		  </table>
         </div>
         <div class="btn_content">
-          <a class="btn_a_l" href="/order/list">返回订单列表</a>
+          <a class="btn_a_l" href="/order/list/delivering">返回订单列表</a>
           <a class="btn_b_l" href="javascript:printOrder();">打印订单</a>
         </div>
       </div>
@@ -79,8 +79,8 @@
 </html>
 <script type="text/javascript">
   $(function(){
-  op  = new OrderPrint()
-  op.setData({{.ProductDetailJson}})
+    op  = new OrderPrint()
+    op.setData({{.ProductDetailJson}})
   });
 </script>
 

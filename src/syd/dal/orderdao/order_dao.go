@@ -238,6 +238,17 @@ func ListOrder(status string) ([]*model.Order, error) {
 	return _listOrder(query)
 }
 
+func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, error) {
+	var query *db.QueryParser
+	if status == "all" {
+		query = em.Select().Where().And("type", orderType).OrderBy("create_time desc")
+	} else {
+		query = em.Select().
+			Where("status", status).And("type", orderType).OrderBy("create_time desc")
+	}
+	return _listOrder(query)
+}
+
 func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
 	orders := make([]*model.Order, 0)
 	if err := query.Query(

@@ -17,7 +17,9 @@
 
         <div class="tips_content tips_content_b">
           <span class="icon_warning"></span>
-          {{if .Order.IsStatus "todeliver"}}
+          {{if .Order.IsStatus "toprint"}}
+          <strong>待发货订单，</strong>新订单，待打印。打印之后变成待发货发货状态！
+          {{end}} {{if .Order.IsStatus "todeliver"}}
           <strong>待发货订单，</strong>商品等待发货，累计欠款为当前该客户欠款，你还可以修改订单。发货后状态锁定！
           {{end}} {{if .Order.IsStatus "delivering"}}
           <strong>已发货订单，</strong>商品已经发出，订单详情页为该订单快照，累计欠款及商品单价为订单创建时的状态！

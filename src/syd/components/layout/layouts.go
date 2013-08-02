@@ -2,12 +2,12 @@ package layout
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 )
 
 func Register() {}
 func init() {
-	register.Component(Register,
+	route.Component(Register,
 		&Header{}, &HeaderNav{}, &LeftNav{},
 	)
 }

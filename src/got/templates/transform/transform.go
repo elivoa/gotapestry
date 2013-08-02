@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-07-31 18:52:59>
+  Time-stamp: <[transform.go] Elivoa @ Thursday, 2013-08-01 21:49:56>
 */
 package transform
 
@@ -76,6 +76,8 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 			switch string(k) {
 			case "range", "with", "if":
 				t.b.WriteString("{{end}}")
+			case "hide":
+				t.b.WriteString("*/}}")
 			default:
 				t.b.Write(raw)
 			}
@@ -142,16 +144,16 @@ func (t *Transformater) processStartTag() bool {
 	switch string(bname) {
 	case "range":
 		t.renderRange(attrs)
-		return true
 	case "if":
 		t.renderIf(attrs)
-		return true
 	case "else":
 		t.b.WriteString("{{else}}")
-		return true
+	case "hide":
+		t.b.WriteString("{{/*")
 	default:
 		return false
 	}
+	return true
 }
 
 func (t *Transformater) renderRange(attrs map[string][]byte) {

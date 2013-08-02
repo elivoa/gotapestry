@@ -68,7 +68,7 @@ func (p *ShippingInstead) Setup() {
 	var totalCount int = 0
 	for _, so := range subOrders {
 		totalCount += so.TotalCount
-		totalPrice += so.SumOrderPrice()
+		totalPrice += so.TotalPrice //SumOrderPrice()
 		if so.ExpressFee > 0 {
 			totalExpressFee += so.ExpressFee
 		}

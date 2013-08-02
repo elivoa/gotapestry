@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Friday, 2013-08-02 14:28:01>
+  Time-stamp: <[cache.go] Elivoa @ Friday, 2013-08-02 14:27:58>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -55,13 +55,13 @@ type FieldInfo struct {
 	IsSlice bool // is this fields a slice type? Used in InjectFormValues.
 
 	// embed component
-	Tid string // if Kind is component, this is Tid, default component's name
+q	Tid string // if Kind is component, this is Tid, default component's name
 }
 
 // ________________________________________________________________________________
 // functions for StructInfo
 //
-
+p
 func (si *StructInfo) IsPage() bool {
 	return si.Kind == core.PAGE
 }

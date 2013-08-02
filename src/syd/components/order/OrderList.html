@@ -12,12 +12,12 @@
 
         <else t="-------------------------------" />
 
-        {{/* ----- 批量结款 ----- */}}
-        {{/* ------------------------------------------------------------------------------------
-        <div class="batch_content">
-          {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
-        </div>
-        ------------------------------------------------------------------------------------ */}}
+        <hide t="----- 批量结款 -----">
+          {{/* ------------------------------------------------------------------------------------
+          <div class="batch_content">
+            {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
+          </div>
+        </hide>
         
         <table class="tbl_main">
           <tr>
@@ -57,30 +57,43 @@
                 {{end}}
               </td>
               <td>{{.DisplayStatus }}</td>
-              <td nowrap>{{.CreateTime | beautytime}}</td>
+              <td nowrap>{{.CreateTime | formattime "2006-01-02"}}</td>
+              
+              <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
+
+                {{/* 
+                {{if .IsStatus "toprint"}} {{template "order-list-operator-toprint" .}} {{end}}
+                {{if .IsStatus "todeliver"}} {{template "order-list-operator-todeliver" .}} {{end}}
+                {{if .IsStatus "delivering"}} {{template "order-list-operator-delivering" .}} {{end}}
+                {{if .IsStatus "cancelled" "done"}} {{template "order-list-operator-cancelled" .}} {{end}}
+                */}}
                 
-                {{if .IsStatus "todeliver"}}
+                {{if .IsStatus "toprint"}}
                 <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-                <a href="{{$.PrintOrderLink .}}" target="_blank">打印订单</a><span class="vline">|</span>
-                {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
+                <a href="{{$.PrintOrderLink .}}"
+                   onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
                 <span class="vline">|</span>
-                <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
-                   onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
                 {{end}}
 
-                
+
+                {{if .IsStatus "todeliver"}}
+                <a href="{{$.FixPrintOrderLink .}}">打印订单</a>
+                <span class="vline">|</span>
+                {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
+                <span class="vline">|</span>
+                {{end}}
+
                 {{if .IsStatus "delivering"}}
                 {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
                 {{end}}
 
-                {{if .IsStatus "canceled" "done"}}
+                {{if .IsStatus "cancelled" "done"}}  
                 <a href="{{$.ViewLink .}}">查看订单</a>
                 {{end}}
 
-                <!-- <a href="/order/create/detail/{{.Id}}">[请喜小乐修改订单]</a> -->
-                <span class="vline">|</span>
-                <a href="/order/list.orderlist.delete/{{.TrackNumber}}">[喜小乐可以删除订单]</a>
+                <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}">[喜小乐可以删除订单]</a>
+                
               </td>
             </tr>
           </range>
@@ -88,13 +101,25 @@
       </if>
 
       <script type="text/javascript">
-  $(function(){
-    orderlist = new OrderList({
-      ClientId: {{.ClientId}}
-    })
-  });
-</script>
+              $(function(){
+                orderlist = new OrderList({
+                  ClientId: {{.ClientId}}
+                })
+              });
+      </script>
 
     </div>
   </body>
 </html>
+
+
+
+{{define "--------------" }}
+<a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
+<a href="{{$.PrintOrderLink .}}" target="_blank">打印订单</a><span class="vline">|</span>
+<a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+   onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+{{end}}
+
+
+

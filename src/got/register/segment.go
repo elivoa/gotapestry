@@ -21,9 +21,9 @@ type ProtonSegment struct {
 	Path     string                    // TODO: URL path; TODO use appconfig
 	Parent   *ProtonSegment            //
 	Children map[string]*ProtonSegment //
-	Src      string                    // source package, used to select app
 	Level    int                       // depth
 	Proton   core.Protoner             // Proton
+	Src      string                    // source package, used to select app
 
 	identity     string // cache identity
 	templatePath string // cache template path.

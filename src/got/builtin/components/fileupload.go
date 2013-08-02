@@ -8,13 +8,13 @@ package components
 
 import (
 	"got/core"
-	"got/register"
+	"got/route"
 	"path/filepath"
 )
 
 // func Register() {}
 func init() {
-	register.Component(Register, &FileUpload{})
+	route.Component(Register, &FileUpload{})
 }
 
 // ________________________________________________________________________________

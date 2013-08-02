@@ -14,7 +14,11 @@ import (
    Register all pages under /order
 */
 func init() {
-	register.Page(Register, &OrderList{}, &OrderIndex{}, &ButtonSubmitHere{}, &ViewOrder{})
+	register.Page(Register,
+		&OrderIndex{},
+		&OrderList{}, &ShippingInsteadList{},
+		&ButtonSubmitHere{}, &ViewOrder{},
+	)
 }
 func Register() {}
 
@@ -45,7 +49,7 @@ type OrderList struct {
 
 func (p *OrderList) Activate() {
 	if p.Tab == "" {
-		p.Tab = "todeliver" // default go in todeliver
+		p.Tab = "toprint" // default go in toprint
 	}
 }
 
@@ -88,6 +92,62 @@ func (p *OrderList) _onStatusEvent(trackNumber int64, status string, tab string)
 	return "redirect", "/order/list/" + tab
 }
 
+/* ________________________________________________________________________________
+   Order List
+*/
+type ShippingInsteadList struct {
+	core.Page
+
+	Orders []*model.Order
+	Tab    string `path-param:"1"`
+
+	// customerNames map[int]*model.Person // order-id -> customer names
+}
+
+func (p *ShippingInsteadList) Activate() {
+	if p.Tab == "" {
+		p.Tab = "todeliver" // default go in todeliver
+	}
+}
+
+func (p *ShippingInsteadList) SetupRender() {
+	orders, err := orderservice.ListOrderByType(model.ShippingInstead, p.Tab)
+	if err != nil {
+		panic(err.Error())
+	}
+	p.Orders = orders
+}
+
+func (p *ShippingInsteadList) TabStyle(tab string) string {
+	if strings.ToLower(p.Tab) == strings.ToLower(tab) {
+		return "cur"
+	}
+	return ""
+}
+
+// EVENT: cancel order.
+// TODO: put this on component.
+// TODO: return null to refresh the current page.
+func (p *ShippingInsteadList) OnCancelOrder(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "canceled", tab)
+}
+
+func (p *ShippingInsteadList) OnDeliver(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "delivering", tab)
+}
+
+func (p *ShippingInsteadList) OnMarkAsDone(trackNumber int64, tab string) (string, string) {
+	return p._onStatusEvent(trackNumber, "done", tab)
+}
+
+func (p *ShippingInsteadList) _onStatusEvent(trackNumber int64, status string, tab string) (string, string) {
+	err := orderservice.ChangeOrderStatus(trackNumber, status)
+	if err != nil {
+		panic(err.Error())
+	}
+	return "redirect", "/order/list/" + tab
+}
+
 // ________________________________________________________________________________
 // ________________________________________________________________________________
 // EVNET: Form submits here
@@ -109,6 +169,7 @@ type ButtonSubmitHere struct {
 }
 
 // **** important logic ****
+// TODO transaction.
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 1/2 update delivery informantion to order.
 
@@ -133,16 +194,19 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	fmt.Println(">>>>>>>>>>>>>>>>>>>> update pesron......................")
 
 	// 2/2 update customer's AccountBallance
-	customer := personservice.GetPerson(order.CustomerId)
-	if customer == nil {
-		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
-	}
-	customer.AccountBallance -= order.TotalPrice
-	if order.ExpressFee > 0 {
-		customer.AccountBallance -= float64(order.ExpressFee)
-	}
-	if _, err = personservice.Update(customer); err != nil {
-		panic(err.Error())
+	switch model.OrderType(order.Type) {
+	case model.Wholesale, model.SubOrder: //
+		customer := personservice.GetPerson(order.CustomerId)
+		if customer == nil {
+			panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+		}
+		customer.AccountBallance -= order.TotalPrice
+		if order.ExpressFee > 0 {
+			customer.AccountBallance -= float64(order.ExpressFee)
+		}
+		if _, err = personservice.Update(customer); err != nil {
+			panic(err.Error())
+		}
 	}
 	fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
 
