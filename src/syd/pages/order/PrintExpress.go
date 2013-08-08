@@ -13,24 +13,24 @@ func init() {
 // TODO!!: Doesn't support to inject to composed component.
 
 // this is base
-type printExpress struct {
+type PrintExpress struct {
 	core.Page
 	DeliveryMethod string `path-param:"1"`
 	Address        string `query:"address"`
 }
 
-func (p *printExpress) Setup() {
+func (p *PrintExpress) Setup() {
 
 }
 
 // --------------------------------------------------------------------------------
 type PrintExpressYTO struct {
-	printExpress
+	PrintExpress
 	Address string `query:"address"`
 }
 
 // --------------------------------------------------------------------------------
 type PrintExpressSF struct {
-	printExpress
+	PrintExpress
 	Address string `query:"address"`
 }

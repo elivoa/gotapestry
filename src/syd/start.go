@@ -1,74 +1,28 @@
+/*
+  Time-stamp: <[start.go] Elivoa @ Thursday, 2013-08-08 14:43:27>
+
+  Application Entrance: The New World starts here.
+
+  TODO: Remove this file. Start the application in another way.
+
+*/
 package syd
 
 import (
-	// pages & components' import
-	index_pages "syd/pages"
-	p_admin "syd/pages/admin"
-	p_api "syd/pages/api"
-	p_api_suggest "syd/pages/api/suggest"
-	person_pages "syd/pages/person"
-	product_pages "syd/pages/product"
-
-	pages_order "syd/pages/order"
-	pages_order_create "syd/pages/order/create"
-
-	syd_components "syd/components"
-	layout_components "syd/components/layout"
-	order_components "syd/components/order"
-	c_product "syd/components/product"
-
 	"fmt"
-	"github.com/gorilla/mux"
 	"got"
 	"got/config"
-	"got/register"
 )
 
+// Start collects all module information and call start the system.
+// Note: only pass module location here.
+// TODO make the system startup better.
 func Start() {
-	// welcome message
-	fmt.Println("syd > SYD Sales Manage System Starting...")
+	// Startup-1: register modules. (Do not do others)
+	config.Config.RegisterModulePath(SYDModule.Path(), "SYDModule")
 
-	g := got.Init()
-	g.Module(
-		sydModule,
-	)
-
-	welcome()
-
-	// start server
-	config.Config.ResourcePath = "/var/site/data/syd/pictures/"
-	g.StartServer(&got.GotConfig{
-		StaticResources: [][]string{
-			[]string{"/pictures/", "/var/site/data/syd/pictures/"},
-			[]string{"/static/", "../static/"},
-		},
-	})
-}
-
-// ________________________________________________________________________________
-// Register SYD GOT style pages.
-// TODO: How to automatically do this?
-//
-func sydModule(r *mux.Router) {
-	register.RegisterApp(
-		"syd",
-		"SYD Module",
-		"syd",
-	)
-
-	index_pages.Register()
-	person_pages.Register()
-	product_pages.Register()
-	p_api.Register()
-	p_api_suggest.Register()
-	p_admin.Register()
-	pages_order.Register()
-	pages_order_create.Register()
-
-	syd_components.Register()
-	layout_components.Register()
-	order_components.Register()
-	c_product.Register()
+	// start got
+	got.BuildStart()
 }
 
 func welcome() {
@@ -77,6 +31,7 @@ func welcome() {
 	fmt.Println("`  SYD Sale Management System (ALPHA 1)          `")
 	fmt.Println("`                                                `")
 	fmt.Println("``````````````````````````````````````````````````")
-	fmt.Printf("Server Started, Listen localhost:8080\n\n")
+	// TODO config the port.
+	fmt.Printf("Server Started, Listen localhost:%v\n\n", got.Config.Port)
 	// got.PrintRegistry()
 }

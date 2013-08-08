@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Friday, 2013-08-02 14:28:01>
+  Time-stamp: <[cache.go] Elivoa @ Monday, 2013-08-05 13:32:33>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -17,11 +17,19 @@ import (
 	"fmt"
 	"got/core"
 	"got/debug"
+	"got/parser"
 	"got/utils"
 	"reflect"
 	"strings"
 	"sync"
 )
+
+// --------------------------------------------------------------------------------
+// SourceInfo Cache.
+
+var SourceCache *parser.SourceInfo
+
+// --------------------------------------------------------------------------------
 
 var StructCache = NewCache() // PUBLIC
 

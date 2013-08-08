@@ -1,5 +1,5 @@
 pkg/*
 *.a
-
+.dropbox
 
 .DS_Store

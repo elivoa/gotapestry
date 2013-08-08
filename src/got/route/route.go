@@ -3,7 +3,7 @@ package route
 import (
 	"bytes"
 	"fmt"
-	"github.com/gorilla/mux"
+	"got/cache"
 	"got/core"
 	"got/core/lifecircle"
 	"got/debug"
@@ -24,9 +24,10 @@ var (
 
 // RouteHandler is responsible to handler all got request.
 func RouteHandler(w http.ResponseWriter, r *http.Request) {
-	url := "/" + mux.Vars(r)["url"]
+	url := r.URL.Path
 
 	// 1. skip special resources. TODO Expand to config.
+	// TODO better this
 	if url == "/favicon.ico" {
 		return
 	}
@@ -99,7 +100,7 @@ func handleReturn(lcc *lifecircle.LifeCircleControl, seg *register.ProtonSegment
 	if seg != nil && lcc.Err == nil && lcc.ResultType == "" {
 		// find default tempalte to return
 		identity, templatePath := seg.TemplatePath()
-		// debug.Log("-755- [TemplateSelect] %v -> %v", key, tplPath)
+		// debug.Log("-755- [TemplateSelect] %v -> %v", identity, templatePath)
 		if _, err := templates.GotTemplateCache.Get(identity, templatePath); err != nil {
 			lcc.Err = err
 		} else {
@@ -140,8 +141,8 @@ func printAccessFooter(r *http.Request) {
 
 func processPanic(err interface{}, r *http.Request) {
 	log.Print("xxxxxxxx  PANIC  xxxxxxxxxxxxx", yibaix)
-	log.Printf("x URL: %-109v x", r.URL.Path)
-	log.Printf("x panic: %-109v x", err)
+	log.Printf("x URL: %-80v x", r.URL.Path)
+	log.Printf("x panic: %-80v x", err)
 	log.Print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", yibaix)
 	fmt.Println("StackTrace >>")
 	rd.PrintStack()
@@ -152,21 +153,26 @@ var yibaix = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 // --------------------------------------------------------------------------------
 
-func Page(f func(), pages ...core.Pager) int {
-	return register.Page(f, pages...)
-}
+// ----  Register Proton  ----------------------------------------------------------------------------
 
-func Component(f func(), components ...core.Componenter) int {
-	for _, c := range components {
-		url := register.MakeUrl(f, c)
-		// TODO has space to improve.
-		selectors := register.Components.Add(url, c)
+func RegisterProton(pkg string, name string, modulePkg string, proton core.Protoner) {
+	si, ok := cache.SourceCache.StructMap[fmt.Sprintf("%v.%v", pkg, name)]
+	if !ok {
+		panic(fmt.Sprintf("struct info not found: %v.%v ", pkg, name))
+	}
+
+	switch proton.Kind() {
+	case core.PAGE:
+		register.Pages.Add(si, proton)
+	case core.COMPONENT:
+		selectors := register.Components.Add(si, proton)
 		for _, selector := range selectors {
 			lowerKey := strings.ToLower(strings.Join(selector, "/"))
 			templates.RegisterComponent(lowerKey, componentLifeCircle(lowerKey))
 		}
+	case core.MIXIN, core.STRUCT, core.UNKNOWN:
+		fmt.Println("........ [WARRNING...] Mixin not suported now!", si)
 	}
-	return len(components)
 }
 
 /* ________________________________________________________________________________
@@ -224,4 +230,9 @@ func handleComponentReturn(lcc *lifecircle.LifeCircleControl, seg *register.Prot
 	if lcc.Err != nil {
 		panic(lcc.Err.Error())
 	}
+}
+
+// TODO delete this files.
+func Component(f func(), components ...core.Componenter) int {
+	return 0
 }

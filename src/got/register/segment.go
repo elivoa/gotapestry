@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"got/config"
 	"got/core"
+	"got/parser"
 	"log"
 	"path/filepath"
 	"strings"
@@ -13,25 +14,40 @@ import (
 
 var conf = config.Config
 
-/* ________________________________________________________________________________
-   Segment, like a trie.
-*/
+// ProtonSegment is a tree like structure to hold path to Page/Component
+// 1. Support quick lookup to locate a page or component. (TODO need improve performance)
+// 2. Each kind of page has one ProtonSegment instance. (one path)
+// TODO
+//   - refactor this.
+//
 type ProtonSegment struct {
+	// as a tree node
 	Name     string                    // segment name
-	Path     string                    // TODO: URL path; TODO use appconfig
 	Parent   *ProtonSegment            //
 	Children map[string]*ProtonSegment //
 	Level    int                       // depth
-	Proton   core.Protoner             // Proton
-	Src      string                    // source package, used to select app
 
-	identity     string // cache identity
+	// TODO: Test Performance: New Method
+	//   - Test Perforance between `reflect new` and `native func call`
+	//   ? Use Generated New function (e.g. NewSomePage) to create new Page? Is This Faster?
+	Proton core.Protoner // The base proton segment. Create new one when installed.
+
+	// associated external resources.
+	ModulePackage string           // e.g. got/builtin, syd; used in init.
+	StructInfo    *parser.TypeInfo // from parser package
+	module        *Module          // associated Module
+
+	// caches
+	identity     string // cache identity, default the same name with StructName
 	templatePath string // cache template path.
 
-	// TODO cache structure info.
-	// TODO add pointer to proton?
+	// TODO - try the method that use use channel to lock.
+	// TODO - Use RWMutex lock
+	l sync.RWMutex
 
-	l sync.Mutex // TODO used to synchronized, use channel version to support multiwrite.
+	// TODO replace with typeinfo
+	// Path          string // ? TODO: URL path; TODO use appconfig
+	// Src           string // source package, used to select app
 }
 
 func (s *ProtonSegment) AddChild(seg *ProtonSegment) {
@@ -64,34 +80,46 @@ var identityPrefixMap = map[core.Kind]string{
 	core.MIXIN:     "x_",
 }
 
+// unique identity used as template key.
+// TODO refactor all Identities of proton. with event call and event path call.
 func (s *ProtonSegment) Identity() string {
 	if s.identity == "" {
-		appConfig := Apps.Get(s.Src)
-		if appConfig == nil {
-			panic(fmt.Sprintf("Can't find APP Config %v", s.Src))
-		}
-		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()], s.Src, s.Path)
+		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()],
+			s.StructInfo.ImportPath, s.StructInfo.StructName)
 	}
 	return s.identity
 }
 
 func (s *ProtonSegment) TemplatePath() (string, string) {
-	if s.identity == "" {
-		appConfig := Apps.Get(s.Src)
-		if appConfig == nil {
-			panic(fmt.Sprintf("Can't find APP Config %v", s.Src))
-		}
-		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()], s.Src, s.Path)
-
+	if s.templatePath == "" {
+		module := s.Module()
 		if s.templatePath == "" {
 			s.templatePath = filepath.Join(
-				appConfig.FilePath,
-				pathMap[s.Proton.Kind()], // "pages","components"
-				s.Path,
-			) + conf.TemplateFileExtension // TODO Configthis
+				module.BasePath,
+				s.StructInfo.ImportPath,
+				fmt.Sprintf("%v%v", s.StructInfo.StructName, conf.TemplateFileExtension),
+			) // TODO Configthis
+		}
+
+	}
+
+	return s.Identity(), s.templatePath
+}
+
+func (s *ProtonSegment) Module() *Module {
+	if s.module == nil {
+		if s.StructInfo != nil {
+			// for k, module := range Modules.Map() {
+			// 	fmt.Println("--- ", k, module.String())
+			// }
+			module := Modules.Get(s.StructInfo.ModulePackage)
+			if module == nil {
+				panic(fmt.Sprint("Can't find module for ", s.StructInfo.ModulePackage))
+			}
+			s.module = module
 		}
 	}
-	return s.identity, s.templatePath
+	return s.module
 }
 
 // ________________________________________________________________________________
@@ -102,11 +130,18 @@ func (s *ProtonSegment) TemplatePath() (string, string) {
 //   order, orderlist
 //   order/create/OrderCreateDetail
 //
-func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]string) {
+func (s *ProtonSegment) Add(si *parser.TypeInfo, p core.Protoner) (selectors [][]string) {
 
-	src, segments := trimPathSegments(baseUrl, pathMap[p.Kind()])
+	// TODO segment has structinfo
+	src := si.ModulePackage
+	segments := strings.Split(si.ProtonPath(), "/")
+	if len(segments) > 0 && segments[0] == "" {
+		segments = segments[1:]
+	}
+	segments = append(segments, si.StructName)
+	// src, segments := trimPathSegments(baseUrl, pathMap[p.Kind()])
 
-	dlog("-___- [Register %v] %v::%v url:%v", pathMap[p.Kind()], src, segments, baseUrl)
+	dlog("-___- [Register %v] %v::%v url:%v", pathMap[p.Kind()], src, segments, si)
 
 	// add to registerc
 	var (
@@ -118,6 +153,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 	)
 
 	// 1. process path segments, without last node
+	// fmt.Println("debug:", segments)
 	for idx, seg := range segments[0:(len(segments) - 1)] {
 		var lowerSeg = strings.ToLower(seg)
 		var segment *ProtonSegment
@@ -126,10 +162,10 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 			segment = currentSeg.Children[seg]
 			dlog("!!!! cached path: currentSeg: %v, has seg: %v\n", currentSeg.Name, seg)
 			dlog("!!!! children: %v\n", s.Children[seg])
-			// detect conflict
-			if segment.Src != "" && segment.Src != src {
-				log.Fatalf("Conflict of Page defination %v.\n", baseUrl)
-			}
+			// TODO detect conflict
+			// if segment.Src != "" && segment.Src != src {
+			// 	log.Fatalf("Conflict of Page defination %v.\n", si)
+			// }
 		} else {
 			segment = &ProtonSegment{
 				Name:   seg,
@@ -182,8 +218,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 			finalSegs = append(finalSegs, s)
 		} else {
 			// fallback TODO
-			currentSeg.Src = src
-			currentSeg.Path = strings.Join(segments, "/")
+			// currentSeg.Src = src
 			currentSeg.Proton = p
 		}
 	}
@@ -203,9 +238,9 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 			if shortSeg == "" {
 				// fallback
 				dlog("+++++ Fallback.\n") // ------------------------------------------
-				currentSeg.Src = src
-				currentSeg.Path = strings.Join(segments, "/")
+				// currentSeg.Src = src
 				currentSeg.Proton = p
+				currentSeg.StructInfo = si
 			} else {
 				// eg: /order/OrderDetailIndex --> /order/detail
 				finalSegs = append(finalSegs, shortSeg)
@@ -219,12 +254,11 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 	for _, s := range finalSegs {
 		// link segment together.
 		segment := &ProtonSegment{
-			Name:   s,
-			Parent: currentSeg,
-			Level:  len(segments) - 1,
-			Src:    src,
-			Path:   strings.Join(segments, "/"),
-			Proton: p,
+			Name:       s,
+			Parent:     currentSeg,
+			Level:      len(segments) - 1,
+			Proton:     p,
+			StructInfo: si,
 		}
 		currentSeg.AddChild(segment)
 
@@ -234,7 +268,7 @@ func (s *ProtonSegment) Add(baseUrl string, p core.Protoner) (selectors [][]stri
 		selector = append(selector, s)
 		selectors = append(selectors, selector)
 	}
-	dlog(">>>>> Selectors: %v\n", selectors)
+	// dlog(">>>>> Selectors: %v\n", selectors)
 	return
 }
 
@@ -317,10 +351,16 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
    Print Helper
 */
 
-// string()
 func (s *ProtonSegment) String() string {
-	return fmt.Sprintf("%-14v (%v)[SRC='%v' PATH='%v']",
-		s.Name, len(s.Children), s.Src, s.Path)
+	length, path := ".", "--"
+	if len(s.Children) > 0 {
+		length = fmt.Sprint(len(s.Children))
+	}
+	if s.StructInfo != nil {
+		path = s.StructInfo.ImportPath
+	}
+	return fmt.Sprintf("%-20v (%v)[%v]", s.Name, length, path)
+	// return fmt.Sprintf("%-20v (%v)[%v]", s.Name, length, path)
 }
 
 // print all details

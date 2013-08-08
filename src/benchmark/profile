@@ -1,0 +1,6 @@
+#!/bin/sh
+
+go build goprofile.go
+./goprofile -cpuprofile "2.prof"
+
+echo "go tool pprof goprofile.go 2.prof"

@@ -15,12 +15,18 @@ const (
 	PAGE
 	COMPONENT
 	MIXIN
-	STRUCT // invalid proton
+	STRUCT // Normal Struct
 )
 
-/*_______________________________________________________________________________
-  Proton
-*/
+var KindLabels = map[Kind]string{
+	UNKNOWN:   "Unknown",
+	PAGE:      "Page",
+	COMPONENT: "Component",
+	MIXIN:     "Mixin",
+	STRUCT:    "struct",
+}
+
+// Protoner is interface of Proton
 type Protoner interface {
 	Request() *http.Request
 	ResponseWriter() http.ResponseWriter
@@ -36,7 +42,7 @@ type Protoner interface {
 	SetId(id string)
 }
 
-// Common object which Page and Component both has.
+// A Proton is a Page, Component or Mixins.
 type Proton struct {
 	// buildin
 	W http.ResponseWriter

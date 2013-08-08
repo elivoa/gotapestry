@@ -19,7 +19,7 @@ func init() {
 type Status struct {
 	core.Page
 
-	Apps       *register.AppConfigs
+	Modules    *register.ModuleCache
 	Pages      *register.ProtonSegment
 	Components *register.ProtonSegment
 	Tpls       []*template.Template
@@ -27,7 +27,7 @@ type Status struct {
 
 func (p *Status) SetupRender() {
 	p.Tpls = templates.Templates.Templates()
-	p.Apps = register.Apps
+	p.Modules = register.Modules
 	p.Pages = &register.Pages
 }
 
@@ -39,26 +39,7 @@ func (p *Status) AfterRender() {
 func (p *Status) OnClickTemplate(name string) {
 	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 	fmt.Println("click template: ", name)
-	t:= templates.Templates.Lookup(name)
+	t := templates.Templates.Lookup(name)
 	fmt.Println(t)
 	fmt.Println(t.Delims)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

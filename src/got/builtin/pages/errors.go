@@ -13,7 +13,9 @@ func init() {
 func Register() {}
 
 type Errors struct {
+	A *string
 	core.Page
+	C []int
 }
 
 func (p *Errors) SetupRender() {
