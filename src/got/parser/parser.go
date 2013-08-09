@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[parser.go] Elivoa @ Thursday, 2013-08-08 12:51:53>
+  Time-stamp: <[parser.go] Elivoa @ Friday, 2013-08-09 16:41:14>
 
   Parse all page/components source files. Cache it's content.
 
@@ -10,6 +10,7 @@
   TODO:
     - Rename function names.
     - Cleanup this file.
+    - Make a lightwight parse, only parse modules with core embed.
 */
 
 package parser
@@ -84,10 +85,13 @@ type TypeInfo struct {
 func (t *TypeInfo) IsProton() bool {
 	switch t.ProtonKind {
 	case core.PAGE, core.COMPONENT, core.MIXIN:
-		return true
-	default:
-		return false
+		// must be exported.
+		capitalletter := t.StructName[0]
+		if 65 <= capitalletter && capitalletter <= 90 {
+			return true
+		}
 	}
+	return false
 }
 
 func (t *TypeInfo) ProtonPath() string {

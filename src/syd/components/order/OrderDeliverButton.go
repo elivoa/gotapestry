@@ -2,12 +2,7 @@ package order
 
 import (
 	"got/core"
-	"got/route"
 )
-
-func init() {
-	route.Component(Register, &OrderDeliverButton{})
-}
 
 type OrderDeliverButton struct {
 	core.Component

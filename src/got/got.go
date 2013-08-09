@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[got.go] Elivoa @ Thursday, 2013-08-08 19:10:53>
+  Time-stamp: <[got.go] Elivoa @ Friday, 2013-08-09 17:32:13>
 
   TODO:
     - Add Hooks: OnAppStart, AfterAppStart, ...
@@ -87,7 +87,7 @@ func welcome() {
 	fmt.Println("`                                                `")
 	fmt.Println("``````````````````````````````````````````````````")
 	fmt.Printf("Server Started, Listen localhost:%v\n\n", Config.Port)
-	// PrintRegistry()
+	PrintRegistry()
 }
 
 // ________________________________________________________________________________

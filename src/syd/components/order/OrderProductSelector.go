@@ -6,12 +6,7 @@ package order
 
 import (
 	"got/core"
-	"got/route"
 )
-
-func init() {
-	route.Component(Register, &OrderProductSelector{})
-}
 
 type OrderProductSelector struct {
 	core.Component

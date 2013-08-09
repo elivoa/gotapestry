@@ -3,7 +3,6 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/register"
 	"syd/model"
 	"syd/service/orderservice"
 )
@@ -11,11 +10,6 @@ import (
 /* ________________________________________________________________________________
    Register all pages under /order
 */
-func init() {
-	register.Page(Register, &OrderCreateIndex{})
-}
-func Register() {}
-
 // --------  Order Create Index  -----------------------------------------------------------------------
 
 // BUG: OrderCreate here can't fallback to /order/create

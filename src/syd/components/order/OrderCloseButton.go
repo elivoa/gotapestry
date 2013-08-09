@@ -3,15 +3,10 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/route"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
-
-func init() {
-	route.Component(Register, &OrderCloseButton{})
-}
 
 type OrderCloseButton struct {
 	core.Component

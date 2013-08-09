@@ -9,13 +9,6 @@ import (
 	"syd/service/suggest"
 )
 
-func Register() {}
-
-func init() {
-	register.Page(Register, &Status{})
-}
-
-// TODO
 type Status struct {
 	core.Page
 

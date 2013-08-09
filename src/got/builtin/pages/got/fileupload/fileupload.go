@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"got/config"
 	"got/core"
-	"got/register"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -23,13 +22,13 @@ import (
 	"time"
 )
 
-func Register() {}
-func init() {
-	register.Page(Register,
-		&FileUploadIndex{},
-		&FileUploadTest{},
-	)
-}
+// func Register() {}
+// func init() {
+// 	register.Page(Register,
+// 		&FileUploadIndex{},
+// 		&FileUploadTest{},
+// 	)
+// }
 
 // ________________________________________________________________________________
 //

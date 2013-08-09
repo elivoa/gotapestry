@@ -3,16 +3,11 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/register"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 	"syd/service/productservice"
 )
-
-func init() {
-	register.Page(Register, &ShippingInstead{})
-}
 
 //
 // --------  Order Shipping Instead  -----------------------------------------------------------------------

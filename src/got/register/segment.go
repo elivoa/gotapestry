@@ -7,6 +7,7 @@ import (
 	"got/core"
 	"got/parser"
 	"log"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -75,17 +76,18 @@ var pathMap = map[core.Kind]string{
 }
 
 var identityPrefixMap = map[core.Kind]string{
-	core.PAGE:      "",
-	core.COMPONENT: "c_",
-	core.MIXIN:     "x_",
+	core.PAGE:      "p/",
+	core.COMPONENT: "c/",
+	core.MIXIN:     "x/",
 }
 
 // unique identity used as template key.
 // TODO refactor all Identities of proton. with event call and event path call.
 func (s *ProtonSegment) Identity() string {
 	if s.identity == "" {
-		s.identity = fmt.Sprintf("%v%v:%v", identityPrefixMap[s.Proton.Kind()],
-			s.StructInfo.ImportPath, s.StructInfo.StructName)
+		s.identity = fmt.Sprintf("%v:%v",
+			path.Join(identityPrefixMap[s.Proton.Kind()], s.StructInfo.ProtonPath()),
+			s.StructInfo.StructName)
 	}
 	return s.identity
 }
@@ -279,6 +281,8 @@ type LookupResult struct {
 	PageUrl   string
 	EventName string
 }
+
+var average_lookup_time int
 
 // Lookup the structure, find the right page/component.
 // TODO performance

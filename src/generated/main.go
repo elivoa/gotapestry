@@ -81,7 +81,7 @@ func main() {
     route.RegisterProton("syd/pages/order", "ButtonSubmitHere", "syd", &order0.ButtonSubmitHere{})
     route.RegisterProton("syd/pages/order", "ViewOrder", "syd", &order0.ViewOrder{})
     route.RegisterProton("syd/pages/order", "OrderPrint", "syd", &order0.OrderPrint{})
-    route.RegisterProton("syd/pages/order", "PrintExpress", "syd", &order0.PrintExpress{})
+    route.RegisterProton("syd/pages/order", "PrintExpressYTO", "syd", &order0.PrintExpressYTO{})
     route.RegisterProton("syd/pages/order", "ShippingInsteadPrint", "syd", &order0.ShippingInsteadPrint{})
     route.RegisterProton("syd/pages/order/create", "OrderCreateDetail", "syd", &order1.OrderCreateDetail{})
     route.RegisterProton("syd/pages/order/create", "OrderCreateIndex", "syd", &order1.OrderCreateIndex{})

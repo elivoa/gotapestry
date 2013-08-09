@@ -152,75 +152,77 @@ function onclick(){
   var buyerName = document.getElementById("buyerName");
   var buyerPhone = document.getElementById("buyerPhone");
   var buyerTel = document.getElementById("buyerTel");
-var buyerProvicy = document.getElementById("buyerProvicy");
-var buyerDistrict = document.getElementById("buyerDistrict");
-var buyerAddr = document.getElementById("buyerAddr");
-var buyerCountry = document.getElementById("buyerCountry");
-var buyerCity = document.getElementById("buyerCity");
-var buyerCityMain = document.getElementById("buyerCityMain");
-buyerName.innerHTML = "";
-buyerPhone.innerHTML = "";
-buyerTel.innerHTML = "";
-buyerPhone.innerHTML = "";
-buyerDistrict.innerHTML = "";
-buyerAddr.innerHTML = "";
-buyerCountry.innerHTML = "";
-buyerCity.innerHTML = "";
-buyerCityMain.innerHTML = "";
-buyerProvicy.innerHTML = "";
+  var buyerProvicy = document.getElementById("buyerProvicy");
+  var buyerDistrict = document.getElementById("buyerDistrict");
+  var buyerAddr = document.getElementById("buyerAddr");
+  var buyerCountry = document.getElementById("buyerCountry");
+  var buyerCity = document.getElementById("buyerCity");
+  var buyerCityMain = document.getElementById("buyerCityMain");
+  buyerName.innerHTML = "";
+  buyerPhone.innerHTML = "";
+  buyerTel.innerHTML = "";
+  buyerPhone.innerHTML = "";
+  buyerDistrict.innerHTML = "";
+  buyerAddr.innerHTML = "";
+  buyerCountry.innerHTML = "";
+  buyerCity.innerHTML = "";
+  buyerCityMain.innerHTML = "";
+  buyerProvicy.innerHTML = "";
 
-buyerName.innerHTML = orderInfoArr[0];
-buyerPhone.innerHTML = orderInfoArr[1];
-buyerTel.innerHTML = orderInfoArr[2];
-var buyerAddress = "";
-if(orderInfoArr.length >4){
-  buyerAddress = orderInfoArr.slice(3,-1).join("，");
-}
-else{
-  buyerAddress = orderInfoArr[3];
-}
-
-if(buyerAddress.indexOf("省") != -1){
-  //alert(buyerAddress);
-  var buyerProvicyStart = buyerAddress.indexOf("省");
-  buyerProvicy.innerHTML = buyerAddress.substring(0,buyerProvicyStart); 
-  buyerAddress = buyerAddress.substring(buyerProvicyStart+1); 
-  //alert(buyerAddress);
-}
-
-if(buyerAddress.indexOf("市") != -1){
-  var buyerCityStart = buyerAddress.lastIndexOf("市");
-  var buyerCityArr = buyerAddress.substring(0,buyerCityStart).split("市");
-  
-  if(buyerCityArr[buyerCityArr.length-1].indexOf(" ") !=-1){
-	buyerCityArr[buyerCityArr.length-1] = buyerCityArr[buyerCityArr.length-1].substring(buyerCityArr[buyerCityArr.length-1].indexOf(" "));
+  buyerName.innerHTML = orderInfoArr[0];
+  buyerPhone.innerHTML = orderInfoArr[1];
+  buyerTel.innerHTML = orderInfoArr[2];
+  var buyerAddress = "";
+  if(orderInfoArr.length >4){
+    buyerAddress = orderInfoArr.slice(3,-1).join("，");
+  } else {
+    buyerAddress = orderInfoArr[3];
   }
-  //alert(buyerCityArr[buyerCityArr.length-1].indexOf(" "));
-  buyerCity.innerHTML = buyerCityArr[buyerCityArr.length-1]; 
-  buyerCityMain.innerHTML = buyerCity.innerHTML; 
-  buyerAddress = buyerAddress.substring(buyerCityStart+1);
-}
+  if (buyerAddress == undefined){
+    buyerAddress = ""
+  }
 
-if(buyerAddress.indexOf("县") != -1){
-  var buyerCountryStart = buyerAddress.indexOf("县");
-  buyerCountry.innerHTML = buyerAddress.substring(0,buyerCountryStart); 
-  buyerAddress = buyerAddress.substring(buyerCountryStart+1); 
-}
+  if(buyerAddress.indexOf("省") != -1){
+    //alert(buyerAddress);
+    var buyerProvicyStart = buyerAddress.indexOf("省");
+    buyerProvicy.innerHTML = buyerAddress.substring(0,buyerProvicyStart); 
+    buyerAddress = buyerAddress.substring(buyerProvicyStart+1); 
+    //alert(buyerAddress);
+  }
 
-if(buyerAddress.indexOf("镇") != -1 &&buyerAddress.indexOf("区") == -1){
-  //alert("1");
-  var buyerDistrictStart = buyerAddress.indexOf("镇");
-  buyerDistrict.innerHTML = buyerAddress.substring(0,buyerDistrictStart); 
-  buyerAddress = buyerAddress.substring(buyerDistrictStart+1); 
-}
-if(buyerAddress.indexOf("区") != -1){
-  //alert("2");
-  var buyerDistrictStart = buyerAddress.indexOf("区");
-  buyerDistrict.innerHTML = buyerAddress.substring(0,buyerDistrictStart); 
-  buyerAddress = buyerAddress.substring(buyerDistrictStart+1); 
-}
+  if(buyerAddress.indexOf("市") != -1){
+    var buyerCityStart = buyerAddress.lastIndexOf("市");
+    var buyerCityArr = buyerAddress.substring(0,buyerCityStart).split("市");
+    
+    if(buyerCityArr[buyerCityArr.length-1].indexOf(" ") !=-1){
+	  buyerCityArr[buyerCityArr.length-1] = buyerCityArr[buyerCityArr.length-1].substring(buyerCityArr[buyerCityArr.length-1].indexOf(" "));
+    }
+    //alert(buyerCityArr[buyerCityArr.length-1].indexOf(" "));
+    buyerCity.innerHTML = buyerCityArr[buyerCityArr.length-1]; 
+    buyerCityMain.innerHTML = buyerCity.innerHTML; 
+    buyerAddress = buyerAddress.substring(buyerCityStart+1);
+  }
 
-buyerAddr.innerHTML = buyerAddress;
+  if(buyerAddress.indexOf("县") != -1){
+    var buyerCountryStart = buyerAddress.indexOf("县");
+    buyerCountry.innerHTML = buyerAddress.substring(0,buyerCountryStart); 
+    buyerAddress = buyerAddress.substring(buyerCountryStart+1); 
+  }
+
+  if(buyerAddress.indexOf("镇") != -1 &&buyerAddress.indexOf("区") == -1){
+    //alert("1");
+    var buyerDistrictStart = buyerAddress.indexOf("镇");
+    buyerDistrict.innerHTML = buyerAddress.substring(0,buyerDistrictStart); 
+    buyerAddress = buyerAddress.substring(buyerDistrictStart+1); 
+  }
+  if(buyerAddress.indexOf("区") != -1){
+    //alert("2");
+    var buyerDistrictStart = buyerAddress.indexOf("区");
+    buyerDistrict.innerHTML = buyerAddress.substring(0,buyerDistrictStart); 
+    buyerAddress = buyerAddress.substring(buyerDistrictStart+1); 
+  }
+
+  buyerAddr.innerHTML = buyerAddress;
 
 }
 function fromPerson(form_name){
@@ -258,6 +260,8 @@ function fontZoomIn(){
 }
 
 onclick()
+fromPerson({{$.SenderAddress}})
+
       </script>
     </body>
   </html>

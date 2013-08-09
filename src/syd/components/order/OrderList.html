@@ -41,7 +41,7 @@
               <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
               <td nowrap>
                 <a href="{{$.ViewLink .}}">
-                  {{if .TypeIs 1}}D{{end}}{{.TrackNumber}}
+                  {{if .TypeIs 1}}<span style="color:red;font-weight:bold;">D</span>{{end}}{{.TrackNumber}}
                 </a>
               </td>
               <td>
@@ -62,7 +62,9 @@
               <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
 
-                {{/* 
+                {{/*
+                // Not works because the context is not correct.
+                // Context Needed: $, ., $xxx(all variables.), 
                 {{if .IsStatus "toprint"}} {{template "order-list-operator-toprint" .}} {{end}}
                 {{if .IsStatus "todeliver"}} {{template "order-list-operator-todeliver" .}} {{end}}
                 {{if .IsStatus "delivering"}} {{template "order-list-operator-delivering" .}} {{end}}
@@ -85,15 +87,17 @@
                 {{end}}
 
                 {{if .IsStatus "delivering"}}
+                <a href="{{$.FixPrintOrderLink .}}">打印订单(累计欠款条目可能有问题)</a>
+                <span class="vline">|</span>
                 {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
                 {{end}}
 
                 {{if .IsStatus "cancelled" "done"}}  
                 <a href="{{$.ViewLink .}}">查看订单</a>
                 {{end}}
-
+                {{/*
                 <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}">[喜小乐可以删除订单]</a>
-                
+                */}}            
               </td>
             </tr>
           </range>

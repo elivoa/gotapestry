@@ -3,19 +3,10 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/route"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
-
-func Register() {}
-func init() {
-	route.Component(Register, &OrderList{})
-}
-
-// ________________________________________________________________________________
-//
 
 type OrderList struct {
 	core.Component

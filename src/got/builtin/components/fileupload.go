@@ -8,14 +8,8 @@ package components
 
 import (
 	"got/core"
-	"got/route"
 	"path/filepath"
 )
-
-// func Register() {}
-func init() {
-	route.Component(Register, &FileUpload{})
-}
 
 // ________________________________________________________________________________
 // Must used within a form. Will generate one or more Input:hidden.
@@ -40,6 +34,7 @@ func (p *FileUpload) Activate() {
 func (p *FileUpload) PictureLink(filekey string) string {
 	return filepath.Join("/pictures", filekey)
 }
+
 func (p *FileUpload) FileLink(folder string, filekey string) string {
 	return filepath.Join(folder, filekey)
 }

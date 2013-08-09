@@ -3,16 +3,11 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/register"
 	"gxl"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
-
-func init() {
-	register.Page(Register, &OrderCreateDetail{})
-}
 
 // --------  Order Create Details  -----------------------------------------------------------------------
 
@@ -105,7 +100,11 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 	}
 
 	// set new & edited order's status.
-	p.Order.Status = "toprint"
+	if p.Order.DeliveryMethod == "TakeAway" {
+		p.Order.Status = "delivering"
+	} else {
+		p.Order.Status = "toprint"
+	}
 
 	// update
 	if p.Id != nil {
@@ -116,7 +115,9 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 
 	// return source?
 	if p.SourceUrl == "" {
-		return "redirect", "/order/list/toprint"
+		// return to the right list.
+		return "redirect", "/order/list/" + p.Order.Status
+		// return "redirect", "/order/list/toprint"
 	} else {
 		return "redirect", p.SourceUrl
 	}

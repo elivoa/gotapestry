@@ -72,7 +72,7 @@
 				<td valign="top" nowrap rowspan="{{len $order.Details}}">
                   <a href="{{$.EditLink $order}}">编辑</a><span class="vline">|</span>
 
-                  <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}"
+                  <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}&sender={{$.Customer.Name}}"
                      target="_blank">打印快递单</a>
 
                   {{/* 发货 */}}
