@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Tuesday, 2013-07-30 13:01:54>
+   Time-stamp: <[templates.go] Elivoa @ Saturday, 2013-08-10 13:34:46>
 */
 package templates
 
@@ -171,7 +171,7 @@ type TemplateCache struct {
 	Templates map[string]bool // is this template cached?
 }
 
-// TODO Performance issue
+// TODO Test & Improve Performance.
 // . the first return value is not used.
 // . the name shoud change
 func (t *TemplateCache) Get(key string, templatePath string) (*template.Template, error) {

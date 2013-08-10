@@ -50,18 +50,20 @@
               </td>
               <td>
                 {{if .IsStatus "todeliver"}}
-                <strong class="price">{{.TotalPrice}}</strong>
+                <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
                 <span class="txt_c">(不含运费)</span>
                 {{else}}
                 {{if .DeliveryMethodIs "TakeAway"}}<span class="txt_c">(自提)</span>
                 {{else}}
-                <strong class="price">{{.SumOrderPrice}}</strong>
+                <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
                 <span class="txt_c">(含运费{{.ExpressFee}}元)</span>
                 {{end}}
                 {{end}}
               </td>
               <td>{{.DisplayStatus }}</td>
-              <td nowrap>{{.CreateTime | formattime "2006-01-02"}}</td>
+              <td nowrap title="{{.CreateTime | prettytime}} ">
+                {{.CreateTime | prettyday}} <!-- formattime "2006-01-02"-->
+              </td>
               
               <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
@@ -111,11 +113,11 @@
       </if>
 
       <script type="text/javascript">
-              $(function(){
-                orderlist = new OrderList({
-                  ClientId: {{.ClientId}}
-                })
-              });
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
       </script>
 
     </div>

@@ -13,9 +13,12 @@
     <td nowrap><a href="/product/detail/{{.Id}}">{{.Name}}</a></td>
     <td align="right"><span class="price">{{.Price | formatcurrency}}</span></td>
     <td nowrap>
-      TODO:红色：S / M / L<span class="vline">|</span>
-      黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
-      <span class="vline">|</span>绿色：S / M / L / XL
+      {{$.ShowSpecification .Id}}
+      <!--
+          TODO:红色：S / M / L<span class="vline">|</span>
+          黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
+          <span class="vline">|</span>绿色：S / M / L / XL
+          -->
     </td>
     <td nowrap>
       <a href="#TODO">填写入库信息</a><span class="vline">|</span>

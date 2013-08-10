@@ -3,3 +3,4 @@ pkg/*
 .dropbox
 
 .DS_Store
+src/generated

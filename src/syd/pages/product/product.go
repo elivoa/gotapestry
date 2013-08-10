@@ -4,20 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"got/core"
-	"got/register"
 	"gxl"
 	"strings"
 	"syd/model"
 	"syd/service/personservice"
 	"syd/service/productservice"
 )
-
-func Register() {
-	register.Page(Register,
-		&ProductIndex{}, &ProductEdit{}, &ProductList{},
-		&ProductCreate{}, &ProductDetail{},
-	)
-}
 
 /* ________________________________________________________________________________
    Product Home Page

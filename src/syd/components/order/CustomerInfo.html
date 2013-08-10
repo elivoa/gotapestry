@@ -3,7 +3,7 @@
   <div class="tit"><strong>客户信息</strong></div>
   <div class="B_person_info">
     <span class="B_overdraft">累计欠款：
-      <strong class="price">{{.Customer.Accomulated | beautycurrency}}</strong>元
+      <strong class="price">{{.Customer.Accomulated | prettycurrency}}</strong>元
       <input type="hidden" name="Order.Accumulated" value="{{.Customer.Accomulated}}" />
     </span>
     <strong>

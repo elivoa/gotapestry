@@ -1,10 +1,10 @@
 /*
-   Time-stamp: <[templates-funcs.go] Elivoa @ Monday, 2013-07-29 12:12:56>
+   Time-stamp: <[templates-funcs.go] Elivoa @ Saturday, 2013-08-10 14:54:40>
 */
 package templates
 
 import (
-	"fmt"
+	"gxl"
 	"html/template"
 	"time"
 )
@@ -16,14 +16,13 @@ func registerBuiltinFuncs() {
 		// deprecated
 		"eq": equas,
 
-		"beautytime":     BeautyTime,
-		"beautycurrency": BeautyCurrency,
-
 		// new
 		"formattime":     FormatTime,
-		"formatcurrency": BeautyCurrency,
-		"prettycurrency": BeautyCurrency,
 		"prettytime":     BeautyTime,
+		"prettyday":      gxl.PrettyDay,
+		"prettycurrency": PrettyCurrency,
+		// "beautytime": BeautyTime,
+		// "formatcurrency": PrettyCurrency,
 	})
 }
 
@@ -44,6 +43,6 @@ func BeautyTime(t time.Time) string {
 	return t.Format("2006-01-02 15:04:05")
 }
 
-func BeautyCurrency(d float64) string {
-	return fmt.Sprintf("%.2f", d)
+func PrettyCurrency(d float64) string {
+	return gxl.FormatCurrency(d, 2)
 }

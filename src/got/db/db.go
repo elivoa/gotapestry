@@ -10,7 +10,7 @@ var DB *sql.DB
 
 func Connect() (*sql.DB, error) {
 	var err error
-	conn, err := sql.Open("mysql", "root:eserver409$)(@/syd?charset=utf8&parseTime=true")
+	conn, err := sql.Open("mysql", "root:eserver409$)(@/syd?charset=utf8&parseTime=true&loc=Local")
 	if err != nil {
 		panic(err.Error())
 		return nil, err

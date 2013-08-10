@@ -113,7 +113,7 @@ class OrderEdit
     obj.css 'color', 'red'
 
   markPass: (obj, price)->
-    # TODO format currency
+    # TODO javascript: format currency
     obj.html price
     obj.css 'color', 'green'
 

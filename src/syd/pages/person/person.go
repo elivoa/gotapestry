@@ -180,14 +180,14 @@ func (p *PersonDetail) Setup() {
 				msg.WriteString("，")
 
 				// price
-				msg.WriteString(fmt.Sprint(productJson.SellingPrice * float64(totalQuantity)))
+				msg.WriteString(gxl.FormatCurrency(productJson.SellingPrice*float64(totalQuantity), 2))
 				msg.WriteString("元")
 				msg.WriteString("；")
 			}
 
 			// 共计
 			msg.WriteString("共计")
-			msg.WriteString(fmt.Sprint(sumTotal))
+			msg.WriteString(gxl.FormatCurrency(sumTotal, 2))
 			msg.WriteString("元")
 			msg.WriteString("；")
 
@@ -209,7 +209,7 @@ func (p *PersonDetail) Setup() {
 
 			// 总计
 			msg.WriteString("总计")
-			msg.WriteString(fmt.Sprint(int64(sumTotal) + order.ExpressFee))
+			msg.WriteString(gxl.FormatCurrency(sumTotal+float64(order.ExpressFee), 2))
 			msg.WriteString("元")
 			msg.WriteString("；")
 
@@ -220,7 +220,7 @@ func (p *PersonDetail) Setup() {
 				msg.WriteString(" + ")
 				msg.WriteString(fmt.Sprint(int64(sumTotal) + order.ExpressFee))
 				msg.WriteString(" = ")
-				msg.WriteString(fmt.Sprint(float64(int64(sumTotal)+order.ExpressFee) + order.Accumulated))
+				msg.WriteString(gxl.FormatCurrency(float64(int64(sumTotal)+order.ExpressFee)+order.Accumulated, 2))
 				msg.WriteString("元")
 				msg.WriteString("；【内测：请仔细检查累计欠款是否正确】")
 			}

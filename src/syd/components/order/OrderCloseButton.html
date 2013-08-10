@@ -25,14 +25,14 @@ CloseOrderModal -- open modal box to close order
 	    <strong>{{.Customer.Name}}</strong>
 	    <span class="L_overage">
           账户余额：
-          <span class="price">{{.Customer.AccountBallance | beautycurrency}}</span> 元
+          <span class="price">{{.Customer.AccountBallance | prettycurrency}}</span> 元
         </span>
 	  </div>
 	  <div class="form_main">
 	    <dl class="clearfix">
 		  <dt class="L_order_price">订单金额：</dt>
 		  <dd>
-		    <strong class="price">{{.Order.SumOrderPrice | beautycurrency}}</strong> 元
+		    <strong class="price">{{.Order.SumOrderPrice | prettycurrency}}</strong> 元
 		  </dd>
 	    </dl>
 	    <dl class="clearfix">
