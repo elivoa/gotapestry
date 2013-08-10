@@ -42,10 +42,17 @@
             {{end}}
           </table>
 
+          <hr />
           <h2>账户余额: {{.Person.AccountBallance}}</h2>
+
+          <hr />
+          <h2>今日留言: for {{.Person.Name}}</h2>
+          
+          <div style="padding:8px;margin:10px 0;font-size:16px;witdh:300px;border:solid 1px green">
+            今日发货：{{.LeavingMessage}}
+          </div>
           
           <hr />
-          
           {{t_order_list $ "orders" .Orders}}
 
         </div>

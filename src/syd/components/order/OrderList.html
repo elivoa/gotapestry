@@ -38,10 +38,14 @@
                 <input type="checkbox" class="order-check"
                        value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
               </td>
-              <td nowrap>{{$.ShowCustomerName .CustomerId}}</td>
+              <td nowrap>
+                <a href="/person/detail/{{.CustomerId}}">{{$.ShowCustomerName .CustomerId}}</a>
+              </td>
               <td nowrap>
                 <a href="{{$.ViewLink .}}">
-                  {{if .TypeIs 1}}<span style="color:red;font-weight:bold;">D</span>{{end}}{{.TrackNumber}}
+                  {{if .TypeIs 1}}<span style="color:red;font-weight:bold;">D</span>{{end}}
+                  {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
+                  {{.TrackNumber}}
                 </a>
               </td>
               <td>
@@ -86,9 +90,11 @@
                 <span class="vline">|</span>
                 {{end}}
 
-                {{if .IsStatus "delivering"}}
-                <a href="{{$.FixPrintOrderLink .}}">打印订单(累计欠款条目可能有问题)</a>
-                <span class="vline">|</span>
+                {{if .StatusIs "delivering"}}
+                {{if .DeliveryMethodIs "TakeAway"}}
+                <a href="{{$.FixPrintOrderLink .}}">自提打印订单</a><span class="vline">|</span>
+
+                {{end}}
                 {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
                 {{end}}
 

@@ -273,9 +273,30 @@ func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
 func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
 	var query *db.QueryParser
 	if status == "all" {
-		query = em.Select().Where("customer_id", personId)
+		query = em.Select().Where("customer_id", personId).
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
 	} else {
-		query = em.Select().Where("customer_id", personId).And("status", status)
+		query = em.Select().Where("customer_id", personId).
+			And("status", status).
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
+	}
+	return _listOrder(query)
+}
+
+// TODO ...
+func ListOrderByCustomerToday(personId int, status string) ([]*model.Order, error) {
+	var query *db.QueryParser
+	if status == "all" {
+		query = em.Select().Where("customer_id", personId).
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
+	} else {
+		query = em.Select().Where("customer_id", personId).
+			And("status", status).
+			Or("type", model.Wholesale, model.ShippingInstead).
+			OrderBy("create_time desc")
 	}
 	return _listOrder(query)
 }

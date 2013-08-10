@@ -85,6 +85,10 @@ func (p *OrderList) EditLink(order *model.Order) string {
 		return fmt.Sprintf("/order/create/detail/%v", order.Id)
 	case model.ShippingInstead:
 		return fmt.Sprintf("/order/create/shippinginstead/%v", order.TrackNumber)
+	case model.SubOrder:
+		return "#Error"
+	default:
+		return fmt.Sprintf("%v", order.Type)
 	}
 	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
 }
@@ -95,6 +99,10 @@ func (p *OrderList) ViewLink(order *model.Order) string {
 		return fmt.Sprintf("/order/view/%v", order.TrackNumber)
 	case model.ShippingInstead:
 		return fmt.Sprintf("/order/create/shippinginstead/%v?readonly=true", order.TrackNumber)
+	case model.SubOrder:
+		return "#Error"
+	default:
+		return fmt.Sprintf("%v", order.Type)
 	}
 	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
 }
@@ -107,6 +115,10 @@ func (p *OrderList) PrintOrderLink(order *model.Order) string {
 		return fmt.Sprintf("/order/list.orderlist.Print/%v", order.TrackNumber)
 	case model.ShippingInstead:
 		return fmt.Sprintf("/order/list.orderlist.ShippingInsteadOrderPrint/%v", order.TrackNumber)
+	case model.SubOrder:
+		return "#Error"
+	default:
+		return fmt.Sprintf("%v", order.Type)
 	}
 	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
 }
@@ -118,6 +130,10 @@ func (p *OrderList) FixPrintOrderLink(order *model.Order) string {
 		return fmt.Sprintf("/order/print/%v", order.TrackNumber)
 	case model.ShippingInstead:
 		return fmt.Sprintf("/order/shippinginsteadprint/%v", order.TrackNumber)
+	case model.SubOrder:
+		return "#Error"
+	default:
+		return fmt.Sprintf("%v", order.Type)
 	}
 	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
 }
