@@ -34,9 +34,9 @@ type ProtonSegment struct {
 	Proton core.Protoner // The base proton segment. Create new one when installed.
 
 	// associated external resources.
-	ModulePackage string           // e.g. got/builtin, syd; used in init.
-	StructInfo    *parser.TypeInfo // from parser package
-	module        *Module          // associated Module
+	ModulePackage string             // e.g. got/builtin, syd; used in init.
+	StructInfo    *parser.StructInfo // from parser package
+	module        *Module            // associated Module
 
 	// caches
 	identity     string // cache identity, default the same name with StructName
@@ -132,7 +132,7 @@ func (s *ProtonSegment) Module() *Module {
 //   order, orderlist
 //   order/create/OrderCreateDetail
 //
-func (s *ProtonSegment) Add(si *parser.TypeInfo, p core.Protoner) (selectors [][]string) {
+func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [][]string) {
 
 	// TODO segment has structinfo
 	src := si.ModulePackage

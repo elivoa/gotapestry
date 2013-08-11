@@ -4,12 +4,14 @@
     <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css">
     <t:layout_header title='(print .SubTitle "列表")' />
 
-    {{/* --------------------------------------------------------------------------------
-    <t:layout_header title="print .SubTitle `列表`" />
-    <t:layout_header title="literal:print .SubTitle `列表`" />
-    <meta t:type="layout_header" title=".SubTitle" />
-    <t:layout_header title="print .SubTitle `列表`" />
-    <t:layout_header title="print .SubTitle `列表`" />
+    {{/* ------------------------------------------------------------------------------
+    <!--
+        <t:layout_header title="print .SubTitle `列表`" />
+        <t:layout_header title="literal:print .SubTitle `列表`" />
+        <meta t:type="layout_header" title=".SubTitle" />
+        <t:layout_header title="print .SubTitle `列表`" />
+        <t:layout_header title="print .SubTitle `列表`" />
+        -->
     --------------------------------------------------------------------------------*/}}
 
   </head>
@@ -19,7 +21,7 @@
 
     <div class="container">
 
-      <t:layout_leftnav curPage="/person/list" />
+      <t:layout_leftnav CurPage="/person/list/{{.PersonType}}" />
 
       <div class="main_content">
     	<h1>{{.SubTitle}}列表</h1>

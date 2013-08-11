@@ -28,7 +28,7 @@ Documentation
 + OnSubmit() or OnSubmitFromTableTID()
   - before inject submit values, init fields.
 + ?? OnValidate()
-  - TODO… 
+  - TODO…
 + OnSuccess() or OnSuccessFromTalbeTID()
   - after inject values, do submit.
 + ?? OnValidationFailed()
@@ -37,11 +37,18 @@ Documentation
 ### Form Submit
 
 
+## Templates
+Got's template engine;
+Some Examples here:
 
-
-
-
-
+- If
+> `<if t="some test">…</if>`
+- Loop
+> `<range source=".List"`>…</range>
+- Component
+> `<t:layout_leftnav CurPage="/person/list/{{.PersonType}}" />`
+	Note that got will change the name of the attribute lowercased
+	when attribute name doesn't match with struct's field name.
 
 
 

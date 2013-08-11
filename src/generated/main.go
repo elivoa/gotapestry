@@ -39,7 +39,7 @@ func main() {
     config.Config.RegisterModulePath("/Users/bogao/develop/gitme/gotapestry/src/got/builtin", "BuiltinModule")
 
     // parse source again.
-    sourceInfo, compileError := parser.ParseSource(config.Config.ModulePath)
+    sourceInfo, compileError := parser.ParseSource(config.Config.ModulePath, false) // deep parse
     if compileError != nil {
         panic(compileError.Error())
     }
@@ -96,10 +96,12 @@ func main() {
     route.RegisterProton("syd/pages/product", "ProductList", "syd", &product0.ProductList{})
     route.RegisterProton("syd/pages/product", "ProductDetail", "syd", &product0.ProductDetail{})
     route.RegisterProton("got/builtin/components", "FileUpload", "got/builtin", &components0.FileUpload{})
+    route.RegisterProton("got/builtin/components", "Output", "got/builtin", &components0.Output{})
     route.RegisterProton("got/builtin/components", "ProvinceSelect", "got/builtin", &components0.ProvinceSelect{})
     route.RegisterProton("got/builtin/components", "Select", "got/builtin", &components0.Select{})
     route.RegisterProton("got/builtin/pages", "Errors", "got/builtin", &got.Errors{})
     route.RegisterProton("got/builtin/pages/got", "Status", "got/builtin", &got0.Status{})
+    route.RegisterProton("got/builtin/pages/got", "TestIndex", "got/builtin", &got0.TestIndex{})
     route.RegisterProton("got/builtin/pages/got/fileupload", "FileUploadTest", "got/builtin", &fileupload.FileUploadTest{})
     route.RegisterProton("got/builtin/pages/got/fileupload", "FileUploadIndex", "got/builtin", &fileupload.FileUploadIndex{})
 

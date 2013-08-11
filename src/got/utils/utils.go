@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -95,5 +96,23 @@ func BasePath(currentPath string) string {
 	}
 
 	log.Fatalln("Unexpected! Code path is not in GOPATH:", currentPath)
+	return ""
+}
+
+func IsCapitalized(s string) bool {
+	if len(s) > 0 {
+		firstLetter := s[0]
+		if 65 <= firstLetter && firstLetter <= 90 {
+			return true
+		}
+	}
+	return false
+}
+
+func Capitalize(s string) string {
+	if len(s) > 0 {
+		firstLetter := s[0]
+		return strings.ToUpper(strconv.Itoa(int(firstLetter))) + s[1:]
+	}
 	return ""
 }

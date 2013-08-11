@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Saturday, 2013-08-10 13:34:46>
+   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-08-11 14:10:18>
 */
 package templates
 
@@ -12,7 +12,9 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -28,6 +30,22 @@ func init() {
 	Templates = template.New("Got-Template")
 	registerBuiltinFuncs()   // Register built-in templates.
 	registerComponentFuncs() // no use?
+}
+
+/*_______________________________________________________________________________
+  Register components
+*/
+func registerComponentFuncs() {
+	// init functions
+	Templates.Funcs(template.FuncMap{})
+}
+
+// register components as template function call.
+func RegisterComponent(name string, f interface{}) {
+	funcName := fmt.Sprintf("t_%v", strings.Replace(name, "/", "_", -1))
+	lowerFuncName := strings.ToLower(funcName)
+	// debuglog("-108- [RegisterComponent] %v", funcName)
+	Templates.Funcs(template.FuncMap{funcName: f, lowerFuncName: f})
 }
 
 /*
@@ -206,3 +224,14 @@ func (t *TemplateCache) Get(key string, templatePath string) (*template.Template
 // 	}
 // 	return nil
 // }
+
+// --------------------------------------------------------------------------------
+// log
+//
+var debugLog = true
+
+func debuglog(format string, params ...interface{}) {
+	if debugLog {
+		log.Printf(format, params...)
+	}
+}

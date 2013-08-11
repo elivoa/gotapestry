@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"got/utils"
 	"gxl"
+	"regexp"
 )
 
 func main() {
@@ -14,4 +15,12 @@ func main() {
 	fmt.Println(gxl.FormatCurrency(234567.456788, 3))     //234,567.457
 	fmt.Println(gxl.FormatCurrency(8234567890012.456, 4)) //8,234,567,890,012.4561
 	fmt.Println(gxl.FormatCurrency(0012.456, 4))          //12.4560
+	fmt.Println("********************************************************************************")
+
+	var rePrintValue, _ = regexp.Compile("^(.*){{(.*)}}$")
+	result := rePrintValue.FindStringSubmatch("/order/list/{{.IDIDID}}")
+	for _, r := range result {
+		fmt.Println(r)
+	}
+
 }

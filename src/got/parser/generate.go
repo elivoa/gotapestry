@@ -33,7 +33,7 @@ var importErrorPattern = regexp.MustCompile("cannot find package \"([^\"]+)\"")
 // 2. Run the appropriate "go build" command.
 // Requires that revel.Init has been called previously.
 // Returns the path to the built binary, and an error if there was a problem building it.
-func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *revel.Error) {
+func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *Error) {
 	if modulePaths == nil || len(modulePaths) == 0 {
 		panic("Generating Error: No modules found!!!")
 	}
@@ -41,7 +41,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *revel
 	// First, clear the generated files (to avoid them messing with ProcessSource).
 	cleanSource("generated")
 
-	sourceInfo, compileError := ParseSource(modulePaths)
+	sourceInfo, compileError := ParseSource(modulePaths, true) // find only
 	if compileError != nil {
 		return nil, compileError
 	}
@@ -53,8 +53,8 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *revel
 	// 	sourceInfo.InitImportPaths = append(sourceInfo.InitImportPaths, dbImportPath)
 	// }
 	importPaths := make(map[string]string)
-	// pageSpecs := []*TypeInfo{}
-	typeArrays := [][]*TypeInfo{sourceInfo.StructSpecs}
+	// pageSpecs := []*StructInfo{}
+	typeArrays := [][]*StructInfo{sourceInfo.Structs}
 	for _, specs := range typeArrays {
 		for _, spec := range specs {
 			switch spec.ProtonKind {
@@ -77,7 +77,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *revel
 		// "Controllers":    sourceInfo.ControllerSpecs(), // empty, leave it there
 		// "ValidationKeys": sourceInfo.ValidationKeys,    // empty, levae it there
 		"ImportPaths": importPaths,
-		"Structs":     sourceInfo.StructSpecs,
+		"Structs":     sourceInfo.Structs,
 		"ModulePaths": modulePaths,
 		"Modules":     modules,
 		"ProtonKindLabel": map[core.Kind]string{
@@ -154,7 +154,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *revel
 /// add by elivoa
 func calcImports(src *SourceInfo) map[string]string {
 	aliases := make(map[string]string)
-	typeArrays := [][]*TypeInfo{src.StructSpecs /*, src.TestSuites()*/}
+	typeArrays := [][]*StructInfo{src.Structs /*, src.TestSuites()*/}
 	for _, specs := range typeArrays {
 		for _, spec := range specs {
 			// fmt.Println("  > i:", spec.ImportPath, " o:", spec.PackageName)
@@ -247,34 +247,34 @@ func ExecuteTemplate(tmpl revel.ExecutableTemplate, data interface{}) string {
 // Looks through all the method args and returns a set of unique import paths
 // that cover all the method arg types.
 // Additionally, assign package aliases when necessary to resolve ambiguity.
-func calcImportAliases(src *SourceInfo) map[string]string {
-	aliases := make(map[string]string)
-	typeArrays := [][]*TypeInfo{src.ControllerSpecs() /*, src.TestSuites()*/}
-	for _, specs := range typeArrays {
-		for _, spec := range specs {
-			addAlias(aliases, spec.ImportPath, spec.PackageName)
+// func calcImportAliases(src *SourceInfo) map[string]string {
+// 	aliases := make(map[string]string)
+// 	typeArrays := [][]*StructInfo{src.ControllerSpecs() /*, src.TestSuites()*/}
+// 	for _, specs := range typeArrays {
+// 		for _, spec := range specs {
+// 			addAlias(aliases, spec.ImportPath, spec.PackageName)
 
-			for _, methSpec := range spec.MethodSpecs {
-				for _, methArg := range methSpec.Args {
-					if methArg.ImportPath == "" {
-						continue
-					}
+// 			for _, methSpec := range spec.MethodSpecs {
+// 				for _, methArg := range methSpec.Args {
+// 					if methArg.ImportPath == "" {
+// 						continue
+// 					}
 
-					addAlias(aliases, methArg.ImportPath, methArg.TypeExpr.PkgName)
-				}
-			}
-		}
-	}
+// 					addAlias(aliases, methArg.ImportPath, methArg.TypeExpr.PkgName)
+// 				}
+// 			}
+// 		}
+// 	}
 
-	// Add the "InitImportPaths", with alias "_"
-	for _, importPath := range src.InitImportPaths {
-		if _, ok := aliases[importPath]; !ok {
-			aliases[importPath] = "_"
-		}
-	}
+// 	// Add the "InitImportPaths", with alias "_"
+// 	for _, importPath := range src.InitImportPaths {
+// 		if _, ok := aliases[importPath]; !ok {
+// 			aliases[importPath] = "_"
+// 		}
+// 	}
 
-	return aliases
-}
+// 	return aliases
+// }
 
 func addAlias(aliases map[string]string, importPath, pkgName string) {
 	alias, ok := aliases[importPath]
@@ -306,12 +306,12 @@ func containsValue(m map[string]string, val string) bool {
 
 // Parse the output of the "go build" command.
 // Return a detailed Error.
-func newCompileError(output []byte) *revel.Error {
+func newCompileError(output []byte) *Error {
 	errorMatch := regexp.MustCompile(`(?m)^([^:#]+):(\d+):(\d+:)? (.*)$`).
 		FindSubmatch(output)
 	if errorMatch == nil {
 		revel.ERROR.Println("Failed to parse build errors:\n", string(output))
-		return &revel.Error{
+		return &Error{
 			SourceType:  "Go code",
 			Title:       "Go Compilation Error",
 			Description: "See console for build error.",
@@ -324,7 +324,7 @@ func newCompileError(output []byte) *revel.Error {
 		absFilename, _ = filepath.Abs(relFilename)
 		line, _        = strconv.Atoi(string(errorMatch[2]))
 		description    = string(errorMatch[4])
-		compileError   = &revel.Error{
+		compileError   = &Error{
 			SourceType:  "Go code",
 			Title:       "Go Compilation Error",
 			Path:        relFilename,
@@ -367,7 +367,7 @@ func main() {
     config.Config.RegisterModulePath("{{.PackagePath}}", "{{.Name}}"){{end}}
 
     // parse source again.
-    sourceInfo, compileError := parser.ParseSource(config.Config.ModulePath)
+    sourceInfo, compileError := parser.ParseSource(config.Config.ModulePath, false) // deep parse
     if compileError != nil {
         panic(compileError.Error())
     }
@@ -389,3 +389,12 @@ func main() {
     _got.Start()
 }
 `
+
+// // cache StructCache
+// if !findOnly {
+// 	fmt.Println("********************************************************************************")
+// 	for _, si := range srcInfo.Structs {
+// 		// cache.StructCache.GetCreate(si.IsProton)
+// 		fmt.Println(si)
+// 	}
+// }

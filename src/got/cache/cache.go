@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Monday, 2013-08-05 13:32:33>
+  Time-stamp: <[cache.go] Elivoa @ Sunday, 2013-08-11 18:52:29>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -14,6 +14,7 @@
 package cache
 
 import (
+	"encoding/json"
 	"fmt"
 	"got/core"
 	"got/debug"
@@ -25,7 +26,7 @@ import (
 )
 
 // --------------------------------------------------------------------------------
-// SourceInfo Cache.
+// SourceInfo Cache. from package parser.
 
 var SourceCache *parser.SourceInfo
 
@@ -47,14 +48,15 @@ type Cache struct {
 }
 
 type StructInfo struct {
-	l      sync.Mutex
+	l      sync.RWMutex
 	t      reflect.Type
-	Fields map[string]*FieldInfo // fieldname -> FieldInfo
+	Fields map[string]*FieldInfo // lower(fieldname) -> FieldInfo
 	Kind   core.Kind             // current struct's kind
 }
 
 // IsSlice()
 type FieldInfo struct {
+	Name string       // field's name
 	Type reflect.Type // field's type, or slice's Elem() type.
 	Kind core.Kind    // [page|component|mixin|struct|slice?]
 
@@ -78,20 +80,23 @@ func (si *StructInfo) IsComponent() bool {
 	return si.Kind == core.COMPONENT
 }
 
+// returns FieldInfo
 func (si *StructInfo) FieldInfo(field string) *FieldInfo {
-	si.l.Lock()
-	fi := si.Fields[field]
-	si.l.Unlock()
+	si.l.RLock()
+	fi := si.Fields[strings.ToLower(field)]
+	si.l.RUnlock()
 	return fi
 }
 
 // advanced
 func (si *StructInfo) Deep(field string) *StructInfo {
-	if fi := si.FieldInfo(field); fi != nil {
-		// TODO mutex?
-		StructCache.l.Lock()
+	si.l.RLock()
+	fi := si.FieldInfo(field)
+	si.l.RUnlock()
+	if fi != nil {
+		StructCache.l.RLock()
 		deeperSI, ok := StructCache.m[fi.Type]
-		StructCache.l.Unlock()
+		StructCache.l.RUnlock()
 		if ok {
 			return deeperSI
 		}
@@ -123,9 +128,9 @@ func (c *Cache) GetCreate(rt reflect.Type, kind core.Kind) *StructInfo {
 	}
 
 	// 2. get and return
-	c.l.Lock()
+	c.l.RLock()
 	si := c.m[t]
-	c.l.Unlock()
+	c.l.RUnlock()
 	if si != nil {
 		// validation
 		if si.Kind != kind {
@@ -157,11 +162,29 @@ func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
 		Fields: make(map[string]*FieldInfo),
 		Kind:   kind,
 	}
+	createFieldInfo(si, t)
+	if false {
+		fmt.Println("*******  print struct info *******************************************************")
+		for k, v := range si.Fields {
+			fmt.Println(k, " -> ", v)
+		}
+	}
+	return si
+}
+
+// analysis fields in t, set info into si.
+func createFieldInfo(si *StructInfo, t reflect.Type) {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		alias := fieldAlias(field)
 		if alias == "-" { // Ignore this field.
 			continue
+		}
+
+		//
+		if field.Anonymous {
+			anonymousType, _ := utils.RemovePointer(field.Type, false)
+			createFieldInfo(si, anonymousType)
 		}
 
 		ft, isSlice := utils.RemovePointer(field.Type, true)
@@ -175,18 +198,18 @@ func (c *Cache) create(rt reflect.Type, kind core.Kind) *StructInfo {
 			*/
 		}
 		fi := &FieldInfo{
+			Name:    field.Name,
 			Index:   i,
 			Type:    field.Type,
 			IsSlice: isSlice,
-			Kind:    core.UNKNOWN, // unknown if it's that.
+			Kind:    core.UNKNOWN,
 		}
 		// TODO here judge if it's a page or component, store the type.
 
 		si.l.Lock()
-		si.Fields[alias] = fi
+		si.Fields[strings.ToLower(alias)] = fi
 		si.l.Unlock()
 	}
-	return si
 }
 
 // Append FieldInfo which describ a component embed in a page or component.
@@ -219,6 +242,7 @@ func (si *StructInfo) CacheEmbedProton(rt reflect.Type, tid string, kind core.Ki
 
 	// if not cached. create FieldInfo and cache.
 	fi := &FieldInfo{
+		// Name:    tid, // if component with tid but no field, use tid as name.
 		Tid:     tid,
 		Kind:    core.COMPONENT,
 		Index:   -1, // not exist in proton
@@ -227,7 +251,7 @@ func (si *StructInfo) CacheEmbedProton(rt reflect.Type, tid string, kind core.Ki
 	}
 
 	si.l.Lock()
-	si.Fields[tid] = fi
+	si.Fields[strings.ToLower(tid)] = fi
 	si.l.Unlock()
 	return fi
 }
@@ -250,8 +274,12 @@ func (c *Cache) String() string {
 }
 
 func (fi *FieldInfo) String() string {
-	return fmt.Sprintf("StructInfo{Type:%v, Idx:%v, IsSlice:%v}",
-		fi.Type, fi.Index, fi.IsSlice)
+	b, err := json.Marshal(fi)
+	if err != nil {
+		return fmt.Sprintf("[name:StructInfo{Type:%v, Idx:%v, IsSlice:%v}",
+			fi.Type, fi.Index, fi.IsSlice)
+	}
+	return string(b)
 }
 
 // __________________________________________________________________________________________

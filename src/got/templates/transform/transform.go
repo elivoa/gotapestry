@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Thursday, 2013-08-01 21:49:56>
+  Time-stamp: <[transform.go] Elivoa @ Sunday, 2013-08-11 18:52:43>
 */
 package transform
 
@@ -7,7 +7,13 @@ import (
 	"bytes"
 	"code.google.com/p/go.net/html"
 	"fmt"
+	"got/cache"
+	"got/core"
+	"got/register"
 	"io"
+	"reflect"
+	"regexp"
+	"strings"
 )
 
 // ---- Transform template ------------------------------------------
@@ -101,10 +107,10 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 // return
 //   - true if already write to buffer.
 //   - false if need to write Raw() to buffer.
+// Note: go.net/html package lowercased all values,
 //
 func (t *Transformater) processStartTag() bool {
 	bname, hasAttr := t.z.TagName()
-
 	var (
 		iscomopnent   bool
 		componentName []byte
@@ -190,6 +196,16 @@ func (t *Transformater) renderIf(attrs map[string][]byte) {
 func (t *Transformater) transformComponent(componentName []byte, elementName []byte,
 	attrs map[string][]byte) {
 
+	// lookup component and get StructInfo
+	lookupurl := strings.Replace(string(componentName), "_", "/", -1)
+	lr, err := register.Components.Lookup(lookupurl)
+	if err != nil {
+		panic(fmt.Sprintf("Can't find component for: %v", string(componentName)))
+	}
+	sc := cache.StructCache
+	si := sc.GetCreate(reflect.TypeOf(lr.Segment.Proton), core.COMPONENT)
+	// TODO: cache embed directly elements.
+
 	t.b.WriteString("{{t_")
 	t.b.Write(componentName)
 	t.b.WriteString(" $")
@@ -205,9 +221,13 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 		for key, val := range attrs {
 			// write key, all capitlize
 			t.b.WriteString(" \"")
-			t.b.WriteString(key)
-			// t.b.WriteString(strings.ToUpper(string(attr[0][0:1])))
-			// t.b.Write(attr[0][1:])
+			// get which is cached.
+			fi := si.FieldInfo(key)
+			if fi != nil {
+				t.b.WriteString(fi.Name)
+			} else {
+				t.b.WriteString(key)
+			}
 			t.b.WriteString("\" ")
 
 			// TODO: Auto-detect literal or functional
@@ -217,21 +237,35 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 			//   "literal:....."      "...."               // literal prefix
 			//	 "abcd"               "abcd"               // auto detect plan text
 			//	 ".Name+'_'+.Id"      (print .Name '_' .Id)// special
+			//   "/xxx/{{.ID}}"       (print "/xxx/" .Id)
 			//
 			//   TODO support more prefix...
 			//
 			// if value starts from . or $ , treate this as property. others as string
-			if len(val) > 0 && (val[0] == '.' || val[0] == '$' || val[0] == '(') {
+			switch {
+			case len(val) > 0 && (val[0] == '.' || val[0] == '$' || val[0] == '('):
 				t.b.Write(val)
-			} else if len(val) > 5 && bytes.Equal(val[0:5], []byte("print")) {
+			case len(val) > 5 && bytes.Equal(val[0:5], []byte("print")):
 				t.b.WriteString("(")
 				t.b.Write(val)
 				t.b.WriteString(")")
-			} else if len(val) > 8 && bytes.Equal(val[0:8], []byte("literal:")) {
+			case len(val) > 8 && bytes.Equal(val[0:8], []byte("literal:")):
 				t.b.WriteString(" \"")
 				t.b.Write(bytes.Replace(val[8:], []byte{'"'}, []byte{'\\', '"'}, 0))
 				t.b.WriteString("\"")
-			} else { // default
+			case printValueRegex.Match(val): // if is "/xxx/{{.ID}}"
+				result := printValueRegex.FindSubmatch(val)
+				// for _, r := range result {
+				// 	fmt.Println(r)
+				// }
+				if len(result) == 3 { // translate to (print "/xxx/" .ID)
+					t.b.WriteString(" (print \"")
+					t.b.Write(result[1])
+					t.b.WriteString("\" ")
+					t.b.Write(result[2])
+					t.b.WriteString(")")
+				}
+			default:
 				t.b.WriteString(" \"")
 				t.b.Write(bytes.Replace(val, []byte{'"'}, []byte{'\\', '"'}, 0))
 				t.b.WriteString("\"")
@@ -240,6 +274,8 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 	}
 	t.b.WriteString("}}")
 }
+
+var printValueRegex, _ = regexp.Compile("^(.*){{(.*)}}$")
 
 func (t *Transformater) Render() string {
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
