@@ -149,20 +149,23 @@ func (p *PersonDetail) Setup() {
 		if y == y2 && m == m2 && d == d2 { // today's order
 			jo := orderservice.OrderDetailsJson(order)
 			var sumTotal float64
+			var sumQuantity int
 			for _, id := range jo.Orders {
 				productJson := jo.Products[strconv.Itoa(id)]
+				// 例如：奢华宝石
 				msg.WriteString(productJson.Name)
-				// msg.WriteString(" ")
 				totalQuantity := 0
 				for _, q := range productJson.Quantity {
 					totalQuantity += q[2].(int)
 					sumTotal += float64(q[2].(int)) * productJson.SellingPrice
 				}
-
+				sumQuantity += totalQuantity
+				// eg: 1件
 				msg.WriteString(strconv.Itoa(totalQuantity))
 				msg.WriteString("件")
+
 				// details
-				if len(productJson.Quantity) > 1 {
+				if len(productJson.Quantity) >= 1 {
 					msg.WriteString("(")
 					i := 0
 					for _, q := range productJson.Quantity {
@@ -170,8 +173,14 @@ func (p *PersonDetail) Setup() {
 							msg.WriteString(", ")
 						}
 						i += 1
-						msg.WriteString(q[0].(string))
-						msg.WriteString(q[1].(string))
+						_color := q[0].(string)
+						_size := q[1].(string)
+						if _color != "默认颜色" {
+							msg.WriteString(_color)
+						}
+						if _size != "均码" {
+							msg.WriteString(_size)
+						}
 						msg.WriteString(" ")
 						msg.WriteString(strconv.Itoa(q[2].(int)))
 					}
@@ -179,14 +188,17 @@ func (p *PersonDetail) Setup() {
 				}
 				msg.WriteString("，")
 
-				// price
-				msg.WriteString(gxl.FormatCurrency(productJson.SellingPrice*float64(totalQuantity), 2))
+				// price eg: xxx元
+				msg.WriteString(fmt.Sprint(productJson.SellingPrice * float64(totalQuantity)))
+				// msg.WriteString(gxl.FormatCurrency(productJson.SellingPrice*float64(totalQuantity), 2))
 				msg.WriteString("元")
 				msg.WriteString("；")
 			}
 
-			// 共计
+			// 共计 n件 x元
 			msg.WriteString("共计")
+			msg.WriteString(strconv.Itoa(sumQuantity))
+			msg.WriteString("件")
 			msg.WriteString(gxl.FormatCurrency(sumTotal, 2))
 			msg.WriteString("元")
 			msg.WriteString("；")
@@ -197,7 +209,7 @@ func (p *PersonDetail) Setup() {
 			} else if order.DeliveryMethodIs("YTO") {
 				msg.WriteString("圆通运费")
 			} else {
-				msg.WriteString("【ERROR】 运费")
+				msg.WriteString("【快递类型错误】 运费")
 			}
 			if order.ExpressFee > 0 {
 				msg.WriteString(fmt.Sprint(order.ExpressFee))
@@ -222,7 +234,7 @@ func (p *PersonDetail) Setup() {
 				msg.WriteString(" = ")
 				msg.WriteString(gxl.FormatCurrency(float64(int64(sumTotal)+order.ExpressFee)+order.Accumulated, 2))
 				msg.WriteString("元")
-				msg.WriteString("；【内测：请仔细检查累计欠款是否正确】")
+				msg.WriteString("；")
 			}
 		}
 	}
