@@ -46,21 +46,24 @@
                   <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">D</span></if>
                   {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
                   <!--<t:output value=".TrackNumber" />
-                      nested components Render order has bugs.-->
+                  nested components Render order has bugs.-->
                   {{.TrackNumber}}
                 </a>
               </td>
               <td>
-                {{if .IsStatus "todeliver"}}
-                <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
-                <span class="txt_c">(不含运费)</span>
-                {{else}}
-                {{if .DeliveryMethodIs "TakeAway"}}<span class="txt_c">(自提)</span>
-                {{else}}
-                <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
-                <span class="txt_c">(含运费{{.ExpressFee}}元)</span>
-                {{end}}
-                {{end}}
+                <if t='.IsStatus "todeliver"'>
+                  <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
+                  <span class="txt_c">(不含运费)</span>
+                  <else />
+                  <if t='.DeliveryMethodIs "TakeAway"'>
+                    <span class="txt_c">(自提)</span>
+                    <else />
+                    <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
+                    <span class="txt_c">
+                      ({{if not .IsDaoFu}}含运费{{.ExpressFee}}元{{else}}到付{{end}})
+                    </span>
+                  </if>
+                </if>
               </td>
               <td>{{.DisplayStatus }}</td>
               <td nowrap title="{{.CreateTime | prettytime}} ">
@@ -70,44 +73,53 @@
               <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
 
-                {{/*
+                {{/* -----------
                 // Not works because the context is not correct.
                 // Context Needed: $, ., $xxx(all variables.), 
                 {{if .IsStatus "toprint"}} {{template "order-list-operator-toprint" .}} {{end}}
                 {{if .IsStatus "todeliver"}} {{template "order-list-operator-todeliver" .}} {{end}}
                 {{if .IsStatus "delivering"}} {{template "order-list-operator-delivering" .}} {{end}}
                 {{if .IsStatus "cancelled" "done"}} {{template "order-list-operator-cancelled" .}} {{end}}
-                */}}
+                ------------- */}}
                 
-                {{if .IsStatus "toprint"}}
-                <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-                <a href="{{$.PrintOrderLink .}}"
-                   onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
-                <span class="vline">|</span>
-                {{end}}
+                <if t='.IsStatus "toprint"'>
+                  <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
+                  <a href="{{$.PrintOrderLink .}}"
+                     onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
+                  <span class="vline">|</span>
+                  <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+                     onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+                </if>
 
 
-                {{if .IsStatus "todeliver"}}
-                <a href="{{$.FixPrintOrderLink .}}">打印订单</a>
-                <span class="vline">|</span>
-                {{t_order_deliverbutton $ "tid" `deliverBtn` "TrackNumber" .TrackNumber "DeliveryMethod" .DeliveryMethod "DeliveryTrackingNumber" .DeliveryTrackingNumber "ExpressFee" .ExpressFee "Source" (print "/order/list/" $.Tab)}}
-                <span class="vline">|</span>
-                {{end}}
+                <if t='.IsStatus "todeliver"'>
+                  <a href="{{$.FixPrintOrderLink .}}">打印订单</a>
+                  <span class="vline">|</span>
+                  <a t:type="order/DeliverButton" tid="deliverBtn" trackNumber=".TrackNumber"
+                     deliveryMethod=".DeliveryMethod" deliveryTrackingNumber=".DeliveryTrackingNumber"
+                     ExpressFee=".ExpressFee" Source="/order/list/{{$.Tab}}" />
+                  <span class="vline">|</span>
+                  <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+                     onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+                </if>
 
-                {{if .StatusIs "delivering"}}
-                {{if .DeliveryMethodIs "TakeAway"}}
-                <a href="{{$.FixPrintOrderLink .}}">自提打印订单</a><span class="vline">|</span>
+                <if t='.StatusIs "delivering"'>
+                  <if t='.DeliveryMethodIs "TakeAway"'>
+                    <a href="{{$.FixPrintOrderLink .}}">自提打印订单</a>
+                    <span class="vline">|</span>
+                  </if>
+                  
+                  {{/* TODO order/CloseButton */}}
+                  <a t:type="order.CloseButton" Tid="CloseButton" id="close{{.TrackNumber}}_"
+                     TrackNumber=".TrackNumber" Source="/order/list{{$.Tab}}" />
+                </if>
 
-                {{end}}
-                {{t_order_closebutton $ "Tid" `CloseButton` "id" (print `close` .TrackNumber `_`) "TrackNumber" .TrackNumber "Source" (print "/order/list/" $.Tab)}}
-                {{end}}
-
-                {{if .IsStatus "cancelled" "done"}}  
-                <a href="{{$.ViewLink .}}">查看订单</a>
-                {{end}}
-                {{/*
-                <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}">[喜小乐可以删除订单]</a>
-                */}}            
+                <if t='.IsStatus "cancelled" "done"'>
+                  <a href="{{$.ViewLink .}}">查看订单</a>
+                </if>
+                <hide>
+                  <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}">[喜小乐可以删除订单]</a>
+                </hide>          
               </td>
             </tr>
           </range>
@@ -115,12 +127,12 @@
       </if>
 
       <script type="text/javascript">
-              $(function(){
-                orderlist = new OrderList({
-                  ClientId: {{.ClientId}}
-                })
-              });
-      </script>
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+</script>
 
     </div>
   </body>

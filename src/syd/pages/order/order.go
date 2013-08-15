@@ -3,24 +3,11 @@ package order
 import (
 	"fmt"
 	"got/core"
-	"got/register"
 	"strings"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
-
-/* ________________________________________________________________________________
-   Register all pages under /order
-*/
-func init() {
-	register.Page(Register,
-		&OrderIndex{},
-		&OrderList{}, &ShippingInsteadList{},
-		&ButtonSubmitHere{}, &ViewOrder{},
-	)
-}
-func Register() {}
 
 // ________________________________________________________________________________
 // Start Order pages

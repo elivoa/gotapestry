@@ -22,14 +22,6 @@ import (
 	"time"
 )
 
-// func Register() {}
-// func init() {
-// 	register.Page(Register,
-// 		&FileUploadIndex{},
-// 		&FileUploadTest{},
-// 	)
-// }
-
 // ________________________________________________________________________________
 //
 type FileUploadTest struct {

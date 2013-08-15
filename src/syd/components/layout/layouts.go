@@ -2,15 +2,7 @@ package layout
 
 import (
 	"got/core"
-	"got/route"
 )
-
-func Register() {}
-func init() {
-	route.Component(Register,
-		&Header{}, &HeaderNav{}, &LeftNav{},
-	)
-}
 
 // ________________________________________________________________________________
 // Header -- including css and js resources.

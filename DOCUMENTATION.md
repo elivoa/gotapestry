@@ -12,6 +12,7 @@ Documentation
 ==============
 
 ## Page Lifecircle
+-------------------
 
 ### Page value Injection
 + TODO …
@@ -37,18 +38,35 @@ Documentation
 ### Form Submit
 
 
+## Components
+-------------
+
+
 ## Templates
+------------
+
 Got's template engine;
 Some Examples here:
 
 - If
 > `<if t="some test">…</if>`
+
 - Loop
 > `<range source=".List"`>…</range>
+
 - Component
 > `<t:layout_leftnav CurPage="/person/list/{{.PersonType}}" />`
 	Note that got will change the name of the attribute lowercased
 	when attribute name doesn't match with struct's field name.
+
+- Use components
+Several method to use a component on template file. Most of them 
+will be transformed to the last one.
+
+	- `<t:order.DetailsForm param1="value1"/>`
+	- `<t:order_DetailsForm />`
+	- `<div t:type="order.DetailsForm"></div>`
+	- `{{t_order_detailsform $ "Param1" "value1"}}`
 
 
 

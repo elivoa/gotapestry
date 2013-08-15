@@ -2,15 +2,9 @@ package product
 
 import (
 	"got/core"
-	"got/route"
 	"syd/model"
 	"syd/service/productservice"
 )
-
-func Register() {}
-func init() {
-	route.Component(Register, &ProductColorSizeTable{})
-}
 
 // ________________________________________________________________________________
 // Product ColorSize Table

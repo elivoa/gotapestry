@@ -45,7 +45,8 @@ func (p *OrderCreateDetail) Setup() {
 		if err != nil {
 			panic(err.Error())
 		}
-		if !order.IsStatus("toprint") {
+		// can't edit WholeSale order when it's staus is after delivering.
+		if !order.IsStatus("toprint") && order.TypeIs(uint(model.Wholesale)) {
 			panic(fmt.Sprintf("Order are not allow to edit in this status[%v]", order.Status))
 		}
 

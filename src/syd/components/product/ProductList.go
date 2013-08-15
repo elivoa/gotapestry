@@ -27,6 +27,9 @@ func (p *ProductList) Ondelete(productId int) (string, string) {
 
 func (p *ProductList) ShowSpecification(productId int) template.HTML {
 	product := productservice.GetProduct(productId)
+	if nil == product{
+		return template.HTML("ERROR: PRODUCT IS NIL!")
+	}
 	var spec bytes.Buffer
 	if product.Colors == nil || len(product.Colors) > 0 {
 		i := 0
@@ -38,6 +41,8 @@ func (p *ProductList) ShowSpecification(productId int) template.HTML {
 			spec.WriteString(": ")
 			o := 0
 			for _, size := range product.Sizes {
+				// if stock is nil, returns nothing.
+				// to be continued....
 				if o = o + 1; o > 1 {
 					spec.WriteString(" / ")
 				}

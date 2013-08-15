@@ -5,13 +5,8 @@ import (
 	"fmt"
 	"got/core"
 	"got/debug"
-	"got/register"
 	"syd/service/suggest"
 )
-
-func Register() {}
-
-func init() { register.Page(Register, &Suggest{}) }
 
 type Suggest struct {
 	core.Page

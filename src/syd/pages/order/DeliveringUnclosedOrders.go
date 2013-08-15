@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"got/core"
-	"got/register"
 	"strconv"
 	"strings"
 	"syd/dal/orderdao"
@@ -12,10 +11,6 @@ import (
 	"syd/service/orderservice"
 	"time"
 )
-
-func init() {
-	register.Page(Register, &DeliveringUnclosedOrders{})
-}
 
 type DeliveringUnclosedOrders struct {
 	core.Page

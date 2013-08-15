@@ -44,18 +44,32 @@
         </div>
 
         <div class="">
-          {{t_order_detailsform $}}
+          <t:order.DetailsForm />
+
+          <!-- times -->
+          <ul>
+            <li>订单创建时间：{{.Order.CreateTime | prettytime}}</li>
+            <li>订单修改时间：{{.Order.UpdateTime | prettytime}}</li>
+            <if t='.Order.StatusIs "Closed"'>
+              <li>订单关闭时间：{{.Order.CloseTime | prettytime}}</li>
+            </if>
+          </ul>
         </div>
         
         <div class="unit">
           <div class="tit"><strong>发货方式</strong></div>
           <div class="B_express">
 			<span class="B_shipping_method">
-              {{if .Order.DeliveryMethodIs "YTO"}}<span class="icon_yto"></span>{{end}}
-              {{if .Order.DeliveryMethodIs "SF"}}<span class="icon_sf"></span>{{end}}
-              {{if .Order.DeliveryMethodIs "TakeAway"}}<span class="icon_pickup"></span>{{end}}
+              <if t='.Order.DeliveryMethodIs "YTO"'><span class="icon_yto"></span></if>
+              <if t='.Order.DeliveryMethodIs "SF"'><span class="icon_sf"></span></if>
+              <if t='.Order.DeliveryMethodIs "TakeAway"'><span class="icon_pickup"></span></if>
             </span>
-			<span class="B_shipping_price">运费：<span class="price">{{.Order.ExpressFee}}</span>元</span>
+            <if t='.Order.IsDaoFu | not'>
+			  <span class="B_shipping_price">运费：<span class="price">{{.Order.ExpressFee}}</span>元</span>
+            </if>
+            <if t='.Order.IsDaoFu'>
+              到付
+            </if>
 			<span class="B_order_num">运单号：{{.Order.DeliveryTrackingNumber}}</span>
           </div>
         </div>
@@ -63,9 +77,12 @@
         <div class="unit">
           <div class="tit"><strong>合计</strong></div>
           <div class="B_express">
-            <span>{{.Order.TotalPrice}}</span> + 
-            <span>{{.Order.ExpressFee}}</span> =
-            <span class="price">{{.Order.SumOrderPrice}}</span>
+            <span>{{.Order.TotalPrice}}</span>
+            <if t='not .Order.IsDaoFu'>
+              + <span>{{.Order.ExpressFee}}</span> =
+              <span class="price">{{.Order.SumOrderPrice}}</span>
+            </if>
+            <span>元</span>
           </div>
         </div>
         

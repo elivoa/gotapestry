@@ -10,18 +10,11 @@ import (
 	"fmt"
 	"got/core"
 	"got/debug"
-	"got/register"
 	"syd/dal"
 	"syd/dal/productdao"
 	"syd/service/personservice"
 	"syd/service/productservice"
 )
-
-func Register() {
-	register.Page(Register,
-		&Api{},
-	)
-}
 
 type Api struct {
 	core.Page

@@ -11,7 +11,7 @@
   {{range .Products}}
   <tr>
     <td nowrap><a href="/product/detail/{{.Id}}">{{.Name}}</a></td>
-    <td align="right"><span class="price">{{.Price | formatcurrency}}</span></td>
+    <td align="right"><span class="price">{{.Price | prettycurrency}}</span></td>
     <td nowrap>
       {{$.ShowSpecification .Id}}
       <!--

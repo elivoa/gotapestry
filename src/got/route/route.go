@@ -232,8 +232,3 @@ func handleComponentReturn(lcc *lifecircle.LifeCircleControl, seg *register.Prot
 		panic(lcc.Err.Error())
 	}
 }
-
-// TODO delete this files.
-func Component(f func(), components ...core.Componenter) int {
-	return 0
-}

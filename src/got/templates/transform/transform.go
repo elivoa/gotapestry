@@ -1,11 +1,12 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Sunday, 2013-08-11 18:52:43>
+  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-08-14 00:06:43>
 */
 package transform
 
 import (
 	"bytes"
 	"code.google.com/p/go.net/html"
+	"errors"
 	"fmt"
 	"got/cache"
 	"got/core"
@@ -197,17 +198,22 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 	attrs map[string][]byte) {
 
 	// lookup component and get StructInfo
-	lookupurl := strings.Replace(string(componentName), "_", "/", -1)
+	lookupurl := strings.Replace(string(componentName), ".", "/", -1)
 	lr, err := register.Components.Lookup(lookupurl)
-	if err != nil {
-		panic(fmt.Sprintf("Can't find component for: %v", string(componentName)))
+	if err == nil && (lr.Segment == nil || lr.Segment.Proton == nil) {
+		err = errors.New(fmt.Sprintf("Can't find component for %v", string(componentName)))
 	}
+	if err != nil {
+		panic(err.Error())
+	}
+
 	sc := cache.StructCache
 	si := sc.GetCreate(reflect.TypeOf(lr.Segment.Proton), core.COMPONENT)
 	// TODO: cache embed directly elements.
 
 	t.b.WriteString("{{t_")
-	t.b.Write(componentName)
+	// t.b.Write(componentName)
+	t.b.WriteString(strings.Replace(lookupurl, "/", "_", -1))
 	t.b.WriteString(" $")
 
 	// elementName

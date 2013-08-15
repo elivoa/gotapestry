@@ -2,15 +2,9 @@ package index
 
 import (
 	"got/core"
-	"got/register"
 	"syd/model"
 	"syd/service/personservice"
 )
-
-func Register() {}
-func init() {
-	register.Page(Register, &Index{})
-}
 
 // _______________________________________________________________________________
 //  ROOT Page

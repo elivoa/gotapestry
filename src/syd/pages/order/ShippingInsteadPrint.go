@@ -4,17 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"got/core"
-	"got/register"
 	"html/template"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 	"syd/service/productservice"
 )
-
-func init() {
-	register.Page(Register, &ShippingInsteadPrint{})
-}
 
 // ________________________________________________________________________________
 // ShippingInsteadPrint

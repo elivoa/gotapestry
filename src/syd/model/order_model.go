@@ -157,6 +157,10 @@ func (order *Order) StatusIs(status ...string) bool {
 	return false
 }
 
+func (order *Order) IsDaoFu() bool {
+	return order.ExpressFee == -1
+}
+
 func (order *Order) DeliveryMethodIs(deliveryMethod string) bool {
 	return deliveryMethod == order.DeliveryMethod
 }
