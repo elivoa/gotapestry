@@ -2,6 +2,7 @@ package product
 
 import (
 	"bytes"
+	"fmt"
 	"got/core"
 	"got/debug"
 	"got/route"
@@ -25,9 +26,10 @@ func (p *ProductList) Ondelete(productId int) (string, string) {
 	return route.RedirectDispatch(p.Source, "/product/list")
 }
 
+// returns a string contains available size and color.
 func (p *ProductList) ShowSpecification(productId int) template.HTML {
 	product := productservice.GetProduct(productId)
-	if nil == product{
+	if nil == product {
 		return template.HTML("ERROR: PRODUCT IS NIL!")
 	}
 	var spec bytes.Buffer
@@ -42,11 +44,14 @@ func (p *ProductList) ShowSpecification(productId int) template.HTML {
 			o := 0
 			for _, size := range product.Sizes {
 				// if stock is nil, returns nothing.
-				// to be continued....
-				if o = o + 1; o > 1 {
-					spec.WriteString(" / ")
+				key := fmt.Sprintf("%v__%v", color, size)
+				stock := product.Stocks[key]
+				if stock != -1 { // stock = -1 means not available.
+					if o = o + 1; o > 1 {
+						spec.WriteString(" / ")
+					}
+					spec.WriteString(size)
 				}
-				spec.WriteString(size)
 			}
 		}
 	}

@@ -23,7 +23,7 @@ type Product struct {
 	UpdateTime time.Time
 
 	Pictures string // picture keys splited by ';' filenamne can't contain ';'
-
+	
 	// additional information, not in persistence
 	Colors     []string // these two information stores in product_properties table.
 	Sizes      []string

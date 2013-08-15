@@ -126,6 +126,16 @@ func (p *ProductList) Setup() {
 	}
 }
 
+func (p *ProductList) TabClass(letter string) string {
+	if "all" == letter && p.Capital == "" {
+		return "cur"
+	}
+	if strings.ToLower(p.Capital) == strings.ToLower(letter) {
+		return "cur"
+	}
+	return ""
+}
+
 // ________________________________________________________________________________
 // Product Details
 
