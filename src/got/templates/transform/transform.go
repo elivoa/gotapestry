@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Wednesday, 2013-08-14 00:06:43>
+  Time-stamp: <[transform.go] Elivoa @ Friday, 2013-08-16 15:51:59>
 */
 package transform
 
@@ -55,7 +55,6 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 	t.z = z
 	for {
 		tt := z.Next()
-
 		// after call something all tag is lowercased. but here with case.
 		zraw := z.Raw()
 		raw := make([]byte, len(zraw))
@@ -111,11 +110,13 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 // Note: go.net/html package lowercased all values,
 //
 func (t *Transformater) processStartTag() bool {
+	// collect information
 	bname, hasAttr := t.z.TagName()
 	var (
 		iscomopnent   bool
 		componentName []byte
 		elementName   []byte
+		err           error
 	)
 	if len(bname) >= 2 && bname[0] == 't' && bname[1] == ':' {
 		iscomopnent = true
@@ -142,8 +143,9 @@ func (t *Transformater) processStartTag() bool {
 		}
 	}
 	if iscomopnent {
-		t.transformComponent(componentName, elementName, attrs)
-		return true
+		if err = t.transformComponent(componentName, elementName, attrs); err == nil {
+			return true
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -157,7 +159,12 @@ func (t *Transformater) processStartTag() bool {
 		t.b.WriteString("{{else}}")
 	case "hide":
 		t.b.WriteString("{{/*")
+	case "t:import":
+		t.b.WriteString("----------")
 	default:
+		if err != nil {
+			panic(err.Error())
+		}
 		return false
 	}
 	return true
@@ -195,7 +202,7 @@ func (t *Transformater) renderIf(attrs map[string][]byte) {
 }
 
 func (t *Transformater) transformComponent(componentName []byte, elementName []byte,
-	attrs map[string][]byte) {
+	attrs map[string][]byte) error {
 
 	// lookup component and get StructInfo
 	lookupurl := strings.Replace(string(componentName), ".", "/", -1)
@@ -204,7 +211,7 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 		err = errors.New(fmt.Sprintf("Can't find component for %v", string(componentName)))
 	}
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 
 	sc := cache.StructCache
@@ -279,6 +286,7 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 		}
 	}
 	t.b.WriteString("}}")
+	return nil
 }
 
 var printValueRegex, _ = regexp.Compile("^(.*){{(.*)}}$")

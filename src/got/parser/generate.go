@@ -113,7 +113,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *Error
 		buildCmd := exec.Command(goPath, "build",
 			// "-tags", buildTags,
 			"-o", binName, path.Join("generated"))
-		debug.Log("Exec: %v", buildCmd.Args)
+		// debug.Log("Exec: %v", buildCmd.Args)
 		output, err := buildCmd.CombinedOutput()
 
 		// If the build succeeded, we're done.
@@ -121,7 +121,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *Error
 			fmt.Println("bulid success, return")
 			return NewApp(binName), nil
 		}
-		revel.ERROR.Println(string(output))
+		panic(string(output))
 
 		// See if it was an import error that we can go get.
 		matches := importErrorPattern.FindStringSubmatch(string(output))
@@ -138,16 +138,18 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *Error
 
 		// Execute "go get <pkg>"
 		getCmd := exec.Command(goPath, "get", pkgName)
-		revel.TRACE.Println("Exec:", getCmd.Args)
+		// debug.Log("Exec: ", getCmd.Args)
 		getOutput, err := getCmd.CombinedOutput()
 		if err != nil {
-			revel.ERROR.Println(string(getOutput))
+			panic(string(getOutput))
+			// revel.ERROR.Println(string(getOutput))
 			return nil, newCompileError(output)
 		}
 
 		// Success getting the import, attempt to build again.
 	}
-	revel.ERROR.Fatalf("Not reachable")
+
+	panic("Not reachable")
 	return nil, nil
 }
 

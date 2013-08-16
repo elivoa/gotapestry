@@ -11,8 +11,9 @@ import (
 type OrderList struct {
 	core.Component
 
-	Orders []*model.Order
-	Tab    string // receive status tabs. TODO A Better way to do this?
+	Orders     []*model.Order
+	Tab        string  // receive status tabs. TODO A Better way to do this?
+	TotalPrice float64 // all order's price
 
 	// temp values
 	customerNames map[int]*model.Person // order-id -> customer names
@@ -30,6 +31,7 @@ func (p *OrderList) SetupRender() {
 	if length > 0 {
 		p.customerNames = make(map[int]*model.Person, length)
 		for _, o := range p.Orders {
+			p.TotalPrice += o.TotalPrice
 			if _, ok := p.customerNames[o.CustomerId]; ok {
 				continue
 			}

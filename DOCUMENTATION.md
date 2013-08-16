@@ -70,8 +70,19 @@ will be transformed to the last one.
 
 
 
+## Javascript files In Components 
 
+- Example 1: Components use body only, if any.
+> `<html>`<br>
+> `<header><t:import> -- script & css -- <t:import></header>`<br>
+> `<body> -- component body -- </body>`<br>
+> `</html>`<br>
 
+- Example 2: if only has html tag, use contents in html tag.
+> `<html> -- component body --</html>`<br>
+
+- Note: Things in <t:import> will be treated as js and css. used to 
+remove duplication.
 
 
 

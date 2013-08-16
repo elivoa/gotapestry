@@ -12,6 +12,7 @@ import (
 	
     builtin "got/builtin"
     components0 "got/builtin/components"
+    layout0 "got/builtin/components/layout"
     got "got/builtin/pages"
     got0 "got/builtin/pages/got"
     fileupload "got/builtin/pages/got/fileupload"
@@ -99,6 +100,7 @@ func main() {
     route.RegisterProton("got/builtin/components", "Output", "got/builtin", &components0.Output{})
     route.RegisterProton("got/builtin/components", "ProvinceSelect", "got/builtin", &components0.ProvinceSelect{})
     route.RegisterProton("got/builtin/components", "Select", "got/builtin", &components0.Select{})
+    route.RegisterProton("got/builtin/components/layout", "GOTHeader", "got/builtin", &layout0.GOTHeader{})
     route.RegisterProton("got/builtin/pages", "Errors", "got/builtin", &got.Errors{})
     route.RegisterProton("got/builtin/pages/got", "Status", "got/builtin", &got0.Status{})
     route.RegisterProton("got/builtin/pages/got", "TestIndex", "got/builtin", &got0.TestIndex{})
