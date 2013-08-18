@@ -3,5 +3,5 @@ pkg/*
 .dropbox
 
 .DS_Store
-/src/generated/*
+src/generated/*.go
 src/generated/main.go
