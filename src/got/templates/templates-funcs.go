@@ -1,11 +1,12 @@
 /*
-   Time-stamp: <[templates-funcs.go] Elivoa @ Sunday, 2013-08-18 14:54:28>
+   Time-stamp: <[templates-funcs.go] Elivoa @ Sunday, 2013-08-18 18:28:05>
 */
 package templates
 
 import (
 	"gxl"
 	"html/template"
+	"math"
 	"time"
 )
 
@@ -42,5 +43,9 @@ func BeautyTime(t time.Time) string {
 }
 
 func PrettyCurrency(d float64) string {
-	return gxl.FormatCurrency(d, 0)
+	if math.Mod(d, 1) > 0 {
+		return gxl.FormatCurrency(d, 2)
+	} else {
+		return gxl.FormatCurrency(d, 0)
+	}
 }

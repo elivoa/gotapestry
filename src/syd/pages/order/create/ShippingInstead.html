@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html>
   <head>
@@ -35,74 +34,88 @@
               <th align="left" nowrap>操作</th>
             </tr>
 
-            {{range $order := .SubOrders}}
-			<tbody class="hover">
-			  <tr class="B_tbid_info">
-				<td colspan="7">地址: {{.ShippingAddress}}</td>
-			  </tr>
-              
-              {{with $.FirstDetail $order}}
-			  <tr>
-				<td nowrap>
-				  <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
-				  <div class="B_sub_info">
-                    <span class="B_spacer">颜色：{{.Color}}</span>
-                    <span class="B_spacer">尺码：{{.Size}}</span>
-                    <span class="B_spacer">数量：{{.Quantity}}</span>
-                  </div>
-				</td>
-				<td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
-				<td align="center" rowspan="{{len $order.Details}}" nowrap>
-                  <strong>{{$order.TotalCount}}</strong>
-                  <!-- <strong>{{.Quantity}}</strong> -->
-                </td>
-				<td nowrap rowspan="{{len $order.Details}}">
-                  <div class="B_sub_info">
-                    {{$order.DeliveryMethod}}<br>
-                    运费<span class="price">{{$order.ExpressFee}}</span> 元<br>
-                    {{if $order.DeliveryTrackingNumber}} 运单号:{{$order.DeliveryTrackingNumber}} {{end}}
-                  </div>
-                </td>
-				<td align="right" rowspan="{{len $order.Details}}" >
-                  <strong class="price">{{$order.SumOrderPrice | prettycurrency}}</strong>
-                  <!-- <strong class="price">{{.TotalPrice | prettycurrency}}</strong> -->
-                </td>
-				<td valign="top"><div class="B_sub_info">{{.Note}}</div></td>
+            <range source=".SubOrders" var="$order">
+			  <tbody class="hover">
+			    <tr class="B_tbid_info">
+				  <td colspan="7">
+                    地址: {{.ShippingAddress}}
+                    <div style="float:right">
+                      {{if .StatusIs "toprint"}}<span style="color:red">待发货...</span>{{end}}
+                      {{if .StatusIs "delivering"}}<span style="color:green">已发货</span>{{end}}
+                    </div>
+                  </td>
+			    </tr>
                 
-				<td valign="top" nowrap rowspan="{{len $order.Details}}">
-                  <a href="{{$.EditLink $order}}">编辑</a><span class="vline">|</span>
-
-                  <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}&sender={{$.Customer.Name}}"
-                     target="_blank">打印快递单</a>
-
-                  {{/* 发货 */}}
-                  {{t_order_deliverbutton $ "tid" `deliverButton` "TrackNumber" $order.TrackNumber "DeliveryMethod" $order.DeliveryMethod "DeliveryTrackingNumber" $order.DeliveryTrackingNumber "ExpressFee" $order.ExpressFee "Source" $.ThisPage}}
-                  <span class="vline">|</span>
-
+                {{with $.FirstDetail $order}}
+			    <tr>
+				  <td nowrap>
+				    <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
+				    <div class="B_sub_info">
+                      <span class="B_spacer">颜色：{{.Color}}</span>
+                      <span class="B_spacer">尺码：{{.Size}}</span>
+                      <span class="B_spacer">数量：{{.Quantity}}</span>
+                    </div>
+				  </td>
+				  <td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
+				  <td align="center" rowspan="{{len $order.Details}}" nowrap>
+                    <strong>{{$order.TotalCount}}</strong>
+                    <!-- <strong>{{.Quantity}}</strong> -->
+                  </td>
+				  <td nowrap rowspan="{{len $order.Details}}">
+                    <div class="B_sub_info">
+                      {{$order.DeliveryMethod}}<br>
+                      运费<span class="price">{{$order.ExpressFee}}</span> 元<br>
+                      {{if $order.DeliveryTrackingNumber}} 运单号:{{$order.DeliveryTrackingNumber}} {{end}}
+                    </div>
+                  </td>
+				  <td align="right" rowspan="{{len $order.Details}}" >
+                    <strong class="price">{{$order.SumOrderPrice | prettycurrency}}</strong>
+                    <!-- <strong class="price">{{.TotalPrice | prettycurrency}}</strong> -->
+                  </td>
+				  <td valign="top"><div class="B_sub_info">{{.Note}}</div></td>
                   
-                  <a href="#" onclick="if(msg('确认要取消这个代发订单么？ 本操作不可撤销！');){alert('哈哈！这个功能还没做好啊，我逗你玩呢!!!')}return false;">取消</a>
-                </td>
-			  </tr>
-              {{end}}
-              
-              {{range $.OtherDetails $order}}
-			  <tr>
-				<td nowrap>
-				  <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
-				  <div class="B_sub_info">
-                    <span class="B_spacer">颜色：{{.Color}}</span>
-                    <span class="B_spacer">尺码：{{.Size}}</span>
-                    <span class="B_spacer">数量：{{.Quantity}}</span>
-                  </div>
-				</td>
-				<td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
-				<td valign="top" rowspan="1"><div class="B_sub_info">{{.Note}}</div></td>
-			  </tr>
-              {{end}}
+				  <td valign="top" nowrap rowspan="{{len $order.Details}}">
+                    <if t="$order.StatusIs `toprint`">
+                      <a href="{{$.EditLink $order}}">编辑</a>
+                      <span class="vline">|</span>
+                      <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}&sender={{$.Customer.Name}}" target="_blank">打印快递单</a>
+                      <span class="vline">|</span>
+                      <any t:type="order.deliverbutton" tid="deliverButton" TrackNumber="$order.TrackNumber"
+                           DeliveryMethod="$order.DeliveryMethod"
+                           DeliveryTrackingNumber="$order.DeliveryTrackingNumber"
+                           ExpressFee="$order.ExpressFee" Source="$.ThisPage">
+                      </any>
+                    </if>
 
-			</tbody>
-            {{end}}
-            
+                    <if t="$order.StatusIs `delivering`">
+                      <a href="/order/printexpress{{$order.DeliveryMethod}}?address={{$order.ShippingAddress}}&sender={{$.Customer.Name}}" target="_blank">打印快递单</a>
+                    </if>
+
+                    <span class="vline">|</span>
+                    <a href="#" onclick="if(msg('确认要取消这个代发订单么？ 本操作不可撤销！');){alert('哈哈！这个功能还没做好啊，我逗你玩呢!!!')}return false;">取消</a>
+
+                  </td>
+                </tr>
+                {{end}}
+
+                {{range $.OtherDetails $order}}
+                <tr>
+                  <td nowrap>
+	                <div class="B_main_info"><strong>{{$.ShowProductName .ProductId}}</strong></div>
+	                <div class="B_sub_info">
+                      <span class="B_spacer">颜色：{{.Color}}</span>
+                      <span class="B_spacer">尺码：{{.Size}}</span>
+                      <span class="B_spacer">数量：{{.Quantity}}</span>
+                    </div>
+                  </td>
+                  <td nowrap><span class="price">{{.SellingPrice | prettycurrency}}</span></td>
+                  <td valign="top" rowspan="1"><div class="B_sub_info">{{.Note}}</div></td>
+                </tr>
+                {{end}}
+
+              </tbody>
+            </range>
+
             <tr class="total">
               <td valign="top" align="right"><strong>总计</strong></td>
               <td valign="top">&nbsp;</td>
@@ -124,12 +137,12 @@
           <input type="hidden" name="Order.TotalCount" value="{{$.Order.TotalCount}}">
           <input type="hidden" name="Order.ExpressFee" value="{{$.Order.ExpressFee}}">
           
-		  <div class="unit">
+          <div class="unit">
             <div class="tit"><strong>订单备注</strong></div>
-		    <div class="B_order_remark">
-			  <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
-		    </div>
-		  </div>
+	        <div class="B_order_remark">
+	          <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
+	        </div>
+          </div>
           
           <div class="btn_content">
             {{if not .ReadonlyMode}}
@@ -138,7 +151,7 @@
             <a href="/order/list" class="btn_a_l">返回订单列表</a>
           </div>
         </form>
-        
+
       </div>
     </div>
   </body>
