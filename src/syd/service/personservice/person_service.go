@@ -1,6 +1,7 @@
 package personservice
 
 import (
+	"sort"
 	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/suggest"
@@ -41,6 +42,60 @@ func GetCustomer(customerId int) *model.Customer {
 	// TODO get Accumulated
 	return &customer
 }
+
+// --------------------------------------------------------------------------------
+
+// person list, sortable
+type PersonListSortbyAccountBallance []*model.Person
+
+func (p PersonListSortbyAccountBallance) Len() int {
+	return len(p)
+}
+
+func (p PersonListSortbyAccountBallance) Less(i, j int) bool {
+	return p[i].AccountBallance < p[j].AccountBallance
+}
+
+func (p PersonListSortbyAccountBallance) Swap(i, j int) {
+	t := p[j]
+	p[j] = p[i]
+	p[i] = t
+}
+
+func SortByAccumulated(list []*model.Person) {
+	newl := PersonListSortbyAccountBallance{}
+	newl = list[:]
+	sort.Sort(newl)
+}
+
+// // person list, sortable
+// type PersonListSortbyAccountBallance struct {
+// 	list []*model.Person
+// }
+
+// func (p *PersonListSortbyAccountBallance) Len() int {
+// 	return len(p.list)
+// }
+
+// func (p *PersonListSortbyAccountBallance) Less(i, j int) bool {
+// 	return p.list[i].AccountBallance < p.list[j].AccountBallance
+// }
+
+// func (p *PersonListSortbyAccountBallance) Swap(i, j int) {
+// 	t := p.list[j]
+// 	p.list[j] = p.list[i]
+// 	p.list[i] = t
+// }
+
+// func SortByAccumulated(list []*model.Person) *PersonListSortbyAccountBallance {
+// 	newl := &PersonListSortbyAccountBallance{
+// 		list: list,
+// 	}
+// 	sort.Sort(newl)
+// 	return newl
+// }
+
+// --------------------------------------------------------------------------------
 
 func List(personType string) ([]*model.Person, error) {
 	return persondao.ListAll(personType)

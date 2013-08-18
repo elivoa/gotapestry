@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates-funcs.go] Elivoa @ Saturday, 2013-08-10 14:54:40>
+   Time-stamp: <[templates-funcs.go] Elivoa @ Sunday, 2013-08-18 14:54:28>
 */
 package templates
 
@@ -21,8 +21,6 @@ func registerBuiltinFuncs() {
 		"prettytime":     BeautyTime,
 		"prettyday":      gxl.PrettyDay,
 		"prettycurrency": PrettyCurrency,
-		// "beautytime": BeautyTime,
-		// "formatcurrency": PrettyCurrency,
 	})
 }
 
@@ -44,5 +42,5 @@ func BeautyTime(t time.Time) string {
 }
 
 func PrettyCurrency(d float64) string {
-	return gxl.FormatCurrency(d, 2)
+	return gxl.FormatCurrency(d, 0)
 }

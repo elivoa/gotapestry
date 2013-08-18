@@ -30,6 +30,7 @@
             <th align="left">订单状态</th>
             <th align="left">日期</th>
             <th align="left">操作</th>
+            <th align="left">特殊操作</th>
           </tr>
 
           <range source=".Orders">
@@ -46,13 +47,13 @@
                   <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">D</span></if>
                   {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
                   <!--<t:output value=".TrackNumber" />
-                  nested components Render order has bugs.-->
+                      nested components Render order has bugs.-->
                   {{.TrackNumber}}
                 </a>
               </td>
               <td>
+                <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
                 <if t='.IsStatus "todeliver"'>
-                  <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
                   <span class="txt_c">(不含运费)</span>
                   <else />
                   <if t='.DeliveryMethodIs "TakeAway"'>
@@ -117,9 +118,13 @@
                 <if t='.IsStatus "cancelled" "done"'>
                   <a href="{{$.ViewLink .}}">查看订单</a>
                 </if>
-                <hide>
-                  <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}">[喜小乐可以删除订单]</a>
-                </hide>          
+              </td>
+              
+              <td>
+                <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}"
+                   onclick="return confirm('******************************\n注意：真的要删除{{$.ShowCustomerName .CustomerId}}的订单么？\n******************************');">
+                  【删除订单】
+                </a>
               </td>
             </tr>
           </range>
@@ -128,12 +133,12 @@
       </if>
 
       <script type="text/javascript">
-  $(function(){
-    orderlist = new OrderList({
-      ClientId: {{.ClientId}}
-    })
-  });
-</script>
+                 $(function(){
+                   orderlist = new OrderList({
+                     ClientId: {{.ClientId}}
+                   })
+                 });
+                 </script>
 
     </div>
   </body>

@@ -17,6 +17,10 @@ func (t *Timer) Now() int {
 	return time.Now().Nanosecond() - t.base
 }
 
+func (t *Timer) NowSecond() float64 {
+	return float64(time.Now().Nanosecond()-t.base) / 1000000
+}
+
 func NewTimer() *Timer {
 	return &Timer{base: time.Now().Nanosecond()}
 }

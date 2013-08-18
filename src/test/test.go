@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	t := utils.NewTimer()
+
+	fmt.Println(gxl.FormatCurrency(-12384.333, 2))
+
 	fmt.Println("~~~~ test utils ~~~~")
 	fmt.Println(">>", utils.CurrentBasePath(), "<<")
 
@@ -23,4 +27,5 @@ func main() {
 		fmt.Println(r)
 	}
 
+	fmt.Println("execution time is: ", t.NowSecond())
 }

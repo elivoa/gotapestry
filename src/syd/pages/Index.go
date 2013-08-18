@@ -21,6 +21,11 @@ func (p *Index) SetupRender() {
 	if err != nil {
 		panic(err.Error())
 	}
+	personservice.SortByAccumulated(customers)
+
+	// TODO: sort customers by accoumulated.
+	// sort.Float64s
+
 	// for _, c := range customers {
 	// 	fmt.Println(c.AccountBallance)
 	// }

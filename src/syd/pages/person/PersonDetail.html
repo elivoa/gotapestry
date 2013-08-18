@@ -3,52 +3,36 @@
   <head>
   <head>
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "Title" `客户资料` }}
+    <link href="/static/css/pages/gb.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="客户资料" />
   </head>
   <body class="PG_create_order">
-
-    {{t_layout_headernav $}}
-
+    <t:layout.headernav />
     <div class="container">
-
-      {{t_layout_leftnav $ "CurPage" `/person/list/customer`}}
+      <t:layout.leftnav curpage="/person/list/customer" />
 
       <div class="main_content">
-	    <h1>客户资料 TODO 无页面 TODO 供货商资料</h1>
+	    <h1>客户资料:
+          <small><a href="/person/edit/{{.Person.Id}}">修改资料</a></small>
+          <small>(TODO 无页面 TODO 供货商资料)<small>
+        </h1>
+        <t:person.CustomerProfileCard customer=".Person" />
 
-        <div class="person_list">
-		  <table>
-            <tr>
-              <th>客户姓名</th>
-              <th>地址</th>
-              <th>电话</th>
-              <th>qq</th>
-              <th>网店</th>
-              <th>备注</th>
-              <th>操作</th>
-            </tr>
-
-            {{with .Person}}
-            <tr>
-              <td>{{.Name}}</td>
-              <td>{{.Address}}</td>
-              <td>{{.Phone}}</td>
-              <td>{{.QQ}}</td>
-              <td><a href="{{.Website}}">{{.Website}}</a></td>
-              <td>{{.Note}}</td>
-              <td>
-              </td>
-            </tr>
-            {{end}}
-          </table>
-
-          <hr />
-          <h2>账户余额: {{.Person.AccountBallance}}</h2>
-
-          <hr />
-          <h2>今日留言: for {{.Person.Name}} 订单号： TODO</h2>
-          
-          <div style="padding:12px;margin:10px 0;font-size:16px;witdh:300px;border:dashed 2px green">
+        <div class="section">
+          <h2>账户余额:
+            <small class="price">{{.Person.AccountBallance | prettycurrency}}元</small>
+          </h2>
+          <div class="">
+            工具: <a href="/person/EditAccountBallance/{{.Person.Id}}">【修改账户余额】</a>
+          </div>
+        </div>
+        <br class="spliter" />
+        
+        <div class="section">
+          <h2>今日留言:
+            <small>for {{.Person.Name}} 订单号： TODO</small>
+          </h2>
+          <div class="messagebox">
             今日发货：{{.LeavingMessage}}
             <br />
             <br />
@@ -56,12 +40,17 @@
             注 2：自动选择当天的订单。<br>
             注 3：目前只支持每天一个订单。并且还不包括代发订单。<br>
           </div>
-          
-          <br /><hr /><br />
-          <h2>所有 {{.Person.Name}} 的订单:</h2>
-          {{t_order_list $ "orders" .Orders}}
-
         </div>
+        <br class="spliter" />
+
+        <div class="section">
+          <h2>所有 {{.Person.Name}} 的订单:</h2>
+          <div>
+            {{t_order_list $ "orders" .Orders}}
+          </div>
+        </div>
+        <br class="spliter" />
+        
       </div>
     </div>
     <div class="footer">

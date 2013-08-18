@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Friday, 2013-08-16 15:51:59>
+  Time-stamp: <[transform.go] Elivoa @ Saturday, 2013-08-17 16:17:34>
 */
 package transform
 
@@ -19,13 +19,9 @@ import (
 
 // ---- Transform template ------------------------------------------
 type Transformater struct {
-	nodes []*Node
-	b     bytes.Buffer
-	z     *html.Tokenizer
-}
-
-type Node struct {
-	text string
+	tree *Node
+	b    bytes.Buffer
+	z    *html.Tokenizer
 }
 
 func NewTransformer() *Transformater {
@@ -49,6 +45,64 @@ TODOs:
 ---- N --------------------------------------------------------------------------------
 */
 var compressHtml bool = false
+
+// func (t *Transformater) ParseToTree(reader io.Reader) *Transformater {
+// 	z := html.NewTokenizer(reader)
+// 	t.z = z
+// 	for {
+// 		tt := z.Next()
+// 		zraw := z.Raw()
+
+// 		// new node
+// 		node := &Node{
+// 			raw: make([]byte, len(zraw)),
+// 		}
+
+// 		// after call something all tag is lowercased. but here with case.
+// 		copy(node.raw, zraw[:])
+
+// 		switch tt {
+// 		case html.TextToken:
+// 			// here may contains {{ }}
+// 			// trim spaces?
+// 			if compressHtml {
+// 				t.b.Write(TrimTextNode(z.Raw())) // trimed spaces
+// 			} else {
+// 				t.b.Write(raw)
+// 			}
+// 		case html.StartTagToken:
+// 			if b := t.processStartTag(); !b {
+// 				t.b.Write(raw)
+// 			}
+// 		case html.SelfClosingTagToken:
+// 			if b := t.processStartTag(); !b {
+// 				t.b.Write(raw)
+// 			}
+// 		case html.EndTagToken:
+// 			k, _ := z.TagName()
+// 			switch string(k) {
+// 			case "range", "with", "if":
+// 				t.b.WriteString("{{end}}")
+// 			case "hide":
+// 				t.b.WriteString("*/}}")
+// 			default:
+// 				t.b.Write(raw)
+// 			}
+// 		// case html.CommentToken:
+// 		// 	// ignore all comments
+// 		// // case html.DoctypeToken:
+// 		case html.ErrorToken:
+// 			if z.Err().Error() == "EOF" {
+// 				return t
+// 			} else {
+// 				panic(z.Err().Error())
+// 			}
+// 		default:
+// 			t.b.Write(raw)
+// 		}
+// 	}
+// 	return t
+// }
 
 func (t *Transformater) Parse(reader io.Reader) *Transformater {
 	z := html.NewTokenizer(reader)

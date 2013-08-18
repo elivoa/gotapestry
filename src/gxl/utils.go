@@ -12,9 +12,6 @@ func FormatCurrency(c float64, digit int) string {
 	n := leading / 3
 	r := leading % 3
 	var result bytes.Buffer
-	if c < 0 { // sign
-		result.WriteString("-")
-	}
 	if r > 0 {
 		result.WriteString(str[0:r])
 	}

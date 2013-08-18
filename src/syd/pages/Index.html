@@ -37,6 +37,8 @@
               <td>
                 {{/* TODO: ajax get latest value. */}}
                 {{t_order_batchclose $ "CustomerId" .Id }}
+                <a href="/person/EditAccountBallance/{{.Id}}" target="_blank">
+                  【修改账户余额(累计欠款)】</a>
               </td>
             </tr>
             {{end}}

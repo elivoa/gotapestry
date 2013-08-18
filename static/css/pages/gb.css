@@ -1,0 +1,16 @@
+@charset "UTF-8";
+body {font-size:16px;}
+.main_content {font-size:16px;}
+.main_content h1 {font-size:20px;font-weight:bold}
+.main_content h1 small{font-size:14px;font-weight:normal;color:#999}
+
+.messagebox {padding:12px;margin:10px 0;font-size:16px;witdh:300px;border:dashed 2px green}
+
+.person_list {font-size:14px;margin:8px}
+
+.section {font-size:14px;margin:8px 2px;padding:8px 2px;}
+.section h2 {font-size:16px;font-weight:bold;border-bottom:dashed 1px #999;
+             margin-bottom:8px;padding-bottom:4px;}
+.section > div {margin-left:12px;}
+
+br.spliter {height:12px;}

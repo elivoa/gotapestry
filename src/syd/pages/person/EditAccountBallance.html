@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <head>
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/pages/gb.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="修改账户余额" />
+  </head>
+  <body class="PG_create_order">
+    <t:layout.headernav />
+    <div class="container">
+      <t:layout.leftnav curpage="/person/list/customer" />
+
+      <div class="main_content">
+	    <h1>修改账户余额：
+          <small><a href="/person/detail/{{.Person.Id}}">返回</a></small>
+        </h1>
+        <t:person.CustomerProfileCard customer=".Person" />
+
+        <div class="section">
+          <h2>目前账户余额:
+            <small class="price">{{.Person.AccountBallance | prettycurrency}}元</small>
+          </h2>
+          <div class="">
+            <form method="POST" id="CustomerForm" action=""
+                  onsubmit="return confirm('确认修改账户余额么？此操作不能撤销！');">
+              修改为: <input type="text" name="AccountBallance" value="0" />
+              <input type="submit" value="修改账户余额" />
+              <span>注意： 如果想将累计欠款修改为300， 应该在账户余额内输入-300。</span>
+            </form>
+          </div>
+        </div>
+        <br class="spliter" />
+        
+      </div>        
+    </div>
+    <div class="footer">
+    </div>
+  </body>
+</html>

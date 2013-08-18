@@ -1,0 +1,35 @@
+<div class="profile-card">
+  
+  <if t=".Customer">
+    <div class="person_list">
+	  <table border="1">
+        <tr>
+          <th>客户姓名</th>
+          <th>地址</th>
+          <th>电话</th>
+          <th>qq</th>
+          <th>网店</th>
+          <th>备注</th>
+          <th>操作</th>
+        </tr>
+
+        {{with .Customer}}
+        <tr>
+          <td>{{.Name}}</td>
+          <td>{{.Address}}</td>
+          <td>{{.Phone}}</td>
+          <td>{{.QQ}}</td>
+          <td><a href="{{.Website}}">{{.Website}}</a></td>
+          <td>{{.Note}}</td>
+          <td>
+          </td>
+        </tr>
+        {{end}}
+      </table>
+    </div>
+    
+    <else />
+    没找到客户！
+  </if>
+
+</div>

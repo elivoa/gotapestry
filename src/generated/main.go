@@ -20,6 +20,7 @@ import (
     components "syd/components"
     layout "syd/components/layout"
     order "syd/components/order"
+    person "syd/components/person"
     product "syd/components/product"
     index "syd/pages"
     admin "syd/pages/admin"
@@ -27,7 +28,7 @@ import (
     api0 "syd/pages/api/suggest"
     order0 "syd/pages/order"
     order1 "syd/pages/order/create"
-    person "syd/pages/person"
+    person0 "syd/pages/person"
     product0 "syd/pages/product"
 )
 
@@ -69,6 +70,7 @@ func main() {
     route.RegisterProton("syd/components/order", "OrderDetailsForm", "syd", &order.OrderDetailsForm{})
     route.RegisterProton("syd/components/order", "OrderList", "syd", &order.OrderList{})
     route.RegisterProton("syd/components/order", "OrderProductSelector", "syd", &order.OrderProductSelector{})
+    route.RegisterProton("syd/components/person", "CustomerProfileCard", "syd", &person.CustomerProfileCard{})
     route.RegisterProton("syd/components/product", "ProductColorSizeTable", "syd", &product.ProductColorSizeTable{})
     route.RegisterProton("syd/components/product", "ProductList", "syd", &product.ProductList{})
     route.RegisterProton("syd/pages", "Index", "syd", &index.Index{})
@@ -87,10 +89,11 @@ func main() {
     route.RegisterProton("syd/pages/order/create", "OrderCreateDetail", "syd", &order1.OrderCreateDetail{})
     route.RegisterProton("syd/pages/order/create", "OrderCreateIndex", "syd", &order1.OrderCreateIndex{})
     route.RegisterProton("syd/pages/order/create", "ShippingInstead", "syd", &order1.ShippingInstead{})
-    route.RegisterProton("syd/pages/person", "PersonIndex", "syd", &person.PersonIndex{})
-    route.RegisterProton("syd/pages/person", "PersonList", "syd", &person.PersonList{})
-    route.RegisterProton("syd/pages/person", "PersonEdit", "syd", &person.PersonEdit{})
-    route.RegisterProton("syd/pages/person", "PersonDetail", "syd", &person.PersonDetail{})
+    route.RegisterProton("syd/pages/person", "EditAccountBallance", "syd", &person0.EditAccountBallance{})
+    route.RegisterProton("syd/pages/person", "PersonIndex", "syd", &person0.PersonIndex{})
+    route.RegisterProton("syd/pages/person", "PersonList", "syd", &person0.PersonList{})
+    route.RegisterProton("syd/pages/person", "PersonEdit", "syd", &person0.PersonEdit{})
+    route.RegisterProton("syd/pages/person", "PersonDetail", "syd", &person0.PersonDetail{})
     route.RegisterProton("syd/pages/product", "ProductIndex", "syd", &product0.ProductIndex{})
     route.RegisterProton("syd/pages/product", "ProductCreate", "syd", &product0.ProductCreate{})
     route.RegisterProton("syd/pages/product", "ProductEdit", "syd", &product0.ProductEdit{})
