@@ -9,6 +9,9 @@ import (
 func FormatCurrency(c float64, digit int) string {
 	str := fmt.Sprintf("%."+strconv.Itoa(digit)+"f", c)
 	leading := len(str) - digit - 1
+	if digit == 0 {
+		leading += 1
+	}
 	n := leading / 3
 	r := leading % 3
 	var result bytes.Buffer
