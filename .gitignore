@@ -4,3 +4,4 @@ pkg/*
 
 .DS_Store
 /src/generated/*
+src/generated/main.go
