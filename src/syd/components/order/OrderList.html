@@ -52,14 +52,14 @@
                 </a>
               </td>
               <td>
-                <strong class="price">{{.TotalPrice |prettycurrency}}</strong>
                 <if t='.IsStatus "todeliver"'>
+                  <strong class="price">{{.TotalPrice | prettycurrency}}</strong>
                   <span class="txt_c">(不含运费)</span>
                   <else />
+                  <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
                   <if t='.DeliveryMethodIs "TakeAway"'>
                     <span class="txt_c">(自提)</span>
                     <else />
-                    <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
                     <span class="txt_c">
                       ({{if not .IsDaoFu}}含运费{{.ExpressFee}}元{{else}}到付{{end}})
                     </span>
@@ -133,12 +133,12 @@
       </if>
 
       <script type="text/javascript">
-                 $(function(){
-                   orderlist = new OrderList({
-                     ClientId: {{.ClientId}}
-                   })
-                 });
-                 </script>
+              $(function(){
+                orderlist = new OrderList({
+                  ClientId: {{.ClientId}}
+                })
+              });
+</script>
 
     </div>
   </body>
