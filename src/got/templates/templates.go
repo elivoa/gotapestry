@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Sunday, 2013-08-11 14:10:18>
+   Time-stamp: <[templates.go] Elivoa @ Tuesday, 2013-08-20 19:17:28>
 */
 package templates
 
@@ -11,7 +11,6 @@ import (
 	"got/templates/transform"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -27,7 +26,7 @@ func init() {
 	// Templates = template.Must(template.ParseFiles(
 	// 	LocatePath("nothing"),
 	// ))
-	Templates = template.New("Got-Template")
+	Templates = template.New("-")
 	registerBuiltinFuncs()   // Register built-in templates.
 	registerComponentFuncs() // no use?
 }
@@ -53,7 +52,7 @@ func RegisterComponent(name string, f interface{}) {
    template - when tempalte available and parse successful.
    nil      - when template not exists or error occurs.
 */
-func AddGOTTemplate(key string, filename string) (*template.Template, error) {
+func parseTempaltes(key string, filename string) (map[string]*template.Template, error) {
 
 	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
 
@@ -73,16 +72,27 @@ func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 			panic(err)
 		}
 	}()
+
 	// make a read buffer
 	r := bufio.NewReader(fi)
 
 	// transform
 	trans := transform.NewTransformer()
-	html := trans.Parse(r).Render()
-	// fmt.Println("--------------------------------------------------------------------------------------")
-	// fmt.Println("------------------", filename, "--------------------------------------")
-	// fmt.Println(html)
-	// fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
+	trans.Parse(r)
+
+	templatesToParse := map[string]string{}
+	templatesToParse[key] = trans.RenderToString()
+	blocks := trans.RenderBlocks()
+	if blocks != nil {
+		for blockId, html := range blocks {
+			templatesToParse[fmt.Sprintf("%v:%v", key, blockId)] = html
+		}
+	}
+
+	fmt.Println("--------------------------------------------------------------------------------------")
+	fmt.Println("------------------", filename, "--------------------------------------")
+	fmt.Println(templatesToParse[key])
+	fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
 
 	// Old version uses filename as key, I make my own key. not
 	// filepath.Base(filename) First template becomes return value if
@@ -91,74 +101,27 @@ func AddGOTTemplate(key string, filename string) (*template.Template, error) {
 	// file has the same name as t, this file becomes the contents of
 	// t, so t, err := New(name).Funcs(xxx).ParseFiles(name)
 	// works. Otherwise we create a new template associated with t.
-	name := key
-
-	// Add to template
+	returns := map[string]*template.Template{}
 	t := Templates
-	var tmpl *template.Template
-	if t == nil {
-		t = template.New(name)
-	}
-	if name == t.Name() {
-		tmpl = t
-	} else {
-		tmpl = t.New(name)
-	}
+	for name, html := range templatesToParse {
+		// Add to template
+		var tmpl *template.Template
+		if t == nil {
+			t = template.New(name)
+		}
+		if name == t.Name() {
+			tmpl = t
+		} else {
+			tmpl = t.New(name)
+		}
 
-	_, err = tmpl.Parse(html)
-	if err != nil {
-		return nil, err
+		_, err = tmpl.Parse(html)
+		if err != nil {
+			return nil, err
+		}
+		returns[name] = tmpl
 	}
-	return tmpl, nil
-}
-
-func AddGOTTemplate__go_tempaltes_parser(key string, filename string) (*template.Template, error) {
-
-	debug.Log("-   - [ParseTempalte] %v, %v", key, filename)
-
-	// borrowed from html/tempate
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		return nil, nil // file not exist, don't panic.
-	}
-
-	// read source from file.
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	html := string(b)
-	name := key
-	// Old version uses filename as key, I make my own key. not
-	// filepath.Base(filename) First template becomes return value if
-	// not already defined, and we use that one for subsequent New
-	// calls to associate all the templates together. Also, if this
-	// file has the same name as t, this file becomes the contents of
-	// t, so t, err := New(name).Funcs(xxx).ParseFiles(name)
-	// works. Otherwise we create a new template associated with t.
-
-	// Add to template
-	t := Templates
-	var tmpl *template.Template
-	if t == nil {
-		t = template.New(name)
-	}
-	if name == t.Name() {
-		tmpl = t
-	} else {
-		tmpl = t.New(name)
-	}
-
-	// old
-	_, err = tmpl.Parse(html)
-	if err != nil {
-		return nil, err
-	}
-	// fmt.Println("--------------------------------------------------------------------------------------")
-	// fmt.Println("--------------------------------------------------------------------------------------")
-	// fmt.Println(ttt)
-	// fmt.Println(debug.PrintEntrails(ttt))
-	// fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
-	return tmpl, nil
+	return returns, nil
 }
 
 /* ________________________________________________________________________________
@@ -197,12 +160,11 @@ func (t *TemplateCache) Get(key string, templatePath string) (*template.Template
 	_, ok := t.Templates[templatePath]
 	t.l.Unlock()
 	if !ok {
-		tmpl, err := AddGOTTemplate(key, templatePath)
+		tmpls, err := parseTempaltes(key, templatePath) // map[string]*template.Template, error
 		if err != nil {
-			// panic(err.Error())
 			return nil, err
 		}
-		if tmpl == nil {
+		if tmpls == nil {
 			err = errors.New(fmt.Sprintf("Templates for '%v' not found!", key))
 			return nil, err
 		}
@@ -211,19 +173,10 @@ func (t *TemplateCache) Get(key string, templatePath string) (*template.Template
 		t.Templates[templatePath] = true
 		t.l.Unlock()
 
-		return tmpl, nil
+		return tmpls[key], nil
 	}
 	return nil, nil
 }
-
-// // used by lifecircle-component
-// func RenderTemplate(w io.Writer, tmpl string, p interface{}) error {
-// 	err := Templates.ExecuteTemplate(w, tmpl+".html", p)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return nil
-// }
 
 // --------------------------------------------------------------------------------
 // log

@@ -48,18 +48,12 @@ func GetCustomer(customerId int) *model.Customer {
 // person list, sortable
 type PersonListSortbyAccountBallance []*model.Person
 
-func (p PersonListSortbyAccountBallance) Len() int {
-	return len(p)
-}
-
+func (p PersonListSortbyAccountBallance) Len() int { return len(p) }
 func (p PersonListSortbyAccountBallance) Less(i, j int) bool {
 	return p[i].AccountBallance < p[j].AccountBallance
 }
-
 func (p PersonListSortbyAccountBallance) Swap(i, j int) {
-	t := p[j]
-	p[j] = p[i]
-	p[i] = t
+	p[i], p[j] = p[j], p[i]
 }
 
 func SortByAccumulated(list []*model.Person) {

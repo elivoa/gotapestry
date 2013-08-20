@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Saturday, 2013-08-17 16:17:34>
+  Time-stamp: <[transform.go] Elivoa @ Tuesday, 2013-08-20 19:30:26>
 */
 package transform
 
@@ -19,9 +19,9 @@ import (
 
 // ---- Transform template ------------------------------------------
 type Transformater struct {
-	tree *Node
-	b    bytes.Buffer
-	z    *html.Tokenizer
+	tree   *Node // root node
+	blocks map[string]*Node
+	z      *html.Tokenizer
 }
 
 func NewTransformer() *Transformater {
@@ -46,115 +46,162 @@ TODOs:
 */
 var compressHtml bool = false
 
-// func (t *Transformater) ParseToTree(reader io.Reader) *Transformater {
-// 	z := html.NewTokenizer(reader)
-// 	t.z = z
-// 	for {
-// 		tt := z.Next()
-// 		zraw := z.Raw()
-
-// 		// new node
-// 		node := &Node{
-// 			raw: make([]byte, len(zraw)),
-// 		}
-
-// 		// after call something all tag is lowercased. but here with case.
-// 		copy(node.raw, zraw[:])
-
-// 		switch tt {
-// 		case html.TextToken:
-// 			// here may contains {{ }}
-// 			// trim spaces?
-// 			if compressHtml {
-// 				t.b.Write(TrimTextNode(z.Raw())) // trimed spaces
-// 			} else {
-// 				t.b.Write(raw)
-// 			}
-// 		case html.StartTagToken:
-// 			if b := t.processStartTag(); !b {
-// 				t.b.Write(raw)
-// 			}
-// 		case html.SelfClosingTagToken:
-// 			if b := t.processStartTag(); !b {
-// 				t.b.Write(raw)
-// 			}
-// 		case html.EndTagToken:
-// 			k, _ := z.TagName()
-// 			switch string(k) {
-// 			case "range", "with", "if":
-// 				t.b.WriteString("{{end}}")
-// 			case "hide":
-// 				t.b.WriteString("*/}}")
-// 			default:
-// 				t.b.Write(raw)
-// 			}
-// 		// case html.CommentToken:
-// 		// 	// ignore all comments
-// 		// // case html.DoctypeToken:
-// 		case html.ErrorToken:
-// 			if z.Err().Error() == "EOF" {
-// 				return t
-// 			} else {
-// 				panic(z.Err().Error())
-// 			}
-// 		default:
-// 			t.b.Write(raw)
-// 		}
-// 	}
-// 	return t
-// }
-
 func (t *Transformater) Parse(reader io.Reader) *Transformater {
 	z := html.NewTokenizer(reader)
 	t.z = z
+
+	// the root node
+	root := newNode() // &Node{level: 0}
+	t.tree = root
+	parent := root
+
 	for {
 		tt := z.Next()
+
+		// new the current node.
+		node := newNode()
+
 		// after call something all tag is lowercased. but here with case.
 		zraw := z.Raw()
-		raw := make([]byte, len(zraw))
-		copy(raw[:], zraw[:])
-		var ()
+		node.raw = make([]byte, len(zraw))
+		copy(node.raw, zraw[:])
+		zraw = node.raw
+
+		// start parse
 		switch tt {
 		case html.TextToken:
 			// here may contains {{ }}
-			// trim spaces?
 			if compressHtml {
-				t.b.Write(TrimTextNode(z.Raw())) // trimed spaces
+				node.html.Write(TrimTextNode(z.Raw())) // trimed spaces
 			} else {
-				t.b.Write(raw)
+				node.html.Write(zraw)
 			}
+			parent.AddChild(node)
+
 		case html.StartTagToken:
-			if b := t.processStartTag(); !b {
-				t.b.Write(raw)
+			node.closed = false
+			if b := t.processStartTag(node); !b {
+				node.html.Write(zraw)
 			}
+			parent.AddChild(node)
+			parent = node // go in
+
 		case html.SelfClosingTagToken:
-			if b := t.processStartTag(); !b {
-				t.b.Write(raw)
+			if b := t.processStartTag(node); !b {
+				node.html.Write(zraw)
 			}
+			parent.AddChild(node)
+
 		case html.EndTagToken:
 			k, _ := z.TagName()
-			switch string(k) {
+			tag := string(k)
+			switch tag {
 			case "range", "with", "if":
-				t.b.WriteString("{{end}}")
+				node.html.WriteString("{{end}}")
 			case "hide":
-				t.b.WriteString("*/}}")
+				node.html.WriteString("*/}}")
 			default:
-				t.b.Write(raw)
+				node.html.Write(zraw)
 			}
+			// TODO: process unclosed tag.
+			// if has unclosed tag, just unclose it.
+			// find the right tag and close, move wrong tag back.
+			if tag == parent.tagName {
+				parent.AddChild(node)
+				parent.closed = true
+				parent = parent.parent
+			} else {
+				// fmt.Println(">>>+++++++ ", node)
+
+				node.parent = parent // only set parent will not link the node to the tree.
+				temp := node
+				for {
+					// if true{break}
+					if temp == nil {
+						panic(fmt.Sprintf("Tag %v not closed!", temp))
+					}
+					temp = temp.parent
+					if tag == temp.tagName {
+						temp.AddChild(node)
+						parent = temp.parent
+						temp.closed = true
+						break
+					} else {
+						if temp.children != nil {
+							// fmt.Println("    > ++++++++++++++++++ move children up!", temp)
+							// tp := []*Node{}
+							for _, c := range temp.children {
+								// fmt.Println("      > move <<< ", c.tagName, ";", c.html.String(), ">>>")
+								c.Detach()
+								temp.parent.AddChild(c)
+								temp.closed = true
+							}
+						}
+					}
+				}
+			}
+
 		// case html.CommentToken:
 		// 	// ignore all comments
 		// // case html.DoctypeToken:
+
 		case html.ErrorToken:
 			if z.Err().Error() == "EOF" {
+
+				// here is the entrance
+				// get blocks from tree.
+				t.parseBlocks()
+
 				return t
 			} else {
 				panic(z.Err().Error())
 			}
+		// case html.DoctypeToken:
+		// 	node.html.Write(zraw)
 		default:
-			t.b.Write(raw)
+			node.html.Write(zraw)
+			parent.AddChild(node)
 		}
 	}
+	// can't be here
 	return t
+}
+
+func (t *Transformater) parseBlocks() {
+	t.blocks = map[string]*Node{}
+	t._parseBlocks(t.tree)
+}
+
+func (t *Transformater) _parseBlocks(n *Node) {
+	if n == nil {
+		return
+	}
+	// TODO do something
+	if n.tagName == "t:block" {
+		var found bool = false
+		var id string
+		if n.attrs != nil {
+			for k, v := range n.attrs {
+				if strings.ToLower(k) == "id" {
+					id = string(v)
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			panic("Can't find `id` attribute in t:block tag!")
+		}
+
+		t.blocks[id] = n.Detach()
+	} else {
+		if n.children != nil {
+			for _, node := range n.children {
+				t._parseBlocks(node)
+			}
+		}
+	}
+
 }
 
 // processing every start tag()
@@ -163,9 +210,10 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 //   - false if need to write Raw() to buffer.
 // Note: go.net/html package lowercased all values,
 //
-func (t *Transformater) processStartTag() bool {
+func (t *Transformater) processStartTag(node *Node) bool {
 	// collect information
 	bname, hasAttr := t.z.TagName()
+	node.tagName = string(bname) // performance
 	var (
 		iscomopnent   bool
 		componentName []byte
@@ -178,7 +226,6 @@ func (t *Transformater) processStartTag() bool {
 	}
 
 	var attrs map[string][]byte
-	// var attrs [][][]byte
 	if hasAttr {
 		attrs = map[string][]byte{}
 		for {
@@ -195,9 +242,10 @@ func (t *Transformater) processStartTag() bool {
 				break
 			}
 		}
+		node.attrs = attrs
 	}
 	if iscomopnent {
-		if err = t.transformComponent(componentName, elementName, attrs); err == nil {
+		if err = t.transformComponent(node, componentName, elementName, attrs); err == nil {
 			return true
 		}
 	}
@@ -206,15 +254,19 @@ func (t *Transformater) processStartTag() bool {
 	// not a component, process if tag is command
 	switch string(bname) {
 	case "range":
-		t.renderRange(attrs)
+		t.renderRange(node, attrs)
 	case "if":
-		t.renderIf(attrs)
+		t.renderIf(node, attrs)
 	case "else":
-		t.b.WriteString("{{else}}")
+		node.html.WriteString("{{else}}")
 	case "hide":
-		t.b.WriteString("{{/*")
+		node.html.WriteString("{{/*")
 	case "t:import":
-		t.b.WriteString("----------")
+		node.html.WriteString("----------")
+	case "t:block":
+		t.renderBlock(node, attrs)
+	case "t:delegate":
+		t.renderDelegate(node, attrs)
 	default:
 		if err != nil {
 			panic(err.Error())
@@ -224,22 +276,40 @@ func (t *Transformater) processStartTag() bool {
 	return true
 }
 
-func (t *Transformater) renderRange(attrs map[string][]byte) {
-	t.b.WriteString("{{range ")
-	if nil != attrs {
-		if _var, ok := attrs["var"]; ok {
-			t.b.Write(_var)
-			t.b.WriteString(":=")
-		}
-		if source, ok := attrs["source"]; ok {
-			t.b.Write(source)
-		}
-	}
-	t.b.WriteString("}}")
+func (t *Transformater) renderBlock(node *Node, attrs map[string][]byte) {
+	node.html.WriteString("||delegate some one||")
+	
 }
 
-func (t *Transformater) renderIf(attrs map[string][]byte) {
-	t.b.WriteString("{{if ")
+func (t *Transformater) renderDelegate(node *Node, attrs map[string][]byte) {
+	node.html.Write(node.raw)
+}
+
+func (t *Transformater) builtinComponentFunction(name string) func(*Node, map[string][]byte) {
+	switch name {
+	case "range":
+		return t.renderRange
+	default:
+		panic(fmt.Sprintf("Builtin component %v not found!", name))
+	}
+}
+
+func (t *Transformater) renderRange(node *Node, attrs map[string][]byte) {
+	node.html.WriteString("{{range ")
+	if nil != attrs {
+		if _var, ok := attrs["var"]; ok {
+			node.html.Write(_var)
+			node.html.WriteString(":=")
+		}
+		if source, ok := attrs["source"]; ok {
+			node.html.Write(source)
+		}
+	}
+	node.html.WriteString("}}")
+}
+
+func (t *Transformater) renderIf(node *Node, attrs map[string][]byte) {
+	node.html.WriteString("{{if ")
 	if nil != attrs {
 		var (
 			_var []byte
@@ -250,12 +320,12 @@ func (t *Transformater) renderIf(attrs map[string][]byte) {
 				panic("`If` must have attribute test or t!")
 			}
 		}
-		t.b.Write(_var)
+		node.html.Write(_var)
 	}
-	t.b.WriteString("}}")
+	node.html.WriteString("}}")
 }
 
-func (t *Transformater) transformComponent(componentName []byte, elementName []byte,
+func (t *Transformater) transformComponent(node *Node, componentName []byte, elementName []byte,
 	attrs map[string][]byte) error {
 
 	// lookup component and get StructInfo
@@ -272,30 +342,30 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 	si := sc.GetCreate(reflect.TypeOf(lr.Segment.Proton), core.COMPONENT)
 	// TODO: cache embed directly elements.
 
-	t.b.WriteString("{{t_")
-	// t.b.Write(componentName)
-	t.b.WriteString(strings.Replace(lookupurl, "/", "_", -1))
-	t.b.WriteString(" $")
+	node.html.WriteString("{{t_")
+	// node.html.Write(componentName)
+	node.html.WriteString(strings.Replace(lookupurl, "/", "_", -1))
+	node.html.WriteString(" $")
 
 	// elementName
 	if elementName != nil {
-		t.b.WriteString(" \"elementName\" `")
-		t.b.Write(elementName)
-		t.b.WriteString("`")
+		node.html.WriteString(" \"elementName\" `")
+		node.html.Write(elementName)
+		node.html.WriteString("`")
 	}
 
 	if attrs != nil {
 		for key, val := range attrs {
 			// write key, all capitlize
-			t.b.WriteString(" \"")
+			node.html.WriteString(" \"")
 			// get which is cached.
 			fi := si.FieldInfo(key)
 			if fi != nil {
-				t.b.WriteString(fi.Name)
+				node.html.WriteString(fi.Name)
 			} else {
-				t.b.WriteString(key)
+				node.html.WriteString(key)
 			}
-			t.b.WriteString("\" ")
+			node.html.WriteString("\" ")
 
 			// TODO: Auto-detect literal or functional
 			// Value transform: for name="_some_value_", we transform it into:
@@ -311,46 +381,65 @@ func (t *Transformater) transformComponent(componentName []byte, elementName []b
 			// if value starts from . or $ , treate this as property. others as string
 			switch {
 			case len(val) > 0 && (val[0] == '.' || val[0] == '$' || val[0] == '('):
-				t.b.Write(val)
+				node.html.Write(val)
 			case len(val) > 5 && bytes.Equal(val[0:5], []byte("print")):
-				t.b.WriteString("(")
-				t.b.Write(val)
-				t.b.WriteString(")")
+				node.html.WriteString("(")
+				node.html.Write(val)
+				node.html.WriteString(")")
 			case len(val) > 8 && bytes.Equal(val[0:8], []byte("literal:")):
-				t.b.WriteString(" \"")
-				t.b.Write(bytes.Replace(val[8:], []byte{'"'}, []byte{'\\', '"'}, 0))
-				t.b.WriteString("\"")
+				node.html.WriteString(" \"")
+				node.html.Write(bytes.Replace(val[8:], []byte{'"'}, []byte{'\\', '"'}, 0))
+				node.html.WriteString("\"")
 			case printValueRegex.Match(val): // if is "/xxx/{{.ID}}"
 				result := printValueRegex.FindSubmatch(val)
 				// for _, r := range result {
 				// 	fmt.Println(r)
 				// }
 				if len(result) == 3 { // translate to (print "/xxx/" .ID)
-					t.b.WriteString(" (print \"")
-					t.b.Write(result[1])
-					t.b.WriteString("\" ")
-					t.b.Write(result[2])
-					t.b.WriteString(")")
+					node.html.WriteString(" (print \"")
+					node.html.Write(result[1])
+					node.html.WriteString("\" ")
+					node.html.Write(result[2])
+					node.html.WriteString(")")
 				}
 			default:
-				t.b.WriteString(" \"")
-				t.b.Write(bytes.Replace(val, []byte{'"'}, []byte{'\\', '"'}, 0))
-				t.b.WriteString("\"")
+				node.html.WriteString(" \"")
+				node.html.Write(bytes.Replace(val, []byte{'"'}, []byte{'\\', '"'}, 0))
+				node.html.WriteString("\"")
 			}
 		}
 	}
-	t.b.WriteString("}}")
+	node.html.WriteString("}}")
 	return nil
 }
 
+// Redner
+func (t *Transformater) RenderToString() string {
+	return t.tree.Render()
+}
+
+func (t *Transformater) RenderBlocks() map[string]string {
+	if t.blocks != nil {
+		returns := map[string]string{}
+		for blockId, node := range t.blocks {
+			returns[blockId] = node.Render()
+		}
+		return returns
+	}
+	return nil
+}
+
+// --------------------------------------------------------------------------------
+
+// variables
 var printValueRegex, _ = regexp.Compile("^(.*){{(.*)}}$")
 
-func (t *Transformater) Render() string {
-	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	fmt.Println(t.b.String())
-	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+++")
-	return t.b.String()
-}
+// func (t *Transformater) Render() string {
+// 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+// 	fmt.Println(t.b.String())
+// 	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=+++")
+// 	return t.b.String()
+// }
 
 // ---- utils --------------------------------------------------------------------------------
 

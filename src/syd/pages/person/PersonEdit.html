@@ -1,18 +1,14 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-
-    <link href="/static/css/pages/pg_create_person.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "Title" (print .SubTitle "联系人") }}
-    
+    <link href="/static/css/pages/pg_create_person.css" rel="stylesheet" type="text/css" />
+    <t:layout.header title="print .SubTitle `联系人`" />
   </head>
   <body class="PG_create_person">
-
-    {{t_layout_headernav $}}
+    <t:layout.headernav />
 
     <div class="container">
-
-      {{t_layout_leftnav $ "CurPage" `/person/list`}}
+      <t:layout.leftnav curpage="/person/list/customer" />
 
       <div class="main_content">
     	<h1>{{.SubTitle}}联系人</h1>
@@ -37,7 +33,7 @@
             <dl class="clearfix">
               <dt>类型：</dt>
               <dd>
-                {{t_select $ "data" .TypeData "name" "Person.Type" "value" .Person.Type "Header" "请选择"}}
+                <t:select data=".TypeData" name="Person.Type" value=".Person.Type" Header="请选择" />
               </dd>
               <dd></dd>
             </dl>
