@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Thursday, 2013-08-01 01:21:16>
+  Time-stamp: <[suggest.go] Elivoa @ Wednesday, 2013-08-21 00:33:50>
 */
 package suggest
 
@@ -40,13 +40,13 @@ func EnsureLoaded() {
 	if loaded {
 		return
 	}
-	println("lock")
+
 	l.Lock()
 	if !loaded {
 		load()
 		loaded = true
 	}
-	println("unlock")
+
 	l.Unlock()
 	PrintAll()
 }
@@ -124,7 +124,6 @@ func Add(category string, text string, id int) {
 		QuickString: parseQuickText(text),
 	}
 
-	println("lock")
 	l.Lock()
 	items, ok := cache[category]
 	if !ok {
@@ -133,13 +132,13 @@ func Add(category string, text string, id int) {
 		items = append(items, item)
 		cache[category] = items
 	}
-	println("unlock")
+
 	l.Unlock()
 }
 
 func Delete(category string, id int) {
 	EnsureLoaded()
-	println("lock")
+	//
 	l.Lock()
 	items, ok := cache[category]
 	if !ok {
@@ -152,7 +151,7 @@ func Delete(category string, id int) {
 			break
 		}
 	}
-	println("unlock")
+	//
 	l.Unlock()
 }
 
@@ -163,7 +162,7 @@ func Update(category string, text string, id int) {
 
 func PrintAll() {
 	fmt.Println("------ Print All Suggest Items ---------------")
-	println("r-lock")
+	//
 	l.RLock()
 	for key, value := range cache {
 		fmt.Printf("> %v\n", key)
@@ -175,16 +174,13 @@ func PrintAll() {
 			}
 		}
 	}
-	println("r-unlock")
+
 	l.RUnlock()
 }
 
 func Lookup(q string, category string) ([]*Item, error) {
-
-	println("lookup r-lock")
 	l.RLock()
 	items, ok := cache[category]
-	println("lookup r-unlock")
 	l.RUnlock()
 	if !ok {
 		err := errors.New(fmt.Sprintf("Category '%v' not found.", category))
@@ -197,7 +193,7 @@ func Lookup(q string, category string) ([]*Item, error) {
 		filtered = make([]*Item, N, N)
 		found    = 0
 	)
-	println("r-lock")
+
 	l.RLock()
 	for _, item := range items {
 		if item == nil {
@@ -212,7 +208,7 @@ func Lookup(q string, category string) ([]*Item, error) {
 			idx++
 		}
 	}
-	println("r-unlock")
+
 	l.RUnlock()
 	result := filtered[:found]
 	return result, nil

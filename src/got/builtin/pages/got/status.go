@@ -6,7 +6,6 @@ import (
 	"got/register"
 	"got/templates"
 	"html/template"
-	"syd/service/suggest"
 )
 
 type Status struct {
@@ -25,8 +24,6 @@ func (p *Status) SetupRender() {
 }
 
 func (p *Status) AfterRender() {
-	fmt.Println("\n\n---------------------------\n\n")
-	suggest.PrintAll()
 }
 
 func (p *Status) OnClickTemplate(name string) {
