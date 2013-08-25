@@ -27,15 +27,27 @@
     <dd class="{{.Style `/person/list/factory` }}"><a href="/person/list/factory">厂家列表</a></dd>
   </dl>
 
+  <div class="hrline"></div>
+  <dl>
+    <dt>豆包统计</dt>
+    <dd class="{{.Style `/stat/today` }}"><a href="/stat/today">今天</a></dd>
+    <dd class="{{.Style `/stat/productsold` }}"><a href="/stat/productsold">产品销量分析</a></dd>
+    <dd class="{{.Style `/stat/trend` }}"><a href="/stat/trend">趋势分析</a></dd>
+    <dd class="{{.Style `/stat/more` }}"><a href="/stat/more">MORE</a></dd>
+  </dl>
+
+  
   <t:delegate name="changelog" />
+  <div class="hrline"></div>
+  <dl>
+    <dt>Change Log</dt>
+    <dd>2013-08-24:<br> <a>首页：一周销量统计</a></dd>
+    <dd>2013-08-24:<br> <a>Refactor Core Flow!</a></dd>
+    <dd>2013-08-13:<br> <a>可以删除订单!</a></dd>
+    <dd>2013-08-13:<br> <a>可以修改账户余额!</a></dd>
+  </dl>
 
 </div>
 
 <t:block id="changelog">
-  <div class="hrline"></div>
-  <dl>
-    <dt>Change Log</dt>
-    <dd>2013-08-13:<br> <a>可以删除订单!</a></dd>
-    <dd>2013-08-13:<br> <a>可以修改账户余额!</a></dd>
-  </dl>
 </t:block>

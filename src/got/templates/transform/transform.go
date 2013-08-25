@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Tuesday, 2013-08-20 19:30:26>
+  Time-stamp: <[transform.go] Elivoa @ Saturday, 2013-08-24 14:47:09>
 */
 package transform
 
@@ -83,8 +83,13 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 			if b := t.processStartTag(node); !b {
 				node.html.Write(zraw)
 			}
+			// switch node.tagName {
+			// case "input", "br", "hr", "link":
+			// 	parent.AddChild(node)
+			// default:
 			parent.AddChild(node)
 			parent = node // go in
+			// }
 
 		case html.SelfClosingTagToken:
 			if b := t.processStartTag(node); !b {
@@ -143,8 +148,8 @@ func (t *Transformater) Parse(reader io.Reader) *Transformater {
 
 		// case html.CommentToken:
 		// 	// ignore all comments
-		// // case html.DoctypeToken:
-
+		// case html.DoctypeToken:
+		// 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", z.Raw())
 		case html.ErrorToken:
 			if z.Err().Error() == "EOF" {
 
@@ -205,10 +210,12 @@ func (t *Transformater) _parseBlocks(n *Node) {
 }
 
 // processing every start tag()
-// return
+// return 1.
 //   - true if already write to buffer.
 //   - false if need to write Raw() to buffer.
+//   2. tagNamep
 // Note: go.net/html package lowercased all values,
+//
 //
 func (t *Transformater) processStartTag(node *Node) bool {
 	// collect information
@@ -278,7 +285,7 @@ func (t *Transformater) processStartTag(node *Node) bool {
 
 func (t *Transformater) renderBlock(node *Node, attrs map[string][]byte) {
 	node.html.WriteString("||delegate some one||")
-	
+
 }
 
 func (t *Transformater) renderDelegate(node *Node, attrs map[string][]byte) {

@@ -30,10 +30,11 @@ import (
 */
 func (lcc *LifeCircleControl) InjectFormValues() {
 	fmt.Println("++++  Inject Form Values  ++++++++>---")
+	page := lcc.page
 
 	// debug print
-	if debug.FLAG_print_form_submit_details && lcc.Kind == core.PAGE {
-		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.R.Form)
+	if debug.FLAG_print_form_submit_details && lcc.page.kind == core.PAGE {
+		debug.PrintFormMap("~ 1 ~ Request.Form", lcc.r.Form)
 	}
 
 	// 为了迎合gorilla/schema的奇葩要求，这里需要转换格式为：FormData
@@ -41,7 +42,7 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	// TODO version 2: l2cache
 
 	// 1) Precondition
-	v := lcc.V
+	v := page.v
 	// if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 	// 	lcc.Err = errors.New("got/lifecircle: interface must be a pointer to struct")
 	// 	return
@@ -50,7 +51,7 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	// 2) Parse array in form
 	data := map[string][]string{} // stores transfered FormData
 
-	for path, formValue := range lcc.R.Form {
+	for path, formValue := range lcc.r.Form {
 
 		// Get something from cache.
 		// is path in name Attribute need translate to "x.y.1.z" format
@@ -107,12 +108,12 @@ func (lcc *LifeCircleControl) InjectFormValues() {
 	}
 
 	// debug print
-	if debug.FLAG_print_form_submit_details && lcc.Kind == core.PAGE {
+	if debug.FLAG_print_form_submit_details && lcc.page.kind == core.PAGE {
 		debug.PrintFormMap("~ 2 ~ gorilla/schema Data", data)
 	}
 
 	// 3) decode
-	utils.SchemaDecoder.Decode(lcc.Proton, data)
+	utils.SchemaDecoder.Decode(lcc.page.proton, data)
 
 	// debug print
 	if debug.FLAG_print_form_submit_details {

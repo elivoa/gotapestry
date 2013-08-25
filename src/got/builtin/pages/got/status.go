@@ -8,6 +8,10 @@ import (
 	"html/template"
 )
 
+// TODO render blocks as tree structure.
+// TODO order templates display.
+// TODO show pages.
+// TODO show components.
 type Status struct {
 	core.Page
 
@@ -18,6 +22,7 @@ type Status struct {
 }
 
 func (p *Status) SetupRender() {
+	fmt.Println(">>>>>>>>>>> set up redner s >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	p.Tpls = templates.Templates.Templates()
 	p.Modules = register.Modules
 	p.Pages = &register.Pages

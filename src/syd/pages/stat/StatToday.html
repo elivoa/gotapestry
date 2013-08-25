@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" type="text/css" media="screen" />
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="今日统计" />
+  </head>
+  <body class="PG_create_order">
+    <t:layout.headernav />
+    <div class="container">
+      <t:layout.leftnav curpage="/stat/today" />
+      <div class="main_content">
+    	<h1>今日统计</h1>
+        <div class="">
+          <t:stat.TodayStat />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

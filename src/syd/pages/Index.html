@@ -3,49 +3,24 @@
   <head>
     <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css">
     <link href="/static/css/layer/layer.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "Title" `SYD 圣衣蝶神奇喜大乐系统` }}
-
+    <t:layout.header title="SYD 圣衣蝶神奇喜大乐系统" />
   </head>
   <body class="PG_list_person">
-    {{t_layout_headernav $}}
+    <t:layout.headernav />
     <div class="container">
-      {{t_layout_leftnav $ "CurPage" `/person/list`}}
+      <t:layout.leftnav curpage="/person/list" />
 
       <div class="main_content">
     	<h1>圣衣蝶喜大乐系统</h1>
-
-        <h2>客户快速结账通道</h2>
         
-        <div class="list_person">
-          <table class="tbl_main">
-            <tr>
-              <th align="left">客户姓名</th>
-              <th align="left">城市</th>
-              <th align="left">网店</th>
-              <th align="left">备注</th>
-              <th align="left">账户余额</th>
-              <th align="left">操作</th>
-            </tr>
-
-            {{range .Customers}}
-            <tr>
-              <td><a href="/person/detail/{{.Id}}" >{{.Name}}</a></td>
-              <td>{{.City}}</td>
-              <td><a href="{{.Website}}">{{.Website}}</a></td>
-              <td>{{.Note}}</td>
-              <td>{{.AccountBallance}}</td>
-              <td>
-                {{/* TODO: ajax get latest value. */}}
-                {{t_order_batchclose $ "CustomerId" .Id }}
-                <a href="/person/EditAccountBallance/{{.Id}}" target="_blank">
-                  【修改账户余额(累计欠款)】</a>
-              </td>
-            </tr>
-            {{end}}
-
-          </table>
-          <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+        <h2>快捷统计</h2>
+        <div style="margin:4px;border:solid 1px gray;padding:8px;">
+          <!-- TODO TodayStat should be Today -->
+          <t:stat.TodayStat />
         </div>
+        <h2>客户快速结账通道</h2>
+        <t:person.DebtCustomerList />
+        
       </div>
     </div>
   </body>

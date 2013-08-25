@@ -1,0 +1,65 @@
+<div class="stat-today">
+
+  <h3>一周销量概况:</h3>
+
+  <div id="{{.ClientId}}" style="width: 600px; height: 200px;"></div>
+  <div id="{{.ClientId}}_2" style="width: 600px; height: 200px;"></div>
+  
+  <table border="1" style="text-align:right" class="table">
+    <tr>
+      <td>日期</td>
+      <td>订单数</td>
+      <td>销售数量</td>
+      <td>总价</td>
+    </tr>
+    
+    {{range .Stats}}
+    <tr>
+      <td>{{$.ShowDate .Id | prettyday}}</td>
+      <td>{{.NOrder}}</td>
+      <td>{{.NSold}}</td>
+      <td>{{.TotalPrice | prettycurrency}}</td>
+    </tr>
+    {{end}}
+  </table>
+</div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(drawChart);
+function drawChart() {
+  var data = google.visualization.arrayToDataTable([
+    ['日期', '总金额'],
+    {{range .Stats}}
+    [{{$.ShowDate .Id | prettyday}}, {{.TotalPrice}}],
+    {{end}}
+  ]);
+
+  var options = {
+    title: '金额',
+    hAxis: {title: 'Year', titleTextStyle: {color: 'red'}}
+  };
+
+  var chart = new google.visualization.LineChart(document.getElementById({{.ClientId}}));
+  chart.draw(data, options);
+}
+</script>
+<script type="text/javascript">
+  google.setOnLoadCallback(drawChart2);
+function drawChart2() {
+  var data = google.visualization.arrayToDataTable([
+    ['日期', '订单数', '销售数量' ],
+    {{range .Stats}}
+    [{{$.ShowDate .Id | prettyday}}, {{.NOrder}}, {{.NSold}}],
+    {{end}}
+  ]);
+
+  var options = {
+    title: '数量 | 订单数'
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("{{.ClientId}}_2"));
+  chart.draw(data, options);
+}
+</script>

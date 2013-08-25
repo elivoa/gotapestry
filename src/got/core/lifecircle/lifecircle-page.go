@@ -1,11 +1,12 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2013-07-27 00:28:03>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2013-08-24 14:18:50>
 */
 package lifecircle
 
 import (
 	"fmt"
 	"got/core"
+	"got/register"
 	"got/utils"
 	"net/http"
 	"reflect"
@@ -13,60 +14,81 @@ import (
 )
 
 // --------------------------------------------------------------------------------
+var LCC_OBJECT_KEY = "__lifecircle_control_key__"
 
-func NewPageFlow(w http.ResponseWriter, r *http.Request, page core.Pager) *LifeCircleControl {
+func NewPageFlow(w http.ResponseWriter, r *http.Request, registry *register.ProtonSegment) *LifeCircleControl {
 	// init & maintaince structCache
+	page := registry.Proton
 	if si := scache.GetPageX(reflect.TypeOf(page)); si == nil {
 		panic("Can't parse page!")
 	}
-	return newLifeCircleControl(w, r, core.PAGE, page)
-}
-
-var pageLifecircles = []string{
-	"Setup",
-	"SetupRender", // SetupRender is deprecated. use Setup instead.
-	"BeginRender",
-	"AfterRender",
-}
-
-// Page Render Flow:       new -> path -> url ->
-func (lcc *LifeCircleControl) Flow() *LifeCircleControl {
-
-	// Inject
-	lcc.injectBasic().injectPath().injectURLParameter()
-	// lcc.InjectValue() // old version
-
-	// Acitvate() in Tapestry5 is used to receive parameters in path.
-	// I use Tag `path:"#"` to do the same thing. So Activate() receives no parameters.
-	// Note: Only Page has Activate() event.
-	//       Activate() will be called before an event call on page's event or any inner component's event.
-	//
-	if lcc.Kind == core.PAGE {
-		if ret := lcc.CallEvent("Activate"); ret {
-			return lcc
-		}
-	}
-
-	// On form submit, go to another flow.
-	// Note: Now only support post to page.
-	//       TODO: support to submit to component.
-	//
-	if lcc.R.Method == "POST" && lcc.Kind == core.PAGE {
-		return lcc.PostFlow()
-	}
-
-	// Call PageFlow Events
-	for _, eventName := range pageLifecircles {
-		if ret := lcc.CallEvent(eventName); ret {
-			return lcc
-		}
-	}
-
-	// TODO Handle Returns Here
+	lcc := newControl(w, r)
+	lcc.createPage(page)
+	lcc.page.SetRegistry(registry)
 	return lcc
 }
 
-// --------  Event Call on Page  -------------------------------------------------------------------
+// Page Render Flow: (Entrance 1)    new -> path -> url ->
+func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
+
+	// Inject
+	lcc.injectBasic().injectPath().injectURLParameter()
+
+	// Acitvate() in Tapestry5 is used to receive parameters in path.
+	// I use Tag `path:"#"` to do the same thing. Here Activate() receives no parameters.
+	// Note: Only Page has Activate() event.
+	//       Activate() will also be called before an event call.
+	//
+
+	returns := eventReturn(lcc.page.call("Activate"))
+	if returns.returnsTrue() {
+		if lcc.r.Method == "POST" {
+			// >> Form post flow
+
+			// Note: Now only support post to page.
+			//       TODO: support to submit to component.
+			returns = lcc.PostFlow()
+			if returns.breakReturn() {
+				lcc.handleBreakReturn()
+			}
+		} else {
+			// >> page render flow
+
+			// Save lcc in request scope. First is set lcc to request data store.(now)
+			// The other way is set to the proton object. component can get $ object.
+			lcc.SetToRequest(LCC_OBJECT_KEY, lcc)
+
+			// universial flow
+			lcc.rendering = true
+			returns = lcc.page.flow()
+			lcc.rendering = false
+		}
+	}
+
+	// error handling
+	if lcc.Err != nil {
+		panic(lcc.Err.Error())
+	}
+
+	if returns == nil {
+		// if embed components has break-returns.
+		returns = lcc.returns
+	} else {
+		// set returns back to lcc.
+		lcc.returns = returns
+	}
+
+	// handle returns
+	if returns.breakReturn() {
+		lcc.handleBreakReturn() // handle break return.
+	} else if !returns.returnsFalse() {
+		// normal template-rendering
+		lcc.w.Write(lcc.page.out.Bytes())
+	}
+	return lcc
+}
+
+// ----  Event Call on Page  --------------------------------------------------
 
 func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 
@@ -75,18 +97,16 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 	// 1. Inject values into root page
 	lcc.injectBasic().injectPath().injectURLParameter()
 
-	// 2. Call Activate method on root page
-	if lcc.Kind == core.PAGE {
-		if ret := lcc.CallEvent("Activate"); ret {
-			return lcc
-		}
+	returns := eventReturn(lcc.page.call("Activate"))
+	if !returns.returnsTrue() {
+		return lcc
 	}
 
 	// NOTE: Performance: Todo: It's no need to use proton. A
 	// reflect.Type is enough, and thus don't need to create new value
 	// to each node on path. But how to get proton.Kind() only use a reflect.Type?
 
-	proton := lcc.Proton                    // proton is near upper container proton
+	proton := lcc.page.proton               // proton is upper container's proton
 	eventPaths := strings.Split(event, ".") // event call path
 
 	// follow the path

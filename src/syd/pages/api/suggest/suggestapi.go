@@ -39,9 +39,7 @@ func (p *Suggest) Setup() (interface{}, interface{}) {
 		return err, nil
 	}
 	jsonstr := string(jsonbytes)
-	fmt.Println(jsonstr)
-	return "json", jsonbytes
-
+	return "json", jsonstr
 }
 
 /* struct to json */

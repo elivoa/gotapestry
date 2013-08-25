@@ -16,30 +16,32 @@ const (
 	URLInjectionTag  string = "query" // TODO change to url
 )
 
+// injectBasic injects request&response into current Life.
 func (lcc *LifeCircleControl) injectBasic() *LifeCircleControl {
-	lcc.injectBasicTo(lcc.Proton)
+	lcc.injectBasicTo(lcc.current.proton)
 	return lcc
 }
 
 // InjectBasicTo will inject R & W into proton, this is not necessary, make this an option.
 func (lcc *LifeCircleControl) injectBasicTo(proton core.Protoner) {
-	proton.SetRequest(lcc.R)
-	proton.SetResponseWriter(lcc.W)
+	proton.SetRequest(lcc.r)
+	proton.SetResponseWriter(lcc.w)
 }
 
 func (lcc *LifeCircleControl) injectPath() *LifeCircleControl {
-	lcc.injectPathTo(lcc.Proton)
+	lcc.injectPathTo(lcc.current.proton)
 	return lcc
 }
 
 // value must be Proton struct, not ptr
 // everything in lcc is belong to the root page. parameter proton is inject target.
+// TODO remove reflect.
 func (lcc *LifeCircleControl) injectPathTo(proton core.Protoner) {
 	value := reflect.ValueOf(proton)
 	t, _ := utils.RemovePointer(value.Type(), false)
 
 	values := make(map[string][]string) // used to inject
-	pathParams := extractPathParameters(lcc.R.URL.Path, lcc.PageUrl, lcc.EventName)
+	pathParams := extractPathParameters(lcc.r.URL.Path, lcc.pageUrl, lcc.eventName)
 
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -70,7 +72,7 @@ func (lcc *LifeCircleControl) injectPathTo(proton core.Protoner) {
 }
 
 func (lcc *LifeCircleControl) injectURLParameter() *LifeCircleControl {
-	lcc.injectURLParameterTo(lcc.Proton)
+	lcc.injectURLParameterTo(lcc.current.proton)
 	return lcc
 }
 
@@ -78,7 +80,7 @@ func (lcc *LifeCircleControl) injectURLParameterTo(proton core.Protoner) {
 	t := utils.GetRootType(proton)
 
 	values := make(map[string][]string) // used to inject
-	queries := lcc.R.URL.Query()
+	queries := lcc.r.URL.Query()
 
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -109,7 +111,7 @@ func (lcc *LifeCircleControl) injectURLParameterTo(proton core.Protoner) {
 	}
 }
 func (lcc *LifeCircleControl) injectComponentParameters(params []interface{}) *LifeCircleControl {
-	lcc.injectComponentParametersTo(lcc.Proton, params)
+	lcc.injectComponentParametersTo(lcc.current.proton, params)
 	return lcc
 }
 
@@ -308,15 +310,15 @@ func injectField(target reflect.Value, fieldName string, value interface{}) {
 // 	}
 // }
 
-func (lcc *LifeCircleControl) SetInjected(fields ...string) {
-	SetInjected(lcc.V, fields...)
-	// method := lcc.V.MethodByName("SetInjected")
-	// if method.IsValid() {
-	// 	for _, f := range fields {
-	// 		method.Call([]reflect.Value{reflect.ValueOf(f), reflect.ValueOf(true)})
-	// 	}
-	// }
-}
+// func (lcc *LifeCircleControl) SetInjected(fields ...string) {
+// 	SetInjected(lcc.v, fields...)
+// 	// method := lcc.V.MethodByName("SetInjected")
+// 	// if method.IsValid() {
+// 	// 	for _, f := range fields {
+// 	// 		method.Call([]reflect.Value{reflect.ValueOf(f), reflect.ValueOf(true)})
+// 	// 	}
+// 	// }
+// }
 
 // ________________________________________________________________________________
 // Inject values to object, use values in lcc, but not modify any value in lcc.

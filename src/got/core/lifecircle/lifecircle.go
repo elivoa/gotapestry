@@ -1,12 +1,15 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2013-07-29 00:26:52>
+   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2013-08-24 14:50:03>
 */
 
 package lifecircle
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/gorilla/context"
 	"got/core"
+	"got/register"
 	"got/utils"
 	"log"
 	"net/http"
@@ -25,71 +28,141 @@ Injection Order:
 TODO:
  . Callback functions
  . Cache Method to inject, borrowed form gorilla/schema
-
-
 */
 
-// ______________________________
-// Control Struct
-//
+// LifecircleControl controls flow of a Request.
 type LifeCircleControl struct {
-	// basic service
-	W http.ResponseWriter
-	R *http.Request
+	// basic services
+	w http.ResponseWriter
+	r *http.Request
 
-	// target
-	Proton    core.Protoner // Pager or Componenter value
-	RootType  reflect.Type  // proton's root type
-	V         reflect.Value // proton's reflect.Value
-	Kind      core.Kind     // enum: page|component
-	Name      string        // page name or component name
-	Path      string        // ???
-	PageUrl   string        // matched page url, Activate parameter part
-	EventName string        // an event call on page, not page render
+	// request related
+	pageUrl   string // matched page url, Activate parameter part
+	eventName string // an event call on page, not page render
 
-	// result type:[template|redirect]
-	ResultType   string // returns manually. if empty, find default tempalte
-	// TemplateName string // customized template name // not used
-	String       string // component html
-	Err          error  // error if something error. TODO change to MultiError.
+	// lifes
+	page    *Life // The Page Life
+	current *Life // The Current Life
+
+	// returns           || type:[template|redirect]
+	rendering bool     // set to false to stop render.
+	returns   *Returns //
+	Err       error    // error if something error. TODO change to MultiError.
+
+	// ResultType string // returns manually. if empty, find default tempalte
+	// String     string // component html
 }
 
-// TODO kill this
-func newLifeCircleControl(w http.ResponseWriter, r *http.Request,
-	kind core.Kind, proton core.Protoner) *LifeCircleControl {
+// Life is a Page, Component, or others in the page render lifecircle.
+type Life struct {
+	// targets: are these too many?
+	proton   core.Protoner // Pager or Componenter value
+	rootType reflect.Type  // proton's root type
+	v        reflect.Value // proton's reflect.Value
+	kind     core.Kind     // enum: page|component
+	name     string        // page name or component name
 
-	lcc := &LifeCircleControl{W: w, R: r, Kind: kind}
-	lcc.V = newProtonInstance(proton)
-	lcc.Proton = lcc.V.Interface().(core.Protoner)
-	lcc.Name = fmt.Sprint(reflect.TypeOf(lcc.Proton).Elem())
-	lcc.RootType = utils.GetRootType(proton)
+	registry *register.ProtonSegment // Is this really useful
 
-	debuglog("-710- [flow] New LifeCircleControl: %v[%v].", lcc.Kind, lcc.Name)
+	// tree structure. TODO need children?
+	control   *LifeCircleControl
+	container *Life
+	embed     []*Life // not used
 
+	// results
+	out bytes.Buffer
+
+	// no use?
+	Path string // ???
+}
+
+// newControl create a new LifeCircleConstrol.
+func newControl(w http.ResponseWriter, r *http.Request) *LifeCircleControl {
+	lcc := &LifeCircleControl{w: w, r: r}
 	return lcc
 }
 
-//
-// Page lifecircle methods
-//
+// createPage set the root page to lcc(LifeCircleControl).
+func (lcc *LifeCircleControl) createPage(seed core.Protoner) *Life {
+	life := newLife(seed)
+	life.control = lcc
+	lcc.page = life
+	lcc.current = life
+	debuglog("-710- [flow] New LifeCircleControl: %v[%v].", life.kind, life.name)
+	return life
+}
 
-// --------------------------------------------------------------------------------
-// TODO Refactor NewPageFlow, NewComponentFlow
+// appendComponent appends an embed component to lcc and chain it.
+func (lcc *LifeCircleControl) appendComponent(seed core.Protoner) *Life {
+	if seed.Kind() == core.PAGE {
+		panic("Can't embed a Page!")
+	}
+	life := newLife(seed)
+	life.control = lcc
+	life.container = lcc.current
+	lcc.current = life
+	return lcc.current
+}
 
-/* ______________________________
-   Flow
-*/
+// create new proton value from the seed.
+func newLife(seed core.Protoner) *Life {
+	life := &Life{}
+	life.v = newProtonInstance(seed)
+	life.proton = life.v.Interface().(core.Protoner)
+	life.name = fmt.Sprint(reflect.TypeOf(life.proton).Elem()) // remove dependence of fmt
+	life.rootType = utils.GetRootType(seed)
+	life.kind = life.proton.Kind()
+	return life
+}
+
+// ---- utils ---------------------------------------------------------------------
+
+func (lcc *LifeCircleControl) SetToRequest(key interface{}, value interface{}) {
+	context.Set(lcc.r, key, value)
+}
+
+func (lcc *LifeCircleControl) GetFromRequest(key interface{}) interface{} {
+	return context.Get(lcc.r, key)
+}
+
+// ---- Accessors -----------------------------------------------------------------
 func (lcc *LifeCircleControl) SetPageUrl(pageUrl string) *LifeCircleControl {
-	lcc.PageUrl = pageUrl
+	lcc.pageUrl = pageUrl
 	return lcc
 }
 
 func (lcc *LifeCircleControl) SetEventName(event string) *LifeCircleControl {
-	lcc.EventName = event
+	lcc.eventName = event
 	return lcc
 }
 
+// ---- Life ----------------------------------------------------------------------
+
+func (l *Life) SetRegistry(registry *register.ProtonSegment) {
+	l.registry = registry
+}
+
+// Call Events, and other events.
+func (l *Life) call(names ...string) []reflect.Value {
+	// fmt.Println("  ----  >> try call: ", names)
+	// execute the first available method
+	for _, name := range names {
+		method := l.v.MethodByName(name)
+		if method.IsValid() {
+			debuglog("-730- [flow] Call Event: %v::%v().", l.name, name)
+			returns := method.Call(emptyParameters)
+			return returns
+		}
+	}
+	return nil
+}
+
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+
 // ________________________________________________________________________________
+
 // POST Flow,
 //   Events:
 //     OnSubmit    - Form submitted, called before inject form values.
@@ -97,25 +170,31 @@ func (lcc *LifeCircleControl) SetEventName(event string) *LifeCircleControl {
 //                   If returns false, render the current page, with errors
 //     OnSuccess   - Called if OnValidate returns true.
 //
-func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
+// TODO post to components.
+func (lcc *LifeCircleControl) PostFlow() (returns *Returns) {
 	// add ParseForm to fix bugs in go1.1.1
-	err := lcc.R.ParseForm()
+	err := lcc.r.ParseForm()
 	if err != nil {
 		lcc.Err = err
-		return lcc
+		return nil
 	}
 
 	// TODO use another method to retrive FormName. t:id
-	formName := lcc.R.PostFormValue("t:id")
+	formName := lcc.r.PostFormValue("t:id")
 	if formName != "" {
 		formName = fmt.Sprintf("From%v", formName)
 	}
 	fmt.Println("********************************************************************************")
 	fmt.Println(formName)
+
 	// call OnSubmit() method
 	onSubmitEventName := fmt.Sprintf("%v%v", "OnSubmit", formName)
-	if lcc.CallEvent(onSubmitEventName) {
-		return lcc
+	returns = eventReturn(lcc.page.call(onSubmitEventName))
+	if returns.breakReturn() {
+		return
+	}
+	if returns.returnsFalse() {
+		return lcc.refreshThisPage()
 	}
 
 	// inject form values
@@ -123,58 +202,62 @@ func (lcc *LifeCircleControl) PostFlow() *LifeCircleControl {
 
 	// call OnValidate() method
 	onValidateEventName := fmt.Sprintf("%v%v", "OnValidate", formName)
-	if lcc.CallEvent(onValidateEventName) {
-		return lcc
+	returns = eventReturn(lcc.page.call(onValidateEventName))
+	if returns.breakReturn() {
+		return
+	}
+	if returns.returnsFalse() {
+		return lcc.refreshThisPage()
 	}
 
 	// call success method
 	// call OnSuccess() method
 	onSuccessEventName := fmt.Sprintf("%v%v", "OnSuccess", formName)
-	fmt.Println("********************************************************************************")
-	fmt.Println(onSuccessEventName)
-
-	if lcc.CallEvent(onSuccessEventName) {
-		return lcc
+	returns = eventReturn(lcc.page.call(onSuccessEventName))
+	if returns.breakReturn() {
+		return
 	}
+	fmt.Println("***************************************************************************")
+	fmt.Println(onSuccessEventName)
 
 	// something else, validation...
 	// post flows stopd here.
-	return lcc
+	return lcc.refreshThisPage()
 }
 
 // ________________________________________________________________________________
 // Call Events, and other events.
 //
-func (lcc *LifeCircleControl) CallEvent(name string) bool {
-	method := lcc.V.MethodByName(name)
-	if method.IsValid() {
-		debuglog("-730- [flow] Call Event: %v::%v().", lcc.Name, name)
-		returns := method.Call(emptyParameters)
-		return lcc.Return(returns...)
-	} else {
-		// debuglog("    - Event Not Found: %v", name)
-	}
-	return false
-}
+// func (lcc *LifeCircleControl) CallEvent(name string) bool {
+// 	method := lcc.V.MethodByName(name)
+// 	if method.IsValid() {
+// 		debuglog("-730- [flow] Call Event: %v::%v().", lcc.Name, name)
+// 		returns := method.Call(emptyParameters)
+// 		return lcc.Return(returns...)
+// 	} else {
+// 		// debuglog("    - Event Not Found: %v", name)
+// 	}
+// 	return false
+// }
 
 // Call Events, with parameters. only used by Activate for now.
 // TODO performance
 func (lcc *LifeCircleControl) CallEventWithURLParameters(name string) bool {
-	return lcc._callEventWithURLParameters(name, lcc.V)
+	return lcc._callEventWithURLParameters(name, lcc.page.v)
 }
 
 func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base reflect.Value) bool {
 	fmt.Println("______________________________________________________________")
 	// fmt.Println(lcc.R.URL.Path)
 
-	url := lcc.R.URL.Path
-	if !strings.HasPrefix(url, lcc.PageUrl) {
-		panic(fmt.Sprintf("%v should has prefix %v", url, lcc.PageUrl))
+	url := lcc.r.URL.Path
+	if !strings.HasPrefix(url, lcc.pageUrl) {
+		panic(fmt.Sprintf("%v should has prefix %v", url, lcc.pageUrl))
 	}
 
 	// parepare parameters, TODO extract method.
-	paramsString := url[len(lcc.PageUrl)+1:]
-	if lcc.EventName != "" {
+	paramsString := url[len(lcc.pageUrl)+1:]
+	if lcc.eventName != "" {
 		index := strings.Index(paramsString, "/")
 		if index > 0 {
 			paramsString = paramsString[index+1:]
@@ -212,9 +295,10 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 			}
 		}
 
-		debuglog("-730- [flow] Call Event: %v::%v%v().", lcc.Name, name, strParams)
-		returns := method.Call(parameters)
-		return lcc.Return(returns...)
+		debuglog("-730- [flow] Call Event: %v::%v%v().", lcc.page.name, name, strParams)
+		lcc.returns = eventReturn(method.Call(parameters))
+		lcc.handleBreakReturn()
+		return true
 	} else {
 		// debuglog("    - Event Not Found: %v", name)
 	}

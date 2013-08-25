@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates.go] Elivoa @ Tuesday, 2013-08-20 19:17:28>
+   Time-stamp: <[templates.go] Elivoa @ Saturday, 2013-08-24 00:12:15>
 */
 package templates
 
@@ -23,24 +23,16 @@ var Templates *template.Template
 func init() {
 	// init template TODO remove this, change another init method.
 	// TODO: use better way to init.
-	// Templates = template.Must(template.ParseFiles(
-	// 	LocatePath("nothing"),
-	// ))
 	Templates = template.New("-")
 	registerBuiltinFuncs()   // Register built-in templates.
-	registerComponentFuncs() // no use?
 }
 
 /*_______________________________________________________________________________
   Register components
 */
-func registerComponentFuncs() {
-	// init functions
-	Templates.Funcs(template.FuncMap{})
-}
 
 // register components as template function call.
-func RegisterComponent(name string, f interface{}) {
+func RegisterComponentAsFunc(name string, f interface{}) {
 	funcName := fmt.Sprintf("t_%v", strings.Replace(name, "/", "_", -1))
 	lowerFuncName := strings.ToLower(funcName)
 	// debuglog("-108- [RegisterComponent] %v", funcName)
@@ -89,10 +81,10 @@ func parseTempaltes(key string, filename string) (map[string]*template.Template,
 		}
 	}
 
-	fmt.Println("--------------------------------------------------------------------------------------")
-	fmt.Println("------------------", filename, "--------------------------------------")
+	fmt.Println(">>>> ------------------------------------------------------------------------------")
+	fmt.Println(">>>> ------------------", filename, "--------------------------------------")
 	fmt.Println(templatesToParse[key])
-	fmt.Println("``````````````````````````````````````````````````````````````````````````````````````")
+	fmt.Println("<<<< ``````````````````````````````````````````````````````````````````````````````````")
 
 	// Old version uses filename as key, I make my own key. not
 	// filepath.Base(filename) First template becomes return value if
@@ -132,10 +124,9 @@ func parseTempaltes(key string, filename string) (map[string]*template.Template,
 /*_______________________________________________________________________________
   Render Tempaltes
 */
-func RenderGotTemplate(w io.Writer, tplkey string, p interface{}) error {
+func RenderTemplate(w io.Writer, tplkey string, p interface{}) error {
 	err := Templates.ExecuteTemplate(w, tplkey, p)
 	if err != nil {
-		// panic(err)
 		return err
 	}
 	return nil
@@ -145,7 +136,7 @@ func RenderGotTemplate(w io.Writer, tplkey string, p interface{}) error {
   GOT Templates Caches
 */
 // TemplateCache value, mark if template is parsed.
-var GotTemplateCache TemplateCache = TemplateCache{Templates: map[string]bool{}}
+var Cache TemplateCache = TemplateCache{Templates: map[string]bool{}}
 
 type TemplateCache struct {
 	l         sync.Mutex      // TODO lock this.

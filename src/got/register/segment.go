@@ -92,6 +92,7 @@ func (s *ProtonSegment) Identity() string {
 	return s.identity
 }
 
+// TemplatePath returns the tempalte key and it's full path.
 func (s *ProtonSegment) TemplatePath() (string, string) {
 	if s.templatePath == "" {
 		module := s.Module()
@@ -102,8 +103,10 @@ func (s *ProtonSegment) TemplatePath() (string, string) {
 				fmt.Sprintf("%v%v", s.StructInfo.StructName, conf.TemplateFileExtension),
 			) // TODO Configthis
 		}
-
 	}
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	// fmt.Println(s.Identity())
+	// fmt.Println(s.templatePath)
 
 	return s.Identity(), s.templatePath
 }
@@ -141,7 +144,6 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 		segments = segments[1:]
 	}
 	segments = append(segments, si.StructName)
-	// src, segments := trimPathSegments(baseUrl, pathMap[p.Kind()])
 
 	dlog("-___- [Register %v] %v::%v url:%v", pathMap[p.Kind()], src, segments, si)
 
@@ -155,19 +157,13 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 	)
 
 	// 1. process path segments, without last node
-	// fmt.Println("debug:", segments)
 	for idx, seg := range segments[0:(len(segments) - 1)] {
 		var lowerSeg = strings.ToLower(seg)
 		var segment *ProtonSegment
 
 		if currentSeg.HasChild(seg) {
 			segment = currentSeg.Children[seg]
-			dlog("!!!! cached path: currentSeg: %v, has seg: %v\n", currentSeg.Name, seg)
-			dlog("!!!! children: %v\n", s.Children[seg])
 			// TODO detect conflict
-			// if segment.Src != "" && segment.Src != src {
-			// 	log.Fatalf("Conflict of Page defination %v.\n", si)
-			// }
 		} else {
 			segment = &ProtonSegment{
 				Name:   seg,
@@ -184,9 +180,6 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 	}
 
 	// 2. process last node
-	// log.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
-	// log.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
-
 	// ~ 2 ~ overlapped keywords: i.e.: order/OrderEdit ==> order/edit
 	var (
 		seg           string   = segments[len(segments)-1]
@@ -196,14 +189,16 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 		finalSegs     []string = []string{seg} // alias
 	)
 
+	// fmt.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
+	// fmt.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
+
 	// match origin paths: /order/create/OrderCreateIndex
-	// fmt.Println(prevSegs)
 	for _, p := range prevSegs {
 		// dlog("+++ strings.HasPrefix: %v, %v = %v\n", shortLowerSeg, p, strings.HasPrefix(shortLowerSeg, p))
 		if strings.HasPrefix(shortLowerSeg, p) {
 			shortSeg = shortSeg[len(p):]
 			shortLowerSeg = shortLowerSeg[len(p):]
-			if shortSeg != "" {
+			if shortSeg != "" { // e.g. order/create/OrderCreateIndex
 				finalSegs = append(finalSegs, shortSeg)
 				dlog("!!! p:%v, add to final: %v\n", p, shortSeg)
 			}
@@ -227,27 +222,28 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 
 	// judge empty/index
 
+	// remove index if any
 	// /order/Order[Index] - fall back to /order/
-	if p.Kind() == core.PAGE {
-		if strings.HasSuffix(shortLowerSeg, "index") {
-			dlog("+++ Match Index, \n") // ------------------------------------------
+	// /api/suggest/Suggest - fall back to /api/suggest
+	if p.Kind() == core.PAGE && strings.HasSuffix(shortLowerSeg, "index") {
+		dlog("+++ Match Index, \n") // ------------------------------------------
 
-			var trimlen = len(shortLowerSeg) - len("index")
-			if trimlen >= 0 {
-				shortSeg = shortSeg[:trimlen]
-				shortLowerSeg = shortLowerSeg[:trimlen]
-			}
-			if shortSeg == "" {
-				// fallback
-				dlog("+++++ Fallback.\n") // ------------------------------------------
-				// currentSeg.Src = src
-				currentSeg.Proton = p
-				currentSeg.StructInfo = si
-			} else {
-				// eg: /order/OrderDetailIndex --> /order/detail
-				finalSegs = append(finalSegs, shortSeg)
-			}
+		var trimlen = len(shortLowerSeg) - len("index")
+		if trimlen >= 0 {
+			shortSeg = shortSeg[:trimlen]
+			shortLowerSeg = shortLowerSeg[:trimlen]
 		}
+	}
+
+	// Fallback if needed.
+	if shortSeg == "" {
+		// e.g.: /api/suggest/Suggest --> /api/suggest
+		dlog("+++++ Fallback.\n") // ------------------------------------------
+		currentSeg.Proton = p
+		currentSeg.StructInfo = si
+	} else {
+		// e.g.: /order/OrderDetailIndex --> /order/detail
+		finalSegs = append(finalSegs, shortSeg)
 	}
 
 	dlog(">>>>> FinalSegs: %v\n", finalSegs) // ------------------------------------------
@@ -281,6 +277,19 @@ type LookupResult struct {
 	PageUrl   string
 	EventName string
 }
+
+func (lr *LookupResult) IsEventCall() bool {
+	return lr.EventName != ""
+}
+
+func (lr *LookupResult) IsValid() bool {
+	if lr.Segment != nil && lr.Segment.Proton != nil {
+		return true
+	}
+	return false
+}
+
+// ---- .... ------------------------------------------
 
 var average_lookup_time int
 
@@ -374,7 +383,7 @@ func (s *ProtonSegment) PrintALL() string {
 }
 
 func (s *ProtonSegment) print(segment *ProtonSegment) string {
-	fmt.Printf("+ %v\n", segment)
+	fmt.Printf("+ %v >> %v\n", segment, segment.StructInfo)
 	for _, seg := range s.Children {
 		for i := 0; i <= seg.Level; i++ {
 			fmt.Print("  ")
