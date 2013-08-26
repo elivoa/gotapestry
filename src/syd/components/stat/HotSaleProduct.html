@@ -1,0 +1,20 @@
+
+<div>
+  <table class="table">
+    <tr>
+      <th>产品</th>
+      <th>售出(件)</th>
+      <th>详情</th>
+    </tr>
+    <range source=".HotSales.HSProduct">
+      <tr>
+        <td>{{$.ProductName .ProductId}}</td>
+        <td>{{.Sales}}</td>
+        <td style="color:#666">
+          {{range $cskey, $q := .Specs}}
+          {{$cskey}}:{{$q}} | 
+          {{end}}
+        </td>
+      </tr>
+    </range>
+</div>

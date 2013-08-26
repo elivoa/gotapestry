@@ -52,7 +52,7 @@ type Order struct {
 	CustomerId  int
 
 	// shipping info
-	DeliveryMethod         string `` // YTO, SF, TakeAway
+	DeliveryMethod         string `` // YTO, SF, DEPPON, FREIGHT, TakeAway
 	DeliveryTrackingNumber string `` // 快递单号
 	ExpressFee             int64  `` // -1 means 到付
 	ShippingAddress        string `` // this only used in ShippingInstead

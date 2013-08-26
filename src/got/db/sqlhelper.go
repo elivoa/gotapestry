@@ -160,8 +160,14 @@ func (p *QueryParser) And(field string, values ...interface{}) *QueryParser {
 	return p
 }
 
+// and (x1 or x2 or ...) name should be Orxp
 func (p *QueryParser) Or(field string, values ...interface{}) *QueryParser {
 	p.conditions = append(p.conditions, &condition{field: field, values: values, op: "or"})
+	return p
+}
+
+func (p *QueryParser) Range(field string, values ...interface{}) *QueryParser {
+	p.conditions = append(p.conditions, &condition{field: field, values: values, op: "range"})
 	return p
 }
 
@@ -457,6 +463,20 @@ func appendWhereClouse(sql *bytes.Buffer, conditions ...*condition) []interface{
 						sql.WriteString(con.op)
 						sql.WriteString(" ")
 					}
+				}
+				sql.WriteString(")")
+			}
+			values = append(values, con.values...)
+
+		case "range":
+			if lenvalue == 0 || lenvalue > 2 {
+				panic("Where clause must only have 1 or 2 values.")
+			}
+			if !thefirst {
+				sql.WriteString(" and (")
+				sql.WriteString(fmt.Sprintf("`%v`>=?", con.field))
+				if lenvalue > 1 {
+					sql.WriteString(fmt.Sprintf(" and `%v`<?", con.field))
 				}
 				sql.WriteString(")")
 			}

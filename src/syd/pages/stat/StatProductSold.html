@@ -1,3 +1,25 @@
+<!DOCTYPE HTML>
 <html>
-  sdfasdjf
+  <head>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" type="text/css" media="screen" />
+    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="热销产品" />
+  </head>
+  <body class="PG_create_order">
+    <t:layout.headernav />
+    <div class="container">
+      <t:layout.leftnav curpage="/stat/productsold" />
+
+      <div class="main_content">
+    	<h1>一周热销产品</h1>
+        <div class="">
+          <a href="/stat/productsold/7">一周</a>，
+          <a href="/stat/productsold/30">一个月</a>，
+          <a href="/stat/productsold/90">近三个月</a>，
+          <a href="/stat/productsold/365">近一年（慢！慎重）</a>
+          <t:stat.HotSaleProduct days=".Days" />
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

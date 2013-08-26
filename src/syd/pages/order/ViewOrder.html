@@ -62,6 +62,8 @@
 			<span class="B_shipping_method">
               <if t='.Order.DeliveryMethodIs "YTO"'><span class="icon_yto"></span></if>
               <if t='.Order.DeliveryMethodIs "SF"'><span class="icon_sf"></span></if>
+              <if t='.Order.DeliveryMethodIs "Deppon"'><span class="">德邦</span></if>
+              <if t='.Order.DeliveryMethodIs "Freight"'><span class="">货运</span></if>
               <if t='.Order.DeliveryMethodIs "TakeAway"'><span class="icon_pickup"></span></if>
             </span>
             <if t='.Order.IsDaoFu | not'>

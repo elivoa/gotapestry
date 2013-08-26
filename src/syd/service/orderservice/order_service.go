@@ -11,7 +11,29 @@ import (
 	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/productservice"
+	"time"
 )
+
+// --------------------------------------------------------------------------------
+
+type OrderDetailJson struct {
+	Orders   []int                              `json:"order"`
+	Products map[string]*ProductDetalJsonStruct `json:"products"`
+}
+
+// todo rename
+type ProductDetalJsonStruct struct {
+	Id           int             `json:"id"` // product id
+	Name         string          `json:"name"`
+	SellingPrice float64         `json:"price"`
+	ProductPrice float64         `json:"productPrice"`
+	Colors       []string        `json:"colors"`
+	Sizes        []string        `json:"sizes"`
+	Quantity     [][]interface{} `json:"quantity"`
+	Note         string          `json:"note"`
+}
+
+// --------------------------------------------------------------------------------
 
 func ListOrder(status string) ([]*model.Order, error) {
 	return orderdao.ListOrder(status)
@@ -217,19 +239,6 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 	return &r
 }
 
-type OrderDetailJson struct {
-	Orders   []int                              `json:"order"`
-	Products map[string]*ProductDetalJsonStruct `json:"products"`
-}
-
-// todo rename
-type ProductDetalJsonStruct struct {
-	Id           int             `json:"id"` // product id
-	Name         string          `json:"name"`
-	SellingPrice float64         `json:"price"`
-	ProductPrice float64         `json:"productPrice"`
-	Colors       []string        `json:"colors"`
-	Sizes        []string        `json:"sizes"`
-	Quantity     [][]interface{} `json:"quantity"`
-	Note         string          `json:"note"`
+func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
+	return orderdao.ListOrderByTime(start, end)
 }

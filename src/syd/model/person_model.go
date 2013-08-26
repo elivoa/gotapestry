@@ -38,6 +38,7 @@ func NewPerson() *Person {
 }
 
 func (p *Person) Accomulated() float64 {
+	
 	return -p.AccountBallance
 }
 

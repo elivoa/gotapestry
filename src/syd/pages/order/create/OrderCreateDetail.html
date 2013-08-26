@@ -36,13 +36,21 @@
             <div class="tit"><strong>发货方式</strong></div>
             <div class="B_express">
               <div class="choose_express">
-                <label class="checkedxx">
+                <label>
                   <input type="radio" name="Order.DeliveryMethod" value="YTO" />
                   <span class="icon_yto"></span>
                 </label>
                 <label>
                   <input type="radio" name="Order.DeliveryMethod" value="SF" />
                   <span class="icon_sf"></span>
+                </label>
+                <label>
+                  <input type="radio" name="Order.DeliveryMethod" value="Deppon" />
+                  <span style="font-size: 14px;vertical-align:middle;">德邦</span>
+                </label>
+                <label>
+                  <input type="radio" name="Order.DeliveryMethod" value="Freight" />
+                  <span style="font-size: 14px;vertical-align:middle;">货运</span>
                 </label>
                 <label>
                   <input type="radio" name="Order.DeliveryMethod" value="TakeAway" />
@@ -85,14 +93,14 @@
 </html>
 
 <script type="text/javascript">
-  $(function(){
-    ocd = new OrderCreateDetail({{.CustomerId}})
-    
-    {{if .IsEdit}}
-    // Restore information
-    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
-    ocd.odf.setData({{.ProductDetailJson}})
-    {{end}}
-    
-  });
-</script>
+                 $(function(){
+                   ocd = new OrderCreateDetail({{.CustomerId}})
+                   
+                   {{if .IsEdit}}
+                   // Restore information
+                   ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+                   ocd.odf.setData({{.ProductDetailJson}})
+                   {{end}}
+                   
+                 });
+                 </script>

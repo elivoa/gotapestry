@@ -156,7 +156,7 @@ type ButtonSubmitHere struct {
 }
 
 // **** important logic ****
-// TODO transaction.
+// TODO transaction. Move to right place
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 1/2 update delivery informantion to order.
 

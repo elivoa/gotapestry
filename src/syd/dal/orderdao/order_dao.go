@@ -310,3 +310,12 @@ func DeliveringUnclosedOrdersByCustomer(personId int) ([]*model.Order, error) {
 	query := em.Select().Where("customer_id", personId).And("status", "delivering").Or("type", model.Wholesale, model.ShippingInstead)
 	return _listOrder(query)
 }
+
+// list orders by time range, order type is wholesale, not including shipping instead.
+func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
+	var query *db.QueryParser
+	query = em.Select().Where().Or("status", "delivering", "done").
+		And("type", model.Wholesale).
+		Range("create_time", start, end)
+	return _listOrder(query)
+}
