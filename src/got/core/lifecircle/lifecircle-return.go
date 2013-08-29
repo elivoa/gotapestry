@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Saturday, 2013-08-24 14:03:50>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Tuesday, 2013-08-27 13:13:38>
 */
 package lifecircle
 
@@ -63,7 +63,7 @@ func (lcc *LifeCircleControl) refreshThisPage() *Returns {
 // event call returns
 func eventReturn(returns []reflect.Value) *Returns {
 
-	debuglog("... - [route.Return] handle return  '%v'", returns)
+	// debuglog("... - [route.Return] handle return  '%v'", returns)
 
 	// returns nothing equals return true
 	if returns == nil || len(returns) == 0 {

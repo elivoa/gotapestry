@@ -40,6 +40,10 @@ type Protoner interface {
 	IncEmbed() int
 	ClientId() string // no meaning for PAGE
 	SetId(id string)
+
+	// attached lifecircle.Life
+	FlowLife() interface{}
+	SetFlowLife(life interface{})
 }
 
 // A Proton is a Page, Component or Mixins.
@@ -53,6 +57,16 @@ type Proton struct {
 
 	injected map[string]bool     // field that successfully injected
 	embed    map[string]Protoner // embed components TODO
+
+	flowlife interface{} // should be *lifecircle.Life
+}
+
+func (p *Proton) FlowLife() interface{} {
+	return p.flowlife
+}
+
+func (p *Proton) SetFlowLife(life interface{}) {
+	p.flowlife = life
 }
 
 func (p *Proton) Request() *http.Request {
@@ -105,6 +119,10 @@ func (p *Proton) ShowInjected() {
 
 func (p *Proton) Embed(name string) (Protoner, bool) {
 	proton, ok := p.embed[name]
+	fmt.Println("&&&&&&&&&&&&&&&&")
+	for k, _ := range p.embed {
+		fmt.Println("embed:", k)
+	}
 	return proton, ok
 }
 

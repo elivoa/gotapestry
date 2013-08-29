@@ -1,11 +1,10 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Saturday, 2013-08-24 14:49:24>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Thursday, 2013-08-29 13:25:10>
 */
 package lifecircle
 
 import (
 	"fmt"
-	"github.com/gorilla/context"
 	"got/core"
 	"got/debug"
 	"got/register"
@@ -39,15 +38,21 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 
 		// 2. find container page/component
 		container := params[0].(core.Protoner)
-
-		// get lcc from component
+		// 2.1 get Life from container.
+		containerLife := container.FlowLife().(*Life)
 		{
-			fmt.Println("---- debug =============================")
-			// fmt.Println(container)
-			fmt.Println(container.Request())
-			// fmt.Println(context.Get(container.Request(), LCC_OBJECT_KEY))
+			// fmt.Println("~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+			// fmt.Println("container:", utils.GetRootType(container), "  >>> ", container.Kind())
+			// fmt.Println("seed comp:", reflect.TypeOf(result.Segment.Proton))
+			// // fmt.Println("component:", lcc.current.rootType, " >>> ", result.Segment.Proton.Kind())
+			// // fmt.Println("container:", utils.GetRootType(container), "  >>> ", container.ClientId())
+			// // fmt.Println("seed comp:", reflect.TypeOf(result.Segment.Proton))
+			// // fmt.Println("component:", lcc.current.rootType, " >>> ", result.Segment.Proton.ClientId())
+			// fmt.Println("\n")
 		}
-		lcc := context.Get(container.Request(), LCC_OBJECT_KEY).(*LifeCircleControl)
+		// unused: get lcc from component; use method to get from controler.
+		// lcc := context.Get(container.Request(), LCC_OBJECT_KEY).(*LifeCircleControl)
+		lcc := containerLife.control
 		life := lcc.componentFlow(container, result.Segment.Proton, params[1:])
 		life.SetRegistry(result.Segment)
 
@@ -63,7 +68,9 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 		// If returns is not template-renderer (i.e.: redirect or text output),
 		// flow breaks and will not reach here.
 		// Here returns default template render.
-		return template.HTML(life.out.String())
+		rr := template.HTML(life.out.String())
+
+		return rr
 	}
 }
 
@@ -83,7 +90,7 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 func (lcc *LifeCircleControl) componentFlow(container core.Protoner, componentSeed core.Componenter, params []interface{}) *Life {
 
 	{
-		debuglog("----- [Create Component flowcontroller] ------------------------%v",
+		debuglog("----- [Component flow] ------------------------%v",
 			"----------------------------------------")
 		debug.Log("- C - [Component Container] Type: %v, ComponentType:%v,\n",
 			reflect.TypeOf(container), reflect.TypeOf(componentSeed))
@@ -104,19 +111,22 @@ func (lcc *LifeCircleControl) componentFlow(container core.Protoner, componentSe
 	si.CacheEmbedProton(t, tid, componentSeed.Kind())
 
 	// 2. store in proton's embed field. (request scope)
-	proton, ok := container.Embed(tid)
-	if !ok {
-		// first: create and append.
-		life := lcc.appendComponent(componentSeed)
-		// proton = life.Proton.(core.Componenter)
+	containerLife := container.FlowLife().(*Life)
+	life, found := containerLife.embedmap[tid]
+	if !found {
+		// create component life!
+		life := containerLife.appendComponent(componentSeed, tid)
 		container.SetEmbed(tid, life.proton)
 	} else {
+		// already exist, in loop or appear more than once?
+		lcc.current = life
 		// already found. maybe this component is in a loop or range.
 		lcc.current.out.Reset() // components in loop is one instance.
-		proton.IncEmbed()
+		life.proton.IncEmbed()
 	}
-	lcc.injectBasic()
-	lcc.injectComponentParameters(params) // inject component parameters
+
+	lcc.injectBasicTo(lcc.current.proton)
+	lcc.injectComponentParameters(params) // inject component parameters to current life
 	return lcc.current
 }
 

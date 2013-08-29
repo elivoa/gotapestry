@@ -2,6 +2,7 @@ package order
 
 import (
 	"got/core"
+	"time"
 )
 
 // TODO how to solve this problem, 1 template with two different templates.
@@ -31,6 +32,7 @@ type PrintExpressYTO struct {
 	DeliveryMethod string `path-param:"1"`
 	Address        string `query:"address"`
 	Sender         string `query:"sender"`
+	Quantity       int    `query:"quantity"`
 }
 
 func (p *PrintExpressYTO) SenderAddress() string {
@@ -41,7 +43,12 @@ func (p *PrintExpressYTO) SenderAddress() string {
 	return address
 }
 
+func (p *PrintExpressYTO) Today() time.Time {
+	return time.Now()
+}
+
 // --------------------------------------------------------------------------------
+
 type PrintExpressSF struct {
 	printExpress
 	Address string `query:"address"`

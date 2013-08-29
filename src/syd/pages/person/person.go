@@ -119,6 +119,7 @@ type PersonDetail struct {
 
 	Person         *model.Person
 	Orders         []*model.Order
+	TheBigOrder    *model.Order
 	LeavingMessage string
 	// TodayOrders []*model.Order
 }
@@ -135,6 +136,11 @@ func (p *PersonDetail) Setup() {
 			panic(err.Error())
 		}
 		p.Orders = orders
+	}
+
+	p.TheBigOrder, p.LeavingMessage = orderservice.GenerateLeavingMessage(p.Person.Id, time.Now())
+	if true {
+		return
 	}
 
 	// loop orders to find today's order and generate leaving message.

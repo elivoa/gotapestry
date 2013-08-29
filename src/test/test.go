@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"got/utils"
-	"got/service/statservice"
+	"syd/service/statservice"
+	"time"
 )
 
 func main() {
+	now := time.Now()
+	end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0)
+	start := end.AddDate(0, 0, 1)
+}
+
+func main2() {
 	t := utils.NewTimer()
 	// end := time.Now()
 	// start := end.AddDate(0, 0, -7)

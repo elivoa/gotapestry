@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2013-08-24 14:50:03>
+   Time-stamp: <[lifecircle.go] Elivoa @ Thursday, 2013-08-29 13:19:21>
 */
 
 package lifecircle
@@ -61,13 +61,15 @@ type Life struct {
 	v        reflect.Value // proton's reflect.Value
 	kind     core.Kind     // enum: page|component
 	name     string        // page name or component name
+	tid      string        // component tid set in tempalte.
 
 	registry *register.ProtonSegment // Is this really useful
 
 	// tree structure. TODO need children?
 	control   *LifeCircleControl
 	container *Life
-	embed     []*Life // not used
+	embedmap  map[string]*Life
+	//embed     []*Life // not used
 
 	// results
 	out bytes.Buffer
@@ -93,15 +95,25 @@ func (lcc *LifeCircleControl) createPage(seed core.Protoner) *Life {
 }
 
 // appendComponent appends an embed component to lcc and chain it.
-func (lcc *LifeCircleControl) appendComponent(seed core.Protoner) *Life {
+func (lcc *LifeCircleControl) appendComponent(seed core.Protoner, tid string) *Life {
+	return lcc.current.appendComponent(seed, tid)
+}
+
+func (l *Life) appendComponent(seed core.Protoner, tid string) *Life {
 	if seed.Kind() == core.PAGE {
 		panic("Can't embed a Page!")
 	}
 	life := newLife(seed)
-	life.control = lcc
-	life.container = lcc.current
-	lcc.current = life
-	return lcc.current
+	life.tid = tid
+	life.control = l.control
+	life.container = l
+	// append
+	if l.embedmap == nil {
+		l.embedmap = make(map[string]*Life)
+	}
+	l.embedmap[tid] = life
+	l.control.current = life
+	return life
 }
 
 // create new proton value from the seed.
@@ -112,6 +124,7 @@ func newLife(seed core.Protoner) *Life {
 	life.name = fmt.Sprint(reflect.TypeOf(life.proton).Elem()) // remove dependence of fmt
 	life.rootType = utils.GetRootType(seed)
 	life.kind = life.proton.Kind()
+	life.proton.SetFlowLife(life)
 	return life
 }
 
@@ -155,6 +168,35 @@ func (l *Life) call(names ...string) []reflect.Value {
 		}
 	}
 	return nil
+}
+
+// ---- Print Structure --------------------------------------------------------------
+
+func (lcc *LifeCircleControl) PrintCallStructure() string {
+	var out bytes.Buffer
+	printStructure(&out, lcc.page, 0)
+	return out.String()
+}
+
+func printStructure(out *bytes.Buffer, life *Life, level int) {
+	// print indent
+	for i := 0; i < level; i++ {
+		out.WriteString("  ")
+	}
+
+	out.WriteString("+ ")
+	out.WriteString(life.String())
+	out.WriteString("\n")
+	// TODO ordered map
+	if life.embedmap != nil {
+		for _, v := range life.embedmap {
+			printStructure(out, v, level+1)
+		}
+	}
+}
+
+func (l *Life) String() string {
+	return fmt.Sprint(l.proton.Kind(), " ", l.name)
 }
 
 // ********************************************************************************

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[templates-funcs.go] Elivoa @ Sunday, 2013-08-18 18:28:05>
+   Time-stamp: <[templates-funcs.go] Elivoa @ Monday, 2013-08-26 17:06:57>
 */
 package templates
 
@@ -22,6 +22,8 @@ func registerBuiltinFuncs() {
 		"prettytime":     BeautyTime,
 		"prettyday":      gxl.PrettyDay,
 		"prettycurrency": PrettyCurrency,
+		
+		"now":            func() time.Time { return time.Now() },
 	})
 }
 

@@ -2,15 +2,19 @@ package order
 
 import (
 	"got/core"
+	"strconv"
+	"syd/service/personservice"
+	"syd/model"
+	"fmt"
 )
 
 type BatchCloseOrder struct {
 	core.Component
-	CustomerId int // TODO use this.
-	// Customer   *model.Person // now use this.
-	Class            string //  link style
-	JSInit           bool   // false if you want to manually init js
-	QuickClearButton bool   // 已结清按钮
+	CustomerId       int           // TODO use this.
+	Customer         *model.Person // now use this.
+	Class            string        //  link style
+	JSInit           bool          // false if you want to manually init js
+	QuickClearButton bool          // 已结清按钮
 }
 
 func (c *BatchCloseOrder) New() *BatchCloseOrder {
@@ -21,5 +25,9 @@ func (c *BatchCloseOrder) New() *BatchCloseOrder {
 }
 
 func (c *BatchCloseOrder) Setup() {
-	// fmt.Println("------------------------", c.Customer.AccountBallance)
+	c.Customer = personservice.GetPerson(c.CustomerId)
+	if c.Customer == nil {
+		panic("Customer not found! " + strconv.Itoa(c.CustomerId))
+	}
+	fmt.Println("------------------------======", c.Customer.AccountBallance)
 }

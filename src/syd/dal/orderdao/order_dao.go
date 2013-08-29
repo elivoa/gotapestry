@@ -319,3 +319,13 @@ func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
 		Range("create_time", start, end)
 	return _listOrder(query)
 }
+
+// list as following.
+func ListOrderByCustomer_Time(customerId int, start, end time.Time) ([]*model.Order, error) {
+	var query *db.QueryParser
+	query = em.Select().Where().And("customer_id", customerId).
+		Or("status", "todeliver", "delivering", "done").
+		// And("type", model.Wholesale).
+		Range("create_time", start, end)
+	return _listOrder(query)
+}

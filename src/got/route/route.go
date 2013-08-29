@@ -61,6 +61,11 @@ func RouteHandler(w http.ResponseWriter, r *http.Request) {
 	lcc := lifecircle.NewPageFlow(w, r, result.Segment)
 	lcc.SetPageUrl(result.PageUrl)
 	lcc.SetEventName(result.EventName)
+	defer func() {
+		fmt.Println("----------------------------")
+		fmt.Println("Describe the page structure:")
+		fmt.Println(lcc.PrintCallStructure())
+	}()
 
 	if !result.IsEventCall() {
 		// page render flow

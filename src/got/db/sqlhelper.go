@@ -160,6 +160,11 @@ func (p *QueryParser) And(field string, values ...interface{}) *QueryParser {
 	return p
 }
 
+func (p *QueryParser) AndRaw(sqlFragemnt string, values ...interface{}) *QueryParser {
+	p.conditions = append(p.conditions, &condition{field: sqlFragemnt, values: values, op: "sql"})
+	return p
+}
+
 // and (x1 or x2 or ...) name should be Orxp
 func (p *QueryParser) Or(field string, values ...interface{}) *QueryParser {
 	p.conditions = append(p.conditions, &condition{field: field, values: values, op: "or"})
@@ -300,6 +305,7 @@ func (p *QueryParser) Prepare() *QueryParser {
 
 	}
 	p.sql = sql.String()
+	// fmt.Println("%%%% sql is: ", p.sql)
 	p.prepared = true
 	return p
 }
@@ -473,15 +479,23 @@ func appendWhereClouse(sql *bytes.Buffer, conditions ...*condition) []interface{
 				panic("Where clause must only have 1 or 2 values.")
 			}
 			if !thefirst {
-				sql.WriteString(" and (")
-				sql.WriteString(fmt.Sprintf("`%v`>=?", con.field))
-				if lenvalue > 1 {
-					sql.WriteString(fmt.Sprintf(" and `%v`<?", con.field))
-				}
-				sql.WriteString(")")
+				sql.WriteString(" and ")
 			}
+			sql.WriteString("(")
+			sql.WriteString(fmt.Sprintf("`%v`>=?", con.field))
+			if lenvalue > 1 {
+				sql.WriteString(fmt.Sprintf(" and `%v`<?", con.field))
+			}
+			sql.WriteString(")")
 			values = append(values, con.values...)
+
+		case "sql":
+			if !thefirst {
+				sql.WriteString(" and ")
+			}
+			sql.WriteString(con.field)
 		}
+
 		thefirst = false
 	}
 	sql.WriteString(" ")

@@ -138,5 +138,7 @@ func (p *OrderPrint) DeliveryMethodHtml() interface{} {
 var deliveryMethodDisplayMap = map[string]string{
 	"YTO":      "圆通速递",
 	"SF":       "顺风快递",
+	"Depoon":   "德邦",
+	"Freight":  "货运",
 	"TakeAway": "自提",
 }

@@ -102,6 +102,14 @@ func (p *ShippingInstead) ShowProductName(productId int) string {
 	return fmt.Sprintf("product[%v]", productId)
 }
 
+func (p *ShippingInstead) Accumulated() float64 {
+	if p.ReadonlyMode {
+		return p.Order.Accumulated
+	} else {
+		return -p.Customer.AccountBallance
+	}
+}
+
 // before submit, here url injection is ready but post data is not
 // injected. we get order from db.
 func (p *ShippingInstead) OnSubmit() {

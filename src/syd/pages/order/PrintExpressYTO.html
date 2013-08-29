@@ -58,7 +58,7 @@
 	    <!--/内件品名-->
 	    <!--内件数量-->
 	    <div class="Prnt_all" style="position:absolute;left:32mm;top:76.5mm;width:40mm;text-align:center;" contenteditable="true">
-		  1
+		  {{.Quantity}}
 	    </div>
 	    <!--/内件数量-->
 	    <!--寄件人签名-->
@@ -67,15 +67,9 @@
 	    </div>
 	    <!--/寄件人签名-->
 	    <!--发件日期-->
-	    <div class="Prnt_all" style="position:absolute;left:16mm;top:104mm;font-size:10pt;" contenteditable="true">
-		  2013
-	    </div>
-	    <div class="Prnt_all" style="position:absolute;left:29mm;top:104mm;font-size:10pt;" contenteditable="true">
-		  07
-	    </div>
-	    <div class="Prnt_all" style="position:absolute;left:39mm;top:104mm;font-size:10pt;" contenteditable="true">
-		  09
-	    </div>
+	    <div class="Prnt_all" style="position:absolute;left:16mm;top:104mm;font-size:10pt;" contenteditable="true">{{.Today.Year}}</div>
+	    <div class="Prnt_all" style="position:absolute;left:29mm;top:104mm;font-size:10pt;" contenteditable="true">{{now.Format "01"}}</div>
+	    <div class="Prnt_all" style="position:absolute;left:39mm;top:104mm;font-size:10pt;" contenteditable="true">{{now.Day}}</div>
 	    <!--/发件日期-->
 	    
 	    <!--收件人姓名-->
