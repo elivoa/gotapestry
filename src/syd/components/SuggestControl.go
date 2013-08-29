@@ -40,7 +40,7 @@ func (c *SuggestControl) initSuggest() {
 	id := c.Value
 	switch c.Category {
 	case "factory":
-		person := personservice.GetCustomer(id)
+		person := personservice.GetPerson(id)
 		if person != nil {
 			c.DisplayValue = person.Name
 		}

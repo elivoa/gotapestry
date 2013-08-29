@@ -100,9 +100,12 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 		p.Order.ExpressFee = -1
 	}
 
+	// TODO need transaction
 	// set new & edited order's status.
+	var isTakeAwayOrder = false
 	if p.Order.DeliveryMethod == "TakeAway" {
 		p.Order.Status = "delivering"
+		isTakeAwayOrder = true
 	} else {
 		p.Order.Status = "toprint"
 	}
@@ -112,6 +115,18 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 		orderservice.UpdateOrder(p.Order)
 	} else {
 		orderservice.CreateOrder(p.Order)
+
+		// takeaway order sould update person's BallanceAccount
+		if isTakeAwayOrder {
+			customer := personservice.GetPerson(p.Order.CustomerId)
+			if customer != nil {
+				customer.AccountBallance -= p.Order.SumOrderPrice()
+				_, err := personservice.Update(customer)
+				if err != nil {
+					panic(err.Error())
+				}
+			}
+		}
 	}
 
 	// return source?

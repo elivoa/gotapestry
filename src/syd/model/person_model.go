@@ -38,7 +38,6 @@ func NewPerson() *Person {
 }
 
 func (p *Person) Accomulated() float64 {
-	
 	return -p.AccountBallance
 }
 
@@ -48,7 +47,7 @@ func (p *Person) Accomulated() float64 {
 type Customer struct {
 	Person
 	// advanced properties
-	Accumulated float64 // 累计欠款 // TODO replaced by AccountBallance
+	// Accumulated float64 // 累计欠款 // TODO replaced by AccountBallance
 }
 
 type Producer struct {

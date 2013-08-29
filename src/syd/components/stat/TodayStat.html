@@ -2,8 +2,10 @@
 
   <h3>一周销量概况:</h3>
 
-  <div id="{{.ClientId}}" style="width: 800px; height: 200px;"></div>
-  <div id="{{.ClientId}}_2" style="width: 800px; height: 200px;"></div>
+  <if t=".ShowChart">
+    <div id="{{.ClientId}}" style="width: 800px; height: 200px;"></div>
+    <div id="{{.ClientId}}_2" style="width: 800px; height: 200px;"></div>
+  </if>
   
   <table border="1" style="text-align:right" class="table">
     <tr>
@@ -24,8 +26,10 @@
   </table>
 </div>
 
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">
+<if t=".ShowChart">
+
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
   google.load("visualization", "1", {packages:["corechart"]});
 google.setOnLoadCallback(drawChart);
 function drawChart() {
@@ -45,7 +49,7 @@ function drawChart() {
   chart.draw(data, options);
 }
 </script>
-<script type="text/javascript">
+  <script type="text/javascript">
   google.setOnLoadCallback(drawChart2);
 function drawChart2() {
   var data = google.visualization.arrayToDataTable([
@@ -63,3 +67,4 @@ function drawChart2() {
   chart.draw(data, options);
 }
 </script>
+</if>

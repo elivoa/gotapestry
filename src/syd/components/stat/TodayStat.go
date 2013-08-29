@@ -9,7 +9,12 @@ import (
 
 type TodayStat struct {
 	core.Component
-	Stats []*model.SumStat
+	Stats     []*model.SumStat
+	ShowChart bool `default:"true"`
+}
+
+func (p *TodayStat) New() *TodayStat {
+	return &TodayStat{ShowChart: true}
 }
 
 func (p *TodayStat) Setup() {

@@ -15,7 +15,6 @@ func GetProducer(id int) *model.Producer {
 	}
 	producer := model.Producer{
 		Person: *person,
-		// Accumulated: 998,
 	}
 	return &producer
 }
@@ -36,10 +35,8 @@ func GetCustomer(customerId int) *model.Customer {
 		return nil
 	}
 	customer := model.Customer{
-		Person:      *person,
-		Accumulated: 998,
+		Person: *person,
 	}
-	// TODO get Accumulated
 	return &customer
 }
 

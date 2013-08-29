@@ -24,8 +24,6 @@ func SetCustomerPrice(personId int, productId int, price float64) error {
 	defer conn.Close()
 
 	// first get price xxx. TODO performance.
-	// customerPrice := GetCustomerPrice(personId, productId)
-	// if customerPrice == nil {
 	if stmt, err = conn.Prepare("insert into customer_special_price " +
 		"(person_id, product_id, price, create_time, last_use_time) " +
 		"values(?,?,?,?,?)"); err != nil {
