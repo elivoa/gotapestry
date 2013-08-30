@@ -172,7 +172,6 @@ func BatchCloseOrder(money float64, customerId int) {
 	// money used as total shouldbe: inputmoney + (accountballance - allorder's price)
 	totalmoney := money + (person.AccountBallance + totalOrderPrice)
 
-	// TODO ..... finish
 	for _, order := range orders {
 		if totalmoney-order.SumOrderPrice() >= 0 {
 			err := ChangeOrderStatus(order.TrackNumber, "done")
@@ -182,7 +181,6 @@ func BatchCloseOrder(money float64, customerId int) {
 			totalmoney -= order.SumOrderPrice()
 		}
 	}
-	// TODO store money into
 	accountdao.CreateIncoming(&model.AccountIncoming{
 		CustomeId: person.Id,
 		Incoming:  money,
@@ -261,7 +259,7 @@ func CombineOrderDetials(orders ...*model.Order) *model.Order {
 	// can't combined:
 	//   detail.SellingPrice
 
-	for _, o := range orders {
+	for idx, o := range orders {
 		if o.Details == nil || len(o.Details) == 0 {
 			continue
 		}
@@ -295,7 +293,11 @@ func CombineOrderDetials(orders ...*model.Order) *model.Order {
 			finalOrder.DeliveryTrackingNumber += "【单号欠缺】; "
 		}
 		// Accumulated we choose the bigest, instead of sum them.
-		finalOrder.Accumulated = math.Min(finalOrder.Accumulated, o.Accumulated)
+		if idx == 0 {
+			finalOrder.Accumulated = o.Accumulated
+		} else {
+			finalOrder.Accumulated = math.Min(finalOrder.Accumulated, o.Accumulated)
+		}
 	}
 
 	// set to final order.
@@ -425,7 +427,7 @@ func leavingMessage(orders []*model.Order) (*model.Order, string) {
 	}
 	msg.WriteString("单号")
 	msg.WriteString(bigOrder.DeliveryTrackingNumber)
-	msg.WriteString("; ")
+	// msg.WriteString("; ")	
 
 	// 总计
 	msg.WriteString("总计")

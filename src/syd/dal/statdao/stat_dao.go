@@ -37,6 +37,10 @@ order by DATEDIFF(create_time,NOW()) asc
 	for rows.Next() {
 		p := new(model.SumStat)
 		rows.Scan(&p.Id, &p.NOrder, &p.NSold, &p.TotalPrice)
+
+		// update average.
+		p.AvgPrice = p.TotalPrice / float64(p.NSold)
+
 		ps = append(ps, p)
 	}
 	return ps

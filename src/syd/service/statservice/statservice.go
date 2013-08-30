@@ -13,7 +13,6 @@ type HotSales struct {
 }
 
 type HotSaleProduct struct {
-	// Product *model.Product
 	ProductId int
 	Sales     int
 	Specs     map[string]int

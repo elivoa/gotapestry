@@ -12,6 +12,7 @@
       <td>日期</td>
       <td>订单数</td>
       <td>销售数量</td>
+      <td>平均货单价</td>
       <td>总价</td>
     </tr>
     
@@ -20,6 +21,7 @@
       <td>{{$.ShowDate .Id | prettyday}}</td>
       <td>{{.NOrder}}</td>
       <td>{{.NSold}}</td>
+      <td>{{.AvgPrice | prettycurrency}}</td>
       <td>{{.TotalPrice | prettycurrency}}</td>
     </tr>
     {{end}}
