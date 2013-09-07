@@ -285,7 +285,9 @@ func CombineOrderDetials(orders ...*model.Order) *model.Order {
 
 		// order things
 		finalOrder.Note += fmt.Sprint(o.TrackNumber, "; ")
-		finalOrder.ExpressFee += o.ExpressFee
+		if finalOrder.ExpressFee > 0 {
+			finalOrder.ExpressFee += o.ExpressFee
+		}
 		finalOrder.DeliveryMethod = o.DeliveryMethod
 		if o.DeliveryTrackingNumber != "" {
 			finalOrder.DeliveryTrackingNumber += o.DeliveryTrackingNumber + "; "
@@ -332,10 +334,10 @@ func GenerateLeavingMessage(customerId int, date time.Time) (*model.Order, strin
 		panic(err.Error())
 		// return err.Error()
 	}
-	return leavingMessage(orders)
+	return CombinedLeavingMessage(orders...)
 }
 
-func leavingMessage(orders []*model.Order) (*model.Order, string) {
+func CombinedLeavingMessage(orders ...*model.Order) (*model.Order, string) {
 	if orders == nil || len(orders) == 0 {
 		return nil, "<<今日无订单!>>"
 	}
@@ -349,7 +351,10 @@ func leavingMessage(orders []*model.Order) (*model.Order, string) {
 	}
 	LoadDetails(neworders)
 	bigOrder := CombineOrderDetials(neworders...)
+	return bigOrder, LeavingMessage(bigOrder)
+}
 
+func LeavingMessage(bigOrder *model.Order) string {
 	var msg bytes.Buffer
 	jo := OrderDetailsJson(bigOrder)
 	var sumTotal float64
@@ -427,7 +432,7 @@ func leavingMessage(orders []*model.Order) (*model.Order, string) {
 	}
 	msg.WriteString("单号")
 	msg.WriteString(bigOrder.DeliveryTrackingNumber)
-	// msg.WriteString("; ")	
+	// msg.WriteString("; ")
 
 	// 总计
 	msg.WriteString("总计")
@@ -447,5 +452,5 @@ func leavingMessage(orders []*model.Order) (*model.Order, string) {
 		msg.WriteString("元")
 		msg.WriteString("；")
 	}
-	return bigOrder, msg.String()
+	return msg.String()
 }

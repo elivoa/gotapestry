@@ -1,11 +1,9 @@
 package person
 
 import (
-	"bytes"
 	"fmt"
 	"got/core"
 	"gxl"
-	"strconv"
 	"syd/dal/orderdao"
 	"syd/dal/persondao"
 	"syd/model"
@@ -117,11 +115,15 @@ type PersonDetail struct {
 
 	Id *gxl.Int `path-param:"1"`
 
-	Person         *model.Person
-	Orders         []*model.Order
-	TheBigOrder    *model.Order
-	LeavingMessage string
-	// TodayOrders []*model.Order
+	Person *model.Person
+	Orders []*model.Order
+	// TheBigOrder    *model.Order
+	// LeavingMessage string
+	TodayOrders []*model.Order
+}
+
+func (p *PersonDetail) LeavingMessage(order *model.Order) string {
+	return orderservice.LeavingMessage(order)
 }
 
 func (p *PersonDetail) Setup() {
@@ -138,111 +140,127 @@ func (p *PersonDetail) Setup() {
 		p.Orders = orders
 	}
 
-	p.TheBigOrder, p.LeavingMessage = orderservice.GenerateLeavingMessage(p.Person.Id, time.Now())
+	// get today orders.
+	date := time.Now()
+	start := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	end := start.AddDate(0, 0, 1)
+	orders, err := orderdao.ListOrderByCustomer_Time(p.Person.Id, start, end)
+	if err != nil {
+		panic(err.Error())
+	}
+	orderservice.LoadDetails(orders)
+	p.TodayOrders = orders
+
+	// p.TheBigOrder, p.LeavingMessage = orderservice.GenerateLeavingMessage(p.Person.Id, time.Now())
 	if true {
 		return
 	}
-
-	// loop orders to find today's order and generate leaving message.
-	// TODO support more than one order
-	// TODO support shipping instead order.
-	var msg bytes.Buffer
-	for _, order := range p.Orders {
-		// reload order with full details
-		order, _ := orderservice.GetOrder(order.Id)
-		y, m, d := order.CreateTime.Date()
-		y2, m2, d2 := time.Now().Date()
-		if y == y2 && m == m2 && d == d2 { // today's order
-			jo := orderservice.OrderDetailsJson(order)
-			var sumTotal float64
-			var sumQuantity int
-			for _, id := range jo.Orders {
-				productJson := jo.Products[strconv.Itoa(id)]
-				// 例如：奢华宝石
-				msg.WriteString(productJson.Name)
-				totalQuantity := 0
-				for _, q := range productJson.Quantity {
-					totalQuantity += q[2].(int)
-					sumTotal += float64(q[2].(int)) * productJson.SellingPrice
-				}
-				sumQuantity += totalQuantity
-				// eg: 1件
-				msg.WriteString(strconv.Itoa(totalQuantity))
-				msg.WriteString("件")
-
-				// details
-				if len(productJson.Quantity) >= 1 {
-					msg.WriteString("(")
-					i := 0
-					for _, q := range productJson.Quantity {
-						if i > 0 {
-							msg.WriteString(", ")
-						}
-						i += 1
-						_color := q[0].(string)
-						_size := q[1].(string)
-						if _color != "默认颜色" {
-							msg.WriteString(_color)
-						}
-						if _size != "均码" {
-							msg.WriteString(_size)
-						}
-						msg.WriteString(" ")
-						msg.WriteString(strconv.Itoa(q[2].(int)))
-					}
-					msg.WriteString(")")
-				}
-				msg.WriteString("，")
-
-				// price eg: xxx元
-				msg.WriteString(fmt.Sprint(productJson.SellingPrice * float64(totalQuantity)))
-				// msg.WriteString(gxl.FormatCurrency(productJson.SellingPrice*float64(totalQuantity), 2))
-				msg.WriteString("元")
-				msg.WriteString("；")
-			}
-
-			// 共计 n件 x元
-			msg.WriteString("共计")
-			msg.WriteString(strconv.Itoa(sumQuantity))
-			msg.WriteString("件")
-			msg.WriteString(gxl.FormatCurrency(sumTotal, 2))
-			msg.WriteString("元")
-			msg.WriteString("；")
-
-			// shipping
-			if order.DeliveryMethodIs("SF") {
-				msg.WriteString("顺风运费")
-			} else if order.DeliveryMethodIs("YTO") {
-				msg.WriteString("圆通运费")
-			} else {
-				msg.WriteString("【快递类型错误】 运费")
-			}
-			if order.ExpressFee > 0 {
-				msg.WriteString(fmt.Sprint(order.ExpressFee))
-				msg.WriteString("元；")
-			}
-			msg.WriteString("单号")
-			msg.WriteString(order.DeliveryTrackingNumber)
-			msg.WriteString("; ")
-
-			// 总计
-			msg.WriteString("总计")
-			msg.WriteString(gxl.FormatCurrency(sumTotal+float64(order.ExpressFee), 2))
-			msg.WriteString("元")
-			msg.WriteString("；")
-
-			// 累计欠款
-			if order.Accumulated > 0 {
-				msg.WriteString("累计欠款：")
-				msg.WriteString(fmt.Sprint(order.Accumulated))
-				msg.WriteString(" + ")
-				msg.WriteString(fmt.Sprint(int64(sumTotal) + order.ExpressFee))
-				msg.WriteString(" = ")
-				msg.WriteString(gxl.FormatCurrency(float64(int64(sumTotal)+order.ExpressFee)+order.Accumulated, 2))
-				msg.WriteString("元")
-				msg.WriteString("；")
-			}
-		}
-	}
-	p.LeavingMessage = msg.String()
 }
+
+// func xxx(){
+// 	// --------------------------------------------------------------------------------
+// 	// the old things.
+
+// 	// loop orders to find today's order and generate leaving message.
+// 	// TODO support more than one order
+// 	// TODO support shipping instead order.
+// 	var msg bytes.Buffer
+// 	for _, order := range p.Orders {
+// 		// reload order with full details
+// 		order, _ := orderservice.GetOrder(order.Id)
+// 		y, m, d := order.CreateTime.Date()
+// 		y2, m2, d2 := time.Now().Date()
+// 		if y == y2 && m == m2 && d == d2 { // today's order
+// 			jo := orderservice.OrderDetailsJson(order)
+// 			var sumTotal float64
+// 			var sumQuantity int
+// 			for _, id := range jo.Orders {
+// 				productJson := jo.Products[strconv.Itoa(id)]
+// 				// 例如：奢华宝石
+// 				msg.WriteString(productJson.Name)
+// 				totalQuantity := 0
+// 				for _, q := range productJson.Quantity {
+// 					totalQuantity += q[2].(int)
+// 					sumTotal += float64(q[2].(int)) * productJson.SellingPrice
+// 				}
+// 				sumQuantity += totalQuantity
+// 				// eg: 1件
+// 				msg.WriteString(strconv.Itoa(totalQuantity))
+// 				msg.WriteString("件")
+
+// 				// details
+// 				if len(productJson.Quantity) >= 1 {
+// 					msg.WriteString("(")
+// 					i := 0
+// 					for _, q := range productJson.Quantity {
+// 						if i > 0 {
+// 							msg.WriteString(", ")
+// 						}
+// 						i += 1
+// 						_color := q[0].(string)
+// 						_size := q[1].(string)
+// 						if _color != "默认颜色" {
+// 							msg.WriteString(_color)
+// 						}
+// 						if _size != "均码" {
+// 							msg.WriteString(_size)
+// 						}
+// 						msg.WriteString(" ")
+// 						msg.WriteString(strconv.Itoa(q[2].(int)))
+// 					}
+// 					msg.WriteString(")")
+// 				}
+// 				msg.WriteString("，")
+
+// 				// price eg: xxx元
+// 				msg.WriteString(fmt.Sprint(productJson.SellingPrice * float64(totalQuantity)))
+// 				// msg.WriteString(gxl.FormatCurrency(productJson.SellingPrice*float64(totalQuantity), 2))
+// 				msg.WriteString("元")
+// 				msg.WriteString("；")
+// 			}
+
+// 			// 共计 n件 x元
+// 			msg.WriteString("共计")
+// 			msg.WriteString(strconv.Itoa(sumQuantity))
+// 			msg.WriteString("件")
+// 			msg.WriteString(gxl.FormatCurrency(sumTotal, 2))
+// 			msg.WriteString("元")
+// 			msg.WriteString("；")
+
+// 			// shipping
+// 			if order.DeliveryMethodIs("SF") {
+// 				msg.WriteString("顺风运费")
+// 			} else if order.DeliveryMethodIs("YTO") {
+// 				msg.WriteString("圆通运费")
+// 			} else {
+// 				msg.WriteString("【快递类型错误】 运费")
+// 			}
+// 			if order.ExpressFee > 0 {
+// 				msg.WriteString(fmt.Sprint(order.ExpressFee))
+// 				msg.WriteString("元；")
+// 			}
+// 			msg.WriteString("单号")
+// 			msg.WriteString(order.DeliveryTrackingNumber)
+// 			msg.WriteString("; ")
+
+// 			// 总计
+// 			msg.WriteString("总计")
+// 			msg.WriteString(gxl.FormatCurrency(sumTotal+float64(order.ExpressFee), 2))
+// 			msg.WriteString("元")
+// 			msg.WriteString("；")
+
+// 			// 累计欠款
+// 			if order.Accumulated > 0 {
+// 				msg.WriteString("累计欠款：")
+// 				msg.WriteString(fmt.Sprint(order.Accumulated))
+// 				msg.WriteString(" + ")
+// 				msg.WriteString(fmt.Sprint(int64(sumTotal) + order.ExpressFee))
+// 				msg.WriteString(" = ")
+// 				msg.WriteString(gxl.FormatCurrency(float64(int64(sumTotal)+order.ExpressFee)+order.Accumulated, 2))
+// 				msg.WriteString("元")
+// 				msg.WriteString("；")
+// 			}
+// 		}
+// 	}
+// 	p.LeavingMessage = msg.String()
+// }

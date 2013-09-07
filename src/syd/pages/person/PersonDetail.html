@@ -32,12 +32,16 @@
           <h2>今日留言:
             <small>
               for {{.Person.Name}}
-              <if t=".TheBigOrder">订单号： {{.TheBigOrder.Note}}</if>
             </small>
-            {{/* Note is trackingNumber */}}
+            {{/* Note is trackNumber */}}
           </h2>
+          {{range .TodayOrders}}
           <div class="messagebox">
-            今日发货：{{.LeavingMessage}}
+            <h4>订单号： {{.TrackNumber}}</h4>
+            今日发货：{{$.LeavingMessage .}}
+          </div>
+          {{end}}
+          <div class="messagebox">
             <br />
             <br />
             注 1：自动选择当天的订单。<br>
