@@ -37,7 +37,10 @@
           </h2>
           {{range .TodayOrders}}
           <div class="messagebox">
-            <h4>订单号： {{.TrackNumber}}</h4>
+            <h4>
+              订单号： {{.TrackNumber}}
+              <if>...</if>
+            </h4>
             今日发货：{{$.LeavingMessage .}}
           </div>
           {{end}}
@@ -67,3 +70,5 @@
     </div>
   </body>
 </html>
+
+

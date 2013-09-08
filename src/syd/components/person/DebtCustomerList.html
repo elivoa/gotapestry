@@ -3,27 +3,30 @@
 <div class="list_person">
   <table class="tbl_main">
     <tr>
-      <th align="left">客户姓名</th>
-      <th align="left">城市</th>
-      <th align="left">网店</th>
-      <th align="left">备注</th>
-      <th align="left">账户余额</th>
-      <th align="left">操作</th>
+      <th align="center">客户</th>
+      <!-- <th align="left">城市</th> -->
+      <!-- <th align="left">网店</th> -->
+      <!-- <th align="left">备注</th> -->
+      <th align="center">账户余额</th>
+      <th align="center">操作</th>
     </tr>
 
     <range source=".Customers" >
       {{if .}}
       <tr>
-        <td><a href="/person/detail/{{.Id}}" >{{.Name}}</a></td>
-        <td>{{.City}}</td>
-        <td><a href="{{.Website}}">{{.Website}}</a></td>
-        <td>{{.Note}}</td>
-        <td>{{.AccountBallance}}</td>
+        <td>
+          <a href="/person/detail/{{.Id}}" >{{.Name}}</a>
+          {{if .Note}}<span style="color:#999">（{{.Note}}）</span>{{end}}
+        </td>
+        <!-- <td>{{.City}}</td> -->
+        <!-- <td><a href="{{.Website}}">{{.Website}}</a></td> -->
+        <!-- <td>{{.Note}}</td> -->
+        <td align="right" class="price">{{.AccountBallance | prettycurrency}}</td>
         <td>
           {{/* TODO: ajax get latest value. */}}
           {{t_order_batchclose $ "CustomerId" .Id }}
           <a href="/person/EditAccountBallance/{{.Id}}" target="_blank">
-            【修改账户余额(累计欠款)】</a>
+            【修改账户余额】</a>
         </td>
       </tr>
       {{end}}

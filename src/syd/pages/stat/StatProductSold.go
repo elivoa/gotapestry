@@ -10,7 +10,7 @@ type StatProductSold struct {
 }
 
 func (p *StatProductSold) Activate() {
-	if p.Days == 0 {
+	if !p.Injected("Days") {
 		p.Days = 7
 	}
 }
