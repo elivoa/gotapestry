@@ -73,19 +73,10 @@
               
               <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
-
-                {{/* -----------
-                // Not works because the context is not correct.
-                // Context Needed: $, ., $xxx(all variables.), 
-                {{if .IsStatus "toprint"}} {{template "order-list-operator-toprint" .}} {{end}}
-                {{if .IsStatus "todeliver"}} {{template "order-list-operator-todeliver" .}} {{end}}
-                {{if .IsStatus "delivering"}} {{template "order-list-operator-delivering" .}} {{end}}
-                {{if .IsStatus "cancelled" "done"}} {{template "order-list-operator-cancelled" .}} {{end}}
-                ------------- */}}
                 
                 <if t='.IsStatus "toprint"'>
                   <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-                  <a href="{{$.PrintOrderLink .}}"
+                  <a href="{{$.PrintOrderLink .}}" style="font-weight:bolder;color:green"
                      onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
                   <span class="vline">|</span>
                   <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"

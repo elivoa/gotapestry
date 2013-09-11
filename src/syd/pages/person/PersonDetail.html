@@ -12,22 +12,23 @@
       <t:layout.leftnav curpage="/person/list/customer" />
 
       <div class="main_content">
-	    <h1>客户资料:
-          <small><a href="/person/edit/{{.Person.Id}}">修改资料</a></small>
-          <small>(TODO 无页面 TODO 供货商资料)<small>
-        </h1>
-        <t:person.CustomerProfileCard customer=".Person" />
 
-        <div class="section">
+        <div class="section" style="float:right">
           <h2>账户余额:
             <small class="price">{{.Person.AccountBallance | prettycurrency}}元</small>
-          </h2>
-          <div class="">
             工具: <a href="/person/EditAccountBallance/{{.Person.Id}}">【修改账户余额】</a>
-          </div>
+          </h2>
         </div>
         <br class="spliter" />
-        
+
+        <h1 style="float:left">{{.Person.Name}}
+          {{if .Person.IsFactory}} (供货商) {{end}}
+          <small> | </small>
+          <small><a href="/person/edit/{{.Person.Id}}">修改资料</a></small>
+        </h1>
+        <div style="clear:both"></div>
+        <t:person.CustomerProfileCard customer=".Person" />
+
         <div class="section">
           <h2>今日留言:
             <small>

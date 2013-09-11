@@ -132,9 +132,12 @@
     BatchCloseOrder.prototype.submit = function(e) {
       var totalmoney;
       totalmoney = parseFloat(this.money.val());
-      if (isNaN(totalmoney) || totalmoney <= 0 || this.orders_can_clear === 0) {
-        alert("喜乐说你丫的这么点钱还不够结款一单的呢！！！！！");
+      if (isNaN(totalmoney) || totalmoney <= 0) {
+        alert("喜乐说: 你丫的不给钱还想结款？");
         return;
+      }
+      if (this.orders_can_clear === 0) {
+        alert("Warrning! Warrning! 不够结订单，只将钱款加入账户。");
       }
       return $.ajax({
         type: "GET",
@@ -143,7 +146,8 @@
         success: $.proxy(function(data) {
           this.applyJson(data);
           this.orders_can_clear = 0;
-          return this.money.val("");
+          this.money.val("");
+          return this.m.find("a.btn_a_s").html("结款完毕！必须刷新！");
         }, this),
         error: function() {
           return alert('error occured');

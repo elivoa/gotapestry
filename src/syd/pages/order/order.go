@@ -160,7 +160,7 @@ type ButtonSubmitHere struct {
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 1/2 update delivery informantion to order.
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................")
+	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
 		panic(err.Error())
@@ -173,6 +173,16 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 		order.ExpressFee = p.ExpressFee
 	}
 	order.Status = "delivering"
+
+	// get person
+	customer := personservice.GetPerson(order.CustomerId)
+	if customer == nil {
+		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+	}
+
+	// the last chance to update accumulated.
+	order.Accumulated = -customer.AccountBallance
+
 	_, err = orderservice.UpdateOrder(order)
 	if err != nil {
 		panic(err.Error())
@@ -183,10 +193,6 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 2/2 update customer's AccountBallance
 	switch model.OrderType(order.Type) {
 	case model.Wholesale, model.SubOrder: //
-		customer := personservice.GetPerson(order.CustomerId)
-		if customer == nil {
-			panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
-		}
 		customer.AccountBallance -= order.TotalPrice
 		if order.ExpressFee > 0 {
 			customer.AccountBallance -= float64(order.ExpressFee)

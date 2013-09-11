@@ -1,5 +1,5 @@
 ##
-## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Wednesday, 2013-07-24 00:28:41>
+## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Tuesday, 2013-09-10 11:39:40>
 ##
 window.BatchCloseOrder =
 class BatchCloseOrder
@@ -102,7 +102,7 @@ class BatchCloseOrder
   liveMatch:(e) ->
     # money used as total shouldbe: inputmoney + (accountballance - allorder's price)
     totalmoney = parseFloat(@money.val()) + (@param.accountBallance + @TotalOrderPrice)
-    @orders_can_clear = 0
+    @orders_can_clear = 0 # at least one order can clear!
     _=@
     @m.find(".unclosed-orders tr.order").each (index, obj)->
       orderMoney = parseFloat($(obj).attr('money'))
@@ -118,9 +118,12 @@ class BatchCloseOrder
 
   submit:(e)->
     totalmoney = parseFloat(@money.val())
-    if isNaN(totalmoney) or totalmoney <= 0 || @orders_can_clear == 0
-      alert "喜乐说你丫的这么点钱还不够结款一单的呢！！！！！"
+    if isNaN(totalmoney) or totalmoney <= 0
+      alert "喜乐说: 你丫的不给钱还想结款？"
       return
+    if @orders_can_clear == 0
+      alert "Warrning! Warrning! 不够结订单，只将钱款加入账户。"
+
     # submit to batch clear
     $.ajax {
       type:"GET"
@@ -130,6 +133,7 @@ class BatchCloseOrder
         @applyJson(data)
         @orders_can_clear = 0
         @money.val("")
+        @m.find("a.btn_a_s").html("结款完毕！必须刷新！")
       ,@
       error: ()->
         alert 'error occured'

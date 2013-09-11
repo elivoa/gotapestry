@@ -41,6 +41,14 @@ func (p *Person) Accomulated() float64 {
 	return -p.AccountBallance
 }
 
+func (p *Person) IsCustomer() bool {
+	return p.Type=="customer"
+}
+
+func (p *Person) IsFactory() bool {
+	return p.Type=="factory"
+}
+
 //
 // Advanced Wrapper
 //
