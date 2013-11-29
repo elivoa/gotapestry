@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"got/debug"
-	"gxl"
+	"github.com/elivoa/gxl"
 	"math"
 	"strconv"
 	"syd/dal"

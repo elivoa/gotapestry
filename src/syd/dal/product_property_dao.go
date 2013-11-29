@@ -1,25 +1,31 @@
+// refactored.
 package dal
 
 import (
 	"fmt"
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"got/debug"
 )
 
-/* Set customer private price */
+// Set customer private price, panic if any error occurs.
 func AddProductProperty(productId int, propertyName string, property string) {
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	// create
-	stmt, err := db.DB.Prepare("insert into product_property " +
-		"(product_id, property_name, value) values(?,?,?)")
-	if err != nil {
+	sql := "insert into product_property " +
+		"(product_id, property_name, value) values(?,?,?)"
+
+	stmt, err := conn.Prepare(sql)
+	if db.Err(err) {
 		panic(err.Error())
 	}
 	defer stmt.Close()
-	stmt.Exec(productId, propertyName, property)
+
+	_, err = stmt.Exec(productId, propertyName, property)
+	if db.Err(err) {
+		panic(err.Error())
+	}
 
 	// // update
 	// stmt, err := db.DB.Prepare("update customer_special_price set " +
@@ -32,55 +38,61 @@ func AddProductProperty(productId int, propertyName string, property string) {
 	// stmt.Exec(personId, productId, price, time.Now(), customerPrice.Id)
 }
 
-//
 // Delete Product Property by product, property name and value
-//
 func DeleteProductProperty(productId int, propertyName string, property string) {
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	stmt, err := db.DB.Prepare("delete from product_property where " +
+	stmt, err := conn.Prepare("delete from product_property where " +
 		"product_id = ? and property_name = ? and value = ? limit 1")
-	if err != nil {
+	if db.Err(err) {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	stmt.Exec(productId, propertyName, property)
+	_, err = stmt.Exec(productId, propertyName, property)
+	if db.Err(err) {
+		panic(err.Error())
+	}
 }
 
 //
 // Delete Product Property by product, property name and value
 //
 func DeleteOneProductProperty(productId int, propertyName string) {
-	fmt.Println("______________________________________________________________")
-	fmt.Println(productId)
-	fmt.Println(propertyName)
+	// fmt.Println("______________________________________________________________")
+	// fmt.Println(productId)
+	// fmt.Println(propertyName)
 	if productId <= 0 {
 		panic("Error when DeleteOneProductProperty: productId: " + string(productId))
 	}
 
-	db.Connect()
-	defer db.Close()
-	stmt, err := db.DB.Prepare("delete from product_property where " +
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
+
+	stmt, err := conn.Prepare("delete from product_property where " +
 		"product_id = ? and property_name = ?")
-	if err != nil {
+	if db.Err(err) {
 		panic(err.Error())
 	}
 	defer stmt.Close()
-	stmt.Exec(productId, propertyName)
+	_, err = stmt.Exec(productId, propertyName)
+	if db.Err(err) {
+		panic(err.Error())
+	}
 }
 
 // get properties by product and properties' name
 func GetProductProperties(propertyId int, propertiesName string) (values []string) {
 	conn, _ := db.Connect()
-	defer db.CloseConn(conn)
+	defer db.CloseConn(conn) // should use db.CloseConn or conn.Close()?
 
 	stmt, err := conn.Prepare("select value from product_property where " +
 		"product_id=? and property_name=? order by id asc")
 	defer db.CloseStmt(stmt)
 	if db.Err(err) {
-		return
+		panic(err.Error())
+		// should here be empty return?
 	}
 
 	rows, err := stmt.Query(propertyId, propertiesName)
@@ -98,12 +110,14 @@ func GetProductProperties(propertyId int, propertiesName string) (values []strin
 	return values
 }
 
-// TODO implement this.
+// TODO implement IsPropertyExist().
+// TODO is this used?
 func IsPropertyExist(productId string, propertyName string, propertyValue string) bool {
 	return false
 }
 
 // delete product properties && create new properties.
+// TODO add transaction here.
 func UpdateProductProperties(productId int, propertyName string, values ...string) {
 	// properties := GetProperties(productId, propertyName)
 	// TODO performance issue.
@@ -135,16 +149,16 @@ func SetProductPrice(productId int, color string, size string, price float64) {
 func setProductCSValue(productId int, color string, size string,
 	field string, stock int, price float64) {
 
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
 	_sql := fmt.Sprintf("insert into product_cs_value (product_id, color, size, %v) values (?,?,?,?) on duplicate key update %v = ?", field, field)
 
-	stmt, err := db.DB.Prepare(_sql)
-	if err != nil {
+	stmt, err := conn.Prepare(_sql)
+	defer db.CloseStmt(stmt) // the safe way to close.
+	if db.Err(err) {
 		panic(err.Error())
 	}
-	defer stmt.Close()
 
 	if field == "stock" {
 		_, err := stmt.Exec(productId, color, size, stock, stock)
@@ -157,18 +171,17 @@ func setProductCSValue(productId int, color string, size string,
 			debug.Error(err)
 		}
 	}
-
 }
 
 func ClearProductStock(productId int) error {
-	conn, _ := db.Connect()
-	defer conn.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	stmt, err := db.DB.Prepare("delete from product_cs_value where product_id = ?")
-	defer stmt.Close()
+	stmt, err := conn.Prepare("delete from product_cs_value where product_id = ?")
 	if db.Err(err) {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(productId)
 	if db.Err(err) {
@@ -182,14 +195,14 @@ func ClearProductStock(productId int) error {
 */
 func ListProductStocks(productId int) *map[string]int {
 	var err error
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
 	// 1. query
 	var queryString = "select color,size,stock from `product_cs_value` where product_id = ?"
 
 	// 2. prepare
-	stmt, err := db.DB.Prepare(queryString)
+	stmt, err := conn.Prepare(queryString)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -215,6 +228,5 @@ func ListProductStocks(productId int) *map[string]int {
 		rows.Scan(&color, &size, &stock)
 		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
 	}
-	// fmt.Println(stocks)
 	return &stocks
 }

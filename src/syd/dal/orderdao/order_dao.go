@@ -3,8 +3,8 @@ package orderdao
 import (
 	"database/sql"
 	"errors"
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"log"
 	"syd/model"
 	"time"
@@ -192,7 +192,7 @@ func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
 		return nil, err
 	}
 	return orders, nil
-	// stmt, err := db.DB.Prepare("select * from `order_detail` where order_track_number=? order by id asc")
+	// stmt, err := conn?.Prepare("select * from `order_detail` where order_track_number=? order by id asc")
 }
 
 func deleteDetails(trackNumber int64) (int64, error) {

@@ -18,7 +18,11 @@ func (p *TodayStat) New() *TodayStat {
 }
 
 func (p *TodayStat) Setup() {
-	p.Stats = statdao.TodayStat(7)
+	stats, err := statdao.TodayStat(7)
+	if err != nil {
+		panic(err.Error())
+	}
+	p.Stats = stats
 }
 
 func (p *TodayStat) ShowDate(diff int) time.Time {

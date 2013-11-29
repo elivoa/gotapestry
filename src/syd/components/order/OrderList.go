@@ -21,7 +21,7 @@ type OrderList struct {
 
 func (p *OrderList) SetupRender() {
 	// fetch customer names
-	// TODO b'atch it
+	// TODO batch it
 	if p.Orders == nil {
 		return
 	}

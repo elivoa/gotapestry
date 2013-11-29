@@ -14,9 +14,9 @@ func init() {
 type OrderType uint
 
 const (
-	Wholesale OrderType = iota
-	ShippingInstead
-	SubOrder
+	Wholesale       OrderType = iota // 0
+	ShippingInstead                  // 1
+	SubOrder                         // 2
 )
 
 type OrderStatus uint

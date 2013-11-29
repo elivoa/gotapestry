@@ -36,14 +36,16 @@
             </small>
             {{/* Note is trackNumber */}}
           </h2>
+          
           {{range .TodayOrders}}
-          <div class="messagebox">
-            <h4>
-              订单号： {{.TrackNumber}}
-            </h4>
-            今日发货：{{$.LeavingMessage .}}
-          </div>
+          <if t=".TypeIs 0">
+            <div class="messagebox">
+              <h4>订单号： {{.TrackNumber}}</h4>
+              今日发货：{{$.LeavingMessage .}}
+            </div>
+          </if>
           {{end}}
+          
           <div class="messagebox">
             <br />
             <br />

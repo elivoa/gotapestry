@@ -63,6 +63,7 @@ func HackSource(modulePaths []*config.ModulePath) (app *App, compileError *Error
 			}
 		}
 	}
+	
 
 	modules := [][]string{}
 	for _, p := range modulePaths {
@@ -166,7 +167,7 @@ func calcImports(src *SourceInfo) map[string]string {
 			}
 
 			//# method imports, don't import this.
-			//#
+			//#q
 			// for _, methSpec := range spec.MethodSpecs {
 			// 	for _, methArg := range methSpec.Args {
 			// 		if methArg.ImportPath == "" {
@@ -208,10 +209,6 @@ func genSource(dir, filename, templateSource string, args map[string]interface{}
 	sourceCode := ExecuteTemplate(
 		template.Must(template.New("").Parse(templateSource)),
 		args)
-
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-	// fmt.Println(sourceCode)
-	// fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 	// Create a fresh dir.
 	tmpPath := path.Join(config.Config.SrcPath, dir)

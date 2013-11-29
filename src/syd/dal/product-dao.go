@@ -1,7 +1,8 @@
+// refactored.
 package dal
 
 import (
-	"got/db"
+	"github.com/elivoa/got/db"
 	"log"
 	"syd/model"
 	"time"
@@ -12,14 +13,14 @@ import (
 */
 /* create new item in db */
 func CreateProduct(product *model.Product) *model.Product {
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
 	if logdebug {
 		log.Printf("[dal] Create product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, pictures, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?,?)")
+	stmt, err := conn.Prepare("insert into product(name, productId, brand, price, supplier, factoryPrice, stock, note, pictures, createtime, updatetime) values(?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -29,6 +30,8 @@ func CreateProduct(product *model.Product) *model.Product {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// process result -- fill in ID
 	lastInsertId, err := result.LastInsertId()
 	if err == nil || lastInsertId > 0 {
 		product.Id = int(lastInsertId)
@@ -38,20 +41,23 @@ func CreateProduct(product *model.Product) *model.Product {
 
 /* update an existing item */
 func UpdateProduct(product *model.Product) {
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
 	if logdebug {
 		log.Printf("[dal] Edit product: %v", product)
 	}
 
-	stmt, err := db.DB.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, shelfno=?,note=?, pictures=?, updatetime=? where id=?")
+	stmt, err := conn.Prepare("update product set name=?, productId=?, brand=?, price=?, supplier=? , factoryPrice=?, stock=?, shelfno=?,note=?, pictures=?, updatetime=? where id=?")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.ShelfNo, product.Note, product.Pictures, time.Now(), product.Id)
+	_, err = stmt.Exec(product.Name, product.ProductId, product.Brand, product.Price, product.Supplier, product.FactoryPrice, product.Stock, product.ShelfNo, product.Note, product.Pictures, time.Now(), product.Id)
+	if db.Err(err) {
+		panic(err.Error())
+	}
 }
 
 /*
@@ -63,10 +69,10 @@ func ListProduct() *[]model.Product {
 		log.Printf("[dal] List all product")
 	}
 
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	stmt, err := db.DB.Prepare("select * from product")
+	stmt, err := conn.Prepare("select * from product")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -95,14 +101,17 @@ func DeleteProduct(id int) {
 		log.Printf("[dal] delete product %n", id)
 	}
 
-	db.Connect()
-	defer db.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	stmt, err := db.DB.Prepare("delete from product where id = ?")
+	stmt, err := conn.Prepare("delete from product where id = ?")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer stmt.Close()
 
-	stmt.Exec(id)
+	_, err = stmt.Exec(id)
+	if db.Err(err) {
+		panic(err.Error())
+	}
 }

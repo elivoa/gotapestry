@@ -1,14 +1,21 @@
+/*
+
+changed to new db.
+
+*/
 package statdao
 
 import (
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"syd/model"
 )
 
-func TodayStat(n int) []*model.SumStat {
-	conn, _ := db.Connect()
-	defer conn.Close()
+// TodayStat returns statistics of latest n days.
+// TODO: return the second parameter as error
+func TodayStat(n int) ([]*model.SumStat, error) {
+	conn := db.Connectp() // Panic on connection error
+	defer db.CloseConn(conn)
 	sql := `
 select DATEDIFF(create_time,NOW()) as 'date', 
   sum(1) as 'norder',
@@ -20,19 +27,19 @@ select DATEDIFF(create_time,NOW()) as 'date',
 group by DATEDIFF(create_time,NOW())
 order by DATEDIFF(create_time,NOW()) asc
 `
-
-	stmt, err := db.DB.Prepare(sql)
-	if err != nil {
-		panic(err.Error())
+	stmt, err := conn.Prepare(sql)
+	if db.Err(err) {
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(-n)
-	defer db.CloseRows(rows)
 	if db.Err(err) {
-		return nil
+		return nil, err
 	}
+	defer db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
 
+	// the final result
 	ps := []*model.SumStat{}
 	for rows.Next() {
 		p := new(model.SumStat)
@@ -43,5 +50,5 @@ order by DATEDIFF(create_time,NOW()) asc
 
 		ps = append(ps, p)
 	}
-	return ps
+	return ps, nil
 }

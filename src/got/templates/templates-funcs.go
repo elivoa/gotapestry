@@ -1,10 +1,10 @@
 /*
-   Time-stamp: <[templates-funcs.go] Elivoa @ Monday, 2013-08-26 17:06:57>
+   Time-stamp: <[templates-funcs.go] Elivoa @ Saturday, 2013-10-05 22:35:59>
 */
 package templates
 
 import (
-	"gxl"
+	"github.com/elivoa/gxl"
 	"html/template"
 	"math"
 	"time"

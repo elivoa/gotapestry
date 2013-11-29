@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Friday, 2013-07-19 18:23:59>
+  Time-stamp: <[person_dao.go] Elivoa @ Saturday, 2013-11-30 00:12:39>
 
   Note: This is the latest Template for dao functions.
 
@@ -11,8 +11,8 @@ package persondao
 import (
 	"database/sql"
 	"errors"
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"syd/model"
 	"time"
 )
@@ -49,6 +49,7 @@ func Get(id int) (*model.Person, error) {
 	if err != nil {
 		return nil, err
 	}
+	// TODO can here use something like this db.StringNull????
 	if p.Id > 0 {
 		return p, nil
 	}

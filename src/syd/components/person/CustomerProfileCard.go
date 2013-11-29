@@ -2,7 +2,7 @@ package person
 
 import (
 	"got/core"
-	"gxl"
+	"github.com/elivoa/gxl"
 	"syd/model"
 	"syd/service/personservice"
 )

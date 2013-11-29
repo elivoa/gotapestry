@@ -1,12 +1,12 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"syd"
 )
 
 // TESTing....
 func main() {
-	// fmt.Println("syd > Testing SYD Sales Manage System Starting...")
+	fmt.Println("TODO: Make this project a github.com project.")
 	syd.Start()
 }

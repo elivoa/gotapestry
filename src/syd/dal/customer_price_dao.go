@@ -1,9 +1,8 @@
 package dal
 
 import (
-	"database/sql"
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"log"
 	"syd/model"
 	"time"
@@ -15,18 +14,14 @@ func SetCustomerPrice(personId int, productId int, price float64) error {
 		log.Printf("[dal] Set customer price for %v on %v, $%v", personId, productId, price)
 	}
 
-	var conn *sql.DB
-	var stmt *sql.Stmt
-	var err error
-	if conn, err = db.Connect(); err != nil {
-		return err
-	}
-	defer conn.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
 	// first get price xxx. TODO performance.
-	if stmt, err = conn.Prepare("insert into customer_special_price " +
+	stmt, err := conn.Prepare("insert into customer_special_price " +
 		"(person_id, product_id, price, create_time, last_use_time) " +
-		"values(?,?,?,?,?)"); err != nil {
+		"values(?,?,?,?,?)")
+	if db.Err(err) {
 		return err
 	}
 	defer stmt.Close()
@@ -36,30 +31,6 @@ func SetCustomerPrice(personId int, productId int, price float64) error {
 		return err
 	}
 	return nil
-	// } else {
-	// 	if stmt, err = conn.Prepare("insert into customer_special_price " +
-	// 		"(person_id, product_id, price, create_time, last_use_time) " +
-	// 		"values(?,?,?,?,?)"); err != nil {
-	// 		return err
-	// 	}
-	// 	defer stmt.Close()
-	// 	_, err := stmt.Exec(personId, productId, price, time.Now(), nil)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return nil
-
-	// 	// update
-	// 	stmt, err := db.DB.Prepare("update customer_special_price set " +
-	// 		"person_id=?, product_id=?, price=?, last_use_time=? " +
-	// 		"where id = ?")
-	// 	if err != nil {
-	// 		panic(err.Error())
-	// 	}
-	// 	defer stmt.Close()
-	// 	stmt.Exec(personId, productId, price, time.Now(), customerPrice.Id)
-	// }
-
 }
 
 //
@@ -87,10 +58,10 @@ func GetCustomerPriceHistory(personId int, productId int) *[]model.CustomerPrice
 }
 
 func getCustomerPrice(personId int, productId int, number int) *[]model.CustomerPrice {
-	conn, _ := db.Connect()
-	defer conn.Close()
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
 
-	stmt, err := db.DB.Prepare("select * from customer_special_price " +
+	stmt, err := conn.Prepare("select * from customer_special_price " +
 		"where person_id = ? and product_id = ? order by create_time DESC limit ?")
 	if err != nil {
 		panic(err.Error())

@@ -1,10 +1,11 @@
+// refactored
 package productdao
 
 import (
 	"database/sql"
 	"errors"
+	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"got/db"
 	"log"
 	"syd/model"
 	"time"

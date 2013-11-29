@@ -31,13 +31,13 @@ class ProductColorSizeTableGenerator
       htmls.push "  <tr>"
       htmls.push "    <td rowspan=\"#{nSizes}\">#{color}</td>"
       htmls.push "    <td>#{@sizes[0]}</td>"
-      htmls.push "    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_#{color}__#{@sizes[0]}\" class=\"stock\"></td>"
+      htmls.push "    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_#{color}__#{@sizes[0]}\" class=\"stock\" autocomplete=\"off\"></td>"
       htmls.push "  </tr>"
 
       for size in @sizes.slice(1,@sizes.length)
         htmls.push "  <tr>"
         htmls.push "    <td>#{size}</td>"
-        htmls.push "    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_#{color}__#{size}\" class=\"stock\"></td>"
+        htmls.push "    <td><input type=\"text\" size=\"8\" name=\"Stocks\" id=\"csq_#{color}__#{size}\" class=\"stock\" autocomplete=\"off\"></td>"
         htmls.push "  </tr>"
 
     htmls.push "</table>"

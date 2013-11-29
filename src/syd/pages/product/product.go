@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"got/core"
-	"gxl"
+	"github.com/elivoa/gxl"
 	"strings"
 	"syd/model"
 	"syd/service/personservice"
