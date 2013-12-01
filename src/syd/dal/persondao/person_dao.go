@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Saturday, 2013-11-30 00:12:39>
+  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2013-12-01 01:16:09>
 
   Note: This is the latest Template for dao functions.
 
