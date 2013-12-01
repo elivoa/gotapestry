@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2013-12-01 01:16:09>
+  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2013-12-01 13:03:20>
 
   Note: This is the latest Template for dao functions.
 
@@ -17,6 +17,7 @@ import (
 	"time"
 )
 
+// debug option
 var logdebug = true
 var em = &db.Entity{
 	Table: "person",
