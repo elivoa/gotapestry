@@ -2,8 +2,8 @@ package person
 
 import (
 	"fmt"
-	"got/core"
 	"github.com/elivoa/gxl"
+	"got/core"
 	"syd/dal/orderdao"
 	"syd/dal/persondao"
 	"syd/model"
@@ -155,4 +155,13 @@ func (p *PersonDetail) Setup() {
 	if true {
 		return
 	}
+}
+
+func (p *PersonDetail) ShouldShowLeavingMessage(o *model.Order) bool {
+	switch model.OrderType(o.Type) {
+	// case model.Wholesale, model.ShippingInstead:
+	case model.Wholesale, model.SubOrder:
+		return true
+	}
+	return false
 }

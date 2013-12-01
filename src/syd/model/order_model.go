@@ -14,9 +14,9 @@ func init() {
 type OrderType uint
 
 const (
-	Wholesale       OrderType = iota // 0
-	ShippingInstead                  // 1
-	SubOrder                         // 2
+	Wholesale       OrderType = iota // 0 - 大货
+	ShippingInstead                  // 1 - 代发
+	SubOrder                         // 2 - 子订单（主要用于 1-代发）
 )
 
 type OrderStatus uint

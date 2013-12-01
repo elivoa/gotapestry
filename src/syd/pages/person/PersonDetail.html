@@ -32,15 +32,19 @@
         <div class="section">
           <h2>今日留言:
             <small>
-              for {{.Person.Name}}
+              【{{.Person.Name}}】今天有 {{len .TodayOrders}} 个留言；
             </small>
             {{/* Note is trackNumber */}}
           </h2>
+
+          {{/* TODO: range .xxx filter ..... */}}
+          
           
           {{range .TodayOrders}}
-          <if t=".TypeIs 0">
+          {{/* TODO: Auto set loop variable when loop */}}
+          <if t="$.ShouldShowLeavingMessage .">
             <div class="messagebox">
-              <h4>订单号： {{.TrackNumber}}</h4>
+              <h4>订单号 {{if .TypeIs 2}}(代发){{end}}： {{.TrackNumber}}</h4>
               今日发货：{{$.LeavingMessage .}}
             </div>
           </if>
