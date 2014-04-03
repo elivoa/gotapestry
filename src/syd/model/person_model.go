@@ -11,14 +11,14 @@ import (
 type Person struct {
 	Id         int    // id
 	Name       string // pesron name
-	Type       string "enum(客户Customer|厂家Factory)" // person type
+	Type       string `enum(客户Customer|厂家Factory)` // person type
 	Phone      string
 	City       string
 	Address    string
 	PostalCode int
 	QQ         int
 	Website    string
-	Note       string 
+	Note       string
 
 	// Customer: 存储累计欠款; Factory: TODO
 	AccountBallance float64
@@ -42,11 +42,11 @@ func (p *Person) Accomulated() float64 {
 }
 
 func (p *Person) IsCustomer() bool {
-	return p.Type=="customer"
+	return p.Type == "customer"
 }
 
 func (p *Person) IsFactory() bool {
-	return p.Type=="factory"
+	return p.Type == "factory"
 }
 
 //

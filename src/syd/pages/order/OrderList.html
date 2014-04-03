@@ -18,7 +18,7 @@
           <div class="bg">
 	        <ul class="clearfix">
 	          <li class="{{$.TabStyle `toprint`}}"><a href="/order/list/toprint">待打印订单</a></li>
-	          <li class="{{$.TabStyle `todeliver`}}"><a href="/order/list/todeliver">待发货订单</a></li>
+              <li class="{{$.TabStyle `todeliver`}}"><a href="/order/list/todeliver">待发货订单</a></li>
 	          <li class="{{$.TabStyle `delivering`}}"><a href="/order/list/delivering">已发货订单</a></li>
 	          <li class="{{$.TabStyle `done`}}"><a href="/order/list/done">已完成订单</a></li>
 	          <li class="{{$.TabStyle `canceled`}}"><a href="/order/list/canceled">已取消订单</a></li>
@@ -30,13 +30,10 @@
         <div class="list_order">
           <t:order.list tid="orderlist" orders=".Orders" tab=".Tab" />
 
-          <div class="pager_main">
-            <a class="btn_c_s" href="#">首页</a>
-            <span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a>
-              <a href="#">4</a><a href="#">5</a></span>
-            <a class="btn_c_s" href="#">末页</a>
+          <div style="border:solid 0px red">
+            <div t:type="ui.pager" total=".Total" current=".Current" pageitems=".PageItems"
+                 urlTemplate=".UrlTemplate" />
           </div>
-
         </div>
         
       </div>

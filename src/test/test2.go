@@ -22,7 +22,6 @@ var html = `
 </html>
 `
 
-
 func main() {
 	t := transform.NewTransformer()
 	t.Parse(strings.NewReader(html))

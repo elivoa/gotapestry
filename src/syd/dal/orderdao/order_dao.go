@@ -173,6 +173,46 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 	return nil, errors.New("Order not found!")
 }
 
+/*_______________________________________________________________________________
+  Get order
+*/
+
+// CountOrder returns number of orders that are top level orders(i.e. not include suborders.)
+func CountOrder(status string) (int, error) {
+	if logdebug {
+		log.Printf("[dal] Count Order with Status to %v", status)
+	}
+
+	parser := em.Count().Where()
+	if status != "all" {
+		parser.And("status", status)
+	}
+	count, err := parser.Or("type", model.Wholesale, model.ShippingInstead).QueryInt()
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
+}
+
+func CountOrderByCustomer(status string, personId int) (int, error) {
+	if logdebug {
+		log.Printf("[dal] Count Order with Status to %v", status)
+	}
+
+	parser := em.Count().Where()
+	if status != "all" {
+		parser.And("status", status)
+	}
+	count, err := parser.
+		Or("type", model.Wholesale, model.ShippingInstead).
+		And("customer_id", personId).
+		QueryInt()
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
+}
+
 // list interface
 // TODO Order by id asc
 func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
@@ -225,15 +265,30 @@ func DeleteOrder(trackNumber int64) (int64, error) {
 
 func ListOrder(status string) ([]*model.Order, error) {
 	var query *db.QueryParser
+	parser := em.Select().Where()
+	if status != "all" {
+		parser.And("status", status)
+	}
+	query = parser.
+		Or("type", model.Wholesale, model.ShippingInstead).
+		OrderBy("create_time desc")
+	return _listOrder(query)
+}
+
+// not inlude sub orders.
+func ListOrderPager(status string, limit int, n int) ([]*model.Order, error) {
+	var query *db.QueryParser
 	if status == "all" {
 		query = em.Select().Where().
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
+			OrderBy("create_time desc").
+			Limit(limit, n)
 	} else {
 		query = em.Select().
 			Where("status", status).
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
+			OrderBy("create_time desc").
+			Limit(limit, n)
 	}
 	return _listOrder(query)
 }
@@ -270,18 +325,17 @@ func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
 	return orders, nil
 }
 
-func ListOrderByCustomer(personId int, status string) ([]*model.Order, error) {
-	var query *db.QueryParser
-	if status == "all" {
-		query = em.Select().Where("customer_id", personId).
-			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
-	} else {
-		query = em.Select().Where("customer_id", personId).
-			And("status", status).
-			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
+// directly change to limit version.
+func ListOrderByCustomer(personId int, status string, limit int, n int) ([]*model.Order, error) {
+	parser := em.Select()
+	if status != "all" {
+		parser.And("status", status)
 	}
+	var query *db.QueryParser
+	query = parser.And("customer_id", personId).
+		Or("type", model.Wholesale, model.ShippingInstead).
+		OrderBy("create_time desc").
+		Limit(limit, n)
 	return _listOrder(query)
 }
 

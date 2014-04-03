@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"got/debug"
 	"github.com/elivoa/gxl"
+	"got/debug"
 	"math"
 	"strconv"
 	"syd/dal"
@@ -37,9 +37,17 @@ type ProductDetalJsonStruct struct {
 }
 
 // --------------------------------------------------------------------------------
+// TODO: 如此多的方法，还是弄一个类似于Params的东西来接收可变参数。
+func CountOrder(status string) (int, error) {
+	return orderdao.CountOrder(status)
+}
 
 func ListOrder(status string) ([]*model.Order, error) {
 	return orderdao.ListOrder(status)
+}
+
+func ListOrderPager(status string, limit int, n int) ([]*model.Order, error) {
+	return orderdao.ListOrderPager(status, limit, n)
 }
 
 func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, error) {

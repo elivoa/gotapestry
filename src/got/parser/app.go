@@ -71,7 +71,7 @@ func (cmd AppCmd) Start() error {
 	case <-listeningWriter.notifyReady:
 		return nil
 	}
-	panic("Impossible")
+	// panic("Impossible") // unreachable code.
 }
 
 // Run the app server inline.  Never returns.

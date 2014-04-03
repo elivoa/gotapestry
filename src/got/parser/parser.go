@@ -479,6 +479,7 @@ func appendAction(fset *token.FileSet, mm methodMap, decl ast.Decl, pkgImportPat
 	}
 
 	// Add a description of the arguments to the method.
+	// fmt.Println("=========================")
 	for _, field := range funcDecl.Type.Params.List {
 		for _, name := range field.Names {
 			var importPath string
@@ -486,6 +487,10 @@ func appendAction(fset *token.FileSet, mm methodMap, decl ast.Decl, pkgImportPat
 			if !typeExpr.Valid {
 				return // We didn't understand one of the args.  Ignore this action. (Already logged)
 			}
+
+			// debug output
+			// fmt.Println(typeExpr.TypeName(""), " ==== ", typeExpr)
+
 			if typeExpr.PkgName != "" {
 				var ok bool
 				if importPath, ok = imports[typeExpr.PkgName]; !ok {

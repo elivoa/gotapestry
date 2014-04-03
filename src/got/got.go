@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[got.go] Elivoa @ Friday, 2013-08-09 17:32:13>
+  Time-stamp: <[got.go] Elivoa @ Monday, 2013-12-09 23:24:38>
 
   TODO:
     - Add Hooks: OnAppStart, AfterAppStart, ...
@@ -9,7 +9,7 @@ package got
 
 import (
 	"fmt"
-	"got/builtin"
+	"github.com/elivoa/got/builtin"
 	"got/config"
 	"got/parser"
 	"got/register"

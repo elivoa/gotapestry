@@ -22,39 +22,6 @@ func (p *OrderIndex) SetupRender() (string, string) {
 	return "redirect", "/order/list"
 }
 
-/* ________________________________________________________________________________
-   Order List
-*/
-type OrderList struct {
-	core.Page
-
-	Orders []*model.Order
-	Tab    string `path-param:"1"`
-
-	// customerNames map[int]*model.Person // order-id -> customer names
-}
-
-func (p *OrderList) Activate() {
-	if p.Tab == "" {
-		p.Tab = "toprint" // default go in toprint
-	}
-}
-
-func (p *OrderList) SetupRender() {
-	orders, err := orderservice.ListOrder(p.Tab)
-	if err != nil {
-		panic(err.Error())
-	}
-	p.Orders = orders
-	// p.Orders = dal.ListOrder(p.Tab)
-}
-
-func (p *OrderList) TabStyle(tab string) string {
-	if strings.ToLower(p.Tab) == strings.ToLower(tab) {
-		return "cur"
-	}
-	return ""
-}
 
 // EVENT: cancel order.
 // TODO: put this on component.
@@ -160,39 +127,43 @@ type ButtonSubmitHere struct {
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 	// 1/2 update delivery informantion to order.
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
+	// 1. get order form db.
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// 2. set data back to order.
 	order.DeliveryTrackingNumber = p.DeliveryTrackingNumber
 	order.DeliveryMethod = p.DeliveryMethod
 	if p.DaoFu == "on" {
+		// if order.ExpressFee == -1, means this is `daofu`, don't add -1 to 累计欠款.
+		// TODO add field isDaofu to order table. Change ExpressFee to 0;
 		order.ExpressFee = -1
 	} else {
 		order.ExpressFee = p.ExpressFee
 	}
 	order.Status = "delivering"
 
-	// get person
+	// 3. get person, check if customer exists.
 	customer := personservice.GetPerson(order.CustomerId)
 	if customer == nil {
 		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
 	}
 
-	// the last chance to update accumulated.
+	// 4. the last chance to update accumulated.
 	order.Accumulated = -customer.AccountBallance
 
+	// 5. save order changes.
 	_, err = orderservice.UpdateOrder(order)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>> update pesron......................")
-
-	// 2/2 update customer's AccountBallance
+	// 6. update customer's AccountBallance
 	switch model.OrderType(order.Type) {
-	case model.Wholesale, model.SubOrder: //
+	case model.Wholesale, model.SubOrder: // 代发不参与
 		customer.AccountBallance -= order.TotalPrice
 		if order.ExpressFee > 0 {
 			customer.AccountBallance -= float64(order.ExpressFee)

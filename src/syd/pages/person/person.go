@@ -115,6 +115,10 @@ type PersonDetail struct {
 
 	Id *gxl.Int `path-param:"1"`
 
+	Current   int `path-param:"2"` // pager: the current item. in pager.
+	PageItems int `path-param:"3"` // pager: page size.
+	Total     int
+
 	Person *model.Person
 	Orders []*model.Order
 	// TheBigOrder    *model.Order
@@ -130,14 +134,26 @@ func (p *PersonDetail) Setup() {
 	if p.Id == nil {
 		return
 	}
+
+	// fix pagers
+	if p.PageItems <= 0 {
+		p.PageItems = 50 // TODO default pager number. Config this.
+	}
+
 	// performance issue: here we load all orders, this has an performance issue.
 	p.Person = personservice.GetPerson(p.Id.Int)
 	if p.Person != nil {
-		orders, err := orderdao.ListOrderByCustomer(p.Person.Id, "all")
+		var err error
+		p.Total, err = orderdao.CountOrderByCustomer("all", p.Person.Id)
 		if err != nil {
 			panic(err.Error())
 		}
-		p.Orders = orders
+		// TODO finish the common conditional query.
+		// query with pager
+		p.Orders, err = orderdao.ListOrderByCustomer(p.Person.Id, "all", p.Current, p.PageItems)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	// get today orders.
@@ -155,6 +171,10 @@ func (p *PersonDetail) Setup() {
 	if true {
 		return
 	}
+}
+
+func (p *PersonDetail) UrlTemplate() string {
+	return fmt.Sprintf("/person/detail/%d/{{Start}}/{{PageItems}}", p.Person.Id)
 }
 
 func (p *PersonDetail) ShouldShowLeavingMessage(o *model.Order) bool {

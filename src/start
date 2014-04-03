@@ -5,6 +5,9 @@ echo "go build..."
 echo "-200- go install github.com/elivoa/gxl..."
 go install github.com/elivoa/gxl
 
+echo "-210- go install github.com/elivoa/got..."
+go install github.com/elivoa/got
+
 echo "-210- go install github.com/elivoa/got/db..."
 go install github.com/elivoa/got/db
 

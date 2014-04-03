@@ -110,25 +110,25 @@
                 </if>
               </td>
               
-              <td>
+              <td style="display:none">
                 <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}"
-                   onclick="return confirm('******************************\n注意：真的要删除{{$.ShowCustomerName .CustomerId}}的订单么？\n******************************');">
+                   onclick="return confirm('******************************\n注意：真的要删除{{$.ShowCustomerName .CustomerId}}的订单么？已经发货的订单不能删除！会影响累计欠款！\n******************************');">
                   【删除订单】
                 </a>
               </td>
             </tr>
           </range>
         </table>
-        ** 订单总价格: {{$.TotalPrice | prettycurrency}}
+        <div>** 订单总价格: <span class="price">{{$.TotalPrice | prettycurrency}}</span></div>
       </if>
 
       <script type="text/javascript">
-              $(function(){
-                orderlist = new OrderList({
-                  ClientId: {{.ClientId}}
-                })
-              });
-</script>
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+      </script>
 
     </div>
   </body>

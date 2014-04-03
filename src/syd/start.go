@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[start.go] Elivoa @ Thursday, 2013-08-08 14:43:27>
+  Time-stamp: <[start.go] Elivoa @ Friday, 2014-02-14 01:13:10>
 
   Application Entrance: The New World starts here.
 
@@ -26,7 +26,7 @@ func Start() {
 }
 
 func welcome() {
-	fmt.Println("\n")
+	fmt.Print("\n\n")
 	fmt.Println("``````````````````````````````````````````````````")
 	fmt.Println("`  SYD Sale Management System (ALPHA 1)          `")
 	fmt.Println("`                                                `")
