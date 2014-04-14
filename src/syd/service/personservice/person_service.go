@@ -119,6 +119,7 @@ func Create(person *model.Person) error {
 	return nil
 }
 
+// Note: Don't forget create an AccountChangeLog when update person's account-ballance.
 func Update(person *model.Person) (affacted int64, err error) {
 	if affacted, err = persondao.Update(person); err != nil {
 		return

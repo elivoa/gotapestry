@@ -1,10 +1,11 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2013-08-24 14:18:50>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-04-13 22:42:14>
 */
 package lifecircle
 
 import (
 	"fmt"
+	"github.com/elivoa/got/config"
 	"got/core"
 	"got/register"
 	"got/utils"
@@ -14,7 +15,6 @@ import (
 )
 
 // --------------------------------------------------------------------------------
-var LCC_OBJECT_KEY = "__lifecircle_control_key__"
 
 func NewPageFlow(w http.ResponseWriter, r *http.Request, registry *register.ProtonSegment) *LifeCircleControl {
 	// init & maintaince structCache
@@ -34,29 +34,32 @@ func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 	// Inject
 	lcc.injectBasic().injectPath().injectURLParameter()
 
+	// add lcc object to request.
+	lcc.SetToRequest(config.LCC_OBJECT_KEY, lcc)
+
 	// Acitvate() in Tapestry5 is used to receive parameters in path.
 	// I use Tag `path:"#"` to do the same thing. Here Activate() receives no parameters.
 	// Note: Only Page has Activate() event.
 	//       Activate() will also be called before an event call.
 	//
-
-	returns := eventReturn(lcc.page.call("Activate"))
-	if returns.returnsTrue() {
+	returns := SmartReturn(lcc.page.call("Activate"))
+	if returns.IsReturnsTrue() {
 		if lcc.r.Method == "POST" {
 			// >> Form post flow
 
 			// Note: Now only support post to page.
 			//       TODO: support to submit to component.
 			returns = lcc.PostFlow()
-			if returns.breakReturn() {
-				lcc.handleBreakReturn()
+			if returns.IsBreakExit() {
+				lcc.HandleBreakReturn()
 			}
 		} else {
 			// >> page render flow
 
-			// Save lcc in request scope. First is set lcc to request data store.(now)
-			// The other way is set to the proton object. component can get $ object.
-			lcc.SetToRequest(LCC_OBJECT_KEY, lcc)
+			// Save lcc in request scope. There are two approaches:
+			//   1. First is set lcc to request data store.(now)
+			//   2. The other way is set to the proton object. component can get $ object.
+			lcc.SetToRequest(config.LCC_OBJECT_KEY, lcc)
 
 			// universial flow
 			lcc.rendering = true
@@ -79,9 +82,9 @@ func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 	}
 
 	// handle returns
-	if returns.breakReturn() {
-		lcc.handleBreakReturn() // handle break return.
-	} else if !returns.returnsFalse() {
+	if returns.IsBreakExit() {
+		lcc.HandleBreakReturn() // handle break return.
+	} else if !returns.IsReturnsFalse() {
 		// normal template-rendering
 		lcc.w.Write(lcc.page.out.Bytes())
 	}
@@ -97,8 +100,8 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 	// 1. Inject values into root page
 	lcc.injectBasic().injectPath().injectURLParameter()
 
-	returns := eventReturn(lcc.page.call("Activate"))
-	if !returns.returnsTrue() {
+	returns := SmartReturn(lcc.page.call("Activate"))
+	if !returns.IsReturnsTrue() {
 		return lcc
 	}
 

@@ -2,8 +2,9 @@ package order
 
 import (
 	"fmt"
-	"got/core"
 	"github.com/elivoa/gxl"
+	"got/core"
+	"syd/dal/accountdao"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
@@ -110,7 +111,7 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 		p.Order.Status = "toprint"
 	}
 
-	// update
+	// update order OR create order
 	if p.Id != nil {
 		orderservice.UpdateOrder(p.Order)
 	} else {
@@ -125,6 +126,17 @@ func (p *OrderCreateDetail) OnSuccess() (string, string) {
 				if err != nil {
 					panic(err.Error())
 				}
+
+				// create chagne log at the same time:
+				accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+					CustomerId:     customer.Id,
+					Delta:          -p.Order.SumOrderPrice(),
+					Account:        customer.AccountBallance,
+					Type:           2, // create takeaway order
+					RelatedOrderTN: p.Order.TrackNumber,
+					Reason:         "",
+				})
+
 			}
 		}
 	}

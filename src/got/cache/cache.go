@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Sunday, 2013-08-11 18:52:29>
+  Time-stamp: <[cache.go] Elivoa @ Friday, 2014-04-11 00:15:16>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -16,9 +16,9 @@ package cache
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/parser"
 	"got/core"
 	"got/debug"
-	"got/parser"
 	"got/utils"
 	"reflect"
 	"strings"
@@ -105,7 +105,7 @@ func (si *StructInfo) Deep(field string) *StructInfo {
 }
 
 // ________________________________________________________________________________
-// functions for Cache
+// functions for Cache;; TODO Redefine this funcs, too bad names.
 //
 func (c *Cache) GetX(rt reflect.Type) *StructInfo {
 	return c.GetCreate(rt, core.STRUCT)

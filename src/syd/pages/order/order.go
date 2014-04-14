@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"got/core"
 	"strings"
+	"syd/dal/accountdao"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"
@@ -21,7 +22,6 @@ type OrderIndex struct {
 func (p *OrderIndex) SetupRender() (string, string) {
 	return "redirect", "/order/list"
 }
-
 
 // EVENT: cancel order.
 // TODO: put this on component.
@@ -163,7 +163,7 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 
 	// 6. update customer's AccountBallance
 	switch model.OrderType(order.Type) {
-	case model.Wholesale, model.SubOrder: // 代发不参与
+	case model.Wholesale, model.SubOrder: // 代发不参与, 代发订单由其子订单负责参与累计欠款的统计；
 		customer.AccountBallance -= order.TotalPrice
 		if order.ExpressFee > 0 {
 			customer.AccountBallance -= float64(order.ExpressFee)
@@ -171,6 +171,17 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 		if _, err = personservice.Update(customer); err != nil {
 			panic(err.Error())
 		}
+
+		// create chagne log.
+		accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+			CustomerId:     customer.Id,
+			Delta:          -order.TotalPrice,
+			Account:        customer.AccountBallance,
+			Type:           2, // order.send
+			RelatedOrderTN: order.TrackNumber,
+			Reason:         "",
+		})
+
 	}
 	fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
 
@@ -179,6 +190,7 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 }
 
 // **** important logic ****
+// when close order. 结款， Close Order
 func (p *ButtonSubmitHere) OnSuccessFromCloseForm() (string, string) {
 	// 1/2 update delivery informantion to order.
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
@@ -200,6 +212,16 @@ func (p *ButtonSubmitHere) OnSuccessFromCloseForm() (string, string) {
 	if _, err = personservice.Update(customer); err != nil {
 		panic(err.Error())
 	}
+
+	// create chagne log at the same time:
+	accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+		CustomerId:     customer.Id,
+		Delta:          p.Money,
+		Account:        customer.AccountBallance,
+		Type:           3, // batch close order.
+		RelatedOrderTN: order.TrackNumber,
+		Reason:         "",
+	})
 
 	return p.returnDispatch()
 }

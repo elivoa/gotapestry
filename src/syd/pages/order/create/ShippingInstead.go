@@ -120,7 +120,8 @@ func (p *ShippingInstead) OnSubmit() {
 	p.CustomerId = p.Order.CustomerId
 }
 
-// after post data is injected, override to p.Order. Thus p.Order here
+// Shipping Instead order Save button click:
+// After post data is injected, override to p.Order. Thus p.Order here
 // is full and ready to persist.
 func (p *ShippingInstead) OnSuccess() (string, string) {
 	orderservice.UpdateOrder(p.Order)

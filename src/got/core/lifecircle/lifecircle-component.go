@@ -1,10 +1,11 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Thursday, 2013-08-29 13:25:10>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Saturday, 2014-04-12 14:37:21>
 */
 package lifecircle
 
 import (
 	"fmt"
+	"github.com/elivoa/got/route/exit"
 	"got/core"
 	"got/debug"
 	"got/register"
@@ -21,13 +22,14 @@ import (
 func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 
 	// returnd string or template.HTML are inserted into final template.
+	// params: 1. container, 2. ...
 	return func(params ...interface{}) interface{} {
 
 		log.Printf("-620- [flow] Render Component %v ....", name)
 
 		// 1. find base component type
 		result, err := register.Components.Lookup(name)
-		{
+		{ /*  */
 			if err != nil || result.Segment == nil {
 				panic(fmt.Sprintf("Component %v not found!", name))
 			}
@@ -51,14 +53,14 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 			// fmt.Println("\n")
 		}
 		// unused: get lcc from component; use method to get from controler.
-		// lcc := context.Get(container.Request(), LCC_OBJECT_KEY).(*LifeCircleControl)
+		// lcc := context.Get(container.Request(), config.LCC_OBJECT_KEY).(*LifeCircleControl)
 		lcc := containerLife.control
 		life := lcc.componentFlow(container, result.Segment.Proton, params[1:])
 		life.SetRegistry(result.Segment)
 
 		// templates renders in common flow()
 		returns := life.flow()
-		if returns.breakReturn() {
+		if returns.IsBreakExit() {
 			lcc.returns = returns
 			lcc.rendering = false
 			// here don't process returns, handle return in page-flow's end.
@@ -147,7 +149,7 @@ func determinComponentTid(params []interface{}, t reflect.Type) (tid string, set
 // --------------------------------------------------------------------------------
 
 // flow controls the common lifecircles, including pages and components.
-func (l *Life) flow() (returns *Returns) {
+func (l *Life) flow() (returns *exit.Exit) {
 	// There are 2 way to reach here.
 	// 1. Page lifecircle, from PageFlow()
 	// 2. Component's template-func, from func call. Get lcc from Request.
@@ -158,25 +160,25 @@ func (l *Life) flow() (returns *Returns) {
 	// TODO: call lifecircle events with parameter
 
 	for {
-		returns = eventReturn(l.call("Setup", "SetupRender"))
-		if returns.breakReturn() {
+		returns = SmartReturn(l.call("Setup", "SetupRender"))
+		if returns.IsBreakExit() {
 			return
 		}
-		if !returns.returnsFalse() {
+		if !returns.IsReturnsFalse() {
 
 			for {
-				returns = eventReturn(l.call("BeginRender"))
-				if returns.breakReturn() {
+				returns = SmartReturn(l.call("BeginRender"))
+				if returns.IsBreakExit() {
 					return
 				}
-				if !returns.returnsFalse() {
+				if !returns.IsReturnsFalse() {
 
 					for {
-						returns = eventReturn(l.call("BeforeRenderTemplate"))
-						if returns.breakReturn() {
+						returns = SmartReturn(l.call("BeforeRenderTemplate"))
+						if returns.IsBreakExit() {
 							return
 						}
-						if !returns.returnsFalse() {
+						if !returns.IsReturnsFalse() {
 
 							// Here we ignored BeforeRenderBody and AfterRenderBody.
 							// Maybe add it later.
@@ -191,38 +193,40 @@ func (l *Life) flow() (returns *Returns) {
 							}
 						}
 
-						returns = eventReturn(l.call("AfterRenderTemplate"))
-						if returns.breakReturn() {
+						returns = SmartReturn(l.call("AfterRenderTemplate"))
+						if returns.IsBreakExit() {
 							return
 						}
-						if !returns.returnsFalse() {
+						if !returns.IsReturnsFalse() {
 							break
 						}
 					}
 				}
-				returns = eventReturn(l.call("AfterRender"))
-				if returns.breakReturn() {
+				returns = SmartReturn(l.call("AfterRender"))
+				if returns.IsBreakExit() {
 					return
 				}
-				if !returns.returnsFalse() {
+				if !returns.IsReturnsFalse() {
 					break
 				}
 			}
 		}
 
-		returns = eventReturn(l.call("Cleanup", "CleanupRender"))
-		if returns.breakReturn() {
+		returns = SmartReturn(l.call("Cleanup", "CleanupRender"))
+		if returns.IsBreakExit() {
 			return
 		}
-		if !returns.returnsFalse() {
+		if !returns.IsReturnsFalse() {
 			break // exit
 		}
 	}
 
 	// finally I go through all render phrase.
-	returns = &Returns{
-		returnType: "template",
-	}
+	returns = exit.Template(nil)
+	// TODO: Remove this line. This equals line above.
+	// returns = &exit.Exit{
+	// 	returnType: "template",
+	// }
 	return
 }
 

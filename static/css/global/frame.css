@@ -63,3 +63,13 @@ select{padding:2px;}
 .autocomplete-suggestion{ padding:3px 5px; white-space:nowrap; overflow:hidden; }
 .autocomplete-suggestion strong { font-weight:normal; color:#3399FF; }
 .autocomplete-selected{ background:#f2f2f2; }
+
+
+
+/* Add by Bo Gao
+ * The following need to be reimplemented by Lili.
+ * By Elivoa @ 2014-04-07
+ */
+dl.oneline {border:solid 1px #ddd; padding:8px;}
+dl.oneline dt {float:left;width:8em;}
+dl.oneline dd {margin-left:8.5em;margin-bottom:4px;}

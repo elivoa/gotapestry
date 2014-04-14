@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[got.go] Elivoa @ Monday, 2013-12-09 23:24:38>
+  Time-stamp: <[got.go] Elivoa @ Sunday, 2014-04-13 00:18:20>
 
   TODO:
     - Add Hooks: OnAppStart, AfterAppStart, ...
@@ -10,10 +10,10 @@ package got
 import (
 	"fmt"
 	"github.com/elivoa/got/builtin"
-	"got/config"
-	"got/parser"
+	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/parser"
+	"github.com/elivoa/got/route"
 	"got/register"
-	"got/route"
 	"got/utils"
 	"net/http"
 )
@@ -29,33 +29,39 @@ func init() {
 func BuildStart() {
 
 	// register built-in module
-	config.Config.RegisterModulePath(builtin.BuiltinModule.Path(), "BuiltinModule")
+	config.Config.RegisterModule(builtin.BuiltinModule)
+	// config.Config.RegisterModulePath(builtin.BuiltinModule.Path(), "BuiltinModule", false)
 
 	printRegisteredModulePaths()
+
+	// Generate startup codes.
 
 	// generate proton register sourcecode and compile and run.
 	timer := utils.NewTimer()
 	fmt.Println("> Generating startup codes...")
-	app, err := parser.HackSource(Config.ModulePath)
+	app, err := parser.HackSource(Config.Modules)
 	if err != nil {
 		panic(fmt.Sprintf("build error: %v", err.Error()))
 	}
 	timer.Log("generating startup codes Done!")
 
-	// start the server.
+	// Start the server.
+	// TODO: Make my own startup codes.
 	app.Port = Config.Port
 	app.Cmd().Run() // run and not return
+
+	// 	>>> process goes out here, to generated main.go
 }
 
 func printRegisteredModulePaths() {
 	// print registered modules.
 	fmt.Println("> Registered Module paths:")
-	for _, modulePath := range Config.ModulePath {
-		fmt.Printf("    - module: %v.%v\n", modulePath.PackagePath, modulePath.Name)
+	for _, module := range Config.Modules {
+		fmt.Printf("    - module: %v.%v\n", module.PackagePath, module.VarName)
 	}
 }
 
-// called by generated server, start the server.
+// <<< called by generated code, start the server.
 func Start() {
 	welcome()
 
@@ -76,13 +82,14 @@ func Start() {
 
 	// got url matcher
 	http.HandleFunc("/", route.RouteHandler)
+
 	fmt.Println(">> got started...")
 	http.ListenAndServe(fmt.Sprintf(":%v", Config.Port), nil)
 }
 
+// welcome print welcome message to screen.
 func welcome() {
-	fmt.Println("\n")
-	fmt.Println("``````````````````````````````````````````````````")
+	fmt.Println("\n``````````````````````````````````````````````````")
 	fmt.Println("`  GOT WebFramework     (EARLY BUILD 3)          `")
 	fmt.Println("`                                                `")
 	fmt.Println("``````````````````````````````````````````````````")

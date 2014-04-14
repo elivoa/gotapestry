@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elivoa/gxl"
 	"got/core"
+	"syd/dal/accountdao"
 	"syd/dal/orderdao"
 	"syd/dal/persondao"
 	"syd/model"
@@ -184,4 +185,27 @@ func (p *PersonDetail) ShouldShowLeavingMessage(o *model.Order) bool {
 		return true
 	}
 	return false
+}
+
+func (p *PersonDetail) ChangeLogs() []*model.AccountChangeLog {
+	changes, err := accountdao.ListAccountChangeLogsByCustomerId(p.Person.Id)
+	if err != nil {
+		panic(err.Error())
+	}
+	return changes
+}
+
+func (p *PersonDetail) DisplayType(t int) string {
+	switch t {
+	case 1:
+		return "手工修改"
+	case 2:
+		return "订单发货"
+	case 3:
+		return "批量结款"
+	case 4:
+		return "取消已发货订单，减去累计欠款"
+	default:
+		return "不可知类型"
+	}
 }

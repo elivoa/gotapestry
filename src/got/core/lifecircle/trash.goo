@@ -1,0 +1,214 @@
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+
+/*
+   Return analysis the return values and redirect to the write place.
+
+   @return: true if is redirect and should return.
+            false if continue the flow.
+
+   Now can processing: string, string interface...
+
+   Process the return values:
+   If the first value is an error. Redirect to Error page.
+   If the only one value is string, confirm this a url and rediredt.
+   If has at least 2 values and first parameter is the following string.
+      template - template path
+      json     - json string / json bytes
+      text     - plan/text
+      redirect - redirect to url
+   @Author elivoa@gmail.com
+*/
+// event call returns
+func SmartReturn(returns []reflect.Value) *Returns {
+
+	// debuglog("... - [route.Return] handle return  '%v'", returns)
+
+	// returns nothing equals return true
+	if returns == nil || len(returns) == 0 {
+		return returnTrue() // returns nothing equels to return true
+	}
+
+	first := returns[0]
+	kind := first.Kind()
+	// dereference interface
+	if first.Kind() == reflect.Interface {
+		first = reflect.ValueOf(first.Interface())
+		kind = first.Kind()
+	}
+
+	fmt.Println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+	fmt.Println("first return is: ", first)
+	fmt.Println("first return type is: ", reflect.TypeOf(first))
+	fmt.Println("first return kind is: ", kind)
+	fmt.Println("first return type is: ")
+
+	switch kind {
+	case reflect.Bool:
+		return &Returns{"bool", returns[0].Bool()}
+	case reflect.String:
+
+		// now only support (string, string) pair
+		if len(returns) <= 1 {
+			// One String mode:: e.g.: redirect::some_text_output
+			// TODO ...
+			panic("return string must have the second return value. OneStringMode not implemented.")
+		}
+
+		// process the second return value.
+
+		ft := strings.ToLower(first.String())
+		switch ft {
+		case "text", "json":
+			return &Returns{ft, returns[1].Interface()}
+		case "redirect":
+			url, err := extractString(1, returns...)
+			if err != nil {
+				panic(err.Error())
+			}
+			return &Returns{"redirect", url}
+		// case "template":
+		default:
+			debuglog("[Warrning] return type %v not found!", first.String())
+			panic(fmt.Sprintf("[Warrning] return type %v not found!", first.String()))
+		}
+
+	case reflect.Ptr:
+		// may be the first return is an error.
+		err, ok := first.Interface().(error)
+		if ok { // is an error
+			panic(err.Error())
+		}
+
+	case reflect.Invalid: // invalid means return nil
+		return returnTrue()
+
+	}
+	return nil
+}
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+
+// func eventReturn___________(returns []reflect.Value) *Returns {
+// 	// ********************************************************************************
+// 	if len(returns) > 0 {
+// 		// determin kind
+// 		returnValue := returns[0]
+// 		kind := returnValue.Kind()
+// 		if kind == reflect.Interface {
+// 			returnValue = reflect.ValueOf(returnValue.Interface())
+// 			kind = returnValue.Kind()
+// 			// if is interface, reassign kind and value and continue
+// 		}
+
+// 		debuglog("... - [route.return] return type is '%v'", kind)
+
+// 		// the first type is string. process string return.
+// 		if kind == reflect.String {
+// 			stringValue := returnValue.Interface().(string)
+// 			lcc.ResultType = stringValue
+// 			switch strings.ToLower(stringValue) {
+// 			// case "template":
+// 			// 	tname, err := extractString(1, returns...)
+// 			// 	if err != nil {
+// 			// 		lcc.Err = err
+// 			// 		return true
+// 			// 	}
+// 			// 	debuglog("-900- [route:return] parse template '%v'", tname)
+// 			// 	lcc.TemplateName = tname
+
+// 			case "text":
+// 				debuglog("-902- [route:return] return plain string")
+// 				lcc.return_text("plain/text", returns...)
+
+// 			case "json":
+// 				debuglog("-902- [route:return] return plain string")
+// 				lcc.return_text("text/json", returns...)
+
+// 			case "redirect":
+// 				url, err := extractString(1, returns...)
+// 				if err != nil {
+// 					lcc.Err = err
+// 					return true
+// 				}
+// 				debuglog("-904- [route:return] redirect to '%v'", url)
+// 				http.Redirect(lcc.W, lcc.R, url, http.StatusFound)
+// 			default:
+// 				debuglog("[Warrning] return type %v not found!", stringValue)
+// 				panic(fmt.Sprintf("[Warrning] return type %v not found!", stringValue))
+// 			}
+// 			return true
+// 		} else if kind == reflect.Ptr {
+
+// 			// may be the first return is an error.
+// 			returnError, ok := returnValue.Interface().(error)
+// 			if ok { // is an error
+// 				// TODO create error page here.
+// 				lcc.Err = returnError
+// 				return true
+// 			}
+// 		}
+
+// 	}
+// 	return false
+
+// }
+
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+
+// func (lcc *LifeCircleControl) Return(returns ...reflect.Value) bool {
+// }
+
+// // if no return value or true, returns true
+// // panic if return type is not bool
+// func eventReturnBool(returns []reflect.Value) bool {
+// 	if returns == nil || len(returns) == 0 {
+// 		return true
+// 	}
+// 	if len(returns) > 1 || returns[0].Kind() != reflect.Bool {
+// 		panic("return value must be bool or no return value!")
+// 	}
+// 	return returns[0].Bool()
+// }
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+// results // TODO !!! the same to Exit. Combine with Returns.
+// type Returns struct {
+// 	returnType string // bool, redirect, text, json
+// 	value      interface{}
+// }
+
+// func (r *Returns) breakReturn() bool {
+// 	// returns true or nothing
+// 	if r.returnType == "bool" && r.value == true {
+// 		return false
+// 	}
+// 	if r.returnType == "template" {
+// 		return false
+// 	}
+// 	return true
+// }
+
+// func (r *Returns) returnsTrue() bool  { return r.returnType == "bool" && r.value == true }
+// func (r *Returns) returnsFalse() bool { return r.returnType == "bool" && r.value == false }

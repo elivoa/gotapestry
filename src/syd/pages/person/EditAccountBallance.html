@@ -1,7 +1,6 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-  <head>
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
     <link href="/static/css/pages/gb.css" rel="stylesheet" type="text/css">
     <t:layout.header title="修改账户余额" />
@@ -22,12 +21,21 @@
             <small class="price">{{.Person.AccountBallance | prettycurrency}}元</small>
           </h2>
           <div class="">
+            
             <form method="POST" id="CustomerForm" action=""
                   onsubmit="return confirm('确认修改账户余额么？此操作不能撤销！');">
-              修改为: <input type="text" name="AccountBallance" value="0" />
-              <input type="submit" value="修改账户余额" />
-              <span>注意： 如果想将累计欠款修改为300， 应该在账户余额内输入-300。</span>
+              <dl class="oneline">
+                <dt>修改为: </dt>
+                <dd><input type="text" name="AccountBallance" value="0" /></dd>
+                <dt>修改理由：<br />（必填项）</dt>
+                <dd><input type="textarea" name="Reason" /></dd>
+                <dt> </dt>
+                <dd><input type="submit" value="修改账户余额" /></dd>
+                <dt> </dt>
+                <dd>注意： 如果想将累计欠款修改为300， 应该在账户余额内输入-300。</dd>
+              </dl>
             </form>
+            
           </div>
         </div>
         <br class="spliter" />

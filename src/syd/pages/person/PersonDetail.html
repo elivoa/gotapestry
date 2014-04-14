@@ -61,6 +61,31 @@
         </div>
         <br class="spliter" />
 
+        <div class="not defined">
+          <h2>累计欠款变化记录</h2>
+          <table border="1" cellpadding="10">
+            <tr>
+              <td>时间</td>
+              <td>累计欠款</td>
+              <td>Delta</td>
+              <td>类型</td>
+              <td>理由</td>
+              <td>相关订单号</td>
+            </tr>
+            
+            {{range .ChangeLogs}}
+            <tr>
+              <td>{{.Time | prettytime}}</td>
+              <td>{{.Account}}</td>
+              <td>{{.Delta}}</td>
+              <td>{{$.DisplayType .Type}}</td>
+              <td>{{.Reason}}</td>
+              <td>{{.RelatedOrderTN}}</td>
+            </tr>
+            {{end}}
+          </table>
+        </div>
+        
         <div class="section">
           <h2>所有 {{.Person.Name}} 的订单:</h2>
           <div>

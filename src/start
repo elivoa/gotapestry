@@ -7,15 +7,27 @@ go install github.com/elivoa/gxl
 
 echo "-210- go install github.com/elivoa/got..."
 go install github.com/elivoa/got
+go install github.com/elivoa/got/parser
 
 echo "-210- go install github.com/elivoa/got/db..."
 go install github.com/elivoa/got/db
+go install github.com/elivoa/got/route
+go install github.com/elivoa/got/errorhandler
+go install github.com/elivoa/got/builtin/pages
 
 echo "-250- go install got..."
 go install got
 
 echo "-260- go install syd..."
 go install syd
+
+# How to generate all components and pages package to build.
+go install generated
+
+# go install syd/components
+# go install syd/pages
+# go install syd/dal
+# go install syd/model
 
 echo "-270- go run main.go..."
 

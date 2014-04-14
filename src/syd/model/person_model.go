@@ -11,7 +11,7 @@ import (
 type Person struct {
 	Id         int    // id
 	Name       string // pesron name
-	Type       string `enum(客户Customer|厂家Factory)` // person type
+	Type       string // `enum(客户Customer|厂家Factory)` // person type
 	Phone      string
 	City       string
 	Address    string

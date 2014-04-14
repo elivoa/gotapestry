@@ -2,6 +2,7 @@ package order
 
 import (
 	"fmt"
+	"github.com/elivoa/got/errorhandler"
 	"got/core"
 	"strings"
 	"syd/model"
@@ -27,8 +28,17 @@ type OrderList struct {
 }
 
 func (p *OrderList) Activate() {
-	// not injected with parameters.
 
+	// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+	// debug panic() with specific error.
+	if false {
+		fmt.Println("==== I panic =====")
+		// panic("panic le.")		//
+		panic(errorhandler.PermissionDeniedError{ErrMsg: "permission denied."})
+	}
+
+	// not injected with parameters.
+	// fmt.
 	// fix parameters
 	if p.Tab == "" {
 		p.Tab = "toprint" // default go in toprint

@@ -2,8 +2,9 @@ package person
 
 import (
 	"fmt"
-	"got/core"
 	"github.com/elivoa/gxl"
+	"got/core"
+	"syd/dal/accountdao"
 	"syd/model"
 	"syd/service/personservice"
 )
@@ -13,20 +14,31 @@ type EditAccountBallance struct {
 	Id              *gxl.Int `path-param:"1"`
 	Person          *model.Person
 	AccountBallance float64
+	Reason          string
 }
 
 func (p *EditAccountBallance) Setup() {
 	p.Person = personservice.GetPerson(p.Id.Int)
 }
 
+// on form submit
 func (p *EditAccountBallance) OnSuccess() (string, string) {
-	p.Setup() // init again
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", p.AccountBallance)
+	// init person again. get person.
+	p.Setup()
+
 	if p.AccountBallance != p.Person.AccountBallance {
+		// create
+		accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+			CustomerId:     p.Person.Id,
+			Delta:          p.AccountBallance - p.Person.AccountBallance,
+			Account:        p.AccountBallance,
+			Type:           1, // manually modification;
+			RelatedOrderTN: 0,
+			Reason:         p.Reason,
+		})
+		// update account ballance
 		p.Person.AccountBallance = p.AccountBallance
-		fmt.Println(">>>>>>>>>>>>")
 		if _, err := personservice.Update(p.Person); err != nil {
-			fmt.Println(">>>>>>>>>>>>>>>>> ")
 			panic(err)
 		}
 	}

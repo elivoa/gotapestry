@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"got/core"
 	"got/debug"
-	"got/route"
+	"github.com/elivoa/got/route"
 	"html/template"
 	"syd/dal"
 	"syd/model"

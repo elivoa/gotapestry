@@ -3,9 +3,9 @@ package register
 import (
 	"errors"
 	"fmt"
-	"got/config"
+	"github.com/elivoa/got/parser"
+	"github.com/elivoa/got/config"
 	"got/core"
-	"got/parser"
 	"log"
 	"path"
 	"path/filepath"
@@ -36,7 +36,7 @@ type ProtonSegment struct {
 	// associated external resources.
 	ModulePackage string             // e.g. got/builtin, syd; used in init.
 	StructInfo    *parser.StructInfo // from parser package
-	module        *Module            // associated Module
+	module        *core.Module            // associated Module
 
 	// caches
 	identity     string // cache identity, default the same name with StructName
@@ -111,7 +111,7 @@ func (s *ProtonSegment) TemplatePath() (string, string) {
 	return s.Identity(), s.templatePath
 }
 
-func (s *ProtonSegment) Module() *Module {
+func (s *ProtonSegment) Module() *core.Module {
 	if s.module == nil {
 		if s.StructInfo != nil {
 			// for k, module := range Modules.Map() {

@@ -1,17 +1,19 @@
 package syd
 
 import (
-	"got/config"
-	"got/register"
+	"github.com/elivoa/got/config"
+	"got/core"
 	"got/utils"
 )
 
 // todo: think out a better way to register this.
-var SYDModule = &register.Module{
-	Name:        "syd",
-	BasePath:    utils.CurrentBasePath(),
-	PackagePath: "syd",
-	Description: "SYD Selling System Main module.",
+var SYDModule = &core.Module{
+	Name:            "syd",
+	VarName:         "SYDModule",
+	BasePath:        utils.CurrentBasePath(),
+	PackagePath:     "syd",
+	Description:     "SYD Selling System Main module.",
+	IsStartupModule: true,
 	Register: func() {
 		c := config.Config
 

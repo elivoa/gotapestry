@@ -160,12 +160,14 @@ func LoadSubOrders(order *model.Order) ([]*model.Order, error) {
 	return suborders, nil
 }
 
+// 批量结款
 func BatchCloseOrder(money float64, customerId int) {
 	debug.Log("Incoming Money: %v", money)
 	person, err := persondao.Get(customerId)
 	if err != nil {
 		panic(err.Error())
 	}
+	// get unclosed orders for somebody
 	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
 	if err != nil {
 		panic(err.Error())
@@ -196,6 +198,17 @@ func BatchCloseOrder(money float64, customerId int) {
 	// modify customer's accountballance
 	person.AccountBallance += money
 	persondao.Update(person)
+
+	// create chagne log at the same time:
+	accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+		CustomerId: person.Id,
+		Delta:      money,
+		Account:    person.AccountBallance,
+		Type:       2, // create order
+		// RelatedOrderTN: 0,
+		Reason: "Batch insert",
+	})
+
 }
 
 // ________________________________________________________________________________

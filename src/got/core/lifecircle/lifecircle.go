@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Thursday, 2013-08-29 13:19:21>
+   Time-stamp: <[lifecircle.go] Elivoa @ Sunday, 2014-04-13 22:42:19>
 */
 
 package lifecircle
@@ -7,6 +7,7 @@ package lifecircle
 import (
 	"bytes"
 	"fmt"
+	"github.com/elivoa/got/route/exit"
 	"github.com/gorilla/context"
 	"got/core"
 	"got/register"
@@ -45,9 +46,9 @@ type LifeCircleControl struct {
 	current *Life // The Current Life
 
 	// returns           || type:[template|redirect]
-	rendering bool     // set to false to stop render.
-	returns   *Returns //
-	Err       error    // error if something error. TODO change to MultiError.
+	rendering bool       // set to false to stop render.
+	returns   *exit.Exit //
+	Err       error      // error if something error. TODO change to MultiError.
 
 	// ResultType string // returns manually. if empty, find default tempalte
 	// String     string // component html
@@ -213,7 +214,7 @@ func (l *Life) String() string {
 //     OnSuccess   - Called if OnValidate returns true.
 //
 // TODO post to components.
-func (lcc *LifeCircleControl) PostFlow() (returns *Returns) {
+func (lcc *LifeCircleControl) PostFlow() (returns *exit.Exit) {
 	// add ParseForm to fix bugs in go1.1.1
 	err := lcc.r.ParseForm()
 	if err != nil {
@@ -231,11 +232,11 @@ func (lcc *LifeCircleControl) PostFlow() (returns *Returns) {
 
 	// call OnSubmit() method
 	onSubmitEventName := fmt.Sprintf("%v%v", "OnSubmit", formName)
-	returns = eventReturn(lcc.page.call(onSubmitEventName))
-	if returns.breakReturn() {
+	returns = SmartReturn(lcc.page.call(onSubmitEventName))
+	if returns.IsBreakExit() {
 		return
 	}
-	if returns.returnsFalse() {
+	if returns.IsReturnsFalse() {
 		return lcc.refreshThisPage()
 	}
 
@@ -244,19 +245,19 @@ func (lcc *LifeCircleControl) PostFlow() (returns *Returns) {
 
 	// call OnValidate() method
 	onValidateEventName := fmt.Sprintf("%v%v", "OnValidate", formName)
-	returns = eventReturn(lcc.page.call(onValidateEventName))
-	if returns.breakReturn() {
+	returns = SmartReturn(lcc.page.call(onValidateEventName))
+	if returns.IsBreakExit() {
 		return
 	}
-	if returns.returnsFalse() {
+	if returns.IsReturnsFalse() {
 		return lcc.refreshThisPage()
 	}
 
 	// call success method
 	// call OnSuccess() method
 	onSuccessEventName := fmt.Sprintf("%v%v", "OnSuccess", formName)
-	returns = eventReturn(lcc.page.call(onSuccessEventName))
-	if returns.breakReturn() {
+	returns = SmartReturn(lcc.page.call(onSuccessEventName))
+	if returns.IsBreakExit() {
 		return
 	}
 	fmt.Println("***************************************************************************")
@@ -338,8 +339,8 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 		}
 
 		debuglog("-730- [flow] Call Event: %v::%v%v().", lcc.page.name, name, strParams)
-		lcc.returns = eventReturn(method.Call(parameters))
-		lcc.handleBreakReturn()
+		lcc.returns = SmartReturn(method.Call(parameters))
+		lcc.HandleBreakReturn()
 		return true
 	} else {
 		// debuglog("    - Event Not Found: %v", name)
