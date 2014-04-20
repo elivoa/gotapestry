@@ -2,5 +2,16 @@
   <div class="logo">
     <a href="/"><img src="/static/images/header/logo.png" alt=""></a>
   </div>
-  <div class="loginbar">喜乐, <a href="#">退出</a></div>
+
+  <!-- logging control -->
+  <div class="loginbar">
+    <if t=".IsLogin">
+      <a href="/account">{{.UserToken.Username}}</a>,
+      <a href="/account/logout">退出</a>
+      <else>
+        <a href="/account/login">登陆</a>,
+        <a href="/account/register">注册</a>
+      </else>
+    </if>
+  </div>
 </div>

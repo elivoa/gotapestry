@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-04-13 22:42:14>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-04-20 12:51:31>
 */
 package lifecircle
 
@@ -46,7 +46,6 @@ func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 	if returns.IsReturnsTrue() {
 		if lcc.r.Method == "POST" {
 			// >> Form post flow
-
 			// Note: Now only support post to page.
 			//       TODO: support to submit to component.
 			returns = lcc.PostFlow()

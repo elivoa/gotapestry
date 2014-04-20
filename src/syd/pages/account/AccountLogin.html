@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href="/static/css/pages/pg_account.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/layer/layer.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="圣衣蝶 | 账号" />
+  </head>
+  <body class="PG_list_person">
+    <t:layout.headernav />
+
+    <div class="container">
+      <t:layout.leftnav curpage="" />
+
+      <div class="main_content">
+    	<h1>圣衣蝶：登陆</h1>
+
+        <div class="" style="">
+          <div style="float:left;width:560px;">
+            <h2>登陆账号</h2>
+            <form method="POST" id="LoginForm" action="">
+              <if t=".FormMessage">
+                <div class="form_message">{{.FormMessage}}</div>
+              </if>
+              <if t=".FormError">
+                <div class="form_error">{{.FormError}}</div>
+              </if>
+
+              
+              <input type="hidden" name="t:id" value="LoginForm" todo="auto do this."/>
+
+              <label for="username">用户名：</label>
+              <input type="text" id="username" name="User.Username" value=""/>
+              
+              <label for="password">密码：</label>
+              <input type="text" id="password" name="User.Password" value=""
+                     todo="pass Hashed code to server!"/>
+
+              <input type="submit" value="登陆" />
+            </form>
+          </div>
+          
+          <div style="float:left;">
+            <h2>其他信息</h2>
+            <div style="margin:4px;border:solid 1px gray;padding:8px;">
+              asdfasdfasdf
+            </div>
+          </div>
+          <div style="clear:both"></div>
+          
+        </div>
+        
+      </div>
+    </div>
+  </body>
+</html>

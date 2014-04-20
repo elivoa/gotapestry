@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"got/core"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
@@ -20,6 +21,9 @@ type OrderList struct {
 }
 
 func (p *OrderList) SetupRender() {
+	// verify user role.
+	service.User.RequireRole(p.W, p.R, "admin") // TODO remove w, r. use service injection.
+
 	// fetch customer names
 	// TODO batch it
 	if p.Orders == nil {
@@ -60,7 +64,7 @@ func (p *OrderList) Ondelete(trackNumber int64, tab string) (string, string) {
 	fmt.Println("--------------------------------------------------------------------------------")
 	fmt.Printf("Delete order %v \n", trackNumber)
 	if _, err := orderservice.DeleteOrder(trackNumber); err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 	return "redirect", fmt.Sprintf("/order/list/%v", tab)
 }
@@ -76,7 +80,7 @@ func (p *OrderList) OnPrint(trackNumber int64) (string, string) {
 // shipping instead order's status changed to delivering
 func (p *OrderList) OnShippingInsteadOrderPrint(trackNumber int64) (string, string) {
 	if err := orderservice.ChangeOrderStatus(trackNumber, "delivering"); err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 	return "redirect", fmt.Sprintf("/order/shippinginsteadprint/%v", trackNumber)
 }

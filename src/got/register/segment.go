@@ -3,8 +3,8 @@ package register
 import (
 	"errors"
 	"fmt"
-	"github.com/elivoa/got/parser"
 	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/parser"
 	"got/core"
 	"log"
 	"path"
@@ -36,7 +36,7 @@ type ProtonSegment struct {
 	// associated external resources.
 	ModulePackage string             // e.g. got/builtin, syd; used in init.
 	StructInfo    *parser.StructInfo // from parser package
-	module        *core.Module            // associated Module
+	module        *core.Module       // associated Module
 
 	// caches
 	identity     string // cache identity, default the same name with StructName

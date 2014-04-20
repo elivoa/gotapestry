@@ -9,7 +9,7 @@ import (
 //
 type Index struct {
 	core.Page
-	Title     string
+	Title string
 }
 
 func (p *Index) SetupRender() {

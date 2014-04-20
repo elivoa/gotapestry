@@ -62,18 +62,6 @@ func PrintFormMap(name string, m map[string][]string) {
 	}
 }
 
-// ________________________________________________________________________________
-/*
-   TODO: Finish this
-*/
-func PrintAllFieldTags(target interface{}, fieldName string) {
-	fmt.Println("~~~~~ [GOT DEBUG TOOL] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-	fmt.Printf("~ :: Reflect Tags of field '%v'\n", fieldName)
-	fmt.Printf("~ \t key : value")
-	fmt.Printf("~ \t key : value")
-	fmt.Println("~~~~~ END ~~~~~...............")
-}
-
 func test() {
 	fmt.Printf("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n")
 	fmt.Printf("+ %v\n", nil)
@@ -97,4 +85,42 @@ func PrintEntrails(target interface{}) string {
 	}
 	fmt.Println("~~~~~ END ~~~~~...............")
 	return "x"
+}
+
+// func DebugVariable(v interface{}) string {
+// 	return ""
+// }
+
+func DebugPrintVariable(v interface{}) {
+	fmt.Println("::::  DEBUG VARIABLE() :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+	fmt.Println("  Original v = ", v)
+	t := reflect.TypeOf(v)
+	fmt.Println("  TypeOf(v)  = ", t)
+	fmt.Println("  Kind is    = ", t.Kind)
+
+	switch v.(type) {
+	case error:
+		fmt.Printf("Chedan this is an error.\n")
+		Error(v.(error))
+	default:
+		if t.Kind() == reflect.Ptr {
+			inner := reflect.ValueOf(v).Interface()
+			fmt.Println("    > inner value = ", inner)
+			fmt.Println("    > inner TypeOf(v)  = ", reflect.TypeOf(inner))
+			fmt.Println("    > inner Kind is    = ", reflect.TypeOf(inner).Kind())
+		}
+	}
+	fmt.Println("--------------------------------------------------------------------------------")
+}
+
+// ________________________________________________________________________________
+/*
+   TODO: Finish this
+*/
+func PrintAllFieldTags(target interface{}, fieldName string) {
+	fmt.Println("~~~~~ [GOT DEBUG TOOL] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Printf("~ :: Reflect Tags of field '%v'\n", fieldName)
+	fmt.Printf("~ \t key : value")
+	fmt.Printf("~ \t key : value")
+	fmt.Println("~~~~~ END ~~~~~...............")
 }

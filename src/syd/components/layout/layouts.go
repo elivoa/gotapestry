@@ -13,11 +13,6 @@ type Header struct {
 }
 
 // ________________________________________________________________________________
-type HeaderNav struct {
-	core.Component
-}
-
-// ________________________________________________________________________________
 type LeftNav struct {
 	core.Component
 	CurPage string

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Sunday, 2014-04-13 22:42:19>
+   Time-stamp: <[lifecircle.go] Elivoa @ Sunday, 2014-04-20 14:46:19>
 */
 
 package lifecircle
@@ -330,7 +330,7 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 			if len(strParams) > i {
 				v, err := utils.Coercion(strParams[i], pt)
 				if err != nil {
-					panic(err.Error())
+					panic(err)
 				}
 				parameters[i] = v
 			} else {

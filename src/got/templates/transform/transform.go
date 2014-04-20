@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[transform.go] Elivoa @ Saturday, 2013-08-24 14:47:09>
+  Time-stamp: <[transform.go] Elivoa @ Sunday, 2014-04-20 14:46:31>
 */
 package transform
 
@@ -276,7 +276,7 @@ func (t *Transformater) processStartTag(node *Node) bool {
 		t.renderDelegate(node, attrs)
 	default:
 		if err != nil {
-			panic(err.Error())
+			panic(err)
 		}
 		return false
 	}

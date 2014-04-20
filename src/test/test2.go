@@ -1,9 +1,12 @@
 package main
 
 import (
+	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"got/templates/transform"
 	"strings"
+	"syd/exceptions"
 )
 
 var html = `
@@ -27,4 +30,27 @@ func main() {
 	t.Parse(strings.NewReader(html))
 	fmt.Println("--------------------------------------------------------------------------------")
 	fmt.Println(t.RenderToString())
+
+	abc := sha256.Sum256([]byte("elivoa"))
+	ddd := sha1.Sum([]byte("elivoa"))
+	fmt.Println("\n", string(abc[:]))
+	fmt.Println("\n", string(ddd[:]))
+
+	defer func() {
+		if err := recover(); err != nil {
+			switch err.(type) {
+			case error:
+				fmt.Println("type is error")
+			case string:
+				fmt.Println("type is string")
+			case exceptions.LoginError:
+				fmt.Println("type is LoginError")
+			}
+		}
+	}()
+	err := TestSome()
+	print(err)
+}
+func TestSome() error {
+	panic(&exceptions.LoginError{Message: "slkdfjalsdjflkj"})
 }

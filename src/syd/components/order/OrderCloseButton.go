@@ -21,7 +21,7 @@ type OrderCloseButton struct {
 func (p *OrderCloseButton) Setup() {
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 	p.Order = order
 	person := personservice.GetPerson(order.CustomerId)

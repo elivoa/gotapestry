@@ -1,0 +1,26 @@
+@charset "utf-8";
+@import "../../css/global/base.css";
+@import "../../css/global/frame.css";
+@import "../../css/module/leftmenu.css";
+@import "../../css/module/tab_main.css";
+@import "../../css/module/search_filter.css";
+@import "../../css/module/tbl_main.css";
+@import "../../css/module/pager_main.css";
+@import "../../css/module/form_main.css";
+@import "../../css/module/express.css";
+@import "../../css/layer/layer.css";
+
+
+/* All account pages' css are here. */
+
+.PG_list_order .tab_main{margin:30px 0 20px;}
+.PG_list_order .list_order{margin:20px 0 100px;}
+.PG_list_order .list_order .tbl_main{width:100%;}
+.PG_list_order .list_order .pager_main{margin:20px 0 0;}
+.PG_list_order .tips_content{margin:50px 40px 100px 0;}
+.filter_content{margin:30px 0 20px;}
+.batch_content{background:#e6e6e6;padding:5px 10px;border:1px solid #ccc;border-bottom:0;border-radius:3px 3px 0 0;}
+
+
+.form_message{border:solid 1px green;padding:8px;margin:8px;color:green;}
+.form_error{border:solid 1px red;padding:8px;margin:8px;color:red;}
