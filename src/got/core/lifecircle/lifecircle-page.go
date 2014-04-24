@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-04-20 12:51:31>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Wednesday, 2014-04-23 14:23:04>
 */
 package lifecircle
 
@@ -32,7 +32,7 @@ func NewPageFlow(w http.ResponseWriter, r *http.Request, registry *register.Prot
 func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 
 	// Inject
-	lcc.injectBasic().injectPath().injectURLParameter()
+	lcc.injectBasic().injectPath().injectURLParameter().injectHiddenThings()
 
 	// add lcc object to request.
 	lcc.SetToRequest(config.LCC_OBJECT_KEY, lcc)

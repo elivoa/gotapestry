@@ -41,9 +41,9 @@ type Protoner interface {
 	ClientId() string // no meaning for PAGE
 	SetId(id string)
 
-	// attached lifecircle.Life
-	FlowLife() interface{}
-	SetFlowLife(life interface{})
+	// attached *plifecircle.Life
+	FlowLife() interface{}        // used to store *lifecircle.Life
+	SetFlowLife(life interface{}) // set *lifecircle.Life into page.
 }
 
 // A Proton is a Page, Component or Mixins.

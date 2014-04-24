@@ -14,6 +14,7 @@ go install github.com/elivoa/got/db
 go install github.com/elivoa/got/route
 go install github.com/elivoa/got/errorhandler
 go install github.com/elivoa/got/builtin/pages
+go install github.com/elivoa/got/builtin/pages/got  
 
 echo "-250- go install got..."
 go install got

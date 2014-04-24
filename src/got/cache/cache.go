@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Friday, 2014-04-11 00:15:16>
+  Time-stamp: <[cache.go] Elivoa @ Wednesday, 2014-04-23 14:45:54>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -107,6 +107,8 @@ func (si *StructInfo) Deep(field string) *StructInfo {
 // ________________________________________________________________________________
 // functions for Cache;; TODO Redefine this funcs, too bad names.
 //
+
+// GetX get cache by type. If not found, add to cache.
 func (c *Cache) GetX(rt reflect.Type) *StructInfo {
 	return c.GetCreate(rt, core.STRUCT)
 }

@@ -9,6 +9,7 @@ import (
 	"log"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 )
@@ -260,6 +261,15 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 		}
 		currentSeg.AddChild(segment)
 
+		// add the first segment into typemap
+		if segment.Proton.Kind() == core.PAGE {
+			PageTypeMap[reflect.TypeOf(p).Elem()] = segment
+		} else if segment.Proton.Kind() == core.COMPONENT {
+			ComponentTypeMap[reflect.TypeOf(p).Elem()] = segment
+		} else if segment.Proton.Kind() == core.MIXIN {
+			MixinTypeMap[reflect.TypeOf(p).Elem()] = segment
+		}
+
 		// add selector
 		selector := []string{}
 		selector = append(selector, selectorPrefix...)
@@ -274,7 +284,7 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 
 type LookupResult struct {
 	Segment   *ProtonSegment
-	PageUrl   string
+	PageUrl   string // value of request.URL.Path
 	EventName string
 }
 

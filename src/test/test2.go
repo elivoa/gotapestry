@@ -3,8 +3,10 @@ package main
 import (
 	"crypto/sha1"
 	"crypto/sha256"
+	"errors"
 	"fmt"
-	"got/templates/transform"
+	"github.com/elivoa/got/templates/transform"
+	"reflect"
 	"strings"
 	"syd/exceptions"
 )
@@ -26,6 +28,11 @@ var html = `
 `
 
 func main() {
+
+	fmt.Printf("reflect of error %s\n", reflect.TypeOf(errors.New("DDD")))
+
+	fmt.Println("--------------------------------------------------------------------------------")
+
 	t := transform.NewTransformer()
 	t.Parse(strings.NewReader(html))
 	fmt.Println("--------------------------------------------------------------------------------")
@@ -50,6 +57,7 @@ func main() {
 	}()
 	err := TestSome()
 	print(err)
+
 }
 func TestSome() error {
 	panic(&exceptions.LoginError{Message: "slkdfjalsdjflkj"})

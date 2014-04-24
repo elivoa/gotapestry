@@ -5,6 +5,7 @@
 
   <!-- logging control -->
   <div class="loginbar">
+
     <if t=".IsLogin">
       <a href="/account">{{.UserToken.Username}}</a>,
       <a href="/account/logout">退出</a>
@@ -13,5 +14,7 @@
         <a href="/account/register">注册</a>
       </else>
     </if>
+    <span>|</span>
+    <a href="/got/status">Server Status</a>
   </div>
 </div>

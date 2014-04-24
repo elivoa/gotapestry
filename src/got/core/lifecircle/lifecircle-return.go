@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Sunday, 2014-04-20 14:46:01>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Friday, 2014-04-25 01:15:22>
 */
 package lifecircle
 
@@ -7,6 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/elivoa/got/route/exit"
+	"got/core"
+	"got/debug"
+	"got/utils"
 	"net/http"
 	"reflect"
 	"strings"
@@ -106,12 +109,12 @@ func SmartReturn(returns []reflect.Value) *exit.Exit {
 		return &exxx
 		// case reflect.Invalid: // invalid means return nil
 		// 	return exit.TrueExit() // returnTrue()
-
 	default:
 		panic("**** Can't parse return value ****")
 	}
 }
 
+// HandleBreakReturn means
 func (lcc *LifeCircleControl) HandleBreakReturn() {
 	r := lcc.returns
 	if r == nil {
@@ -122,9 +125,39 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 		lcc.return_text("plain/text", r.Value)
 	case "json":
 		lcc.return_text("text/json", r.Value)
+
 	case "redirect":
+		// TODO: support redirect to page.
 		// debuglog("-904- [route:return] redirect to '%v'", url)
 		http.Redirect(lcc.w, lcc.r, r.Value.(string), http.StatusFound)
+
+	case "forward":
+		// Now only support forward to page.
+		// TODO suppport forward to an URL.
+
+		if page, ok := r.Value.(core.Pager); ok {
+			// Forward to a page object, render this page as pager.
+			if pageflowLogger.Debug() {
+				pageflowLogger.Printf("Page forward to PageInstance. %s", page)
+			}
+			if pagelife, ok := page.FlowLife().(*Life); ok {
+				if pageflowLogger.Trace() {
+					pageflowLogger.Printf("Page's Life is %s", pagelife)
+				}
+				// page flow
+				newlcc := pagelife.control
+				newlcc.SetPageUrl(lcc.r.URL.Path)
+				newlcc.PageFlow()
+			} else {
+				debug.DebugPrintVariable(pagelife)
+				panic("can't find life")
+			}
+
+		} else if str, ok := r.Value.(string); ok {
+			panic(fmt.Sprintf("Not support forward to string now. %s", str))
+		} else {
+			panic(fmt.Sprintf("Can't forward to this type, %s.", utils.GetRootValue(r.Value).Kind()))
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Sunday, 2014-04-20 14:46:19>
+   Time-stamp: <[lifecircle.go] Elivoa @ Friday, 2014-04-25 02:08:33>
 */
 
 package lifecircle
@@ -7,6 +7,8 @@ package lifecircle
 import (
 	"bytes"
 	"fmt"
+	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/logs"
 	"github.com/elivoa/got/route/exit"
 	"github.com/gorilla/context"
 	"got/core"
@@ -348,6 +350,32 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 	return false
 }
 
+// CurrentLifecircleControl returns current lcc object from request.
+func CurrentLifecircleControl(r *http.Request) (*LifeCircleControl, bool) {
+	// get current lcc object from request.
+	lcc_obj := context.Get(r, config.LCC_OBJECT_KEY)
+	if lcc_obj == nil {
+		// panic("LCC is missing in session") // TODO: what to do.
+		return nil, false
+	}
+	lcc := lcc_obj.(*LifeCircleControl)
+	if lcc != nil {
+		return lcc, true
+	}
+	return nil, false
+}
+
+// CreatePage creates a new page instance with it's control and life. by given type.
+func CreatePage(w http.ResponseWriter, r *http.Request, pageT reflect.Type) interface{} {
+	if seg := register.GetPage(pageT); seg != nil {
+		var newlcc = NewPageFlow(w, r, seg)
+		var page = newlcc.current.proton
+		page.SetFlowLife(newlcc.current)
+		return page
+	}
+	panic("Can't create page instance")
+}
+
 // --------------------------------------------------------------------------------
 
 const (
@@ -364,3 +392,10 @@ func debuglog(format string, params ...interface{}) {
 		log.Printf(format, params...)
 	}
 }
+
+// ----------------------
+// loggers
+
+var logger = logs.Get("IOC:Inject")
+
+var pageflowLogger = logs.Get("GOT:PageFlow")
