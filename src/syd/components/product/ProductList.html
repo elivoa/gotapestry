@@ -2,6 +2,7 @@
 
 <table class="tbl_main">
   <tr>
+    <th align="left">货号</th>
     <th align="left">商品名称</th>
     <th align="right">销售单价</th>
     <th align="left">产品规格</th>
@@ -10,15 +11,20 @@
 
   {{range .Products}}
   <tr>
-    <td nowrap><a href="/product/detail/{{.Id}}">{{.Name}}</a></td>
-    <td align="right"><span class="price">{{.Price | prettycurrency}}</span></td>
     <td nowrap>
+      <a href="/product/detail/{{.Id}}">{{.ProductId}}</a>
+    </td>
+    <td nowrap>
+      <a href="/product/detail/{{.Id}}">{{.Name}}</a>
+    </td>
+    <td align="right">
+      <span class="price">{{.Price | prettycurrency}}</span>
+    </td>
+    <td nowrap style="color:#a1a1a1">
       {{$.ShowSpecification .Id}}
-      <!--
-          TODO:红色：S / M / L<span class="vline">|</span>
-          黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
-          <span class="vline">|</span>绿色：S / M / L / XL
-          -->
+      <!-- 红色：S / M / L<span class="vline">|</span>
+           黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
+           <span class="vline">|</span>绿色：S / M / L / XL -->
     </td>
     <td nowrap>
       <a href="#TODO">填写入库信息</a><span class="vline">|</span>

@@ -1,6 +1,7 @@
 package register
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/elivoa/got/config"
@@ -105,10 +106,6 @@ func (s *ProtonSegment) TemplatePath() (string, string) {
 			) // TODO Configthis
 		}
 	}
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-	// fmt.Println(s.Identity())
-	// fmt.Println(s.templatePath)
-
 	return s.Identity(), s.templatePath
 }
 
@@ -299,11 +296,10 @@ func (lr *LookupResult) IsValid() bool {
 	return false
 }
 
-// ---- .... ------------------------------------------
-
 var average_lookup_time int
 
-// Lookup the structure, find the right page/component.
+// Lookup the structure, find the right page or component.
+// Can detect event calls, event calls on embed components.
 // TODO performance
 func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	logLookup("- - - [Lookup] '%v'\n", url)
@@ -392,6 +388,25 @@ func (s *ProtonSegment) PrintALL() string {
 	return ""
 }
 
+func (s *ProtonSegment) StringTree(newline string) string {
+	var out bytes.Buffer // = bytes.NewBuffer([]byte{})
+	s.treeSegment(&out, s, newline)
+	return out.String()
+}
+
+func (s *ProtonSegment) treeSegment(out *bytes.Buffer, segment *ProtonSegment, newline string) {
+	out.WriteString(fmt.Sprintf("+ %v >> %v%s", segment, segment.StructInfo, newline))
+	for _, seg := range s.Children {
+		for i := 0; i <= seg.Level; i++ {
+			out.WriteString("  ")
+		}
+		if seg != nil {
+			seg.treeSegment(out, seg, newline)
+		}
+	}
+}
+
+// TODO: user treeSegment instead.
 func (s *ProtonSegment) print(segment *ProtonSegment) string {
 	fmt.Printf("+ %v >> %v\n", segment, segment.StructInfo)
 	for _, seg := range s.Children {

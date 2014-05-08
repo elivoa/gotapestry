@@ -7,7 +7,8 @@
 .prt_tbl th{border-bottom:2px solid #000;font-weight:normal;}
 .prt_tbl th,.prt_tbl td{padding:3px 25px 3px 5px;}
 .prt_tbl .total td{border-top:2px solid #000;}
-.prt_tbl td{font-weight:normal;}
+.prt_tbl td{font-weight:normal;text-align:center;}
 .prt_tbl td.line{height:5px;overflow:hidden;font-size:1px;line-height:1px;}
+.prt_tbl td.money{text-align:right;}
 .other_info{margin:8mm 0 0;line-height:1.8em;}
 .underline{display:inline-block;border-bottom:1px solid #000;width:20mm;}

@@ -39,6 +39,7 @@ type Protoner interface {
 	SetEmbed(name string, proton Protoner) // return loop index
 	IncEmbed() int
 	ClientId() string // no meaning for PAGE
+	CID() string      // short for ClientId()
 	SetId(id string)
 
 	// attached *plifecircle.Life
@@ -119,9 +120,9 @@ func (p *Proton) ShowInjected() {
 
 func (p *Proton) Embed(name string) (Protoner, bool) {
 	proton, ok := p.embed[name]
-	fmt.Println("&&&&&&&&&&&&&&&&")
+	fmt.Println("\t&&&&&&&&&&&&&&&&")
 	for k, _ := range p.embed {
-		fmt.Println("embed:", k)
+		fmt.Println("\tProtonn embed:", k)
 	}
 	return proton, ok
 }
@@ -154,6 +155,10 @@ func (p *Proton) ClientId() string {
 	} else {
 		return fmt.Sprintf("%v_%v", p.Tid, p.LoopIndex)
 	}
+}
+
+func (p *Proton) CID() string {
+	return p.ClientId()
 }
 
 func (p *Proton) SetId(id string) {

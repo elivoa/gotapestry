@@ -31,6 +31,7 @@ class OrderPrint
     sumPrice = 0
 
     # render html
+    idx = 1
     for id in @data.order
       product = @data.products[id]
       if product
@@ -41,7 +42,7 @@ class OrderPrint
         sumQuantity += totalQuantity
         sumPrice += totalPrice
         # render html
-        tr = $(@generateTR(product, totalQuantity, totalPrice).join("\n"))
+        tr = $(@generateTR(product, totalQuantity, totalPrice, idx++).join("\n"))
         tbody.append(tr)
         tbody.append("<tr><td colspan=\"8\" class=\"line\">&nbsp;</td></tr>")
         # @bindAction(tr, id)
@@ -63,25 +64,27 @@ class OrderPrint
   ## hide if no stock
   # generate one product. with all it's quantities.
   # parameter is product json
-  generateTR:(json, totalQuantity, totalPrice)->
+  generateTR:(json, totalQuantity, totalPrice, idx)->
     quantities = []
     quantities.push q for q in json.quantity when q[2] >0
     nquantity = quantities.length
     htmls = []
     htmls.push "<tr>"
+    htmls.push "  <td>#{idx}</td>"
     htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
     htmls.push "    <strong>#{json.name}</strong>"
     htmls.push "  </td>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}' class='money'>"
     htmls.push "    <span class='price'>#{json.price}</span>"
     htmls.push "  </td>"
     if quantities[0][0]=="默认颜色"
       htmls.push "  <td>-</td>"
     else
       htmls.push "  <td>#{quantities[0][0]}</td>"
+
     htmls.push "  <td>#{quantities[0][1]}</td>"
     htmls.push "  <td>#{quantities[0][2]}</td>"
-    htmls.push "  <td valign='top' align='center' rowspan='#{nquantity}'>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
     htmls.push "      <strong>#{totalQuantity}</strong></td>"
     htmls.push "  <td valign='top' align='right' rowspan='#{nquantity}'>"
     htmls.push "      <strong class='price'>#{totalPrice}</strong></td>"
@@ -93,6 +96,7 @@ class OrderPrint
     htmls.push "</tr>"
     for quantity in quantities.slice(1, nquantity)
       htmls.push "<tr>"
+      htmls.push "  <td></td>"
       if quantity[0]=="默认颜色"
         htmls.push "  <td>-</td>"
       else
@@ -106,6 +110,7 @@ class OrderPrint
     footer = []
     footer.push "<tr class='total'>"
     footer.push "<td valign='top' align='right'><strong>总计</strong></td>"
+    footer.push "<td valign='top'>&nbsp;</td>"
     footer.push "<td valign='top'>&nbsp;</td>"
     footer.push "<td valign='top'>&nbsp;</td>"
     footer.push "<td valign='top'>&nbsp;</td>"

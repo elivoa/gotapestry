@@ -16,6 +16,7 @@
           {{/* ------------------------------------------------------------------------------------
           <div class="batch_content">
             {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
+
           </div>
         </hide>
         
@@ -142,6 +143,4 @@
 <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
    onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
 {{end}}
-
-
 

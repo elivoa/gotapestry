@@ -1,0 +1,40 @@
+<div>
+  <table class="table">
+    <tr>
+      <th>产品</th>
+      <th>售出(件)</th>
+      <th>详情</th>
+    </tr>
+    <range source=".HotSales.HSProduct">
+      <tr>
+        <td>{{$.ProductName .ProductId}}</td>
+        <td>{{.Sales}}</td>
+        <td style="color:#666">
+          {{range $cskey, $q := .Specs}}
+          {{$cskey}}:{{$q}} | 
+          {{end}}
+        </td>
+      </tr>
+    </range>
+</div>
+<script type="text/javascript">
+
+// 这里这些东西是否可以自动生成？
+// 如何保证component之间不会冲突？这里需要一个设计模式。
+
+var testApp = angular.module('testApp', []);
+testApp.controller('TestController', function($scope){
+  $scope.test="去你妈蛋的！"
+  $scope.loops = [1,2,3,4,5];
+  $scope.data = [
+    {'client': 'Nexus S', 'ordernumber':'20934804785', 'price':235, 'status':'sending'},
+    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
+    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
+    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
+  ];
+  $scope.changeData = function(){
+    console.log('222');
+    $scope.data[3].client='我要扯淡扯淡';
+  };
+});
+</script>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="testApp">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="angular.min.js"></script>
+  </head>
+  <body>
+
+    <div ng-controller="TestController">  
+
+      <table class="tbl_main" border="1">
+        <tr>
+          <th width="10" align="left">
+            <input type="checkbox" class="check-all">
+          </th> 
+          <th align="left">客户</th>
+          <th align="left">订单号</th>
+          <th align="left">订单金额</th>
+          <th align="left">订单状态</th>
+          <th align="left">日期</th>
+          <th align="left">操作</th>
+        </tr>
+        <tr ng-repeat="item in data">
+          <td><input type="checkbox" class="check-all"></td>
+          <td>{{item.client}}</td>
+          <td>{{item.ordernumber}}</td>
+          <td>{{item.price}}</td>
+          <td>{{item.status}}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <a href="javascript:void(0)" ng-click="changeData()">Change</a>
+      
+      <div class="test">
+        {{'yeah ' + test + ' !'}}
+        <br>
+        <span ng-repeat="i in loops">
+          {{i}}, 
+        </span>
+      </div>
+
+      <script type="text/javascript">
+  // 这里这些东西是否可以自动生成？
+
+var testApp = angular.module('testApp', []);
+testApp.controller('TestController', function($scope){
+  $scope.test="去你妈蛋的！"
+  $scope.loops = [1,2,3,4,5];
+  $scope.data = [
+    {'client': 'Nexus S', 'ordernumber':'20934804785', 'price':235, 'status':'sending'},
+    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
+    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
+    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
+  ];
+  $scope.changeData = function(){
+    console.log('222');
+    $scope.data[3].client='我要扯淡扯淡';
+  };
+});
+      </script>
+
+    </div>
+  </body>
+</html>

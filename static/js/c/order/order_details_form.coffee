@@ -111,7 +111,10 @@ class OrderDetailsForm
     nquantity = quantities.length
     htmls = []
     htmls.push "<tr>"
-    htmls.push "  <td valign='top' rowspan='#{nquantity}'>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>" # 货号
+    htmls.push "    #{json.id}"
+    htmls.push "  </td>"
+    htmls.push "  <td valign='top' rowspan='#{nquantity}'>" # 商品名称
     htmls.push "    <strong>#{json.name}</strong>"
     htmls.push "    <input type='hidden' name='Order.Details.ProductId' value='#{json.id}' />"
     htmls.push "    <input type='hidden' name='Order.Details.SellingPrice' value='#{json.price}' />"

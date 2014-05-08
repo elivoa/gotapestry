@@ -134,6 +134,9 @@
       htmls = [];
       htmls.push("<tr>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("    " + json.id);
+      htmls.push("  </td>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
       htmls.push("    <strong>" + json.name + "</strong>");
       htmls.push("    <input type='hidden' name='Order.Details.ProductId' value='" + json.id + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.SellingPrice' value='" + json.price + "' />");

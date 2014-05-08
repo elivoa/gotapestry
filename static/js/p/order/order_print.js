@@ -18,11 +18,12 @@
     };
 
     OrderPrint.prototype.refreshOrderForm = function() {
-      var footers, id, product, q, sumPrice, sumQuantity, tbody, totalPrice, totalQuantity, tr, _i, _j, _len, _len1, _ref, _ref1;
+      var footers, id, idx, product, q, sumPrice, sumQuantity, tbody, totalPrice, totalQuantity, tr, _i, _j, _len, _len1, _ref, _ref1;
       tbody = $("" + this.containerClass + " tbody");
       tbody.html("");
       sumQuantity = 0;
       sumPrice = 0;
+      idx = 1;
       _ref = this.data.order;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         id = _ref[_i];
@@ -37,7 +38,7 @@
           totalPrice = totalQuantity * product.price;
           sumQuantity += totalQuantity;
           sumPrice += totalPrice;
-          tr = $(this.generateTR(product, totalQuantity, totalPrice).join("\n"));
+          tr = $(this.generateTR(product, totalQuantity, totalPrice, idx++).join("\n"));
           tbody.append(tr);
           tbody.append("<tr><td colspan=\"8\" class=\"line\">&nbsp;</td></tr>");
         } else {
@@ -58,7 +59,7 @@
       return tfoot.find(".sumPrice").html(sumPrice);
     };
 
-    OrderPrint.prototype.generateTR = function(json, totalQuantity, totalPrice) {
+    OrderPrint.prototype.generateTR = function(json, totalQuantity, totalPrice, idx) {
       var htmls, nquantity, q, quantities, quantity, _i, _j, _len, _len1, _ref, _ref1;
       quantities = [];
       _ref = json.quantity;
@@ -71,10 +72,11 @@
       nquantity = quantities.length;
       htmls = [];
       htmls.push("<tr>");
+      htmls.push("  <td>" + idx + "</td>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
       htmls.push("    <strong>" + json.name + "</strong>");
       htmls.push("  </td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "' class='money'>");
       htmls.push("    <span class='price'>" + json.price + "</span>");
       htmls.push("  </td>");
       if (quantities[0][0] === "默认颜色") {
@@ -84,7 +86,7 @@
       }
       htmls.push("  <td>" + quantities[0][1] + "</td>");
       htmls.push("  <td>" + quantities[0][2] + "</td>");
-      htmls.push("  <td valign='top' align='center' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
       htmls.push("      <strong>" + totalQuantity + "</strong></td>");
       htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
       htmls.push("      <strong class='price'>" + totalPrice + "</strong></td>");
@@ -98,6 +100,7 @@
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         quantity = _ref1[_j];
         htmls.push("<tr>");
+        htmls.push("  <td></td>");
         if (quantity[0] === "默认颜色") {
           htmls.push("  <td>-</td>");
         } else {
@@ -115,6 +118,7 @@
       footer = [];
       footer.push("<tr class='total'>");
       footer.push("<td valign='top' align='right'><strong>总计</strong></td>");
+      footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");

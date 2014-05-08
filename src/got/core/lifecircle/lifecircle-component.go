@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Tuesday, 2014-04-22 01:06:02>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Thursday, 2014-05-08 13:38:43>
 */
 package lifecircle
 
@@ -158,7 +158,7 @@ func (l *Life) flow() (returns *exit.Exit) {
 	//   http://tapestry.apache.org/component-rendering.html
 	//
 	// TODO: call lifecircle events with parameter
-
+	// TODO: flat them
 	for {
 		returns = SmartReturn(l.call("Setup", "SetupRender"))
 		if returns.IsBreakExit() {
@@ -183,7 +183,6 @@ func (l *Life) flow() (returns *exit.Exit) {
 							// Here we ignored BeforeRenderBody and AfterRenderBody.
 							// Maybe add it later.
 							// May be useful for Loop component?
-							// TODO here render template:
 							l.renderTemplate()
 
 							// if any component breaks it's render, stop all rendering.
@@ -223,10 +222,6 @@ func (l *Life) flow() (returns *exit.Exit) {
 
 	// finally I go through all render phrase.
 	returns = exit.Template(nil)
-	// TODO: Remove this line. This equals line above.
-	// returns = &exit.Exit{
-	// 	returnType: "template",
-	// }
 	return
 }
 
@@ -237,7 +232,7 @@ func (l *Life) renderTemplate() {
 	// debug.Log("-755- [TemplateSelect] %v -> %v", identity, templatePath)
 
 	identity, templatePath := l.registry.TemplatePath()
-	if _, err := templates.Cache.Get(identity, templatePath); err != nil {
+	if _, err := templates.Cache.GetnParse(identity, templatePath); err != nil {
 		panic(err)
 	}
 	if err := templates.RenderTemplate(&l.out, identity, l.proton); err != nil {
