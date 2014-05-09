@@ -4,6 +4,7 @@
 echo "go build..."
 echo "remove some folder first:"
 rm -rf ~/develop/go/pkg/github.com/elivoa/got/builtin
+rm -rf ~/develop/go/pkg/github.com/elivoa/got
 
 echo "-200- go install github.com/elivoa/gxl..."
 go install github.com/elivoa/gxl
@@ -18,7 +19,9 @@ go install github.com/elivoa/got/route
 go install github.com/elivoa/got/errorhandler
 go install github.com/elivoa/got/builtin/pages
 go install github.com/elivoa/got/builtin/pages/got  
+go install github.com/elivoa/got/builtin/components
 go install github.com/elivoa/got/builtin/components/got          
+go install github.com/elivoa/got/builtin/services 
 
 echo "-250- go install got..."
 go install got

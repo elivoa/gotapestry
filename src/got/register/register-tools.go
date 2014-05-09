@@ -7,6 +7,8 @@ import (
 	"runtime"
 )
 
+// CreateURLs in it
+
 /* ----------------------------------------------------------
    Tools
    ----------------------------------------------------------*/
@@ -28,17 +30,6 @@ func debuglog(format string, params ...interface{}) {
 		debug.Log(format, params...)
 	}
 }
-
-// // join two part of url.
-// // TODO performance here is bad. design is bad.
-// func MakeUrl(f func(), p interface{}) string {
-// 	fName := GetFunctionName(f)
-// 	prefix := fName[:strings.LastIndex(fName, ".")]
-// 	suffix := reflect.TypeOf(p).String()
-// 	suffix = suffix[strings.LastIndex(suffix, ".")+1:]
-// 	url := fmt.Sprintf("%v/%v", prefix, suffix)
-// 	return url
-// }
 
 // not used -----------------
 

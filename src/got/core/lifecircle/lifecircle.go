@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2014-04-26 15:27:02>
+   Time-stamp: <[lifecircle.go] Elivoa @ Friday, 2014-05-09 00:41:07>
 */
 
 package lifecircle
@@ -16,6 +16,7 @@ import (
 	"got/utils"
 	"log"
 	"net/http"
+	"path"
 	"reflect"
 	"strings"
 )
@@ -171,6 +172,32 @@ func (l *Life) call(names ...string) []reflect.Value {
 		}
 	}
 	return nil
+}
+
+// Generate base page url, forexample: /got/status. Fallback to the first container.
+func (l *Life) GeneratePageUrl() string {
+	var rootPageLife = l
+	for rootPageLife.container != nil {
+		rootPageLife = rootPageLife.container
+	}
+	seg := register.PageTypeMap[rootPageLife.rootType]
+	return path.Join(seg.StructInfo.ProtonPath(), seg.StructInfo.StructName)
+}
+
+func (l *Life) Is(kind core.Kind) bool {
+	return l.kind == kind
+}
+
+func (l *Life) GetRootType() reflect.Type {
+	return l.rootType
+}
+
+func (l *Life) GetProton() core.Protoner {
+	return l.proton
+}
+
+func (l *Life) GetContainer() *Life {
+	return l.container
 }
 
 // ---- Print Structure --------------------------------------------------------------

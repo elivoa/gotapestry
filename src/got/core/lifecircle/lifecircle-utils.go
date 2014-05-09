@@ -85,3 +85,5 @@ func extractPathParameters(url string, pageUrl string, eventName string) []strin
 	debug.Log("-   - [injection] URL:%v, parameters:%v", url, pathParams)
 	return pathParams
 }
+
+

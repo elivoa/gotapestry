@@ -51,22 +51,3 @@ func (mc *ModuleCache) PrintALL() {
 	}
 	mc.l.RUnlock()
 }
-
-// // ---------------------------------------------------------------------------------------------------
-// // TODO delete all tings below...
-
-// ----  Advanced Functions  -------------------------------------------------------------------------
-
-// GetPaths returns all module's file path, used to parse files.
-// func (mc *ModuleCache) GetPaths() []string {
-// 	mc.l.RLock()
-// 	defer mc.l.RUnlock()
-
-// 	paths := make([]string, len(mc.m))
-// 	i := 0
-// 	for _, module := range mc.m {
-// 		paths[i] = module.Path
-// 		i += 1
-// 	}
-// 	return paths
-// }
