@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Thursday, 2014-05-08 13:38:43>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Sunday, 2014-05-11 02:31:27>
 */
 package lifecircle
 
@@ -232,7 +232,7 @@ func (l *Life) renderTemplate() {
 	// debug.Log("-755- [TemplateSelect] %v -> %v", identity, templatePath)
 
 	identity, templatePath := l.registry.TemplatePath()
-	if _, err := templates.Cache.GetnParse(identity, templatePath); err != nil {
+	if _, err := templates.Cache.GetnParse(identity, templatePath, l.rootType); err != nil {
 		panic(err)
 	}
 	if err := templates.RenderTemplate(&l.out, identity, l.proton); err != nil {

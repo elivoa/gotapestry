@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Wednesday, 2014-04-23 14:23:04>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-05-11 16:51:09>
 */
 package lifecircle
 
@@ -92,8 +92,9 @@ func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 
 // ----  Event Call on Page  --------------------------------------------------
 
-func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
+func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCircleControl {
 
+	fmt.Println("---------------------------------------- Call event ----------------------------")
 	// Note that page is new created. all values needs inject.
 
 	// 1. Inject values into root page
@@ -108,7 +109,18 @@ func (lcc *LifeCircleControl) EventCall(event string) *LifeCircleControl {
 	// reflect.Type is enough, and thus don't need to create new value
 	// to each node on path. But how to get proton.Kind() only use a reflect.Type?
 
-	proton := lcc.page.proton               // proton is upper container's proton
+	proton := lcc.page.proton // proton is upper container's proton
+
+	// find components in it.
+	if result.ComponentPaths != nil {
+		for idx, cname := range result.ComponentPaths {
+			// if component not exists, load and parse it.
+
+		}
+	}
+	event := "fix this"
+
+	// comtinue here.
 	eventPaths := strings.Split(event, ".") // event call path
 
 	// follow the path

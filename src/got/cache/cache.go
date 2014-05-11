@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Wednesday, 2014-04-23 14:45:54>
+  Time-stamp: <[cache.go] Elivoa @ Saturday, 2014-05-10 17:49:42>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -25,12 +25,8 @@ import (
 	"sync"
 )
 
-// --------------------------------------------------------------------------------
 // SourceInfo Cache. from package parser.
-
 var SourceCache *parser.SourceInfo
-
-// --------------------------------------------------------------------------------
 
 var StructCache = NewCache() // PUBLIC
 
@@ -40,8 +36,7 @@ func NewCache() *Cache {
 	}
 }
 
-// ________________________________________
-//
+// Cache caches page/component type to StructInfo
 type Cache struct {
 	l sync.RWMutex
 	m map[reflect.Type]*StructInfo

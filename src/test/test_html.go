@@ -18,7 +18,7 @@ func main() {
 
 	t.Parse(`Test Templates[  {{testf (. | urlquery) }} ]`)
 
-	err := t.Execute(os.Stdout, "Boutique Sweater Factory")
+	err := t.Execute(os.Stdout, "Boutique Swe/ater Factory")
 	if err != nil {
 		panic(err)
 	}

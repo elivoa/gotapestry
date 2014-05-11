@@ -3,8 +3,7 @@
 #cd /Users/bogao/sync/sydPage/src
 echo "go build..."
 echo "remove some folder first:"
-rm -rf ~/develop/go/pkg/github.com/elivoa/got/builtin
-rm -rf ~/develop/go/pkg/github.com/elivoa/got
+rm -rf ~/develop/go/pkg/darwin_amd64/github.com/elivoa/got
 
 echo "-200- go install github.com/elivoa/gxl..."
 go install github.com/elivoa/gxl

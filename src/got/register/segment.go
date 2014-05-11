@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/logs"
 	"github.com/elivoa/got/parser"
 	"got/core"
 	"log"
@@ -280,9 +281,11 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 // ----  Lookup & Results  ------------------------------------------------------------------------------
 
 type LookupResult struct {
-	Segment   *ProtonSegment
-	PageUrl   string // value of request.URL.Path
-	EventName string
+	Segment        *ProtonSegment
+	PageUrl        string   // value of request.URL.Path
+	ComponentPaths []string // component path ids, for calling event.
+	EventName      string
+	Parameters     []string // parameters reconized.
 }
 
 func (lr *LookupResult) IsEventCall() bool {
@@ -296,73 +299,127 @@ func (lr *LookupResult) IsValid() bool {
 	return false
 }
 
+func (lr *LookupResult) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString(fmt.Sprintf(">> [LookupResult]{\n"))
+	buffer.WriteString(fmt.Sprintf("\tSegment:%v,\n", lr.Segment))
+	buffer.WriteString(fmt.Sprintf("\tPageUrl:%v,\n", lr.PageUrl))
+	buffer.WriteString(fmt.Sprintf("\tComponentPaths:%v,\n", lr.ComponentPaths))
+	buffer.WriteString(fmt.Sprintf("\tEventName:%v,\n", lr.EventName))
+	buffer.WriteString(fmt.Sprintf("\tParameters:%v,\n", lr.Parameters))
+	buffer.WriteString("  }\n")
+	return buffer.String()
+}
+
 var average_lookup_time int
+
+var lookupLogger = logs.Get("URL Lookup")
 
 // Lookup the structure, find the right page or component.
 // Can detect event calls, event calls on embed components.
 // TODO performance
+// 例如： /got/Status.TemplateStatus:TemplateDetail/c__got:TemplateStatus
+// 当遇到第一个.的时候，后面的为components. 当再遇到：的时候，后面的是方法名，/截断作为参数。
 func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
-	logLookup("- - - [Lookup] '%v'\n", url)
-
-	// 1. pre-process url
+	// pre-process url
 	trimedUrl := strings.Trim(url, " ")
 	if !strings.HasSuffix(trimedUrl, "/") {
 		trimedUrl += "/"
 	}
-	segments := strings.Split(trimedUrl, "/")
+
+	if lookupLogger.Debug() {
+		lookupLogger.Printf("[Lookup] '%v'", url)
+	}
 
 	var (
-		level int
-		seg   string
-		event string
+		level         int = -1
+		buffer        bytes.Buffer
+		segments           = []string{}
+		parameterPart bool = false
 	)
-	// BUG: param segment not used?
+	result = &LookupResult{
+		ComponentPaths: []string{}, // init component paths.
+		Parameters:     []string{},
+	}
+
 	segment := s // loop channel object
-	for level, seg = range segments {
+	for _, c := range trimedUrl {
+		switch c {
+		default:
+			buffer.WriteRune(c)
+			continue
+		case '/':
+			level += 1
+		}
+
+		// arrive here means words finished. process segment
+		seg := buffer.String()
+		segments = append(segments, seg)
+		buffer.Reset()
+
 		// skip the first / segment.
 		if level == 0 && seg == "" {
 			continue
 		}
-		logLookup("- - - [Lookup] Step: Level %v Seg:[ %-10v ] segment:[ %-20v ]\n",
-			level, seg, segment)
 
-		// If contains ".", this is an event call.
-		// and match stops here, others are parameters of event.
-		index := strings.Index(seg, ".")
-		if index > 0 {
-			event = seg[index+1:]
-			seg = strings.ToLower(seg[0:index])
-			segment = segment.Children[seg]
-			level = level + 1
-			break
+		if lookupLogger.Debug() {
+			lookupLogger.Printf("[Lookup] Step: Level %v Seg:[ %-10v ] segment:[ %-20v ]\n",
+				level, seg, segment)
 		}
 
-		// NEXT LEVEL LOOP
+		// parameter mode
+		if parameterPart {
+			result.Parameters = append(result.Parameters, seg)
+			continue
+		}
+
+		// parth lookup mode
+
+		// If contains ":", this is an event call. Or parameter.
+		// and match stops here, others are parameters of event.
+		if index := strings.Index(seg, ":"); index > 0 {
+			result.EventName = seg[index+1:]
+			array := strings.Split(seg[0:index], ".")
+			seg = strings.ToLower(array[0])
+			result.ComponentPaths = array[1:]
+
+			level = level + 1
+			parameterPart = true
+		}
+
 		if segment.Children == nil || len(segment.Children) == 0 || !segment.HasChild(seg) {
-			logLookup("- - - [Lookup] match finished.")
+			if lookupLogger.Debug() {
+				lookupLogger.Printf("- - - [Lookup] match finished.")
+			}
+			// Match finished, this must be the first paramete
+			result.Parameters = append(result.Parameters, seg)
+			parameterPart = true
+
 			break
 		} else {
+			fmt.Println("going into next step: ", segment)
 			segment = segment.Children[strings.ToLower(seg)]
 		}
+
 	}
 
 	// get page url
 	pageUrl := strings.Join(segments[:level], "/")
-	if event != "" {
+	if result.EventName != "" {
+		// TODO: bugs here. can', .
 		index := strings.LastIndex(pageUrl, ".")
 		pageUrl = pageUrl[:index]
 	}
-	// log.Printf("- - - [Lookup] 'pageurl is' %v  (including event)\n", pageUrl)
+	log.Printf("- - - [Lookup] 'pageurl is' %v  (including event)\n", pageUrl)
 
 	if nil == segment {
 		err = errors.New("Lookup Failed.")
 	}
-	result = &LookupResult{
-		Segment:   segment,
-		PageUrl:   pageUrl,
-		EventName: event,
+	result.Segment = segment
+	result.PageUrl = pageUrl
+	if lookupLogger.Debug() {
+		lookupLogger.Printf("- - - [Lookup] Result is %v", result)
 	}
-	logLookup("- - - [Lookup] Result is %v", result)
 	return
 }
 

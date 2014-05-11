@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Friday, 2014-05-09 00:41:07>
+   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2014-05-10 12:17:00>
 */
 
 package lifecircle
@@ -48,13 +48,13 @@ type LifeCircleControl struct {
 	page    *Life // The Page Life
 	current *Life // The Current Life
 
-	// returns           || type:[template|redirect]
+	// referer, used in event calls.
+	referer *LifeCircleControl
+
+	// Returns: store returned things.  || type:[template|redirect]
 	rendering bool       // set to false to stop render.
 	returns   *exit.Exit //
 	Err       error      // error if something error. TODO change to MultiError.
-
-	// ResultType string // returns manually. if empty, find default tempalte
-	// String     string // component html
 }
 
 // Life is a Page, Component, or others in the page render lifecircle.
@@ -67,12 +67,12 @@ type Life struct {
 	name     string        // page name or component name
 	tid      string        // component tid set in tempalte.
 
-	registry *register.ProtonSegment // Is this really useful
+	registry *register.ProtonSegment // Is this really useful?
 
 	// tree structure. TODO need children?
 	control   *LifeCircleControl
 	container *Life
-	embedmap  map[string]*Life
+	embedmap  map[string]*Life // what's this use?
 	//embed     []*Life // not used
 
 	// results
