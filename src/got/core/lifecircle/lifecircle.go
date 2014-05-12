@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2014-05-12 11:03:17>
+   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2014-05-12 17:53:16>
 */
 
 package lifecircle
@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"path"
 	"reflect"
-	"strings"
 )
 
 /* ________________________________________________________________________________
@@ -41,8 +40,9 @@ type LifeCircleControl struct {
 	r *http.Request
 
 	// request related
-	pageUrl   string // matched page url, Activate parameter part
-	eventName string // an event call on page, not page render
+	// pageUrl    string   // matched page url, Activate parameter part // no use.
+	eventName  string   // an event call on page, not page render
+	parameters []string // path parameters
 
 	// lifes
 	page    *Life // The Root Page Life
@@ -143,13 +143,18 @@ func (lcc *LifeCircleControl) GetFromRequest(key interface{}) interface{} {
 }
 
 // ---- Accessors -----------------------------------------------------------------
-func (lcc *LifeCircleControl) SetPageUrl(pageUrl string) *LifeCircleControl {
-	lcc.pageUrl = pageUrl
-	return lcc
-}
+// func (lcc *LifeCircleControl) SetPageUrl(pageUrl string) *LifeCircleControl {
+// 	lcc.pageUrl = pageUrl
+// 	return lcc
+// }
 
 func (lcc *LifeCircleControl) SetEventName(event string) *LifeCircleControl {
 	lcc.eventName = event
+	return lcc
+}
+
+func (lcc *LifeCircleControl) SetParameters(parameters []string) *LifeCircleControl {
+	lcc.parameters = parameters
 	return lcc
 }
 
@@ -201,7 +206,6 @@ func (l *Life) GetContainer() *Life {
 }
 
 // ----
-
 
 // ---- Print Structure --------------------------------------------------------------
 
@@ -318,31 +322,15 @@ func (lcc *LifeCircleControl) PostFlow() (returns *exit.Exit) {
 // Call Events, with parameters. only used by Activate for now.
 // TODO performance
 func (lcc *LifeCircleControl) CallEventWithURLParameters(name string) bool {
-	return lcc._callEventWithURLParameters(name, lcc.page.v)
+	return lcc._callEventWithURLParameters(name, nil, lcc.page.v)
 }
 
-func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base reflect.Value) bool {
-	fmt.Println("______________________________________________________________")
-	// fmt.Println(lcc.R.URL.Path)
+func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, contexts []string, base reflect.Value) bool {
+	fmt.Println("\n______________ CALL EVENT ______________________________")
 
-	url := lcc.r.URL.Path
-	if !strings.HasPrefix(url, lcc.pageUrl) {
-		panic(fmt.Sprintf("%v should has prefix %v", url, lcc.pageUrl))
-	}
-
-	// parepare parameters, TODO extract method.
-	paramsString := url[len(lcc.pageUrl)+1:]
-	if lcc.eventName != "" {
-		index := strings.Index(paramsString, "/")
-		if index > 0 {
-			paramsString = paramsString[index+1:]
-		}
-	}
-
-	strParams := strings.Split(paramsString, "/")
-	for idx, strParam := range strParams {
+	for idx, context := range contexts {
 		// TODO inject values.
-		fmt.Printf("-1- param #%d is: %v\n", idx, strParam)
+		fmt.Printf("-1- param #%d is: %v\n", idx, context)
 	}
 
 	//reflect.TypeOf(method).NumIn
@@ -359,8 +347,8 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 		for i := 0; i < numOfParameters; i++ {
 			pt := t.In(i)
 			fmt.Printf("-3- param %v is: %v\n", i, pt)
-			if len(strParams) > i {
-				v, err := utils.Coercion(strParams[i], pt)
+			if len(contexts) > i {
+				v, err := utils.Coercion(contexts[i], pt)
 				if err != nil {
 					panic(err)
 				}
@@ -370,7 +358,7 @@ func (lcc *LifeCircleControl) _callEventWithURLParameters(name string, base refl
 			}
 		}
 
-		debuglog("-730- [flow] Call Event: %v::%v%v().", lcc.page.name, name, strParams)
+		debuglog("-730- [flow] Call Event: %v::%v%v().", lcc.page.name, name, contexts)
 		lcc.returns = SmartReturn(method.Call(parameters))
 		lcc.HandleBreakReturn()
 		return true

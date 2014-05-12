@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Friday, 2014-04-25 01:15:22>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Monday, 2014-05-12 17:56:10>
 */
 package lifecircle
 
@@ -122,7 +122,7 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 	}
 	switch r.ExitType {
 	case "text":
-		lcc.return_text("plain/text", r.Value)
+		lcc.return_text("text/plain", r.Value)
 	case "json":
 		lcc.return_text("text/json", r.Value)
 
@@ -146,7 +146,7 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 				}
 				// page flow
 				newlcc := pagelife.control
-				newlcc.SetPageUrl(lcc.r.URL.Path)
+				// newlcc.SetPageUrl(lcc.r.URL.Path)
 				newlcc.PageFlow()
 			} else {
 				debug.DebugPrintVariable(pagelife)

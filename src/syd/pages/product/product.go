@@ -3,8 +3,8 @@ package product
 import (
 	"encoding/json"
 	"fmt"
-	"got/core"
 	"github.com/elivoa/gxl"
+	"got/core"
 	"strings"
 	"syd/model"
 	"syd/service/personservice"
@@ -51,7 +51,12 @@ func (p *ProductEdit) New() *ProductEdit {
 func (p *ProductEdit) Setup() { // (string, string) {
 	// page values
 	p.Title = "create product post"
+	fmt.Println("[][]][][][][][][--------------------------------------------------------------------------------")
+	fmt.Println(p.Id)
+	fmt.Println(p.Product)
 	if p.Id != nil {
+		fmt.Printf("\t >>> get product by id\n")
+
 		p.Product = productservice.GetProduct(p.Id.Int)
 		p.SubTitle = "编辑"
 	} else {

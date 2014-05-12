@@ -44,7 +44,7 @@ func (lcc *LifeCircleControl) injectPathTo(proton core.Protoner) {
 	t, _ := utils.RemovePointer(value.Type(), false)
 
 	values := make(map[string][]string) // used to inject
-	pathParams := extractPathParameters(lcc.r.URL.Path, lcc.pageUrl, lcc.eventName)
+	// pathParams := extractPathParameters(lcc.r.URL.Path, lcc.pageUrl, lcc.eventName)
 
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -63,8 +63,8 @@ func (lcc *LifeCircleControl) injectPathTo(proton core.Protoner) {
 			if err != nil {
 				panic(fmt.Sprintf("TAG path-param must be numbers. not %v.", tagValue))
 			}
-			if pathParamIndex <= len(pathParams) {
-				values[fieldKey] = []string{pathParams[pathParamIndex-1]}
+			if pathParamIndex <= len(lcc.parameters) {
+				values[fieldKey] = []string{lcc.parameters[pathParamIndex-1]}
 
 				if logger.Debug() {
 					logger.Printf("Inject path param: '%s' <= '%s'\n", f.Name, values[fieldKey])

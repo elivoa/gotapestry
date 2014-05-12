@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 12:28:35>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 18:01:21>
 */
 package lifecircle
 
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/logs"
+	"github.com/elivoa/got/templates"
 	"got/register"
 	"net/http"
 	"reflect"
@@ -101,7 +102,7 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 
 	// 1. Inject values into root page
 	if eventlog.Debug() {
-		eventlog.Printf("[EventCall] Trigger EventCall on %v", result.PageUrl)
+		eventlog.Printf("[EventCall] Trigger EventCall on %v", lcc.r.URL.Path)
 	}
 	lcc.injectBasic().injectPath().injectURLParameter().injectHiddenThings()
 
@@ -122,6 +123,10 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 		}
 
 		currentSeg := FollowComponentByIds(lcc.page.registry, result.ComponentPaths)
+
+		print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
+		fmt.Println("FinalSegment is:", currentSeg)
+
 		lcc.current = newLife(currentSeg.Proton) // new instance
 
 		// inject again, because current is changed.
@@ -138,7 +143,7 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 		eventlog.Printf("[EventCall] Call Event %v", "On"+result.EventName)
 	}
 
-	if ret := lcc._callEventWithURLParameters("On"+result.EventName, lcc.current.v); ret {
+	if ret := lcc._callEventWithURLParameters("On"+result.EventName, result.Parameters, lcc.current.v); ret {
 		return lcc
 	}
 	return lcc
@@ -192,13 +197,26 @@ func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *r
 	if componentIds != nil {
 		for idx, componentId := range componentIds {
 			// if component not exists, load and parse it.
-			fmt.Printf(">> find %vth component by %v \n", idx, componentId)
+			fmt.Printf(">> find %vth component by ID:%v \n", idx, componentId)
+			
 			lowercasedId := strings.ToLower(componentId)
 			if !current.IsTemplateLoaded {
-				// TODO: load segment tempalte
+				fmt.Println("   >> LoadTemplate ", lowercasedId, "")
+				if _, err := templates.LoadTemplates(current, false); err != nil {
+					panic(err)
+				}
 			}
+
+			// fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ")
+			// for k, v := range current.EmbedComponents {
+			// 	fmt.Println("       >> go into: ", k, " >> ", v)
+			// }
+
 			if s, ok := current.EmbedComponents[lowercasedId]; ok {
+				fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ", s)
 				current = s
+			} else {
+				panic(fmt.Sprintf("Can't find component for id:%s ", s))
 			}
 		}
 	}

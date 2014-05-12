@@ -99,7 +99,7 @@ func (s *ProtonSegment) Remove() {
 // TODO refactor all Identities of proton. with event call and event path call.
 func (s *ProtonSegment) Identity() string {
 	if s.identity == "" {
-		s.identity = fmt.Sprintf("%v:%v",
+		s.identity = fmt.Sprintf("%v.%v",
 			path.Join(identityPrefixMap[s.Proton.Kind()], s.StructInfo.ProtonPath()),
 			s.StructInfo.StructName)
 	}
@@ -294,7 +294,6 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 
 type LookupResult struct {
 	Segment        *ProtonSegment
-	PageUrl        string   // value of request.URL.Path
 	ComponentPaths []string // component path ids, for calling event.
 	EventName      string
 	Parameters     []string // parameters reconized.
@@ -315,7 +314,7 @@ func (lr *LookupResult) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString(fmt.Sprintf(">> [LookupResult]{\n"))
 	buffer.WriteString(fmt.Sprintf("\tSegment:%v,\n", lr.Segment))
-	buffer.WriteString(fmt.Sprintf("\tPageUrl:%v,\n", lr.PageUrl))
+	// buffer.WriteString(fmt.Sprintf("\tPageUrl:%v,\n", lr.PageUrl))
 	buffer.WriteString(fmt.Sprintf("\tComponentPaths:%v,\n", lr.ComponentPaths))
 	buffer.WriteString(fmt.Sprintf("\tEventName:%v,\n", lr.EventName))
 	buffer.WriteString(fmt.Sprintf("\tParameters:%v,\n", lr.Parameters))
@@ -409,7 +408,7 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 
 			break
 		} else {
-			fmt.Println("going into next step: ", segment)
+			// fmt.Println("going into next step: ", segment)
 			segment = segment.Children[strings.ToLower(seg)]
 		}
 
@@ -431,7 +430,7 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	result.Segment = segment
 	// result.PageUrl = pageUrl
 	if lookupLogger.Debug() {
-		lookupLogger.Printf("- - - [Lookup] Result is %v", result)
+		// lookupLogger.Printf("- - - [Lookup] Result is %v", result)
 	}
 	return
 }

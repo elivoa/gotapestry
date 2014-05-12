@@ -33,9 +33,9 @@ func newInstance(rt reflect.Type) reflect.Value {
 }
 
 // return parameters
-func _extractParameters(url string, pageUrl string, eventName string) []string {
-	return nil
-}
+// func _extractParameters(url string, pageUrl string, eventName string) []string {
+// 	return nil
+// }
 
 // maybe not used.
 // TODO performance, maybe i can directly call method. don't use reflect.
@@ -61,6 +61,7 @@ func analysisTranslateSuffix(t reflect.Type) string {
 // param:
 //   url - full url
 //   pageUrl - url represent a page
+// deprecated!! Don't use this any more. replaced by LookupResult
 func extractPathParameters(url string, pageUrl string, eventName string) []string {
 	// validate
 	if !strings.HasPrefix(url, pageUrl) {
