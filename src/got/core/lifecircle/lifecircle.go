@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2014-05-10 12:17:00>
+   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2014-05-12 11:03:17>
 */
 
 package lifecircle
@@ -45,7 +45,7 @@ type LifeCircleControl struct {
 	eventName string // an event call on page, not page render
 
 	// lifes
-	page    *Life // The Page Life
+	page    *Life // The Root Page Life
 	current *Life // The Current Life
 
 	// referer, used in event calls.
@@ -199,6 +199,9 @@ func (l *Life) GetProton() core.Protoner {
 func (l *Life) GetContainer() *Life {
 	return l.container
 }
+
+// ----
+
 
 // ---- Print Structure --------------------------------------------------------------
 

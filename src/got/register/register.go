@@ -3,18 +3,39 @@ package register
 import (
 	"fmt"
 	"reflect"
+	"sync"
 )
 
+// segments
+
 var (
+	// lock is not needed here.
 	Pages      = ProtonSegment{Name: "/"}
 	Components = ProtonSegment{Name: "/"}
 	Mixins     = ProtonSegment{Name: "/"}
+)
 
+// type maps
+
+var (
+	// first time initialized. lock seems not useful for them.
 	PageTypeMap      = map[reflect.Type]*ProtonSegment{}
 	ComponentTypeMap = map[reflect.Type]*ProtonSegment{}
 	MixinTypeMap     = map[reflect.Type]*ProtonSegment{}
 )
 
+var TemplateKeyMap = &TempalteKeyMapStruct{
+	Keymap: map[string]*ProtonSegment{},
+}
+
+type TempalteKeyMapStruct struct {
+	l      sync.RWMutex
+	Keymap map[string]*ProtonSegment // template key as key
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+// Get methods
 func GetPage(t reflect.Type) *ProtonSegment {
 	if v, ok := PageTypeMap[t]; ok {
 		return v

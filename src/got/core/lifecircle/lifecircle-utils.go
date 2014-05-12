@@ -86,4 +86,3 @@ func extractPathParameters(url string, pageUrl string, eventName string) []strin
 	return pathParams
 }
 
-

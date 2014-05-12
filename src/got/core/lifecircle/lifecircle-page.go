@@ -1,14 +1,13 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Sunday, 2014-05-11 16:51:09>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 12:28:35>
 */
 package lifecircle
 
 import (
 	"fmt"
 	"github.com/elivoa/got/config"
-	"got/core"
+	"github.com/elivoa/got/logs"
 	"got/register"
-	"got/utils"
 	"net/http"
 	"reflect"
 	"strings"
@@ -91,15 +90,22 @@ func (lcc *LifeCircleControl) PageFlow() *LifeCircleControl {
 }
 
 // ----  Event Call on Page  --------------------------------------------------
+var eventlog = logs.Get("GOT:EventCall")
 
+// Note: for EventCall result.segment is page's semgnet
+// 暂不支持Event的popup
 func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCircleControl {
 
-	fmt.Println("---------------------------------------- Call event ----------------------------")
+	fmt.Println("--$$------------------------------------ Call event ----------------------------")
 	// Note that page is new created. all values needs inject.
 
 	// 1. Inject values into root page
-	lcc.injectBasic().injectPath().injectURLParameter()
+	if eventlog.Debug() {
+		eventlog.Printf("[EventCall] Trigger EventCall on %v", result.PageUrl)
+	}
+	lcc.injectBasic().injectPath().injectURLParameter().injectHiddenThings()
 
+	// call rootpage's activate method before call event.
 	returns := SmartReturn(lcc.page.call("Activate"))
 	if !returns.IsReturnsTrue() {
 		return lcc
@@ -109,71 +115,92 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 	// reflect.Type is enough, and thus don't need to create new value
 	// to each node on path. But how to get proton.Kind() only use a reflect.Type?
 
-	proton := lcc.page.proton // proton is upper container's proton
-
-	// find components in it.
-	if result.ComponentPaths != nil {
-		for idx, cname := range result.ComponentPaths {
-			// if component not exists, load and parse it.
-
-		}
-	}
-	event := "fix this"
-
-	// comtinue here.
-	eventPaths := strings.Split(event, ".") // event call path
-
-	// follow the path
-	for _, piece := range eventPaths[0 : len(eventPaths)-1] {
-		// 1. get from proton cache;
-		// !!!This can't be happened!!!
-		// !! This is no use, because every request is a new proton value.
-		c, ok := proton.Embed(piece)
-		if ok && c != nil {
-			proton = c
-			continue
+	if result.ComponentPaths != nil && len(result.ComponentPaths) > 0 {
+		// Call event on embed components, need create new instance.
+		if eventlog.Debug() {
+			eventlog.Printf("[EventCall] follow by components: %v", result.ComponentPaths)
 		}
 
-		// 2. Is Cached in StructInfo
-		si := scache.GetCreate(reflect.TypeOf(proton), proton.Kind()) // root page
-		if si == nil {
-			panic(fmt.Sprintf("StructInfo for %v can't be null!", reflect.TypeOf(proton)))
-		}
+		currentSeg := FollowComponentByIds(lcc.page.registry, result.ComponentPaths)
+		lcc.current = newLife(currentSeg.Proton) // new instance
 
-		// create new proton instance. maybe a component
-		var newProton core.Protoner
-		fi := si.FieldInfo(piece)
-		if fi != nil { // field info cached.
-			newInstance := newInstance(fi.Type)
-			newProton = newInstance.Interface().(core.Protoner)
-		} else {
-			// If not cached fieldInfo, create FieldInfo
-			containerType := utils.GetRootType(proton)
-			field, ok := containerType.FieldByName(piece) // component in path
-			if !ok {
-				panic(fmt.Sprintf("Can't get field in path: %v", piece))
-			}
-			newInstance := newInstance(field.Type)                   // create new instance
-			newProton = newInstance.Interface().(core.Protoner)      //
-			si.CacheEmbedProton(field.Type, piece, newProton.Kind()) // cache
+		// inject again, because current is changed.
+		if eventlog.Debug() {
+			eventlog.Printf("[EventCall] Inject things into new leafe node.")
 		}
-		//// lcc.InjectValueTo(newProton) // don't inject to passby nodes.
-		proton.SetEmbed(piece, newProton) // store newInstance into proton
-		proton = newProton                // next round
+		lcc.injectBasic().injectPath().injectURLParameter().injectHiddenThings()
+	} else {
+		// Call event on page.
 	}
 
-	// inject into new component. make it's value available.
-	lcc.injectBasicTo(proton)
-	lcc.injectPathTo(proton)
-	lcc.injectURLParameterTo(proton)
-
-	// last node, call the event.
-	piece := eventPaths[len(eventPaths)-1]
-	// Call event. TODO add parameters.
 	fmt.Println("\n----------    EVENT CALL    ----------------")
-	fmt.Printf("Call event [%v] with parameters.\n", event)
-	if ret := lcc._callEventWithURLParameters("On"+piece, reflect.ValueOf(proton)); ret {
+	if eventlog.Debug() {
+		eventlog.Printf("[EventCall] Call Event %v", "On"+result.EventName)
+	}
+
+	if ret := lcc._callEventWithURLParameters("On"+result.EventName, lcc.current.v); ret {
 		return lcc
 	}
 	return lcc
+
+	// find components in it. segInHell is the leaf node of component who contains the event.
+	// seed := currentSeg.Proton
+
+	// // follow the path
+	// for _, piece := range eventPaths[0 : len(eventPaths)-1] {
+	// 	// 1. get from proton cache;
+	// 	// !!!This can't be happened!!!
+	// 	// !! This is no use, because every request is a new proton value.
+	// 	c, ok := proton.Embed(piece)
+	// 	if ok && c != nil {
+	// 		proton = c
+	// 		continue
+	// 	}
+
+	// 	// 2. Is Cached in StructInfo
+	// 	si := scache.GetCreate(reflect.TypeOf(proton), proton.Kind()) // root page
+	// 	if si == nil {
+	// 		panic(fmt.Sprintf("StructInfo for %v can't be null!", reflect.TypeOf(proton)))
+	// 	}
+
+	// 	// create new proton instance. maybe a component
+	// 	var newProton core.Protoner
+	// 	fi := si.FieldInfo(piece)
+	// 	if fi != nil { // field info cached.
+	// 		newInstance := newInstance(fi.Type)
+	// 		newProton = newInstance.Interface().(core.Protoner)
+	// 	} else {
+	// 		// If not cached fieldInfo, create FieldInfo
+	// 		containerType := utils.GetRootType(proton)
+	// 		field, ok := containerType.FieldByName(piece) // component in path
+	// 		if !ok {
+	// 			panic(fmt.Sprintf("Can't get field in path: %v", piece))
+	// 		}
+	// 		newInstance := newInstance(field.Type)                   // create new instance
+	// 		newProton = newInstance.Interface().(core.Protoner)      //
+	// 		si.CacheEmbedProton(field.Type, piece, newProton.Kind()) // cache
+	// 	}
+	// 	//// lcc.InjectValueTo(newProton) // don't inject to passby nodes.
+	// 	proton.SetEmbed(piece, newProton) // store newInstance into proton
+	// 	proton = newProton                // next round
+	// }
+
+}
+
+func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *register.ProtonSegment {
+	current := seg
+	if componentIds != nil {
+		for idx, componentId := range componentIds {
+			// if component not exists, load and parse it.
+			fmt.Printf(">> find %vth component by %v \n", idx, componentId)
+			lowercasedId := strings.ToLower(componentId)
+			if !current.IsTemplateLoaded {
+				// TODO: load segment tempalte
+			}
+			if s, ok := current.EmbedComponents[lowercasedId]; ok {
+				current = s
+			}
+		}
+	}
+	return current
 }

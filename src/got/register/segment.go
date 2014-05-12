@@ -16,60 +16,6 @@ import (
 	"sync"
 )
 
-var conf = config.Config
-
-// ProtonSegment is a tree like structure to hold path to Page/Component
-// 1. Support quick lookup to locate a page or component. (TODO need improve performance)
-// 2. Each kind of page has one ProtonSegment instance. (one path)
-// TODO
-//   - refactor this.
-//
-type ProtonSegment struct {
-	// as a tree node
-	Name     string                    // segment name
-	Parent   *ProtonSegment            //
-	Children map[string]*ProtonSegment //
-	Level    int                       // depth
-
-	// TODO: Test Performance: New Method
-	//   - Test Perforance between `reflect new` and `native func call`
-	//   ? Use Generated New function (e.g. NewSomePage) to create new Page? Is This Faster?
-	Proton core.Protoner // The base proton segment. Create new one when installed.
-
-	// associated external resources.
-	ModulePackage string             // e.g. got/builtin, syd; used in init.
-	StructInfo    *parser.StructInfo // from parser package
-	module        *core.Module       // associated Module
-
-	// caches
-	identity     string // cache identity, default the same name with StructName
-	templatePath string // cache template path.
-
-	// TODO - try the method that use use channel to lock.
-	// TODO - Use RWMutex lock
-	l sync.RWMutex
-
-	// TODO replace with typeinfo
-	// Path          string // ? TODO: URL path; TODO use appconfig
-	// Src           string // source package, used to select app
-}
-
-func (s *ProtonSegment) AddChild(seg *ProtonSegment) {
-	if s.Children == nil {
-		s.Children = map[string]*ProtonSegment{}
-	}
-	s.Children[strings.ToLower(seg.Name)] = seg
-}
-
-func (s *ProtonSegment) HasChild(seg string) bool {
-	return s.Children != nil && s.Children[strings.ToLower(seg)] != nil
-}
-
-// used to update register
-func (s *ProtonSegment) Remove() {
-	// TODO implement this. used in auto reload.
-}
-
 // ----  Identity & Template path  ---------------------------------------------------------------
 
 var pathMap = map[core.Kind]string{
@@ -82,6 +28,71 @@ var identityPrefixMap = map[core.Kind]string{
 	core.PAGE:      "p/",
 	core.COMPONENT: "c/",
 	core.MIXIN:     "x/",
+}
+
+var conf = config.Config
+
+// ProtonSegment is a tree like structure to hold path to Page/Component
+// 1. Support quick lookup to locate a page or component. (TODO need improve performance)
+// 2. Each kind of page has one ProtonSegment instance. (one path)
+// TODO
+//   - refactor this.
+//
+type ProtonSegment struct {
+	// as a tree node
+	Name     string                    // segment name
+	Alias    []string                  // alias, e.g.(order/OrderEdit): edit, orderedit
+	Parent   *ProtonSegment            //
+	Children map[string]*ProtonSegment //
+	Level    int                       // depth
+
+	// template related
+	IsTemplateLoaded  bool
+	Blocks            map[string]*Block         // blocks
+	ContentOrigin     string                    // template's html
+	ContentTransfered string                    // template's transfered html
+	EmbedComponents   map[string]*ProtonSegment // lowercased id
+
+	// TODO: Test Performance: New Method
+	//   - Test Perforance between `reflect new` and `native func call`
+	//   ? Use Generated New function (e.g. NewSomePage) to create new Page? Is This Faster?
+	// TODO: Chagne name
+	Proton core.Protoner // The base proton segment. Create new one when installed.
+
+	// associated external resources.
+	ModulePackage string             // e.g. got/builtin, syd; used in init.
+	StructInfo    *parser.StructInfo // from parser package
+	module        *core.Module       // associated Module
+
+	// caches
+	identity     string // cache identity, default the same name with StructName
+	templatePath string // cache template path.
+
+	// TODO - try the method that use use channel to lock.
+	L sync.RWMutex
+}
+
+type Block struct {
+	ID                string // block's id
+	ContentOrigin     string
+	ContentTransfered string
+}
+
+func (s *ProtonSegment) AddChild(segname string, seg *ProtonSegment) {
+	if s.Children == nil {
+		s.Children = map[string]*ProtonSegment{}
+	}
+	s.Children[strings.ToLower(segname)] = seg
+}
+
+func (s *ProtonSegment) HasChild(seg string) bool {
+	return s.Children != nil && s.Children[strings.ToLower(seg)] != nil
+}
+
+// used to update register
+func (s *ProtonSegment) Remove() {
+	panic("not implement!")
+	// TODO implement this. used in auto reload.
 }
 
 // unique identity used as template key.
@@ -110,12 +121,10 @@ func (s *ProtonSegment) TemplatePath() (string, string) {
 	return s.Identity(), s.templatePath
 }
 
+// Find it's Module
 func (s *ProtonSegment) Module() *core.Module {
 	if s.module == nil {
 		if s.StructInfo != nil {
-			// for k, module := range Modules.Map() {
-			// 	fmt.Println("--- ", k, module.String())
-			// }
 			module := Modules.Get(s.StructInfo.ModulePackage)
 			if module == nil {
 				panic(fmt.Sprint("Can't find module for ", s.StructInfo.ModulePackage))
@@ -148,29 +157,29 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 
 	// add to registerc
 	var (
-		currentSeg = s
-		prevSeg    = "//nothing//" // previous lowercase seg
-		prevSegs   = []string{}    // previous lowercase seg[]
-
-		selectorPrefix = []string{} // tempvalue
+		currentSeg     = s             // always use root segment.
+		prevSeg        = "//nothing//" // previous lowercase seg
+		prevSegs       = []string{}    // previous lowercase seg[]
+		selectorPrefix = []string{}    // tempvalue
 	)
 
-	// 1. process path segments, without last node
+	// 1. process path segments to reach the end, without last node.
 	for idx, seg := range segments[0:(len(segments) - 1)] {
 		var lowerSeg = strings.ToLower(seg)
-		var segment *ProtonSegment
 
+		var segment *ProtonSegment
 		if currentSeg.HasChild(seg) {
 			segment = currentSeg.Children[seg]
 			// TODO detect conflict
 		} else {
+			// Add path to segment.
 			segment = &ProtonSegment{
 				Name:   seg,
 				Parent: currentSeg,
 				Level:  idx,
 			}
 			dlog("!!!! add path to structure: seg: %v\n", seg) // ------------------
-			currentSeg.AddChild(segment)
+			currentSeg.AddChild(segment.Name, segment)
 		}
 		currentSeg = segment
 		selectorPrefix = append(selectorPrefix, seg)
@@ -191,7 +200,8 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 	// fmt.Printf("-www- [RegisterPage] enter last node %v; \n", seg)
 	// fmt.Printf("-www- --------- %v; %v \n", lowerSeg, prevSeg)
 
-	// match origin paths: /order/create/OrderCreateIndex
+	// Match origin paths: /order/create/OrderCreateIndex, in this example we can ignore
+	// prefix 'Order' and the ignore 'Create', and 'Index' can be automatically ignored.
 	for _, p := range prevSegs {
 		// dlog("+++ strings.HasPrefix: %v, %v = %v\n", shortLowerSeg, p, strings.HasPrefix(shortLowerSeg, p))
 		if strings.HasPrefix(shortLowerSeg, p) {
@@ -248,31 +258,33 @@ func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [
 	dlog(">>>>> FinalSegs: %v\n", finalSegs) // ------------------------------------------
 
 	// 4. finally add segment struct to chains.
-	for _, s := range finalSegs {
-		// link segment together.
-		segment := &ProtonSegment{
-			Name:       s,
-			Parent:     currentSeg,
-			Level:      len(segments) - 1,
-			Proton:     p,
-			StructInfo: si,
-		}
-		currentSeg.AddChild(segment)
+	segment := &ProtonSegment{
+		Name:       finalSegs[0], // Name is a bitch.
+		Alias:      finalSegs,
+		Parent:     currentSeg,
+		Level:      len(segments) - 1,
+		Proton:     p,
+		StructInfo: si,
+	}
 
-		// add the first segment into typemap
-		if segment.Proton.Kind() == core.PAGE {
-			PageTypeMap[reflect.TypeOf(p).Elem()] = segment
-		} else if segment.Proton.Kind() == core.COMPONENT {
-			ComponentTypeMap[reflect.TypeOf(p).Elem()] = segment
-		} else if segment.Proton.Kind() == core.MIXIN {
-			MixinTypeMap[reflect.TypeOf(p).Elem()] = segment
-		}
+	for _, s := range finalSegs {
+		currentSeg.AddChild(s, segment) // link segment together.
 
 		// add selector
 		selector := []string{}
 		selector = append(selector, selectorPrefix...)
 		selector = append(selector, s)
 		selectors = append(selectors, selector)
+	}
+
+	// add the first segment into typemap
+	switch segment.Proton.Kind() {
+	case core.PAGE:
+		PageTypeMap[reflect.TypeOf(p).Elem()] = segment
+	case core.COMPONENT:
+		ComponentTypeMap[reflect.TypeOf(p).Elem()] = segment
+	case core.MIXIN:
+		MixinTypeMap[reflect.TypeOf(p).Elem()] = segment
 	}
 	// dlog(">>>>> Selectors: %v\n", selectors)
 	return
@@ -404,19 +416,20 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	}
 
 	// get page url
-	pageUrl := strings.Join(segments[:level], "/")
-	if result.EventName != "" {
-		// TODO: bugs here. can', .
-		index := strings.LastIndex(pageUrl, ".")
-		pageUrl = pageUrl[:index]
-	}
-	log.Printf("- - - [Lookup] 'pageurl is' %v  (including event)\n", pageUrl)
+	// pageUrl := strings.Join(segments[:level], "/")
+	// if result.EventName != "" {
+	// 	// TODO: bugs here. can', .
+	// 	index := strings.LastIndex(pageUrl, ".")
+	// 	fmt.Println("................", index, " >>> ", pageUrl)
+	// 	pageUrl = pageUrl[:index]
+	// }
+	// log.Printf("- - - [Lookup] 'pageurl is' %v  (including event)\n", pageUrl)
 
 	if nil == segment {
 		err = errors.New("Lookup Failed.")
 	}
 	result.Segment = segment
-	result.PageUrl = pageUrl
+	// result.PageUrl = pageUrl
 	if lookupLogger.Debug() {
 		lookupLogger.Printf("- - - [Lookup] Result is %v", result)
 	}

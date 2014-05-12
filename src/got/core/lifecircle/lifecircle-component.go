@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Sunday, 2014-05-11 02:31:27>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Monday, 2014-05-12 01:22:25>
 */
 package lifecircle
 
@@ -228,14 +228,11 @@ func (l *Life) flow() (returns *exit.Exit) {
 // renderTemplate find and render Template using go way.
 func (l *Life) renderTemplate() {
 	// reach here means I can find the template and render it.
-	// I can panic if template not found.
 	// debug.Log("-755- [TemplateSelect] %v -> %v", identity, templatePath)
-
-	identity, templatePath := l.registry.TemplatePath()
-	if _, err := templates.Cache.GetnParse(identity, templatePath, l.rootType); err != nil {
+	if _, err := templates.LoadTemplates(l.registry, false); err != nil {
 		panic(err)
 	}
-	if err := templates.RenderTemplate(&l.out, identity, l.proton); err != nil {
-		panic(err) // lcc.Err = err
+	if err := templates.RenderTemplate(&l.out, l.registry.Identity(), l.proton); err != nil {
+		panic(err)
 	}
 }
