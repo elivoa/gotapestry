@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 18:01:21>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 23:07:28>
 */
 package lifecircle
 
@@ -123,10 +123,6 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 		}
 
 		currentSeg := FollowComponentByIds(lcc.page.registry, result.ComponentPaths)
-
-		print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
-		fmt.Println("FinalSegment is:", currentSeg)
-
 		lcc.current = newLife(currentSeg.Proton) // new instance
 
 		// inject again, because current is changed.
@@ -198,7 +194,7 @@ func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *r
 		for idx, componentId := range componentIds {
 			// if component not exists, load and parse it.
 			fmt.Printf(">> find %vth component by ID:%v \n", idx, componentId)
-			
+
 			lowercasedId := strings.ToLower(componentId)
 			if !current.IsTemplateLoaded {
 				fmt.Println("   >> LoadTemplate ", lowercasedId, "")
@@ -207,13 +203,8 @@ func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *r
 				}
 			}
 
-			// fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ")
-			// for k, v := range current.EmbedComponents {
-			// 	fmt.Println("       >> go into: ", k, " >> ", v)
-			// }
-
 			if s, ok := current.EmbedComponents[lowercasedId]; ok {
-				fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ", s)
+				// fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ", s)
 				current = s
 			} else {
 				panic(fmt.Sprintf("Can't find component for id:%s ", s))
