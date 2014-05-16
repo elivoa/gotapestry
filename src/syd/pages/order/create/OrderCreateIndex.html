@@ -2,16 +2,14 @@
 <html>
   <head>
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "Title" `新增订单` }}
+    <t:layout.header title="新增订单" />
   </head>
 
   <body class="PG_create_order">
-    
-    {{t_layout_headernav $}}
+    <t:layout.headernav />
 
     <div class="container">
-
-      {{t_layout_leftnav $ "CurPage" `/order/create`}}
+      <t:layout.leftnav curPage="/order/create" />
 
       <div class="main_content">
         <h1>新增订单</h1>
@@ -29,8 +27,7 @@
               <dl class="clearfix">
                 <dt><i>*</i>输入客户姓名：</dt>
                 <dd>
-                  {{t_suggestcontrol $ "name" "CustomerId" "value" "" "category" "customer"}}
-                  <!-- <input type="text" size="45"> -->
+                  <t:suggestcontrol name="CustomerId" value="" category="customer" />
                 </dd>
                 <dd class=""></dd>
               </dl>

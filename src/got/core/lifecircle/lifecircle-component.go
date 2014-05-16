@@ -1,46 +1,54 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Monday, 2014-05-12 01:22:25>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Saturday, 2014-05-17 00:59:51>
 */
 package lifecircle
 
 import (
 	"fmt"
+	"github.com/elivoa/got/logs"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/got/templates"
 	"got/core"
-	"got/debug"
 	"got/register"
 	"got/utils"
 	"html/template"
-	"log"
 	"path"
 	"reflect"
 	"strings"
 )
 
+var cflog = logs.Get("ComponentFLow")
+
 // ComponentLifeCircle returns template-func to handle component render.
+// Param: name e.g.: layout/gotheader
 func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 
 	// returnd string or template.HTML are inserted into final template.
-	// params: 1. container, 2. ...
+	// params: 1. container, 2. uniqueID, 3. other parameter pairs...
 	return func(params ...interface{}) interface{} {
 
-		log.Printf("-620- [flow] Render Component %v ....", name)
+		if cflog.Info() {
+			cflog.Printf("[Component] Render Component %v (ID:%s) ....", name, params[1].(string))
+		}
+
+		// Processing component in one page
+		// 1. find component by component's type
+		// 2. find component's container
+		// 3. create component's life
+		// 4. process returns.
 
 		// 1. find base component type
 		result, err := register.Components.Lookup(name)
-		{ /*  */
-			if err != nil || result.Segment == nil {
-				panic(fmt.Sprintf("Component %v not found!", name))
-			}
-			if len(params) < 1 {
-				panic(fmt.Sprintf("First parameter of component must be '$' (container)"))
-			}
+		if err != nil || result.Segment == nil {
+			panic(fmt.Sprintf("Component %v not found!", name))
+		}
+		if len(params) < 1 {
+			panic(fmt.Sprintf("First parameter of component must be '$' (container)"))
 		}
 
-		// 2. find container page/component
+		// 2. find container page or component
 		container := params[0].(core.Protoner)
-		// 2.1 get Life from container.
+		tid := params[1].(string)
 		containerLife := container.FlowLife().(*Life)
 		{
 			// fmt.Println("~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -54,8 +62,8 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 		}
 		// unused: get lcc from component; use method to get from controler.
 		// lcc := context.Get(container.Request(), config.LCC_OBJECT_KEY).(*LifeCircleControl)
-		lcc := containerLife.control
-		life := lcc.componentFlow(container, result.Segment.Proton, params[1:])
+		lcc := containerLife.control // container's lcc has the same R and W.
+		life := lcc.componentFlow(containerLife, result.Segment.Proton, tid, params[2:])
 		life.SetRegistry(result.Segment)
 
 		// templates renders in common flow()
@@ -89,13 +97,19 @@ func ComponentLifeCircle(name string) func(...interface{}) interface{} {
 //
 // TODO: Performance Improve to Component in Loops.
 //
-func (lcc *LifeCircleControl) componentFlow(container core.Protoner, componentSeed core.Componenter, params []interface{}) *Life {
+func (lcc *LifeCircleControl) componentFlow(containerLife *Life, componentSeed core.Componenter, tid string, params []interface{}) *Life {
 
-	{
-		debuglog("----- [Component flow] ------------------------%v",
+	fmt.Println("\n--------------------------------------------------------------------------------")
+	fmt.Println("tid is: ", tid)
+	for _, v := range params {
+		fmt.Println("param: ", v)
+	}
+
+	if cflog.Debug() {
+		cflog.Printf("----- [Component flow] ------------------------%v",
 			"----------------------------------------")
-		debug.Log("- C - [Component Container] Type: %v, ComponentType:%v,\n",
-			reflect.TypeOf(container), reflect.TypeOf(componentSeed))
+		cflog.Printf("- C - [Component Container] Type: %v, ComponentType:%v, tid:%s\n",
+			containerLife.rootType, reflect.TypeOf(componentSeed), tid)
 	}
 
 	// Store type in StructCache, Store instance in ProtonObject.
@@ -104,27 +118,30 @@ func (lcc *LifeCircleControl) componentFlow(container core.Protoner, componentSe
 	//
 
 	// 1. cache in StructInfoCache. (application scope)
-	si := scache.GetCreate(reflect.TypeOf(container), container.Kind())
+	si := scache.GetCreate(containerLife.rootType, containerLife.kind)
 	if si == nil {
-		panic(fmt.Sprintf("StructInfo for %v can't be null!", reflect.TypeOf(container)))
+		panic(fmt.Sprintf("StructInfo for %v can't be null!", containerLife.rootType))
 	}
+
+	// TODO: Is below useful? Can i remove these codes?
+
 	t := utils.GetRootType(componentSeed)
-	tid, _ := determinComponentTid(params, t)
-	si.CacheEmbedProton(t, tid, componentSeed.Kind())
+	// tid, _ := determinComponentTid(params, t)
+	si.CacheEmbedProton(t, tid, componentSeed.Kind()) // TODO: is this useful?
 
 	// 2. store in proton's embed field. (request scope)
-	containerLife := container.FlowLife().(*Life)
+	// containerLife := container.FlowLife().(*Life)
 	life, found := containerLife.embedmap[tid]
 	if !found {
 		// create component life!
 		life := containerLife.appendComponent(componentSeed, tid)
-		container.SetEmbed(tid, life.proton)
+		containerLife.proton.SetEmbed(tid, life.proton)
 	} else {
-		// already exist, in loop or appear more than once?
+		// already exist, must be in a loop.
 		lcc.current = life
 		// already found. maybe this component is in a loop or range.
-		lcc.current.out.Reset() // components in loop is one instance.
-		life.proton.IncEmbed()
+		lcc.current.out.Reset()    // components in loop is one instance.
+		life.proton.IncLoopIndex() // increase loop index
 	}
 
 	lcc.injectBasicTo(lcc.current.proton)
@@ -133,16 +150,21 @@ func (lcc *LifeCircleControl) componentFlow(container core.Protoner, componentSe
 }
 
 // return (name, is setManually); t must not be ptr.
-func determinComponentTid(params []interface{}, t reflect.Type) (tid string, setManually bool) {
+func determinComponentTid(params []interface{}, t reflect.Type) (tid string, specifiedId bool) {
 	for idx, p := range params {
-		if idx%2 == 0 && strings.ToLower(p.(string)) == "tid" {
-			tid = params[idx+1].(string)
+		if idx%2 == 0 {
+			key := strings.ToLower(p.(string))
+			if key == "tid" || key == "t:id" {
+				tid = params[idx+1].(string)
+				// use specified id, can't be duplicated (judge in transform.go)
+				specifiedId = true
+				return
+			}
 		}
 	}
-	if tid == "" {
-		setManually = true
-		tid = path.Ext(t.String())[1:]
-	}
+	// if fall here, measn no specified id.
+	// TODO: get id
+	tid = path.Ext(t.String())[1:]
 	return
 }
 

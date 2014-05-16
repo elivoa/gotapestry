@@ -37,9 +37,9 @@ type Protoner interface {
 	SetInjected(fieldName string, b bool)
 	Embed(name string) (Protoner, bool)
 	SetEmbed(name string, proton Protoner) // return loop index
-	IncEmbed() int
-	ClientId() string // no meaning for PAGE
-	CID() string      // short for ClientId()
+	IncLoopIndex() int                     // is this useful?
+	ClientId() string                      // no meaning for PAGE // TODO: generate clientid in loop
+	CID() string                           // short for ClientId()
 	SetId(id string)
 
 	// attached *plifecircle.Life
@@ -57,7 +57,7 @@ type Proton struct {
 	LoopIndex int    // used when component are in a loop
 
 	injected map[string]bool     // field that successfully injected
-	embed    map[string]Protoner // embed components TODO
+	embed    map[string]Protoner // embed components [id -> protoner]
 
 	flowlife interface{} // should be *lifecircle.Life
 }
@@ -141,7 +141,7 @@ func (p *Proton) SetEmbed(name string, proton Protoner) {
 	proton.SetInjected("Tid", true)
 }
 
-func (p *Proton) IncEmbed() int {
+func (p *Proton) IncLoopIndex() int {
 	p.LoopIndex += 1
 	return p.LoopIndex
 }

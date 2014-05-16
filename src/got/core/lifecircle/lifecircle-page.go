@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Monday, 2014-05-12 23:07:28>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2014-05-17 00:50:39>
 */
 package lifecircle
 
@@ -203,6 +203,9 @@ func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *r
 				}
 			}
 
+			fmt.Println("\n----------------------------------------------------")
+			fmt.Println("idx: ", idx, "; componentId", componentId)
+			fmt.Println("leng of embed is: ", len(current.EmbedComponents))
 			if s, ok := current.EmbedComponents[lowercasedId]; ok {
 				// fmt.Println("   >> go into: ", lowercasedId, " >> seg is: ", s)
 				current = s

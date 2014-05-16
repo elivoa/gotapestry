@@ -23,13 +23,13 @@
           <input type="hidden" name="Order.ParentTrackNumber" value="{{.Order.ParentTrackNumber}}" />
           
           <!-- 客户信息 -->
-          {{t_order_customerinfo $ "Customer" .Customer}}
+          <t:order.customerinfo customer=".Customer" />
 
           <!-- ------------------------------- -->
-          {{t_order_productselector $ "CustomerId" .Customer.Id}}
+          <t:order.productselector customerId=".Customer.Id" />
 
           <div class="">
-            {{t_order_detailsform $}}
+            <t:order.detailsform />
           </div>
           <!-- ------------------------------- -->
           <div class="unit">
@@ -93,14 +93,14 @@
 </html>
 
 <script type="text/javascript">
-                 $(function(){
-                   ocd = new OrderCreateDetail({{.CustomerId}})
-                   
-                   {{if .IsEdit}}
-                   // Restore information
-                   ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
-                   ocd.odf.setData({{.ProductDetailJson}})
-                   {{end}}
-                   
-                 });
-                 </script>
+  $(function(){
+    ocd = new OrderCreateDetail({{.CustomerId}})
+    
+    {{if .IsEdit}}
+    // Restore information
+    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+    ocd.odf.setData({{.ProductDetailJson}})
+    {{end}}
+    
+  });
+</script>

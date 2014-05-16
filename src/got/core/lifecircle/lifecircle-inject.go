@@ -20,7 +20,7 @@ func (lcc *LifeCircleControl) injectBasic() *LifeCircleControl {
 // InjectBasicTo will inject R & W into proton, this is not necessary, make this an option.
 func (lcc *LifeCircleControl) injectBasicTo(proton core.Protoner) {
 	if logger.Debug() {
-		logger.Printf("Inject Basic Information:\n")
+		logger.Printf("[Inject] Inject Basic Information:\n")
 	}
 	if logger.Debug() && false {
 		logger.Printf("Inject proton.r <= lcc.r\n")
