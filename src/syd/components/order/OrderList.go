@@ -118,9 +118,10 @@ func (p *OrderList) PrintOrderLink(order *model.Order) string {
 	switch model.OrderType(order.Type) {
 	case model.Wholesale:
 		// TODO auto generate this via builtin eventlink component.
-		return fmt.Sprintf("/order/list.orderlist.Print/%v", order.TrackNumber)
+		// TODO: Use link generator to generate this link.
+		return fmt.Sprintf("/order/list.orderlist:Print/%v", order.TrackNumber)
 	case model.ShippingInstead:
-		return fmt.Sprintf("/order/list.orderlist.ShippingInsteadOrderPrint/%v", order.TrackNumber)
+		return fmt.Sprintf("/order/list.orderlist:ShippingInsteadOrderPrint/%v", order.TrackNumber)
 	case model.SubOrder:
 		return "#Error"
 	default:

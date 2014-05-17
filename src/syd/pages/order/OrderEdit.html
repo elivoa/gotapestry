@@ -2,10 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title></title>
-
-    {{t_layout_header $}}
-    
+    <t:layout.header title="订单编辑" />    
     <script type="text/javascript" src="/static/js/order_edit.js"></script>
 
   </head>
@@ -15,7 +12,7 @@
     </div>
     <div class="container">
 
-      {{t_layout_leftnav $}}
+      <t:layout.LeftNav />
 
       <div class="content">
     	<h2>{{.SubTitle}}订单</h2>
@@ -42,8 +39,7 @@
               </tr>
               <tr>
                 <td colspan="2">客户：
-
-                  {{t_suggestcontrol $ "name" "Order.CustomerId" "value" .Order.CustomerId "category" "customer"}}
+                  <t:SuggestControl name="Order.CustomerId", value=".Order.CustomerId" category="customer" />
                   
                   <!--
                       <input type="text" class="odc_custname"

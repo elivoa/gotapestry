@@ -50,18 +50,18 @@
             <dl class="clearfix">
               <dt>所在地：</dt>
               <dd>
+                <t:provinceSelect name="Person.City" value=".Person.City" />
 
-                {{t_provinceselect $ "name" "Person.City" "value" .Person.City}}
-
-                {{/*<!--
-                        <select name="Person.City" value="{{.Person.City}}">
-                          <option value="">省</option>
-                          <option value="上海">上海</option>
-                          <option value="嘉兴">嘉兴</option>
-                          <option value="濮院">濮院</option>
-                        </select>
-                        -->
-                */}}
+                <hide>
+                  <!--
+                      <select name="Person.City" value="{{.Person.City}}">
+                        <option value="">省</option>
+                        <option value="上海">上海</option>
+                        <option value="嘉兴">嘉兴</option>
+                        <option value="濮院">濮院</option>
+                      </select>
+                      -->
+                </hide>
                 <input type="text" size="12"
                        name="Person.Address" value="{{.Person.Address}}" />
               </dd>

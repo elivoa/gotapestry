@@ -1,5 +1,5 @@
 ##
-## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Tuesday, 2013-09-10 11:39:40>
+## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Saturday, 2014-05-17 15:41:06>
 ##
 window.BatchCloseOrder =
 class BatchCloseOrder
@@ -127,7 +127,7 @@ class BatchCloseOrder
     # submit to batch clear
     $.ajax {
       type:"GET"
-      url:"/order/deliveringunclosedorders.batchclose/#{totalmoney}/#{@customerId}"
+      url:"/order/deliveringunclosedorders:batchclose/#{totalmoney}/#{@customerId}"
       dataType: "json"
       success: $.proxy (data) ->
         @applyJson(data)

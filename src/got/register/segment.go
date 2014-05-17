@@ -339,7 +339,10 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 	}
 
 	if lookupLogger.Debug() {
-		lookupLogger.Printf("[Lookup] '%v'", url)
+		lookupLogger.Printf("[Lookup] URL: '%v' (trimmed)", url)
+		if lookupLogger.Trace() {
+			lookupLogger.Printf("[Lookup] Trimmed URL: '%v'", trimedUrl)
+		}
 	}
 
 	var (
@@ -361,6 +364,10 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 			continue
 		case '/':
 			level += 1
+		}
+
+		if lookupLogger.Trace() {
+			lookupLogger.Printf("[Lookup] for url segment: '%v'", buffer.String())
 		}
 
 		// arrive here means words finished. process segment
@@ -405,8 +412,7 @@ func (s *ProtonSegment) Lookup(url string) (result *LookupResult, err error) {
 			// Match finished, this must be the first paramete
 			result.Parameters = append(result.Parameters, seg)
 			parameterPart = true
-
-			break
+			// break				//
 		} else {
 			// fmt.Println("going into next step: ", segment)
 			segment = segment.Children[strings.ToLower(seg)]

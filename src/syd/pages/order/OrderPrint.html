@@ -3,7 +3,7 @@
   <head>
 
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "Title" `打印订单` }}
+    <t:layout.header title="打印订单" />    
 
     <link rel="stylesheet" type="text/css" href="/static/css/pages/order-print.css" />
 
@@ -21,12 +21,10 @@
     
   </head>
   <body class="PG_create_order">
-
-    {{t_layout_headernav $}}
+    <t:layout.HeaderNav />
 
     <div class="container">
-
-      {{t_layout_leftnav $ "CurPage" `/order/list`}}
+      <t:layout.LeftNav curPage="/order/list" />
 
       <div class="main_content">
     	<h1>打印订单 Developing.....</h1>

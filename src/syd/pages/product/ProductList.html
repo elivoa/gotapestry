@@ -3,16 +3,14 @@
   <head>
     
     <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
-    {{t_layout_header $ "title" "商品列表"}}
+    <t:layout.header title="商品列表" />
     
   </head>
   <body class="PG_list_product">
-    
-    {{t_layout_headernav $}}
+    <t:layout.headernav />
 
     <div class="container">
-
-      {{t_layout_leftnav $ "CurPage" `/product/list`}}
+      <t:layout.leftnav curPage="/product/list" />
 
       <div class="main_content">
     	<h1>商品列表</h1>
@@ -47,8 +45,9 @@
         </div>
 
         <div class="list_product">
-          
-          {{t_product_list $ "Products" .Products "Source" (print `/product/list/` .Capital) }}
+
+          <t:product.list products=".Products" source="(print `/product/list/` .Capital)" />
+          <hide>{{t_product_list $ "Products" .Products "Source" (print `/product/list/` .Capital) }}</hide>
           
           <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 

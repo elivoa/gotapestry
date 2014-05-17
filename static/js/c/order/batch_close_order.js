@@ -140,7 +140,7 @@
       }
       return $.ajax({
         type: "GET",
-        url: "/order/deliveringunclosedorders.batchclose/" + totalmoney + "/" + this.customerId,
+        url: "/order/deliveringunclosedorders:batchclose/" + totalmoney + "/" + this.customerId,
         dataType: "json",
         success: $.proxy(function(data) {
           this.applyJson(data);

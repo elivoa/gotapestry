@@ -12,14 +12,6 @@
 
         <else/>
 
-        <hide t="----- 批量结款 -----">
-          {{/* ------------------------------------------------------------------------------------
-          <div class="batch_content">
-            {{t_order_batchclose $ "Tid" (print .ClientId "_close") "Class" `btn_b_s` "JSInit" `false` "QuickClearButton" `false`}}
-
-          </div>
-        </hide>
-        
         <table class="tbl_main">
           <tr>
             <th width="10" align="left">
@@ -48,7 +40,7 @@
                   <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">D</span></if>
                   {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
                   <!--<t:output value=".TrackNumber" />
-                      nested components Render order has bugs.-->
+                  nested components Render order has bugs.-->
                   {{.TrackNumber}}
                 </a>
               </td>
@@ -80,7 +72,7 @@
                   <a href="{{$.PrintOrderLink .}}" style="font-weight:bolder;color:green"
                      onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
                   <span class="vline">|</span>
-                  <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
+                  <a href="/order/list:CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
                      onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
                 </if>
 
