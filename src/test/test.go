@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"got/utils"
+	"github.com/elivoa/got/utils"
 	"syd/dal/statdao"
 	"syd/service/orderservice"
 	// "syd/service/personservice"

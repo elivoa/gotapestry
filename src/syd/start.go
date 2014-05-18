@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[start.go] Elivoa @ Sunday, 2014-04-13 00:08:03>
+  Time-stamp: <[start.go] Elivoa @ Sunday, 2014-05-18 13:37:10>
 
   Application Entrance: The New World starts here.
 
@@ -10,8 +10,8 @@ package syd
 
 import (
 	"fmt"
+	"github.com/elivoa/got"
 	"github.com/elivoa/got/config"
-	"got"
 )
 
 // Start collects all module information and call start the system.
@@ -21,18 +21,7 @@ func Start() {
 
 	// Startup-1: register modules. (Do not do others)
 
-	// config.Config.RegisterModulePath
-	// fmt.Println("009")
-	// fmt.Println(SYDModule.Name)
-	// fmt.Println(SYDModule.BasePath)
-	// fmt.Println(SYDModule.PackagePath)
-	// fmt.Println(SYDModule.Description)
-	// fmt.Println(SYDModule.IsStartupModule)
-	// fmt.Println(SYDModule.Register)
-	// fmt.Println("009")
-
 	config.Config.RegisterModule(SYDModule)
-	// config.Config.RegisterModulePath(SYDModule.Path(), "SYDModule", SYDModule.IsStartupModule)
 
 	// start got
 	got.BuildStart() // build and start

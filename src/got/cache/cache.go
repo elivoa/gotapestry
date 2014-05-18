@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Saturday, 2014-05-10 17:49:42>
+  Time-stamp: <[cache.go] Elivoa @ Sunday, 2014-05-18 13:40:34>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -17,9 +17,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/elivoa/got/parser"
+	"github.com/elivoa/got/utils"
 	"got/core"
 	"got/debug"
-	"got/utils"
 	"reflect"
 	"strings"
 	"sync"

@@ -2,8 +2,8 @@ package syd
 
 import (
 	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/utils"
 	"got/core"
-	"got/utils"
 )
 
 // todo: think out a better way to register this.

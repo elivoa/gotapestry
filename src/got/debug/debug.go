@@ -2,7 +2,7 @@ package debug
 
 import (
 	"fmt"
-	"got/utils"
+	"github.com/elivoa/got/utils"
 	"log"
 	"reflect"
 	"runtime/debug"
