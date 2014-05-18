@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/gorilla/context"
+	"github.com/elivoa/got/utils"
 	"net/http"
 	"strings"
 	"syd/dal/userdao"
@@ -35,27 +35,16 @@ var USER_TOKEN_SESSION_KEY string = "USER_TOKEN_SESSION_KEY"
 
 // used in methods.
 func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
-	if userToken := s.GetLogin(w, r); userToken != nil {
+	if userToken := s.GetLogin(w, r); userToken == nil {
+		panic(&exceptions.LoginError{Message: "User not login.", Reason: "some reason"})
+	} else {
 		return userToken
 	}
-	// switch err.(type) {
-	// case error:
-	// 	fmt.Println("1. type is error")
-	// case string:
-	// 	fmt.Println("1. type is string")
-	// case exceptions.LoginError:
-	// 	fmt.Println("1. type is LoginError")
-	// }
-
-	// Note: must not be pointers.
-	panic(&exceptions.LoginError{Message: "User not login.", Reason: "some reason"})
 }
 
 // RequireRole including RequireLogin
 func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role string) *model.UserToken {
-	fmt.Println("********************************************************************************")
 	userToken := s.RequireLogin(w, r)
-
 	lowerRole := strings.ToLower(role)
 	found := false
 	for _, r := range userToken.Roles {
@@ -68,6 +57,7 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 	if found {
 		return userToken
 	} else {
+		fmt.Println("access denied?")
 		panic(&exceptions.AccessDeniedError{Message: "Access Denied."})
 	}
 }
@@ -76,14 +66,18 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 // return true if user is login and login is available.
 // return false if
 func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
-	a1, a2 := context.GetOk(r, USER_TOKEN_SESSION_KEY)
-	fmt.Println("<<<<<<<<<<<<<<<", a1, a2)
-	if userTokenRaw, ok := context.GetOk(r, USER_TOKEN_SESSION_KEY); ok && userTokenRaw != nil {
+	session := utils.Session(r)
+	// { // debug print.
+	// 	fmt.Printf("\t >>>>>>>>>>>>>>>>>>>>>>>>>>> Session.Values: %v\n", session.Values)
+	// 	for k, v := range session.Values {
+	// 		fmt.Printf("key %v --> value: %v\n", k, v)
+	// 	}
+	// }
+	if userTokenRaw, ok := session.Values[USER_TOKEN_SESSION_KEY]; ok && userTokenRaw != nil {
 		if userToken := userTokenRaw.(*model.UserToken); userToken != nil {
 			// TODO: check if userToken is outdated.
 			if outdated := false; !outdated {
 				// TODO: update userToken.Tiemout
-				fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", userToken)
 				return userToken
 			}
 		}
@@ -98,7 +92,7 @@ func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.Us
 			userToken.Username, userToken.Password)
 
 		// if success, update it to session.
-		s.setToSession(r, userToken)
+		s.setToSession(w, r, userToken)
 		return userToken
 	}
 }
@@ -122,20 +116,11 @@ func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error)
 // return username & password pair
 func (s *UserService) loadUserTokenFromCookie(r *http.Request) []string {
 	if c, err := r.Cookie(USER_TOKEN_SESSION_KEY); err == nil {
-
-		// fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-		// fmt.Println("Read from cookie: .", c)
-		// fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-
 		if nil == c {
 			return nil
 		}
 		if splits := strings.Split(c.Value, "|"); len(splits) >= 2 {
 			return splits
-			// return &model.UserToken{
-			// 	Username: splits[0],
-			// 	Password: splits[1],
-			// }
 		}
 	}
 	return nil
@@ -155,7 +140,7 @@ func (s *UserService) Login(username string, password string,
 	user := userdao.GetUserWithCredential(username, password)
 	if nil != user {
 		userToken := user.ToUserToken()
-		s.setToSession(r, userToken)
+		s.setToSession(w, r, userToken)
 		s.setToCookie(w, userToken)
 		return userToken, nil
 	} else {
@@ -164,8 +149,11 @@ func (s *UserService) Login(username string, password string,
 }
 
 // set UserToken to session.
-func (s *UserService) setToSession(r *http.Request, userToken *model.UserToken) {
-	context.Set(r, USER_TOKEN_SESSION_KEY, userToken)
+func (s *UserService) setToSession(w http.ResponseWriter, r *http.Request, userToken *model.UserToken) {
+	session := utils.Session(r)
+	session.Values[USER_TOKEN_SESSION_KEY] = userToken
+	fmt.Printf("\n\nSave to Session \n")
+	session.Save(r, w)
 }
 
 // set UserToken to Cookie.
@@ -186,14 +174,19 @@ func (s *UserService) removeUserCookie(w http.ResponseWriter) {
 	})
 }
 
-func (s *UserService) removeUserTokenSession(r *http.Request) {
-	context.Set(r, USER_TOKEN_SESSION_KEY, nil)
-	context.Delete(r, USER_TOKEN_SESSION_KEY)
+func (s *UserService) removeUserTokenSession(w http.ResponseWriter, r *http.Request) {
+	session := utils.Session(r)
+	session.Values[USER_TOKEN_SESSION_KEY] = nil
+	delete(session.Values, USER_TOKEN_SESSION_KEY)
+	session.Save(r, w)
+
+	// context.Set(r, USER_TOKEN_SESSION_KEY, nil)
+	// context.Delete(r, USER_TOKEN_SESSION_KEY)
 }
 
 func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
 	s.removeUserCookie(w)
-	s.removeUserTokenSession(r)
+	s.removeUserTokenSession(w, r)
 }
 
 // HasRole
