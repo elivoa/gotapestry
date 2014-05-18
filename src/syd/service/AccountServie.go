@@ -53,6 +53,7 @@ func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *mode
 
 // RequireRole including RequireLogin
 func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role string) *model.UserToken {
+	fmt.Println("********************************************************************************")
 	userToken := s.RequireLogin(w, r)
 
 	lowerRole := strings.ToLower(role)
@@ -63,6 +64,7 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 			break
 		}
 	}
+	fmt.Println(found)
 	if found {
 		return userToken
 	} else {
@@ -74,16 +76,14 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 // return true if user is login and login is available.
 // return false if
 func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
-
+	a1, a2 := context.GetOk(r, USER_TOKEN_SESSION_KEY)
+	fmt.Println("<<<<<<<<<<<<<<<", a1, a2)
 	if userTokenRaw, ok := context.GetOk(r, USER_TOKEN_SESSION_KEY); ok && userTokenRaw != nil {
-		// fmt.Printf("======================================\n")
-		// fmt.Println("ok? ", ok)
-		// fmt.Println("rqw? ", userTokenRaw)
-
 		if userToken := userTokenRaw.(*model.UserToken); userToken != nil {
 			// TODO: check if userToken is outdated.
 			if outdated := false; !outdated {
 				// TODO: update userToken.Tiemout
+				fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", userToken)
 				return userToken
 			}
 		}

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2014-05-17 00:50:39>
+   Time-stamp: <[lifecircle-page.go] Elivoa @ Saturday, 2014-05-17 20:52:57>
 */
 package lifecircle
 
@@ -189,6 +189,7 @@ func (lcc *LifeCircleControl) EventCall(result *register.LookupResult) *LifeCirc
 }
 
 func FollowComponentByIds(seg *register.ProtonSegment, componentIds []string) *register.ProtonSegment {
+	fmt.Println("\n7788: alsdjflajsdlfj")
 	current := seg
 	if componentIds != nil {
 		for idx, componentId := range componentIds {

@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle.go] Elivoa @ Monday, 2014-05-12 17:53:16>
+   Time-stamp: <[lifecircle.go] Elivoa @ Saturday, 2014-05-17 18:22:21>
 */
 
 package lifecircle
@@ -263,11 +263,12 @@ func (lcc *LifeCircleControl) PostFlow() (returns *exit.Exit) {
 	if formName != "" {
 		formName = fmt.Sprintf("From%v", formName)
 	}
-	fmt.Println("********************************************************************************")
-	fmt.Println(formName)
+	// fmt.Println("********************************************************************************")
+	// fmt.Println(formName)
 
 	// call OnSubmit() method
 	onSubmitEventName := fmt.Sprintf("%v%v", "OnSubmit", formName)
+	fmt.Println("onSubmitEventName: ", onSubmitEventName)
 	returns = SmartReturn(lcc.page.call(onSubmitEventName))
 	if returns.IsBreakExit() {
 		return

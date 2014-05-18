@@ -1,7 +1,9 @@
 package layout
 
 import (
+	"fmt"
 	"got/core"
+	"syd/service"
 )
 
 // ________________________________________________________________________________
@@ -9,7 +11,17 @@ import (
 //
 type Header struct {
 	core.Component
-	Title string
+	Title  string
+	Public bool
+}
+
+func (c *Header) Setup() {
+	if !c.Public {
+		// verify user role.
+		// 临时加到这里，没登陆是的用户不得查看任何东西。
+		fmt.Println("********************************************************************************")
+		service.User.RequireRole(c.W, c.R, "admin") // TODO remove w, r. use service injection.
+	}
 }
 
 // ________________________________________________________________________________

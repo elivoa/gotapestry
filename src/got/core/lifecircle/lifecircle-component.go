@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-component.go] Elivoa @ Saturday, 2014-05-17 00:59:51>
+   Time-stamp: <[lifecircle-component.go] Elivoa @ Sunday, 2014-05-18 09:58:46>
 */
 package lifecircle
 

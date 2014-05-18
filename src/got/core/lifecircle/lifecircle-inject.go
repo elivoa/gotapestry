@@ -228,32 +228,47 @@ func (lcc *LifeCircleControl) injectHiddenThingsTo(proton core.Protoner) {
 			t = t.Elem()
 		}
 
-		// page injection
-		var tagValue = f.Tag.Get(config.TAG_page_injection)
-		if tagValue != "" {
-
-			if pageObj := CreatePage(lcc.w, lcc.r, t); pageObj != nil {
-				page := pageObj.(core.Pager)
-				page.SetInjected(f.Name, true)
-				v := utils.GetRootValue(proton)
-				fieldValue := v.FieldByName(f.Name)
-				fieldValue.Set(reflect.ValueOf(page))
-			} else {
-				panic(fmt.Sprintf("Can't find registry for type: %s", t))
+		// injection
+		tagInfo := getTagInfo(f.Tag, "inject")
+		if tagInfo != nil {
+			switch tagInfo.TagValue {
+			case "page":
+				if pageObj := CreatePage(lcc.w, lcc.r, t); pageObj != nil {
+					page := pageObj.(core.Pager)
+					page.SetInjected(f.Name, true)
+					v := utils.GetRootValue(proton)
+					fieldValue := v.FieldByName(f.Name)
+					fieldValue.Set(reflect.ValueOf(page)) // set new page into value.
+				} else {
+					panic(fmt.Sprintf("Can't find registry for type: %s", t))
+				}
+			default:
+				panic(fmt.Sprintf("Inject type not supported! %v", tagInfo.TagValue))
 			}
-
-			// if seg := register.GetPage(t); seg != nil {
-			// 	var newlcc = NewPageFlow(lcc.w, lcc.r, seg)
-			// 	var page = newlcc.current.proton
-			// 	page.SetFlowLife(newlcc.current)
-
-			// 	v := utils.GetRootValue(proton)
-			// 	fieldValue := v.FieldByName(f.Name)
-			// 	fieldValue.Set(reflect.ValueOf(page))
-
-			// 	page.SetInjected(f.Name, true)
-			// } else {
 		}
-
 	}
+}
+
+// --------------------------------------------------------------------------------
+func getTagInfo(tag reflect.StructTag, tagName string) *Tag {
+	tagValue := tag.Get(tagName)
+	if tagValue == "" {
+		return nil
+	}
+	tagValue = strings.TrimSpace(tagValue)
+	tagValues := strings.Split(tagValue, " ")
+	taginfo := &Tag{TagName: tagName}
+	if tagValues != nil && len(tagValues) > 0 {
+		taginfo.TagValue = tagValues[0]
+		if len(tagValues) > 1 {
+			taginfo.Feature = tagValues[1:]
+		}
+	}
+	return taginfo
+}
+
+type Tag struct {
+	TagName  string
+	TagValue string
+	Feature  []string
 }

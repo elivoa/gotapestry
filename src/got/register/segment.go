@@ -142,6 +142,7 @@ func (s *ProtonSegment) Module() *core.Module {
 //   order, list
 //   order, orderlist
 //   order/create/OrderCreateDetail
+// TODO: alias not correct.
 //
 func (s *ProtonSegment) Add(si *parser.StructInfo, p core.Protoner) (selectors [][]string) {
 

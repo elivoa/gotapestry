@@ -1,5 +1,5 @@
 /*
-   Time-stamp: <[lifecircle-return.go] Elivoa @ Monday, 2014-05-12 17:56:10>
+   Time-stamp: <[lifecircle-return.go] Elivoa @ Saturday, 2014-05-17 21:00:53>
 */
 package lifecircle
 
@@ -125,12 +125,10 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 		lcc.return_text("text/plain", r.Value)
 	case "json":
 		lcc.return_text("text/json", r.Value)
-
 	case "redirect":
 		// TODO: support redirect to page.
 		// debuglog("-904- [route:return] redirect to '%v'", url)
 		http.Redirect(lcc.w, lcc.r, r.Value.(string), http.StatusFound)
-
 	case "forward":
 		// Now only support forward to page.
 		// TODO suppport forward to an URL.
@@ -138,11 +136,11 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 		if page, ok := r.Value.(core.Pager); ok {
 			// Forward to a page object, render this page as pager.
 			if pageflowLogger.Debug() {
-				pageflowLogger.Printf("Page forward to PageInstance. %s", page)
+				pageflowLogger.Printf("[Forward] Page forward to PageInstance. %s", page)
 			}
 			if pagelife, ok := page.FlowLife().(*Life); ok {
 				if pageflowLogger.Trace() {
-					pageflowLogger.Printf("Page's Life is %s", pagelife)
+					pageflowLogger.Printf("[Forward] Page's Life is %s", pagelife)
 				}
 				// page flow
 				newlcc := pagelife.control
@@ -150,7 +148,7 @@ func (lcc *LifeCircleControl) HandleBreakReturn() {
 				newlcc.PageFlow()
 			} else {
 				debug.DebugPrintVariable(pagelife)
-				panic("can't find life")
+				panic(">>>> can't find life")
 			}
 
 		} else if str, ok := r.Value.(string); ok {
@@ -172,17 +170,7 @@ func (lcc *LifeCircleControl) return_text(contentType string, value interface{})
 	// now we only return 1 result.
 	lcc.w.Header().Add("content-type", contentType)
 	lcc.w.Write([]byte(fmt.Sprint(value)))
-
 	// TODO struct to json
-
-	// // write text
-	// switch v.Kind() {
-	// case reflect.Slice, reflect.Array:
-	// 	// only support byte slice
-	// 	lcc.W.Write(v.Bytes())
-	// case reflect.String:
-	// 	lcc.W.Write([]byte(v.String()))
-	// }
 }
 
 // TODO reflect utils.
