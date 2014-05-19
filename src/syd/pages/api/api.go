@@ -32,12 +32,8 @@ func (p *Api) Setup() (string, string) {
 
 	case "product":
 		product := productservice.GetProduct(p.Param1)
-		// fmt.Println("********************************************************************************")
-		// fmt.Println(product)
-		// fmt.Println(product.Colors)
-		// fmt.Println(product.Sizes)
 		return toJson(product)
-
+		
 	case "customer_price":
 		return "json", getCustomerPrice(p.Param1, p.Param2)
 	}

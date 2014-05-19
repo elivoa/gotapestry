@@ -45,7 +45,7 @@
           <t:order.DetailsForm />
 
           <!-- times -->
-          <ul>
+          <ul style="margin:4px;padding:8px;border:solid 1px #ddd">
             <li>订单创建时间：{{.Order.CreateTime | prettytime}}</li>
             <li>订单修改时间：{{.Order.UpdateTime | prettytime}}</li>
             <if t='.Order.StatusIs "Closed"'>

@@ -52,6 +52,16 @@
       return $("#" + this.tid).html(this.html);
     };
 
+    ProductColorSizeTableGenerator.prototype.getTotalSizes = function() {
+      var total;
+      console.log("Get total sizes.");
+      total = 0;
+      $("#" + this.tid + " .stock").each(function(index, data) {
+        return total += parseInt($(data).val());
+      });
+      return total;
+    };
+
     return ProductColorSizeTableGenerator;
 
   })();

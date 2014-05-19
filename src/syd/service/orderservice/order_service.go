@@ -27,6 +27,7 @@ type OrderDetailJson struct {
 // todo rename
 type ProductDetalJsonStruct struct {
 	Id           int             `json:"id"` // product id
+	ProductId    string          `json:"pid"`
 	Name         string          `json:"name"`
 	SellingPrice float64         `json:"price"`
 	ProductPrice float64         `json:"productPrice"`
@@ -235,6 +236,7 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 
 				jsonStruct = &ProductDetalJsonStruct{
 					Id:           product.Id,
+					ProductId:    product.ProductId,
 					Name:         product.Name,
 					SellingPrice: detail.SellingPrice,
 					ProductPrice: product.Price,

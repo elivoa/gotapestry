@@ -26,6 +26,7 @@ class OrderCreateDetail
     @ops.onAddToOrder = $.proxy (product) ->
       success = false
       console.log "isedit is", @ops.isEdit
+      console.log product
       if @ops.isEdit
         success = @odf.editProduct product
       else

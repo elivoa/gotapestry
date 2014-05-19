@@ -19,6 +19,7 @@
         var success;
         success = false;
         console.log("isedit is", this.ops.isEdit);
+        console.log(product);
         if (this.ops.isEdit) {
           success = this.odf.editProduct(product);
         } else {

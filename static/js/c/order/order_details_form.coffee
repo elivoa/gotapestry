@@ -39,9 +39,9 @@ class OrderDetailsForm
     return true
 
   setData:(json) ->
-    console.log typeof json
+    # console.log json
     @data = json
-    console.log typeof @data
+    # console.log typeof @data
     @refreshOrderForm()
 
   # generate the whole order form
@@ -112,10 +112,10 @@ class OrderDetailsForm
     htmls = []
     htmls.push "<tr>"
     htmls.push "  <td valign='top' rowspan='#{nquantity}'>" # 货号
-    htmls.push "    #{json.id}"
+    htmls.push "    #{json.pid}"
     htmls.push "  </td>"
     htmls.push "  <td valign='top' rowspan='#{nquantity}'>" # 商品名称
-    htmls.push "    <strong>#{json.name}</strong>"
+    htmls.push "    <strong><a href='/product/detail/#{json.id}' target='_blank'>#{json.name}</a></strong>"
     htmls.push "    <input type='hidden' name='Order.Details.ProductId' value='#{json.id}' />"
     htmls.push "    <input type='hidden' name='Order.Details.SellingPrice' value='#{json.price}' />"
     htmls.push "    <input type='hidden' name='Order.Details.Color' value='#{quantities[0][0]}' />"
@@ -161,6 +161,7 @@ class OrderDetailsForm
   addTestData:->
     testproduct = {
       id:1,
+      pid:2233,
       name:"绣虎头",
       price:138,
       productPrice : 120,

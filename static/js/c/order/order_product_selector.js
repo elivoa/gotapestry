@@ -74,6 +74,7 @@
           if (data) {
             newproduct = {
               id: data.Id,
+              pid: data.ProductId,
               name: data.Name,
               productPrice: data.Price,
               colors: data.Colors,
@@ -110,10 +111,8 @@
     };
 
     OrderProductSelector.prototype.refreshContent = function() {
-      var pcstg;
-      console.log('refresh content, ', this.product);
       if (this.product.colors !== null && this.product.sizes !== null) {
-        pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes, "cs-container");
+        this.pcstg = new ProductCSTableGenerator(this.product.colors, this.product.sizes, "cs-container");
       } else {
         $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
       }
@@ -149,9 +148,16 @@
     };
 
     OrderProductSelector.prototype.onAddToOrderClick = function(e) {
+      var total;
       e.preventDefault();
       if (!this.sc.selection) {
         alert("请先输入产品!");
+        return;
+      }
+      console.log(">>>>>>>>>>> ", this.pcstg.getTotalSizes());
+      total = this.pcstg.getTotalSizes();
+      if (isNaN(total) || total <= 0) {
+        alert("必须输入数量");
         return;
       }
       if (this.onAddToOrder) {

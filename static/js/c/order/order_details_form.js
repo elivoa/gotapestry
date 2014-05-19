@@ -39,9 +39,7 @@
     };
 
     OrderDetailsForm.prototype.setData = function(json) {
-      console.log(typeof json);
       this.data = json;
-      console.log(typeof this.data);
       return this.refreshOrderForm();
     };
 
@@ -134,10 +132,10 @@
       htmls = [];
       htmls.push("<tr>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
-      htmls.push("    " + json.id);
+      htmls.push("    " + json.pid);
       htmls.push("  </td>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
-      htmls.push("    <strong>" + json.name + "</strong>");
+      htmls.push("    <strong><a href='/product/detail/" + json.id + "' target='_blank'>" + json.name + "</a></strong>");
       htmls.push("    <input type='hidden' name='Order.Details.ProductId' value='" + json.id + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.SellingPrice' value='" + json.price + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.Color' value='" + quantities[0][0] + "' />");
@@ -185,6 +183,7 @@
       var testproduct;
       testproduct = {
         id: 1,
+        pid: 2233,
         name: "绣虎头",
         price: 138,
         productPrice: 120,

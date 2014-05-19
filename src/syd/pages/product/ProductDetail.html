@@ -11,13 +11,14 @@
 
       {{with .Product}}
       <div class="main_content">
-    	<h1>商品详情</h1>
+    	<h1>商品详情 <span><a href="/product/edit/{{.Id}}?referer=view">编辑</a></span> </h1>
+
 		<div class="B_prd clearfix">
 		  <div class="B_prd_img">
 			<img src="{{$.Picture 0}}"><!-- TODO how to template slice -->
 		  </div>
 		  <div class="B_prd_info">
-			<h2>{{.Name}}</h2>
+			<h2>{{.Name}} (TODO Use angular js to implement this.)</h2>
 			<p>单价：<strong class="price">{{.Price}}</strong>元</p>
 			<p>颜色：{{range .Colors}} {{.}}, {{end}}</p>
 			<p>尺码：{{range .Sizes}} {{.}}, {{end}}</p>

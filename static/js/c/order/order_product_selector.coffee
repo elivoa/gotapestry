@@ -99,6 +99,7 @@ class OrderProductSelector
         if data
           newproduct = {
             id: data.Id
+            pid: data.ProductId
             name: data.Name
             productPrice: data.Price
             colors: data.Colors
@@ -138,10 +139,9 @@ class OrderProductSelector
 
   ## ________________________________________
   refreshContent: ()->
-    console.log 'refresh content, ', @product
     # 1/3 update cstable
     if @product.colors!= null && @product.sizes != null
-      pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes, "cs-container")
+      @pcstg = new ProductCSTableGenerator(@product.colors, @product.sizes, "cs-container")
     else
       $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!")
 
@@ -169,13 +169,20 @@ class OrderProductSelector
         if o != undefined
           o.val q[2]
 
-
   ## ________________________________________
   ## Data part, extract productjson from web. including stocks.
   onAddToOrderClick:(e) ->
     e.preventDefault()
+
+    # 检查是否有选择商品。
     if not @sc.selection
       alert "请先输入产品!"
+      return
+    # 检查是否有填写数量。
+    console.log ">>>>>>>>>>> ", @pcstg.getTotalSizes()
+    total = @pcstg.getTotalSizes()
+    if isNaN(total) or total<=0
+      alert "必须输入数量"
       return
     @onAddToOrder @extractProductJson() if @onAddToOrder
 
@@ -200,7 +207,6 @@ class OrderProductSelector
         value = parseInt strValue
       @product.quantity.push([csinfo[0], csinfo[1], value])
     ,@ #}
-
     return @product
 
   ## ________________________________________

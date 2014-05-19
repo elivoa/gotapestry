@@ -1,5 +1,6 @@
 ################################################################################
 # product color-size table generator
+# TODO: use angularjs to rewrite this.
 ################################################################################
 
 window.ProductCSTableGenerator =
@@ -46,3 +47,9 @@ class ProductColorSizeTableGenerator
     # append to container
     $("##{@tid}").html(@html)
 
+  getTotalSizes: ->
+    console.log "Get total sizes."
+    total = 0
+    $("##{@tid} .stock").each (index, data)->
+      total += parseInt($(data).val())
+    return total
