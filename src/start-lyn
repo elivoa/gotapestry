@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Before everything, I need to change gopath"
+export GOPATH=/root/syd-lyn:$GOPATH
+echo "GOPATH = " $GOPATH
+./start
