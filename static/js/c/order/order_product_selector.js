@@ -39,7 +39,6 @@
         input = $("<input type='text' style='width:40px;'>");
         input.val(this.product.price);
         input.blur($.proxy(function(e) {
-          console.log('blur');
           this.product.price = e.target.value;
           return this.updatePriceDisplay();
         }, this));
@@ -154,7 +153,6 @@
         alert("请先输入产品!");
         return;
       }
-      console.log(">>>>>>>>>>> ", this.pcstg.getTotalSizes());
       total = this.pcstg.getTotalSizes();
       if (isNaN(total) || total <= 0) {
         alert("必须输入数量");

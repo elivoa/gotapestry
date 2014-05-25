@@ -21,11 +21,12 @@ var SYDModule = &core.Module{
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
 		c.AddStaticResource("/static/", "../static/") // TODO: test this, is this works now?
 
-		c.Port = 8080
-		c.DBPort = 3306
-		c.DBName = "syd"
-		c.DBUser = "root"
-		c.DBPassword = "eserver409$)("
+		// TODO: 不能放到这里。我需要启动两个同样的
+		// c.Port = 8080
+		// c.DBPort = 3306
+		// c.DBName = "syd"
+		// c.DBUser = "root"
+		// c.DBPassword = "eserver409$)("
 
 	},
 }

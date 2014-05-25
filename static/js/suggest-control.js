@@ -40,7 +40,9 @@
 
     SuggestControl.prototype.init = function() {
       var _;
-      console.log('init suggest');
+      if (console) {
+        console.log('init suggest');
+      }
       _ = this;
       this.params = {
         serviceUrl: "/api/suggest/" + _.param.category,
@@ -79,11 +81,9 @@
 
     SuggestControl.prototype._setSelection = function(id, name, obj) {
       var parent;
-      console.log(id, name, obj);
       if (obj) {
         parent = $(obj).parents(this.param["parentClass"]);
       } else {
-        console.log;
         parent = $(this.param["parentClass"]);
       }
       parent.find(this.param["hiddenClass"]).val(id);
@@ -95,13 +95,11 @@
     };
 
     SuggestControl.prototype.onClick = function(e) {
-      console.log("register" + e.target);
       this.register(e.target);
       return $(e.target).off(e);
     };
 
     SuggestControl.prototype.register = function(displayInput) {
-      console.log("bind" + displayInput);
       return $(displayInput).autocomplete(this.params);
     };
 

@@ -35,7 +35,6 @@ class EditableTable
     @registerEvent()
 
   registerEvent: ->
-    # console.log "register object id is: #{@id}"
     _=@
 
     $("##{@id} #{@config.mtAddButton}").on "click", $.proxy @addline,@

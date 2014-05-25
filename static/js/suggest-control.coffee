@@ -35,7 +35,7 @@ class SuggestControl
       @param[key] = defaultValue
 
   init: ()-> # this params is plugins' params
-    console.log 'init suggest'
+    console.log 'init suggest' if console
 
     _ = @
     @params = {
@@ -71,11 +71,9 @@ class SuggestControl
 
   # set selection
   _setSelection: (id, name, obj) ->
-    console.log id, name, obj
     if obj
       parent = $(obj).parents(@param["parentClass"])
     else
-      console.log
       parent = $(@param["parentClass"])
     parent.find(@param["hiddenClass"]).val(id)
     parent.find(@param["triggerClass"]).val(name)
@@ -86,13 +84,11 @@ class SuggestControl
 
   # onClick method on display input box.
   onClick: (e) -> # no use
-    console.log "register" + e.target
     @register(e.target)
     $(e.target).off(e)
 
   # register display input.
   register: (displayInput)->
-    console.log "bind" + displayInput
     $(displayInput).autocomplete(@params)
 
   # register display input.
@@ -104,8 +100,6 @@ class SuggestControl
     return value.substr(value.indexOf("||") + 2)
 
 
-# console.log suggestion
-# console.log currentValue
 #reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g'),
 #pattern = '(' + currentValue.replace(reEscape, '\\$1') + ')';
 #return ">>> " + suggestion.value.replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>')

@@ -189,7 +189,6 @@
       category: "product",
       onSelect: function(line, suggestion) {
         var customerId, productId, url;
-        console.log(suggestion);
         productId = suggestion.data;
         customerId = $(".suggest-id").val();
         url = "/api/customer_price/" + customerId + "/" + productId;
@@ -213,7 +212,6 @@
     sc.init();
     omd = new OrderManageDetails();
     return omd.onAdd = function(line) {
-      console.log("----> register line");
       console.log(line);
       return sc.registerLine(line);
     };

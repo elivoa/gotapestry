@@ -48,8 +48,9 @@ class ProductColorSizeTableGenerator
     $("##{@tid}").html(@html)
 
   getTotalSizes: ->
-    console.log "Get total sizes."
     total = 0
     $("##{@tid} .stock").each (index, data)->
-      total += parseInt($(data).val())
+      count = parseInt($(data).val())
+      if count>0
+        total += count
     return total

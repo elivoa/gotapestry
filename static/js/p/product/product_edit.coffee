@@ -25,8 +25,6 @@ class ProductEdit
     this.init()
 
   init: ->
-    # console.log "init ProductEdit page!!!"
-
     ## Enable Color multiline table
     colorMT = new EditableTable(@colorId)
     colorMT.onRemoveLastLine = (line) ->
@@ -58,7 +56,6 @@ class ProductEdit
     [@colors, @sizes] = @readColorSizes()
     pcstg = new ProductCSTableGenerator(@colors, @sizes, @csqTableId)
     # restore stock number.
-    console.log @stockcache
     @fillProductQuantity()
 
   onCSQTableRefresh: ->

@@ -47,7 +47,6 @@
       var pcstg, _ref;
       _ref = this.readColorSizes(), this.colors = _ref[0], this.sizes = _ref[1];
       pcstg = new ProductCSTableGenerator(this.colors, this.sizes, this.csqTableId);
-      console.log(this.stockcache);
       return this.fillProductQuantity();
     };
 

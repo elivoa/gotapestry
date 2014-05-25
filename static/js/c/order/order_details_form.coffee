@@ -8,9 +8,6 @@ class OrderDetailsForm
   constructor:(hideOperation) ->
     @containerClass = ".order-form-container"
     @hideOperation = if hideOperation != undefined then hideOperation else false
-    console.log hideOperation
-    console.log @hideOperation
-
     @onDelete = @defaultOnDelete # delete line callback
     @onEdit # edit line callback
 
@@ -41,7 +38,6 @@ class OrderDetailsForm
   setData:(json) ->
     # console.log json
     @data = json
-    # console.log typeof @data
     @refreshOrderForm()
 
   # generate the whole order form
@@ -94,7 +90,7 @@ class OrderDetailsForm
     delete @data.products[product.id]
     idx = @data.order.indexOf(product.id)
     if idx>=0
-      console.log @data.order.splice(idx, 1)
+      console.log @data.order.splice(idx, 1) if console
     @refreshOrderForm()
 
   updateSummary:(sumQuantity, sumPrice) ->

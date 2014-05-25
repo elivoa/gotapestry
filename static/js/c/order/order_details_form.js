@@ -6,8 +6,6 @@
     function OrderDetailsForm(hideOperation) {
       this.containerClass = ".order-form-container";
       this.hideOperation = hideOperation !== void 0 ? hideOperation : false;
-      console.log(hideOperation);
-      console.log(this.hideOperation);
       this.onDelete = this.defaultOnDelete;
       this.onEdit;
       this.data = {
@@ -106,7 +104,9 @@
       delete this.data.products[product.id];
       idx = this.data.order.indexOf(product.id);
       if (idx >= 0) {
-        console.log(this.data.order.splice(idx, 1));
+        if (console) {
+          console.log(this.data.order.splice(idx, 1));
+        }
       }
       return this.refreshOrderForm();
     };

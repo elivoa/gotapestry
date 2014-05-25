@@ -25,8 +25,6 @@ class OrderCreateDetail
 
     @ops.onAddToOrder = $.proxy (product) ->
       success = false
-      console.log "isedit is", @ops.isEdit
-      console.log product
       if @ops.isEdit
         success = @odf.editProduct product
       else
@@ -37,9 +35,7 @@ class OrderCreateDetail
     ,@
 
     @odf.onEdit = $.proxy (product)->
-      console.log "Edit Product: ", product
       @ops.refresh product
-      console.log "set isedit ", true
       @ops.setEdit true
     ,@
 

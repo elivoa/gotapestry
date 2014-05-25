@@ -50,7 +50,6 @@ class OrderProductSelector
       input = $("<input type='text' style='width:40px;'>")
       input.val(@product.price)
       input.blur $.proxy (e)->
-        console.log 'blur'
         @product.price = e.target.value
         @updatePriceDisplay()
         ## ...
@@ -179,7 +178,6 @@ class OrderProductSelector
       alert "请先输入产品!"
       return
     # 检查是否有填写数量。
-    console.log ">>>>>>>>>>> ", @pcstg.getTotalSizes()
     total = @pcstg.getTotalSizes()
     if isNaN(total) or total<=0
       alert "必须输入数量"

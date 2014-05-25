@@ -3,7 +3,6 @@
 window.OrderDeliverButton =
 class OrderDeliverButton
   constructor:(param) ->
-    console.log param
     @param = param
     if not param
       @param={
@@ -54,8 +53,6 @@ class OrderDeliverButton
         "Tab" : "all"
       }
       success: (data)->
-        console.log "success"
-        console.log data
         @m.modal('hide')
       error: ()->
         console.log "error occured"

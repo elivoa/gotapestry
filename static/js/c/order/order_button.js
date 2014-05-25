@@ -4,7 +4,6 @@
 
   window.OrderDeliverButton = OrderDeliverButton = (function() {
     function OrderDeliverButton(param) {
-      console.log(param);
       this.param = param;
       if (!param) {
         this.param = {
@@ -47,8 +46,6 @@
           "Tab": "all"
         },
         success: function(data) {
-          console.log("success");
-          console.log(data);
           return this.m.modal('hide');
         },
         error: function() {

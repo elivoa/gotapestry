@@ -54,10 +54,13 @@
 
     ProductColorSizeTableGenerator.prototype.getTotalSizes = function() {
       var total;
-      console.log("Get total sizes.");
       total = 0;
       $("#" + this.tid + " .stock").each(function(index, data) {
-        return total += parseInt($(data).val());
+        var count;
+        count = parseInt($(data).val());
+        if (count > 0) {
+          return total += count;
+        }
       });
       return total;
     };

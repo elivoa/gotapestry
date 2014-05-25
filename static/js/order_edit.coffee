@@ -179,7 +179,6 @@ $ ->
     hiddenClass : ".product-id"
     category : "product"
     onSelect : (line, suggestion) ->
-      console.log suggestion
       productId = suggestion.data
 
       # get customer id. TODO bad design
@@ -203,6 +202,5 @@ $ ->
   # Add/remove OrderDetails line
   omd = new OrderManageDetails()
   omd.onAdd = (line) ->
-    console.log "----> register line"
     console.log line
     sc.registerLine(line)
