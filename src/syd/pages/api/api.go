@@ -8,8 +8,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/debug"
 	"got/core"
-	"got/debug"
 	"syd/dal"
 	"syd/dal/productdao"
 	"syd/service/personservice"
@@ -33,7 +33,7 @@ func (p *Api) Setup() (string, string) {
 	case "product":
 		product := productservice.GetProduct(p.Param1)
 		return toJson(product)
-		
+
 	case "customer_price":
 		return "json", getCustomerPrice(p.Param1, p.Param2)
 	}

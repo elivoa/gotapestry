@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/debug"
 	"got/core"
-	"got/debug"
 	"syd/service/suggest"
 )
 

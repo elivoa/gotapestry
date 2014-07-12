@@ -1,12 +1,12 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Wednesday, 2013-08-21 00:33:50>
+  Time-stamp: <[suggest.go] Elivoa @ Saturday, 2014-07-12 11:27:23>
 */
 package suggest
 
 import (
 	"errors"
 	"fmt"
-	"got/debug"
+	"github.com/elivoa/got/debug"
 	"strings"
 	"syd/dal/persondao"
 	"syd/dal/productdao"

@@ -74,7 +74,7 @@ func (p *OrderCreateDetail) Setup() {
 }
 
 // before inject submit values, init fields.
-func (p *OrderCreateDetail) OnSubmit() {
+func (p *OrderCreateDetail) OnPrepareForSubmit() {
 	if p.Id == nil {
 		// if create
 		p.Order = model.NewOrder()

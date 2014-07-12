@@ -3,9 +3,9 @@ package product
 import (
 	"bytes"
 	"fmt"
-	"got/core"
-	"got/debug"
+	"github.com/elivoa/got/debug"
 	"github.com/elivoa/got/route"
+	"got/core"
 	"html/template"
 	"syd/dal"
 	"syd/model"

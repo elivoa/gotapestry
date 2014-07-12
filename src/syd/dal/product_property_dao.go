@@ -1,11 +1,10 @@
-// refactored.
 package dal
 
 import (
 	"fmt"
 	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/debug"
 	_ "github.com/go-sql-driver/mysql"
-	"got/debug"
 )
 
 // Set customer private price, panic if any error occurs.

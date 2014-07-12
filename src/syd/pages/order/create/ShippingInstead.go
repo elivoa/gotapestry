@@ -112,7 +112,7 @@ func (p *ShippingInstead) Accumulated() float64 {
 
 // before submit, here url injection is ready but post data is not
 // injected. we get order from db.
-func (p *ShippingInstead) OnSubmit() {
+func (p *ShippingInstead) OnPrepareForSubmit() {
 	var err error
 	if p.Order, err = orderservice.GetOrderByTrackingNumber(p.TrackNumber); err != nil {
 		panic(err.Error())

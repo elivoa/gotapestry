@@ -6,6 +6,7 @@ import (
 	"syd/dal/statdao"
 	"syd/service/orderservice"
 	// "syd/service/personservice"
+	"elivoa/carfilm/dal/userdao"
 	"syd/dal/persondao"
 	"syd/service/statservice"
 	"time"
@@ -16,15 +17,22 @@ func main() {
 	// end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0)
 	// start := end.AddDate(0, 0, 1)
 
-	for i := 0; i < 20; i++ {
-		testLoad3()
-		time.Sleep(time.Microsecond * 500)
-	}
+	userdao.ListUserByIdSet(1, 3, 4)
 
-	fmt.Println("first call done!")
+	fmt.Println("----------------------------------------------------------------------------------------------------")
+	fmt.Println(time.Now())
+	var t time.Time
+	fmt.Println(t)
+	fmt.Println(utils.ValidTime(time.Now()))
+	// for i := 0; i < 20; i++ {
+	// 	testLoad3()
+	// 	time.Sleep(time.Microsecond * 500)
+	// }
 
-	fmt.Println("Waiting 2 seconds...")
-	time.Sleep(time.Second * 8)
+	// fmt.Println("first call done!")
+
+	// fmt.Println("Waiting 2 seconds...")
+	// time.Sleep(time.Second * 8)
 }
 
 func testLoad3() {

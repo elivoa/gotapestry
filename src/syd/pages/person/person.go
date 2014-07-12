@@ -91,7 +91,7 @@ func (p *PersonEdit) Setup() {
 	}
 }
 
-func (p *PersonEdit) OnSubmit() {
+func (p *PersonEdit) OnPrepareForSubmit() {
 	if p.Id != nil {
 		p.Person = personservice.GetPerson(p.Id.Int)
 	} else {

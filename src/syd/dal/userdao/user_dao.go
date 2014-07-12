@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"syd/model"
 	"time"
+	"syd/model"
 )
 
 // create a new entity.

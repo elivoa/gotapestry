@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Sunday, 2014-05-18 13:40:34>
+  Time-stamp: <[cache.go] Elivoa @ Saturday, 2014-07-12 13:26:48>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -16,10 +16,10 @@ package cache
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/debug"
 	"github.com/elivoa/got/parser"
 	"github.com/elivoa/got/utils"
 	"got/core"
-	"got/debug"
 	"reflect"
 	"strings"
 	"sync"
@@ -264,7 +264,12 @@ func (c *Cache) String() string {
 		fmt.Sprintf("  +  struct cached %v items.", len(c.m)),
 	}
 	for k, v := range c.m {
-		str = append(str, fmt.Sprintf("   : %-20v --> %v", k, v))
+		str = append(str, fmt.Sprintf("   : %-20v --> %d", k, len(v.Fields)))
+		if len(v.Fields) > 0 {
+			for key, field := range v.Fields {
+				str = append(str, fmt.Sprintf("        %-10s --> %v", key, field.Name))
+			}
+		}
 	}
 	c.l.Unlock()
 	return strings.Join(str, "\n")

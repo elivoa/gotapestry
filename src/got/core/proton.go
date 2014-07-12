@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -45,6 +46,13 @@ type Protoner interface {
 	// attached *plifecircle.Life
 	FlowLife() interface{}        // used to store *lifecircle.Life
 	SetFlowLife(life interface{}) // set *lifecircle.Life into page.
+
+	// for componenter
+	SetInformalParameters(ips *InformalParameters)
+	AddInformalParameter(key string, value interface{}) int
+	InformalParameters() *InformalParameters
+	InformalParameter(key string) interface{}
+	InformalParameterString() string
 }
 
 // A Proton is a Page, Component or Mixins.
@@ -58,8 +66,22 @@ type Proton struct {
 
 	injected map[string]bool     // field that successfully injected
 	embed    map[string]Protoner // embed components [id -> protoner]
+	flowlife interface{}         // should be *lifecircle.Life
 
-	flowlife interface{} // should be *lifecircle.Life
+	// for component only
+	informalParameters *InformalParameters // map[string]interface{}
+}
+
+type InformalParameters struct {
+	Order []string
+	Data  map[string]interface{}
+}
+
+func NewInformalParameters() *InformalParameters {
+	return &InformalParameters{
+		Order: []string{},
+		Data:  map[string]interface{}{},
+	}
 }
 
 func (p *Proton) FlowLife() interface{} {
@@ -111,13 +133,6 @@ func (p *Proton) SetInjected(fieldName string, b bool) {
 
 // }
 
-// TEST: should be deleted
-func (p *Proton) ShowInjected() {
-	for k, v := range p.injected {
-		fmt.Printf(" %v --> %v\n", k, v)
-	}
-}
-
 func (p *Proton) Embed(name string) (Protoner, bool) {
 	proton, ok := p.embed[name]
 	fmt.Println("\t&&&&&&&&&&&&&&&&")
@@ -163,4 +178,53 @@ func (p *Proton) CID() string {
 
 func (p *Proton) SetId(id string) {
 	p.Tid = id
+}
+
+// SetInformalParameters(ips *InformalParameters)
+// AddInformalParameter(key string, value interface{}) int
+// InformalParameters() *InformalParameters
+// InformalParameter(key string) interface{}
+
+// for componenter
+func (c *Proton) SetInformalParameters(ips *InformalParameters) {
+	c.informalParameters = ips
+}
+
+func (c *Proton) AddInformalParameter(key string, value interface{}) int {
+	if nil == c.informalParameters {
+		c.informalParameters = NewInformalParameters()
+	}
+	c.informalParameters.Data[key] = value
+	c.informalParameters.Order = append(c.informalParameters.Order, key)
+	return len(c.informalParameters.Data)
+}
+
+func (c *Proton) InformalParameters() *InformalParameters {
+	return c.informalParameters
+}
+
+func (c *Proton) InformalParameter(key string) interface{} {
+	if nil != c.informalParameters {
+		return c.informalParameters.Data[key]
+	}
+	return nil
+}
+
+// TODO ordered.
+func (c *Proton) InformalParameterString() string {
+	var buffer bytes.Buffer
+	if nil != c.informalParameters {
+		for key, value := range c.informalParameters.Data {
+			buffer.WriteString(fmt.Sprintf("%s=\"%v\" ", key, value))
+		}
+	}
+	return buffer.String()
+}
+
+// ----------------------------------------------------------------------------------------------------
+// TEST: should be deleted
+func (p *Proton) ShowInjected() {
+	for k, v := range p.injected {
+		fmt.Printf(" %v --> %v\n", k, v)
+	}
 }

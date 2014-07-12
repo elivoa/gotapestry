@@ -12,6 +12,7 @@ import (
 */
 type Module struct {
 	Name            string // seems no use.
+	Version         string // Application version.
 	VarName         string // module name, should be the same with struct name.
 	BasePath        string // full file path of this module. e.g.: /Users/xxx/src/
 	PackagePath     string // package path. e.g.: /module
@@ -35,6 +36,7 @@ func (m *Module) String() string {
 /* Example */
 var ___Example_Module___ Module = Module{
 	Name:            "syd",
+	Version:         "1.0",
 	VarName:         "SYDModule",
 	BasePath:        "/Users/bogao/develop/gitme/gotapestry/src",
 	PackagePath:     "syd",
