@@ -1,5 +1,5 @@
 /*
-  Time-stamp: <[cache.go] Elivoa @ Saturday, 2014-07-12 13:26:48>
+  Time-stamp: <[cache.go] Elivoa @ Sunday, 2014-07-13 18:07:30>
   Cache Page/Component Struct info.
   And Component/mixins neasted info.
 
@@ -114,6 +114,24 @@ func (c *Cache) GetPageX(rt reflect.Type) *StructInfo {
 
 func (c *Cache) GetComopnentX(rt reflect.Type) *StructInfo {
 	return c.GetCreate(rt, core.COMPONENT)
+}
+
+// Type must be struct. Other type has no meanings.
+func (c *Cache) GetStructInfo(rt reflect.Type) *StructInfo {
+	// 1. prepare
+	t, _ := utils.RemovePointer(rt, true) // remove ptr and slice of type
+	if t.Kind() != reflect.Struct {
+		panic(fmt.Sprintf("[got/cache]: %v must be struct.", rt))
+	}
+
+	// 2. get and return
+	c.l.RLock()
+	si := c.m[t]
+	c.l.RUnlock()
+	if si != nil {
+		return si
+	}
+	return nil
 }
 
 // Type must be struct. Other type has no meanings.

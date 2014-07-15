@@ -271,7 +271,7 @@ func ListOrder(status string) ([]*model.Order, error) {
 	}
 	query = parser.
 		Or("type", model.Wholesale, model.ShippingInstead).
-		OrderBy("create_time desc")
+		OrderBy("create_time", db.DESC)
 	return _listOrder(query)
 }
 
@@ -281,13 +281,13 @@ func ListOrderPager(status string, limit int, n int) ([]*model.Order, error) {
 	if status == "all" {
 		query = em.Select().Where().
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc").
+			OrderBy("create_time", db.DESC).
 			Limit(limit, n)
 	} else {
 		query = em.Select().
 			Where("status", status).
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc").
+			OrderBy("create_time", db.DESC).
 			Limit(limit, n)
 	}
 	return _listOrder(query)
@@ -296,10 +296,10 @@ func ListOrderPager(status string, limit int, n int) ([]*model.Order, error) {
 func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, error) {
 	var query *db.QueryParser
 	if status == "all" {
-		query = em.Select().Where().And("type", orderType).OrderBy("create_time desc")
+		query = em.Select().Where().And("type", orderType).OrderBy("create_time", db.DESC)
 	} else {
 		query = em.Select().
-			Where("status", status).And("type", orderType).OrderBy("create_time desc")
+			Where("status", status).And("type", orderType).OrderBy("create_time", db.DESC)
 	}
 	return _listOrder(query)
 }
@@ -334,7 +334,7 @@ func ListOrderByCustomer(personId int, status string, limit int, n int) ([]*mode
 	var query *db.QueryParser
 	query = parser.And("customer_id", personId).
 		Or("type", model.Wholesale, model.ShippingInstead).
-		OrderBy("create_time desc").
+		OrderBy("create_time", db.DESC).
 		Limit(limit, n)
 	return _listOrder(query)
 }
@@ -345,12 +345,12 @@ func ListOrderByCustomerToday(personId int, status string) ([]*model.Order, erro
 	if status == "all" {
 		query = em.Select().Where("customer_id", personId).
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
+			OrderBy("create_time", db.DESC)
 	} else {
 		query = em.Select().Where("customer_id", personId).
 			And("status", status).
 			Or("type", model.Wholesale, model.ShippingInstead).
-			OrderBy("create_time desc")
+			OrderBy("create_time", db.DESC)
 	}
 	return _listOrder(query)
 }
