@@ -32,7 +32,15 @@ class OrderDetailsForm
 
   editProduct:(product) ->
     return if not product
+    # console.log '=========== on edit ============='
+    # console.log '>> before'
+    # console.log @data
     @data.products[product.id] = product
+    # console.log '>> after '
+    # console.log @data
+    # console.log '>> product is : ', product.id
+    # console.log product
+
     return true
 
   setData:(json) ->
@@ -84,6 +92,10 @@ class OrderDetailsForm
     return (e)->
       e.preventDefault()
       @onDelete(@data.products[id]) if @onDelete
+      console.log '----------------------------------------'
+      # console.log @data.products[id]
+      # console.log @data.products
+      # console.log @data.products
 
   defaultOnDelete:(product)->
     return if not confirm "真的要删除这条记录么？"

@@ -1,7 +1,7 @@
 package components
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/dal/productdao"
 	"syd/service/personservice"
 )

@@ -3,7 +3,7 @@ package person
 import (
 	"fmt"
 	"github.com/elivoa/gxl"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/dal/accountdao"
 	"syd/model"
 	"syd/service/personservice"

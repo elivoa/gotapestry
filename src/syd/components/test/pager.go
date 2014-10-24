@@ -2,7 +2,7 @@ package test
 
 import (
 	"bytes"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"strconv"
 )
 

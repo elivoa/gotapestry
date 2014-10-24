@@ -1,12 +1,13 @@
 package service
 
+// TODO chagne file to UserService
 import (
 	"fmt"
-	"github.com/elivoa/got/utils"
+	"github.com/elivoa/got/coreservice/sessions"
 	"net/http"
 	"strings"
+	"syd"
 	"syd/dal/userdao"
-	"syd/exceptions"
 	"syd/model"
 	"time"
 )
@@ -36,7 +37,7 @@ var USER_TOKEN_SESSION_KEY string = "USER_TOKEN_SESSION_KEY"
 // used in methods.
 func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
 	if userToken := s.GetLogin(w, r); userToken == nil {
-		panic(&exceptions.LoginError{Message: "User not login.", Reason: "some reason"})
+		panic(&syd.LoginError{Message: "User not login.", Reason: "some reason"})
 	} else {
 		return userToken
 	}
@@ -58,7 +59,7 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 		return userToken
 	} else {
 		fmt.Println("access denied?")
-		panic(&exceptions.AccessDeniedError{Message: "Access Denied."})
+		panic(&syd.AccessDeniedError{Message: "Access Denied."})
 	}
 }
 
@@ -66,7 +67,7 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role s
 // return true if user is login and login is available.
 // return false if
 func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
-	session := utils.Session(r)
+	session := sessions.LongCookieSession(r)
 	// { // debug print.
 	// 	fmt.Printf("\t >>>>>>>>>>>>>>>>>>>>>>>>>>> Session.Values: %v\n", session.Values)
 	// 	for k, v := range session.Values {
@@ -107,10 +108,10 @@ func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error)
 			// fmt.Println(userToken)
 			return user.ToUserToken(), nil
 		} else {
-			return nil, &exceptions.LoginError{Message: "Username and password not matched."}
+			return nil, &syd.LoginError{Message: "Username and password not matched."}
 		}
 	}
-	return nil, &exceptions.LoginError{Message: "User not login."}
+	return nil, &syd.LoginError{Message: "User not login."}
 }
 
 // return username & password pair
@@ -144,13 +145,13 @@ func (s *UserService) Login(username string, password string,
 		s.setToCookie(w, userToken)
 		return userToken, nil
 	} else {
-		return nil, &exceptions.LoginError{Message: "Username and password not matched."}
+		return nil, &syd.LoginError{Message: "Username and password not matched."}
 	}
 }
 
 // set UserToken to session.
 func (s *UserService) setToSession(w http.ResponseWriter, r *http.Request, userToken *model.UserToken) {
-	session := utils.Session(r)
+	session := sessions.LongCookieSession(r)
 	session.Values[USER_TOKEN_SESSION_KEY] = userToken
 	fmt.Printf("\n\nSave to Session \n")
 	session.Save(r, w)
@@ -175,7 +176,7 @@ func (s *UserService) removeUserCookie(w http.ResponseWriter) {
 }
 
 func (s *UserService) removeUserTokenSession(w http.ResponseWriter, r *http.Request) {
-	session := utils.Session(r)
+	session := sessions.LongCookieSession(r)
 	session.Values[USER_TOKEN_SESSION_KEY] = nil
 	delete(session.Values, USER_TOKEN_SESSION_KEY)
 	session.Save(r, w)

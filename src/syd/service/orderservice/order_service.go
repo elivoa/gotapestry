@@ -55,18 +55,21 @@ func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, 
 	return orderdao.ListOrderByType(orderType, status)
 }
 
+// >> copied to service.Order
 func CreateOrder(order *model.Order) error {
 	_processOrderCustomerPrice(order)
 	_calculateOrder(order)
 	return orderdao.CreateOrder(order)
 }
 
+// >> copied to service.Order
 func UpdateOrder(order *model.Order) (int64, error) {
 	_processOrderCustomerPrice(order)
 	_calculateOrder(order)
 	return orderdao.UpdateOrder(order)
 }
 
+// >> copied to service.Order
 // calculate order by type
 func _calculateOrder(order *model.Order) {
 	switch model.OrderType(order.Type) {
@@ -82,6 +85,7 @@ func _calculateOrder(order *model.Order) {
 	}
 }
 
+// >> copied to service.Order
 // save customerized price for order
 func _processOrderCustomerPrice(order *model.Order) {
 	if order.Details == nil {
@@ -129,6 +133,7 @@ func ChangeOrderStatus(trackNumber int64, status string) error {
 	return nil
 }
 
+// >> copied to service.order
 func GetOrder(id int) (*model.Order, error) {
 	return orderdao.GetOrder("id", id)
 }
@@ -459,7 +464,11 @@ func LeavingMessage(bigOrder *model.Order) string {
 
 	// 总计
 	msg.WriteString("总计")
-	msg.WriteString(gxl.FormatCurrency(sumTotal+float64(bigOrder.ExpressFee), 2))
+	if bigOrder.ExpressFee > 0 {
+		msg.WriteString(gxl.FormatCurrency(sumTotal+float64(bigOrder.ExpressFee), 2))
+	} else {
+		msg.WriteString(gxl.FormatCurrency(sumTotal, 2))
+	}
 	msg.WriteString("元")
 	msg.WriteString("；")
 

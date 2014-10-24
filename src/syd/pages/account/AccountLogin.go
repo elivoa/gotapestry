@@ -3,7 +3,7 @@ package account
 import (
 	"fmt"
 	"github.com/elivoa/got/route/exit"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service"
 )

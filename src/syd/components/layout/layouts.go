@@ -2,7 +2,7 @@ package layout
 
 import (
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/service"
 )
 

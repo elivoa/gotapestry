@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+/* tbl_main highlight */
+table.tbl_main tr:hover{background-color:#eee}
+
+
+/* OrderList Component, */
+.c_order_list {}
+.c_order_list .tbl_main tr.order_status_canceled{color:#aaa;background-color:#f6f6f6}
+.c_order_list .tbl_main tr.order_status_canceled:hover{background-color:#eee}
+.c_order_list .tbl_main tr.order_status_canceled a{color:#aaa}
+.c_order_list .tbl_main tr.order_status_canceled .price{color:#aaa;font-weight:normal;}

@@ -24,6 +24,10 @@ class OrderCreateDetail
     ,@
 
     @ops.onAddToOrder = $.proxy (product) ->
+
+      console.log '==== onAddToOrder === '
+      console.log product
+
       success = false
       if @ops.isEdit
         success = @odf.editProduct product
@@ -32,8 +36,11 @@ class OrderCreateDetail
       if success
         @odf.refreshOrderForm()
         @ops.clear()
+      else
+        alert "添加产品失败！！"
     ,@
 
+    # on click edit button;
     @odf.onEdit = $.proxy (product)->
       @ops.refresh product
       @ops.setEdit true

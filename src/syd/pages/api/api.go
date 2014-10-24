@@ -8,8 +8,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/debug"
-	"got/core"
 	"syd/dal"
 	"syd/dal/productdao"
 	"syd/service/personservice"
@@ -50,6 +50,8 @@ func getCustomerPrice(personId int, productId int) string {
 	if personId > 0 {
 		// get customer price
 		customerPrice := dal.GetCustomerPrice(personId, productId)
+		fmt.Println("\n\n\n\n\n >>>> price price price price price price price ")
+		fmt.Println(" >>>> ", customerPrice)
 		if nil != customerPrice {
 			price = customerPrice.Price
 		}

@@ -2,7 +2,7 @@ package account
 
 import (
 	"github.com/elivoa/got/route/exit"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/service"
 )
 

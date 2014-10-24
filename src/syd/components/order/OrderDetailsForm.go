@@ -1,7 +1,7 @@
 package order
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 )
 
 type OrderDetailsForm struct {

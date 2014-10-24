@@ -2,7 +2,6 @@ package orderdao
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -43,20 +42,11 @@ func init() {
 	db.RegisterEntity("orderdetail", detailem)
 }
 
-/*_______________________________________________________________________________
-  Create new item in db
-  TODO: Add transaction support.
-*/
+// Create new Order item in db. Only OrderService call this. Not including details.
+// TODO: Add transaction support.
 func CreateOrder(order *model.Order) error {
 	if logdebug {
 		log.Printf("[dal] Create Order: %v", order)
-	}
-
-	// special 000. create order.Details
-	if order.Details != nil && len(order.Details) > 0 {
-		if err := createOrderDetail(order.Details); err != nil {
-			return err
-		}
 	}
 
 	// 1. create connection.
@@ -79,18 +69,18 @@ func UpdateOrder(order *model.Order) (int64, error) {
 		log.Printf("[dal] Update Order: %v", order)
 	}
 
-	// organize order details. delete all and then add all.
-	if _, err := deleteDetails(order.TrackNumber); err != nil {
-		return 0, err
-	}
+	// // organize order details. delete all and then add all.
+	// if _, err := DeleteDetails(order.TrackNumber); err != nil {
+	// 	return 0, err
+	// }
 
-	// special 000. create order.Details
-	if order.Details != nil && len(order.Details) > 0 {
-		// insert into db
-		if err := createOrderDetail(order.Details); err != nil {
-			return 0, err
-		}
-	}
+	// // special 000. create order.Details
+	// if order.Details != nil && len(order.Details) > 0 {
+	// 	// insert into db
+	// 	if err := CreateOrderDetail(order.Details); err != nil {
+	// 		return 0, err
+	// 	}
+	// }
 
 	// update order
 	res, err := em.Update().Exec(
@@ -120,23 +110,70 @@ func UpdateOrderStatus(trackNumber int64, status string) (int64, error) {
 }
 
 // TODO execute many / batch insert
-func createOrderDetail(orderDetails []*model.OrderDetail) error {
-	for _, detail := range orderDetails {
-		// fmt.Printf(">>> detail: %v=n", detail)
-		if detail == nil {
-			continue
+func CreateOrderDetail(orderDetails []*model.OrderDetail) error {
+	if nil != orderDetails {
+		for _, detail := range orderDetails {
+			if detail == nil {
+				continue
+			}
+			res, err := detailem.Insert().Exec(
+				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size,
+				detail.Quantity, detail.SellingPrice, detail.Note,
+			)
+			if err != nil {
+				return err
+			}
+			liid, err := res.LastInsertId()
+			detail.Id = int(liid)
 		}
-		res, err := detailem.Insert().Exec(
-			detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size,
-			detail.Quantity, detail.SellingPrice, detail.Note,
-		)
-		if err != nil {
-			return err
-		}
-		liid, err := res.LastInsertId()
-		detail.Id = int(liid)
 	}
 	return nil
+}
+
+func BatchUpdateOrderDetail(orderDetails []*model.OrderDetail) error {
+	if nil != orderDetails {
+		for _, detail := range orderDetails {
+			if detail == nil {
+				continue
+			}
+			res, err := detailem.Update().Exec(
+				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size,
+				detail.Quantity, detail.SellingPrice, detail.Note,
+				detail.Id,
+			)
+			if err != nil {
+				return err
+			}
+			liid, err := res.LastInsertId()
+			detail.Id = int(liid)
+		}
+	}
+	return nil
+}
+
+func DeleteOrderDetails(orderDetails []*model.OrderDetail) error {
+	if nil != orderDetails {
+		for _, detail := range orderDetails {
+			if detail == nil {
+				continue
+			}
+			res, err := detailem.Delete().Where(detailem.PK, detail.Id).Exec()
+			if err != nil {
+				return err
+			}
+			liid, err := res.LastInsertId()
+			detail.Id = int(liid)
+		}
+	}
+	return nil
+}
+
+func DeleteDetailsByTrackNumber(trackNumber int64) (int64, error) {
+	if res, err := detailem.Delete().Where("order_track_number", trackNumber).Exec(); err != nil {
+		return 0, err
+	} else {
+		return res.RowsAffected()
+	}
 }
 
 /*_______________________________________________________________________________
@@ -170,7 +207,8 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 		p.Details = details
 		return p, nil
 	}
-	return nil, errors.New("Order not found!")
+	// return nil, errors.New("Order not found!") // return error if not exists.p
+	return nil, nil // ignore when entity not exits.
 }
 
 /*_______________________________________________________________________________
@@ -214,10 +252,10 @@ func CountOrderByCustomer(status string, personId int) (int, error) {
 }
 
 // list interface
-// TODO Order by id asc
+// TODO Order by create time;
 func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
 	orders := make([]*model.OrderDetail, 0)
-	err := detailem.Select().Where("order_track_number", trackNumber).Query(
+	err := detailem.Select().Where("order_track_number", trackNumber).OrderBy("product_id", db.DESC).Query(
 		func(rows *sql.Rows) (bool, error) {
 			p := new(model.OrderDetail)
 			err := rows.Scan(
@@ -235,17 +273,9 @@ func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
 	// stmt, err := conn?.Prepare("select * from `order_detail` where order_track_number=? order by id asc")
 }
 
-func deleteDetails(trackNumber int64) (int64, error) {
-	if res, err := detailem.Delete().Where("order_track_number", trackNumber).Exec(); err != nil {
-		return 0, err
-	} else {
-		return res.RowsAffected()
-	}
-}
-
 // TODO transaction
 func DeleteOrder(trackNumber int64) (int64, error) {
-	aff, erro := deleteDetails(trackNumber)
+	aff, erro := DeleteDetailsByTrackNumber(trackNumber)
 	if erro != nil {
 		return aff, erro
 	}

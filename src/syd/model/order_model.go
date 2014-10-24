@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -13,14 +12,16 @@ func init() {
 
 type OrderType uint
 
+// 不可以改变顺序，数据库中是按照增量存储的。
 const (
 	Wholesale       OrderType = iota // 0 - 大货
 	ShippingInstead                  // 1 - 代发
-	SubOrder                         // 2 - 子订单（主要用于 1-代发）
+	SubOrder                         // 2 - 子订单（主要用于 1-代发）// 不应该包含在数量统计中。
 )
 
 type OrderStatus uint
 
+// TODO 这个没用了，数据库里面存储的是字符串的；
 const (
 	ToPrint   OrderStatus = iota // new order
 	ToDeliver                    //
@@ -84,7 +85,8 @@ type OrderDetail struct {
 	Size             string
 	Quantity         int
 	SellingPrice     float64 //售价
-	Unit             string  // always 件, NoUse
+
+	Unit string // always 件, Not Used Yet.
 
 	Note string
 }
@@ -101,14 +103,38 @@ func NewOrder() *Order {
 	return order
 }
 
-func GenerateOrderId() int64 {
-	value, err := strconv.ParseInt(
-		fmt.Sprintf("%v%v", time.Now().Format("0601020304"), rand.Intn(999)),
-		10, 64)
-	if err != nil {
-		panic(err.Error())
+func main() {
+	fmt.Println(33)
+	for i := 0; i <= 10; i++ {
+		fmt.Println(GenerateOrderId())
 	}
-	return value
+}
+
+func GenerateOrderId() int64 {
+	now := time.Now()
+	// var newid int64
+	y, M, d := now.Date()
+	h, m, s := now.Clock()
+	var first int = 0 +
+		y*10000000000 +
+		int(M)*100000000 +
+		d*1000000 +
+		h*10000 +
+		m*100 +
+		s*1 +
+		0
+
+	var final int64 = int64(rand.Intn(9999)) + int64(first*10000)
+
+	if f := false; f {
+		fmt.Println("first is ", first, s)
+	}
+	return final
+	// if value, err := strconv.ParseInt(time.Now().Format("0601020304"), 10, 64); err != nil {
+	// 	panic(err.Error())
+	// } else {
+	// 	return value*10000 + int64(rand.Intn(9999))
+	// }
 }
 
 func (order *Order) DisplayStatus() string {

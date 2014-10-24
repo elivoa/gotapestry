@@ -1,7 +1,7 @@
 package product
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 	"strings"
 	"syd/model"
 	"syd/service/productservice"

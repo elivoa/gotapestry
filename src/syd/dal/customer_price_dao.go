@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"database/sql"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -37,11 +38,12 @@ func SetCustomerPrice(personId int, productId int, price float64) error {
 // Get Customer Price, if nothing found, return nil.
 //
 func GetCustomerPrice(personId int, productId int) *model.CustomerPrice {
-	prices := getCustomerPrice(personId, productId, 1)
-	if prices != nil && len(*prices) == 1 {
-		price := (*prices)[0]
+	if prices, err := getCustomerPrice(personId, productId, 1); err != nil {
+		panic(err.Error())
+	} else if prices != nil && len(prices) == 1 {
+		price := prices[0]
 		if price.Id > 0 {
-			return &price
+			return price
 		} else {
 			return nil
 		}
@@ -49,36 +51,45 @@ func GetCustomerPrice(personId int, productId int) *model.CustomerPrice {
 	return nil
 }
 
-func GetCustomerPriceHistory(personId int, productId int) *[]model.CustomerPrice {
-	prices := getCustomerPrice(personId, productId, 1)
-	if prices != nil {
+func GetCustomerPriceHistory(personId int, productId int) []*model.CustomerPrice {
+	if prices, err := getCustomerPrice(personId, productId, 1); err != nil {
+		panic(err.Error())
+	} else if prices != nil {
 		return prices
 	}
 	return nil
 }
 
-func getCustomerPrice(personId int, productId int, number int) *[]model.CustomerPrice {
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
+func getCustomerPrice(personId int, productId int, number int) ([]*model.CustomerPrice, error) {
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return nil, err
+	}
+	defer conn.Close()
 
-	stmt, err := conn.Prepare("select * from customer_special_price " +
-		"where person_id = ? and product_id = ? order by create_time DESC limit ?")
-	if err != nil {
-		panic(err.Error())
+	_sql := "select * from customer_special_price where person_id = ? and product_id = ? order by create_time DESC limit ?"
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(personId, productId, number)
-	defer db.CloseRows(rows)
-	if db.Err(err) {
-		return nil
+	if err != nil {
+		return nil, err
 	}
+	defer rows.Close()
 
-	ps := []model.CustomerPrice{}
+	models := []*model.CustomerPrice{}
 	for rows.Next() {
-		p := new(model.CustomerPrice)
-		rows.Scan(&p.Id, &p.PersonId, &p.ProductId, &p.Price, &p.CreateTime, &p.LastUsedTime)
-		ps = append(ps, *p)
+		m := new(model.CustomerPrice)
+		var blackhole sql.NullInt64
+		err := rows.Scan(&m.Id, &m.PersonId, &m.ProductId, &m.Price, &m.CreateTime, &blackhole /*&m.LastUsedTime */)
+		if err != nil {
+			panic(err)
+		}
+		models = append(models, m)
 	}
-	return &ps
+	return models, nil
 }

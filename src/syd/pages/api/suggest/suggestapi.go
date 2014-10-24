@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/elivoa/got/debug"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/service/suggest"
 )
 

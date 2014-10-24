@@ -1,11 +1,12 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+    <!-- This is an component, Contents in header and body is used. Other is discard. -->
     <script type="text/javascript" src="/static/js/c/order/order_list.js"></script>
   </head>
   <body>
 
-    <div id="{{.ClientId}}">
+    <div id="{{.ClientId}}" class="c_order_list">
       
       <if t="len .Orders | not">
         <div class="tips_content"><i class="icon_warning"></i> 无记录</div>
@@ -27,7 +28,7 @@
           </tr>
 
           <range source=".Orders">
-            <tr>
+            <tr class="order_status_{{.Status}}">
               <td align="left">
                 <input type="checkbox" class="order-check"
                        value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
@@ -37,10 +38,8 @@
               </td>
               <td nowrap>
                 <a href="{{$.ViewLink .}}">
-                  <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">D</span></if>
+                  <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">[代发]</span></if>
                   {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
-                  <!--<t:output value=".TrackNumber" />
-                  nested components Render order has bugs.-->
                   {{.TrackNumber}}
                 </a>
               </td>
@@ -66,14 +65,16 @@
               
               <hide t="~~~~ operation ~~~~" ></hide>
               <td nowrap>
-                
+
                 <if t='.IsStatus "toprint"'>
                   <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
                   <a href="{{$.PrintOrderLink .}}" style="font-weight:bolder;color:green"
                      onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
                   <span class="vline">|</span>
-                  <a href="/order/list:CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
-                     onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+
+                  <t:a event="CancelOrder" context="{{print .TrackNumber}}" label="取消订单"
+                       parameters="(print `referer=` ($|refer))"
+                       onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');"></t:a>
                 </if>
 
                 <if t='.IsStatus "todeliver"'>
@@ -83,8 +84,9 @@
                      deliveryMethod=".DeliveryMethod" deliveryTrackingNumber=".DeliveryTrackingNumber"
                      ExpressFee=".ExpressFee" Source="/order/list/{{$.Tab}}" />
                   <span class="vline">|</span>
-                  <a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
-                     onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
+                  <t:a event="CancelOrder" context="{{print .TrackNumber}}" label="取消订单"
+                       parameters="(print `referer=` ($|refer))"
+                       onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');"></t:a>
                 </if>
 
                 <if t='.StatusIs "delivering"'>
@@ -98,9 +100,12 @@
                      TrackNumber=".TrackNumber" Source="/order/list{{$.Tab}}" />
                 </if>
 
-                <if t='.IsStatus "cancelled" "done"'>
-                  <a href="{{$.ViewLink .}}">查看订单</a>
-                </if>
+                <!--
+                    点击订单号查看吧，不显示查看订单了。
+                    <if t='.IsStatus "cancelled" "done"'>
+                      <a href="{{$.ViewLink .}}">查看订单</a>
+                    </if>
+                    -->
               </td>
               
               <td style="display:none">
@@ -116,11 +121,11 @@
       </if>
 
       <script type="text/javascript">
-  $(function(){
-    orderlist = new OrderList({
-      ClientId: {{.ClientId}}
-    })
-  });
+                   $(function(){
+                     orderlist = new OrderList({
+                       ClientId: {{.ClientId}}
+                     })
+                   });
       </script>
 
     </div>

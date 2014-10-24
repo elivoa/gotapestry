@@ -1,7 +1,7 @@
 package index
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 )
 
 // _______________________________________________________________________________

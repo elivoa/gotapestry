@@ -2,7 +2,9 @@ package order
 
 import (
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route"
+	"github.com/elivoa/got/route/exit"
 	"syd/model"
 	"syd/service"
 	"syd/service/orderservice"
@@ -15,10 +17,19 @@ type OrderList struct {
 	Orders     []*model.Order
 	Tab        string  // receive status tabs. TODO A Better way to do this?
 	TotalPrice float64 // all order's price
+	Referer    string  // return here.
 
 	// temp values
 	customerNames map[int]*model.Person // order-id -> customer names
 }
+
+// func (p *OrderList) Activate() {
+// 	fmt.Println("\n\n\n********************************************************************************")
+// 	fmt.Println("activate !!!!!!!!!!!!! emlulated ::: ", p.Referer)
+// 	fmt.Println("********************************************************************************")
+// 	fmt.Println("********************************************************************************")
+// 	fmt.Println("********************************************************************************")
+// }
 
 func (p *OrderList) SetupRender() {
 	// verify user role.
@@ -60,9 +71,27 @@ func (p *OrderList) ShowCustomerName(customerId int) string {
 // ________________________________________________________________________________
 // Events
 //
+func (p *OrderList) OnCancelOrder(trackNumber int64, tab string) *exit.Exit {
+	return p._onStatusEvent(trackNumber, "canceled", tab)
+}
+
+func (p *OrderList) OnDeliver(trackNumber int64, tab string) *exit.Exit {
+	return p._onStatusEvent(trackNumber, "delivering", tab)
+}
+
+func (p *OrderList) OnMarkAsDone(trackNumber int64, tab string) *exit.Exit {
+	return p._onStatusEvent(trackNumber, "done", tab)
+}
+
+func (p *OrderList) _onStatusEvent(trackNumber int64, status string, tab string) *exit.Exit {
+	err := orderservice.ChangeOrderStatus(trackNumber, status)
+	if err != nil {
+		panic(err.Error())
+	}
+	return route.RedirectDispatch(route.GetRefererFromURL(p.Request()), "/order/list")
+}
+
 func (p *OrderList) Ondelete(trackNumber int64, tab string) (string, string) {
-	fmt.Println("--------------------------------------------------------------------------------")
-	fmt.Printf("Delete order %v \n", trackNumber)
 	if _, err := orderservice.DeleteOrder(trackNumber); err != nil {
 		panic(err)
 	}
@@ -85,18 +114,29 @@ func (p *OrderList) OnShippingInsteadOrderPrint(trackNumber int64) (string, stri
 	return "redirect", fmt.Sprintf("/order/shippinginsteadprint/%v", trackNumber)
 }
 
+// not finished
+// func (p *OrderList) OnEditOrder() *exit.Exit {
+// 	return nil
+// }
+
 func (p *OrderList) EditLink(order *model.Order) string {
+	var editlink string
 	switch model.OrderType(order.Type) {
 	case model.Wholesale:
-		return fmt.Sprintf("/order/create/detail/%v", order.Id)
+		editlink = fmt.Sprintf("/order/create/detail/%v", order.Id)
 	case model.ShippingInstead:
-		return fmt.Sprintf("/order/create/shippinginstead/%v", order.TrackNumber)
+		editlink = fmt.Sprintf("/order/create/shippinginstead/%v", order.TrackNumber)
 	case model.SubOrder:
-		return "#Error"
+		editlink = "#Error"
 	default:
-		return fmt.Sprintf("%v", order.Type)
+		editlink = fmt.Sprintf("%v", order.Type)
 	}
-	panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
+	return editlink
+
+	// add return url // another method to return page to add referer
+	refer := p.Request().URL.RequestURI()
+	return editlink + "?referer=" + refer // TODO: need encode
+	// panic(fmt.Sprintf("Wrong order type for %v", order.TrackNumber))
 }
 
 func (p *OrderList) ViewLink(order *model.Order) string {

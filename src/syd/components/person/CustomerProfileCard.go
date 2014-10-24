@@ -1,7 +1,7 @@
 package person
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 	"github.com/elivoa/gxl"
 	"syd/model"
 	"syd/service/personservice"

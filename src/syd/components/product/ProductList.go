@@ -3,9 +3,10 @@ package product
 import (
 	"bytes"
 	"fmt"
+	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/debug"
 	"github.com/elivoa/got/route"
-	"got/core"
+	"github.com/elivoa/got/route/exit"
 	"html/template"
 	"syd/dal"
 	"syd/model"
@@ -19,7 +20,7 @@ type ProductList struct {
 }
 
 // NOTE: event name is case sensitive. Kill this when add cache.
-func (p *ProductList) Ondelete(productId int) (string, string) {
+func (p *ProductList) Ondelete(productId int) *exit.Exit {
 	debug.Log("Delete Product %d", productId)
 	productservice.DeleteProduct(productId)
 	// TODO make this default redirect.

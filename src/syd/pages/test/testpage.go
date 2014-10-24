@@ -1,7 +1,7 @@
 package test
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 )
 
 type Test struct {

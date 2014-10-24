@@ -1,7 +1,7 @@
 package layout
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service"
 )

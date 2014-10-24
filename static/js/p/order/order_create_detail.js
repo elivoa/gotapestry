@@ -17,6 +17,8 @@
       }, this);
       this.ops.onAddToOrder = $.proxy(function(product) {
         var success;
+        console.log('==== onAddToOrder === ');
+        console.log(product);
         success = false;
         if (this.ops.isEdit) {
           success = this.odf.editProduct(product);
@@ -26,6 +28,8 @@
         if (success) {
           this.odf.refreshOrderForm();
           return this.ops.clear();
+        } else {
+          return alert("添加产品失败！！");
         }
       }, this);
       this.odf.onEdit = $.proxy(function(product) {

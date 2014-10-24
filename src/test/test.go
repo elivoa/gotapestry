@@ -6,7 +6,6 @@ import (
 	"syd/dal/statdao"
 	"syd/service/orderservice"
 	// "syd/service/personservice"
-	"elivoa/carfilm/dal/userdao"
 	"syd/dal/persondao"
 	"syd/service/statservice"
 	"time"
@@ -17,7 +16,7 @@ func main() {
 	// end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0)
 	// start := end.AddDate(0, 0, 1)
 
-	userdao.ListUserByIdSet(1, 3, 4)
+	// userdao.ListUserByIdSet(1, 3, 4)
 
 	fmt.Println("----------------------------------------------------------------------------------------------------")
 	fmt.Println(time.Now())

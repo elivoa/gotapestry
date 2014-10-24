@@ -3,7 +3,7 @@ package order
 import (
 	"bytes"
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"html/template"
 	"syd/model"
 	"syd/service/orderservice"

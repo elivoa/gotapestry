@@ -2,7 +2,7 @@ package order
 
 import (
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"strings"
 	"syd/model"
 	"syd/service/orderservice"
@@ -19,6 +19,7 @@ type OrderList struct {
 	Tab       string `path-param:"1"`
 	Current   int    `path-param:"2"` // pager: the current item. in pager.
 	PageItems int    `path-param:"3"` // pager: page size.
+	// Referer   string `query:"referer"`
 
 	// properties
 	Total int // pager: total items available
@@ -27,6 +28,11 @@ type OrderList struct {
 }
 
 func (p *OrderList) Activate() {
+	// return p._onStatusEvent(trackNumber, "canceled", tab)
+	// fmt.Println("\n\n\n********************************************************************************")
+	// fmt.Println("activate:: !!!!!!!!!!!!! emlulated ::: ", p.Referer)
+	// fmt.Println("********************************************************************************")
+	// fmt.Println("********************************************************************************")
 
 	// not injected with parameters.
 	// fmt.

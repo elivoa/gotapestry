@@ -61,8 +61,23 @@
         </div>
         <br class="spliter" />
 
+        <div class="section">
+          <h2>所有 {{.Person.Name}} 的订单:</h2>
+          <div>
+            <t:order.list orders=".Orders" />
+
+            <div style="border:solid 1px #eee">
+              <div t:type="ui.pager" total=".Total" current=".Current" pageitems=".PageItems"
+                   urlTemplate=".UrlTemplate" />
+            </div>
+
+          </div>
+        </div>
+        <br class="spliter" />
+        
+
         <div class="not defined">
-          <h2>累计欠款变化记录</h2>
+          <h2>累计欠款变化记录:</h2>
           <table border="1" cellpadding="10">
             <tr>
               <td>时间</td>
@@ -85,21 +100,7 @@
             {{end}}
           </table>
         </div>
-        
-        <div class="section">
-          <h2>所有 {{.Person.Name}} 的订单:</h2>
-          <div>
-            <t:order.list orders=".Orders" />
 
-            <div style="border:solid 1px #eee">
-              <div t:type="ui.pager" total=".Total" current=".Current" pageitems=".PageItems"
-                   urlTemplate=".UrlTemplate" />
-            </div>
-
-          </div>
-        </div>
-        <br class="spliter" />
-        
       </div>
     </div>
     <div class="footer">

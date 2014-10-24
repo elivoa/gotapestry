@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/gxl"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"strings"
 	"syd/model"
 	"syd/service/productservice"

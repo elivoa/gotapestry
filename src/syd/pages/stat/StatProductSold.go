@@ -1,7 +1,7 @@
 package stat
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 )
 
 type StatProductSold struct {

@@ -3,7 +3,7 @@ package order
 import (
 	"bytes"
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"html/template"
 	"syd/model"
 	"syd/service/orderservice"
@@ -155,7 +155,11 @@ func (p *ShippingInsteadPrint) TotalPriceHtml() interface{} {
 	if p.Order.ExpressFee == 0 { // 没填
 		return template.HTML("<span class=\"underline\"></span>")
 	} else {
-		return float64(p.Order.ExpressFee) + p.Sumprice // 合计
+		if p.Order.ExpressFee > 0 {
+			return float64(p.Order.ExpressFee) + p.Sumprice // 合计
+		} else {
+			return "~ERROR~"
+		}
 	}
 }
 

@@ -2,7 +2,7 @@ package product
 
 import (
 	"github.com/elivoa/gxl"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service/personservice"
 	"syd/service/productservice"

@@ -2,7 +2,7 @@ package order
 
 import (
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service/orderservice"
 	"syd/service/personservice"

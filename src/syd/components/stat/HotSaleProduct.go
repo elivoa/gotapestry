@@ -2,7 +2,7 @@ package stat
 
 import (
 	"fmt"
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service/productservice"
 	"syd/service/statservice"

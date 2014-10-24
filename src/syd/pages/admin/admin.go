@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"got/core"
+	"github.com/elivoa/got/core"
 	"syd/service/productservice"
 )
 

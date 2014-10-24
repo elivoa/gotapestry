@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2013-12-01 13:03:20>
+  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-16 00:22:03>
 
   Note: This is the latest Template for dao functions.
 
@@ -37,6 +37,55 @@ func init() {
 // ________________________________________________________________________________
 // Get person by person id
 //
+
+// new version
+func GetPersonById(id int) (*model.Person, error) {
+	return GetPerson(em.PK, id)
+}
+
+// new version
+func GetPerson(field string, value interface{}) (*model.Person, error) {
+	var query = em.Select().Where(field, value)
+	return _one(query)
+}
+
+// the last part, read the list from rows
+func _list(query *db.QueryParser) ([]*model.Person, error) {
+	models := make([]*model.Person, 0)
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			m := &model.Person{}
+			err := rows.Scan(
+				&m.Id, &m.Name, &m.Type, &m.Phone, &m.City, &m.Address, &m.PostalCode, &m.QQ,
+				&m.Website, &m.Note, &m.AccountBallance, &m.CreateTime, &m.UpdateTime,
+			)
+			models = append(models, m)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
+	}
+	return models, nil
+}
+
+// only return the first result;
+func _one(query *db.QueryParser) (*model.Person, error) {
+	m := &model.Person{}
+	if err := query.Query( // TODO: change to QueryOne
+		func(rows *sql.Rows) (bool, error) {
+			err := rows.Scan(
+				&m.Id, &m.Name, &m.Type, &m.Phone, &m.City, &m.Address, &m.PostalCode, &m.QQ,
+				&m.Website, &m.Note, &m.AccountBallance, &m.CreateTime, &m.UpdateTime,
+			)
+			return false, err // don't fetch the second line. first is enough;
+		},
+	); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// TODO: old version, should delete
 func Get(id int) (*model.Person, error) {
 	p := new(model.Person)
 	err := em.Select().Where("id", id).Query(
@@ -58,6 +107,7 @@ func Get(id int) (*model.Person, error) {
 }
 
 // personType: customer, factory
+// The very old method.
 func ListAll(personType string) ([]*model.Person, error) {
 	persons := make([]*model.Person, 0)
 	err := em.Select().Where("type", personType).Query(

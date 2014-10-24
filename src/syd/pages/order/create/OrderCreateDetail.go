@@ -2,10 +2,12 @@ package order
 
 import (
 	"fmt"
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route"
+	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/gxl"
-	"got/core"
-	"syd/dal/accountdao"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
@@ -81,74 +83,118 @@ func (p *OrderCreateDetail) OnPrepareForSubmit() {
 		p.Order.CustomerId = p.CustomerId
 	} else {
 		// if edit
-		// for security reason, TODO security check here.
+		// for security reason, TODO security check here. 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
 		o, err := orderservice.GetOrder(p.Id.Int)
 		if err != nil {
 			panic(err.Error())
 		}
 		p.Order = o
+		// 但是这样做就必须清除form更新的时候需要删除的值，否则form提交和原有值是叠加的，会引起错误；
+		// 这里只需要清除列表等数据，这个Order中只有Details是列表。
+		p.Order.Details = nil // clear some value
 	}
 }
 
-// after inject values, do submit.
-func (p *OrderCreateDetail) OnSuccess() (string, string) {
-	// order, update details
-	for _, detail := range p.Order.Details {
-		detail.OrderTrackNumber = p.Order.TrackNumber
-	}
-	// daofu flag
+// After inject values, do submit.
+func (p *OrderCreateDetail) OnSuccess() *exit.Exit {
+	// daofu flag // TODO: 这个可以用框架来实现，注入框架实现转换；
 	if p.DaoFu == "on" {
 		p.Order.ExpressFee = -1
 	}
-
-	// TODO need transaction
-	// set new & edited order's status.
-	var isTakeAwayOrder = false
-	if p.Order.DeliveryMethod == "TakeAway" {
-		p.Order.Status = "delivering"
-		isTakeAwayOrder = true
-	} else {
-		p.Order.Status = "toprint"
-	}
-
-	// update order OR create order
-	if p.Id != nil {
-		orderservice.UpdateOrder(p.Order)
-	} else {
-		orderservice.CreateOrder(p.Order)
-
-		// takeaway order sould update person's BallanceAccount
-		if isTakeAwayOrder {
-			customer := personservice.GetPerson(p.Order.CustomerId)
-			if customer != nil {
-				customer.AccountBallance -= p.Order.SumOrderPrice()
-				_, err := personservice.Update(customer)
-				if err != nil {
-					panic(err.Error())
-				}
-
-				// create chagne log at the same time:
-				accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
-					CustomerId:     customer.Id,
-					Delta:          -p.Order.SumOrderPrice(),
-					Account:        customer.AccountBallance,
-					Type:           2, // create takeaway order
-					RelatedOrderTN: p.Order.TrackNumber,
-					Reason:         "",
-				})
-
-			}
+	fmt.Println(">>> original order details submit from form;")
+	if nil != p.Order.Details {
+		for _, d := range p.Order.Details {
+			fmt.Println("\t---: ", d.OrderTrackNumber, d.Color, d.Size, " = ", d.Quantity, d.SellingPrice)
 		}
 	}
 
-	// return source?
-	if p.SourceUrl == "" {
-		// return to the right list.
-		return "redirect", "/order/list/" + p.Order.Status
-		// return "redirect", "/order/list/toprint"
+	if p.IsEdit() {
+		if _, err := service.Order.UpdateOrder(p.Order); err != nil {
+			panic(err)
+		}
 	} else {
-		return "redirect", p.SourceUrl
+		if _, err := service.Order.CreateOrder(p.Order); err != nil {
+			panic(err)
+		}
 	}
+
+	url := route.GetRefererFromURL(p.R)
+	return exit.RedirectFirstValid(url, p.SourceUrl, "/order/list/"+p.Order.Status)
+
+	// // order, update details
+	// for _, detail := range p.Order.Details {
+	// 	detail.OrderTrackNumber = p.Order.TrackNumber
+	// }
+
+	// // TODO need transaction
+	// // set new & edited order's status.
+	// var needUpdateBallance = false // takeaway order is
+
+	// // update order OR create order
+	// if p.IsEdit() { // Edit order
+
+	// 	// If status change from other to takeaway, mark as need update ballance.
+	// 	if oldOrder, err := service.Order.GetOrder(p.Order.Id); err != nil {
+	// 		panic(err)
+	// 	} else {
+	// 		if oldOrder.DeliveryMethod != "TakeAway" && p.Order.DeliveryMethod == "TakeAway" {
+	// 			p.Order.Status = "delivering"
+	// 			needUpdateBallance = true
+	// 		}
+	// 		// udpate order
+	// 		if _, err := service.Order.UpdateOrder(p.Order); err != nil {
+	// 			panic(err)
+	// 		}
+	// 	}
+	// } else {
+	// 	// create order
+	// 	if _, err := service.Order.CreateOrder(p.Order); err != nil {
+	// 		panic(err)
+	// 	}
+
+	// 	if p.Order.DeliveryMethod == "TakeAway" {
+	// 		// if takeaway, directly chagne order to status delivering.
+	// 		p.Order.Status = "delivering"
+	// 		needUpdateBallance = true
+	// 	} else {
+	// 		// non takeaway order change to status `toprint`
+	// 		p.Order.Status = "toprint"
+	// 	}
+	// }
+
+	// // Takeaway order sould update person's BallanceAccount.
+	// // If order change from other status to takeaway, update it.
+	// // If order edit and status don't change as takeaway. Don't update.
+	// if needUpdateBallance {
+	// 	customer := personservice.GetPerson(p.Order.CustomerId)
+	// 	if customer != nil {
+	// 		customer.AccountBallance -= p.Order.SumOrderPrice()
+	// 		_, err := personservice.Update(customer)
+	// 		if err != nil {
+	// 			panic(err.Error())
+	// 		}
+
+	// 		// create chagne log at the same time:
+	// 		accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+	// 			CustomerId:     customer.Id,
+	// 			Delta:          -p.Order.SumOrderPrice(),
+	// 			Account:        customer.AccountBallance,
+	// 			Type:           2, // create takeaway order
+	// 			RelatedOrderTN: p.Order.TrackNumber,
+	// 			Reason:         "",
+	// 		})
+
+	// 	}
+	// }
+
+	// // return source?
+	// if p.SourceUrl == "" {
+	// 	// return to the right list.
+	// 	return "redirect", "/order/list/" + p.Order.Status
+	// 	// return "redirect", "/order/list/toprint"
+	// } else {
+	// 	return "redirect", p.SourceUrl
+	// }
 }
 
 func (p *OrderCreateDetail) IsEdit() bool {

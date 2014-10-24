@@ -91,8 +91,9 @@
       return function(e) {
         e.preventDefault();
         if (this.onDelete) {
-          return this.onDelete(this.data.products[id]);
+          this.onDelete(this.data.products[id]);
         }
+        return console.log('----------------------------------------');
       };
     };
 
