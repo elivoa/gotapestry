@@ -94,6 +94,8 @@ func _processingUpdateOrderDetails(order *model.Order) error {
 				for idx2, d2 := range details {
 					// find the matched item.
 					if d.ProductId == d2.ProductId && d.Color == d2.Color && d.Size == d2.Size {
+						// assign id into it; update operation need id.
+						d.Id = d2.Id
 						// if any value changed; If quantity changed to 0, delete it;
 						if d.Quantity != d2.Quantity || d.SellingPrice != d2.SellingPrice || d.Note != d2.Note {
 							if d.Quantity > 0 {
