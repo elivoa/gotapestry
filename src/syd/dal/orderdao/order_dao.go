@@ -2,6 +2,7 @@ package orderdao
 
 import (
 	"database/sql"
+	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -23,6 +24,10 @@ var em = &db.Entity{
 	Fields:       append([]string{"id"}, orderFields...),
 	CreateFields: orderFields,
 	UpdateFields: orderFields,
+}
+
+func EntityManager() *db.Entity {
+	return em
 }
 
 var orderDetailFields = []string{
@@ -216,21 +221,21 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 */
 
 // CountOrder returns number of orders that are top level orders(i.e. not include suborders.)
-func CountOrder(status string) (int, error) {
-	if logdebug {
-		log.Printf("[dal] Count Order with Status to %v", status)
-	}
+// func CountOrder(status string) (int, error) {
+// 	if logdebug {
+// 		log.Printf("[dal] Count Order with Status to %v", status)
+// 	}
 
-	parser := em.Count().Where()
-	if status != "all" {
-		parser.And("status", status)
-	}
-	count, err := parser.Or("type", model.Wholesale, model.ShippingInstead).QueryInt()
-	if err != nil {
-		return -1, err
-	}
-	return count, nil
-}
+// 	parser := em.Count().Where()
+// 	if status != "all" {
+// 		parser.And("status", status)
+// 	}
+// 	count, err := parser.Or("type", model.Wholesale, model.ShippingInstead).QueryInt()
+// 	if err != nil {
+// 		return -1, err
+// 	}
+// 	return count, nil
+// }
 
 func CountOrderByCustomer(status string, personId int) (int, error) {
 	if logdebug {
@@ -288,6 +293,41 @@ func DeleteOrder(trackNumber int64) (int64, error) {
 }
 
 //
+// ---- Basic List orders -------------------------------------------
+//
+func ListOrders(parser *db.QueryParser) ([]*model.Order, error) {
+	// var query *db.QueryParser
+	parser.SetEntity(em) // set entity manager into query parser.
+	parser.Reset()       // to prevent if parser is used before. TODO:Is this necessary?
+	// append default behavore.
+	parser.DefaultOrderBy("create_time", db.DESC)
+	parser.DefaultLimit(0, config.LIST_PAGE_SIZE)
+	parser.Select()
+	return _listOrder(parser)
+}
+
+func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
+	orders := make([]*model.Order, 0)
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			p := new(model.Order)
+			err := rows.Scan(
+				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
+				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
+				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
+				&p.Note, &p.ParentTrackNumber,
+				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
+			)
+			orders = append(orders, p)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+//
 // --------  Special List Order    --------------------------------------------------------------------
 //
 
@@ -332,27 +372,6 @@ func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, 
 			Where("status", status).And("type", orderType).OrderBy("create_time", db.DESC)
 	}
 	return _listOrder(query)
-}
-
-func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
-	orders := make([]*model.Order, 0)
-	if err := query.Query(
-		func(rows *sql.Rows) (bool, error) {
-			p := new(model.Order)
-			err := rows.Scan(
-				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
-				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
-				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
-				&p.Note, &p.ParentTrackNumber,
-				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
-			)
-			orders = append(orders, p)
-			return true, err
-		},
-	); err != nil {
-		return nil, err
-	}
-	return orders, nil
 }
 
 // directly change to limit version.

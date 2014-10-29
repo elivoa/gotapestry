@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-16 00:22:03>
+  Time-stamp: <[person_dao.go] Elivoa @ Tuesday, 2014-10-28 00:41:59>
 
   Note: This is the latest Template for dao functions.
 
@@ -19,15 +19,22 @@ import (
 
 // debug option
 var logdebug = true
+
+var core_fields = []string{
+	"name", "type", "phone", "city", "address", "postalcode", "qq", "website", "note",
+	"AccountBallance", "createtime",
+}
+
 var em = &db.Entity{
-	Table: "person",
-	PK:    "id",
-	Fields: []string{"id", "name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "createtime", "updatetime"},
-	CreateFields: []string{"name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "createtime", "updatetime"},
-	UpdateFields: []string{"name", "type", "phone", "city", "address",
-		"postalcode", "qq", "website", "note", "AccountBallance", "updatetime"},
+	Table:        "person",
+	PK:           "id",
+	Fields:       append(append([]string{"id"}, core_fields...), "updatetime"),
+	CreateFields: core_fields,
+	UpdateFields: core_fields,
+}
+
+func EntityManager() *db.Entity {
+	return em
 }
 
 func init() {
@@ -133,7 +140,8 @@ func ListAll(personType string) ([]*model.Person, error) {
 func Create(person *model.Person) error {
 	res, err := em.Insert().Exec(
 		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode,
-		person.QQ, person.Website, person.Note, person.AccountBallance, time.Now(), time.Now(),
+		person.QQ, person.Website, person.Note, person.AccountBallance, time.Now(),
+		// TODO: later change to create time outside.
 	)
 	if err != nil {
 		return err
@@ -147,7 +155,10 @@ func Create(person *model.Person) error {
 // Update returns RowsAffacted, error
 //
 func Update(person *model.Person) (int64, error) {
-	res, err := em.Update().Exec(person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode, person.QQ, person.Website, person.Note, person.AccountBallance, time.Now(), person.Id)
+	res, err := em.Update().Exec(
+		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode, person.QQ,
+		person.Website, person.Note, person.AccountBallance, time.Now(),
+		person.Id)
 	if err != nil {
 		return 0, err
 	}
@@ -165,4 +176,34 @@ func Delete(id int) (int64, error) {
 		return 0, err
 	}
 	return res.RowsAffected()
+}
+
+func ListPersonByIdSet(ids ...int64) (map[int64]*model.Person, error) {
+	if nil == ids || len(ids) == 0 {
+		return nil, nil
+	}
+	var query *db.QueryParser
+	parser := em.Select().Where()
+	query = parser.InInt64(em.PK, ids...).OrderBy(em.PK, db.DESC)
+
+	models := make([]*model.Person, 0)
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			p := new(model.Person)
+			err := rows.Scan(
+				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
+				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+			)
+			models = append(models, p)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
+	}
+	// return the map
+	var resultmap = map[int64]*model.Person{}
+	for _, u := range models {
+		resultmap[int64(u.Id)] = u
+	}
+	return resultmap, nil
 }

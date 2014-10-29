@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/elivoa/got/db"
 	"syd/dal"
 	"syd/dal/orderdao"
 	"syd/model"
@@ -10,9 +11,9 @@ import (
 
 type OrderService struct{}
 
-// func (s *OrderService) EntityManager() *db.Entity {
-// 	return orderdao.EntityManager()
-// }
+func (s *OrderService) EntityManager() *db.Entity {
+	return orderdao.EntityManager()
+}
 
 // TODO: how to get logined user.
 // func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
@@ -313,3 +314,58 @@ func _processOrderCustomerPrice(order *model.Order) {
 		// }
 	}
 }
+
+func (s *OrderService) ListOrders(parser *db.QueryParser, withs Withs) ([]*model.Order, error) {
+	if orders, err := orderdao.ListOrders(parser); err != nil {
+		return nil, err
+	} else {
+		// TODO: Print warrning information when has unused withs.
+
+		if withs&WITH_PERSON > 0 {
+			if err := s.FillOrderSlicesWithPerson(orders); err != nil {
+				return nil, err
+			}
+		}
+		return orders, nil
+	}
+}
+
+// orderlist is passed by pointer.
+func (s *OrderService) FillOrderSlicesWithPerson(orders []*model.Order) error {
+	var idset = map[int64]bool{}
+	for _, order := range orders {
+		idset[int64(order.CustomerId)] = true
+	}
+	personmap, err := Person.BatchFetchPersonByIdMap(idset)
+	if err != nil {
+		return err
+	}
+	if nil != personmap && len(personmap) > 0 {
+		for _, order := range orders {
+			if person, ok := personmap[int64(order.CustomerId)]; ok {
+				order.Customer = person
+			}
+		}
+	}
+	return nil
+}
+
+// orderlist is passed by pointer.
+// func (s *OrderService) FillOrderSlicesWithPerson(orders []*model.Order) error {
+// 	var idset = map[int64]bool{}
+// 	for _, order := range orders {
+// 		idset[order.CustomerId] = true
+// 	}
+// 	usermap, err := User.BatchFetchUsersByIdMap(idset)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if nil != usermap {
+// 		for _, order := range orders {
+// 			if user, ok := usermap[order.UserId]; ok {
+// 				order.User = user
+// 			}
+// 		}
+// 	}
+// 	return nil
+// }

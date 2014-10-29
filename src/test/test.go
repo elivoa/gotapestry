@@ -11,11 +11,20 @@ import (
 	"time"
 )
 
+var va = 1 << 0
+var vb = 1 << 1
+var vc = 1 << 2
+var vd = 1 << 3
+
 func main() {
 	// now := time.Now()
 	// end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0)
 	// start := end.AddDate(0, 0, 1)
-
+	a := va | vc
+	fmt.Println("va ", a&va > 0)
+	fmt.Println("vb ", a&vb > 0)
+	fmt.Println("vc ", a&vc > 0)
+	fmt.Println("vd ", a&vd > 0)
 	// userdao.ListUserByIdSet(1, 3, 4)
 
 	fmt.Println("----------------------------------------------------------------------------------------------------")

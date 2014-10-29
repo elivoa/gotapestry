@@ -34,7 +34,15 @@
                        value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
               </td>
               <td nowrap>
-                <a href="/person/detail/{{.CustomerId}}">{{$.ShowCustomerName .CustomerId}}</a>
+                <if t=".Customer">
+                  <a href="/person/detail/{{.CustomerId}}">
+                    {{.Customer.Name}}
+                  </a>
+                  <else />
+                  <a href="/person/detail/{{.CustomerId}}">
+                    {{.CustomerId}}
+                  </a>
+                </if>
               </td>
               <td nowrap>
                 <a href="{{$.ViewLink .}}">
@@ -110,7 +118,7 @@
               
               <td style="display:none">
                 <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}"
-                   onclick="return confirm('******************************\n注意：真的要删除{{$.ShowCustomerName .CustomerId}}的订单么？已经发货的订单不能删除！会影响累计欠款！\n******************************');">
+                   onclick="return confirm('******************************\n注意：真的要删除 {{if .Customer}}{{.Customer.Name}}{{else}}{{.CustomerId}}{{end}} 的订单么？已经发货的订单不能删除！会影响累计欠款！\n******************************');">
                   【删除订单】
                 </a>
               </td>
@@ -121,11 +129,11 @@
       </if>
 
       <script type="text/javascript">
-                   $(function(){
-                     orderlist = new OrderList({
-                       ClientId: {{.ClientId}}
-                     })
-                   });
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
       </script>
 
     </div>

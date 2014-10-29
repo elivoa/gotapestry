@@ -39,9 +39,10 @@ type ProductDetalJsonStruct struct {
 
 // --------------------------------------------------------------------------------
 // TODO: 如此多的方法，还是弄一个类似于Params的东西来接收可变参数。
-func CountOrder(status string) (int, error) {
-	return orderdao.CountOrder(status)
-}
+// disable this;
+// func CountOrder(status string) (int, error) {
+// 	return orderdao.CountOrder(status)
+// }
 
 func ListOrder(status string) ([]*model.Order, error) {
 	return orderdao.ListOrder(status)

@@ -50,7 +50,7 @@ type Order struct {
 	TrackNumber int64  `` // real identification
 	Status      string `` // todeliver | delivering | done | canceled | (all)
 	Type        uint   `` //OrderType  // 代发 | 大货 | 子订单
-	CustomerId  int
+	CustomerId  int    // TODO: change this into int64
 
 	// shipping info
 	DeliveryMethod         string `` // YTO, SF, Depoon, Freight, TakeAway
@@ -73,6 +73,9 @@ type Order struct {
 	CreateTime time.Time
 	UpdateTime time.Time
 	CloseTime  time.Time
+
+	// additional containers
+	Customer *Person
 }
 
 // 根据结构，这个应该设计成两个表吧CS信息独立出去，为了省市，重复价格备注字段。
@@ -116,7 +119,7 @@ func GenerateOrderId() int64 {
 	y, M, d := now.Date()
 	h, m, s := now.Clock()
 	var first int = 0 +
-		y*10000000000 +
+		(y-2000)*10000000000 +
 		int(M)*100000000 +
 		d*1000000 +
 		h*10000 +

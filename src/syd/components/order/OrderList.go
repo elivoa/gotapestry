@@ -8,7 +8,6 @@ import (
 	"syd/model"
 	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
 )
 
 type OrderList struct {
@@ -19,17 +18,7 @@ type OrderList struct {
 	TotalPrice float64 // all order's price
 	Referer    string  // return here.
 
-	// temp values
-	customerNames map[int]*model.Person // order-id -> customer names
 }
-
-// func (p *OrderList) Activate() {
-// 	fmt.Println("\n\n\n********************************************************************************")
-// 	fmt.Println("activate !!!!!!!!!!!!! emlulated ::: ", p.Referer)
-// 	fmt.Println("********************************************************************************")
-// 	fmt.Println("********************************************************************************")
-// 	fmt.Println("********************************************************************************")
-// }
 
 func (p *OrderList) SetupRender() {
 	// verify user role.
@@ -44,27 +33,9 @@ func (p *OrderList) SetupRender() {
 	// Prepare customerNames to display.
 	length := len(p.Orders)
 	if length > 0 {
-		p.customerNames = make(map[int]*model.Person, length)
 		for _, o := range p.Orders {
 			p.TotalPrice += o.TotalPrice
-			if _, ok := p.customerNames[o.CustomerId]; ok {
-				continue
-			}
-
-			customer := personservice.GetPerson(o.CustomerId)
-			if customer != nil {
-				p.customerNames[customer.Id] = customer
-			}
 		}
-	}
-}
-
-func (p *OrderList) ShowCustomerName(customerId int) string {
-	customer, ok := p.customerNames[customerId]
-	if ok {
-		return customer.Name
-	} else {
-		return fmt.Sprintf("_[ p%v ]_", customerId)
 	}
 }
 
@@ -113,11 +84,6 @@ func (p *OrderList) OnShippingInsteadOrderPrint(trackNumber int64) (string, stri
 	}
 	return "redirect", fmt.Sprintf("/order/shippinginsteadprint/%v", trackNumber)
 }
-
-// not finished
-// func (p *OrderList) OnEditOrder() *exit.Exit {
-// 	return nil
-// }
 
 func (p *OrderList) EditLink(order *model.Order) string {
 	var editlink string

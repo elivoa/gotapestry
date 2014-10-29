@@ -9,7 +9,7 @@ import (
 // core person model
 //
 type Person struct {
-	Id         int    // id
+	Id         int    // id // TODO: change to int64
 	Name       string // pesron name
 	Type       string // `enum(客户Customer|厂家Factory)` // person type
 	Phone      string
