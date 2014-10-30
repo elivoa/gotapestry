@@ -99,23 +99,23 @@
 </html>
 
 <script type="text/javascript">
-           $(function(){
-             ocd = new OrderCreateDetail({{.CustomerId}})
-             
-             {{if .IsEdit}}
-             // Restore information
-             ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
-             ocd.odf.setData({{.ProductDetailJson}})
-             {{end}}
-             
-           });
+  $(function(){
+    ocd = new OrderCreateDetail({{.CustomerId}})
+    
+    {{if .IsEdit}}
+    // Restore information
+    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+    ocd.odf.setData({{.ProductDetailJson}})
+    {{end}}
+    
+  });
 
 // submit to return this page;
 function tempsave(){
   form = $("#OrderDetailForm")
   btn = $("#returnthispage")
   if(btn){
-    btn.val("true")
+    btn.val("saveonly")
   }
   // console.log(btn.val())
   form.submit()

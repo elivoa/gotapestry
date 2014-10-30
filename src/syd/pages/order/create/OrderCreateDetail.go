@@ -34,7 +34,7 @@ type OrderCreateDetail struct {
 	SubTitle     string // create or edit? TODO i18n resource file.
 	SubmitButton string // 确认下单？ 修改订单
 
-	ReturnThisPage bool // form submit return to this page;
+	ReturnThisPage string // form submit return to this page; values: saveonly, ""
 }
 
 // init page
@@ -85,7 +85,8 @@ func (p *OrderCreateDetail) OnPrepareForSubmit() {
 		p.Order.CustomerId = p.CustomerId
 	} else {
 		// if edit
-		// for security reason, TODO security check here. 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
+		// for security reason, TODO security check here.
+		// 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
 		o, err := orderservice.GetOrder(p.Id.Int)
 		if err != nil {
 			panic(err.Error())
@@ -103,12 +104,15 @@ func (p *OrderCreateDetail) OnSuccess() *exit.Exit {
 	if p.DaoFu == "on" {
 		p.Order.ExpressFee = -1
 	}
-	fmt.Println(">>> original order details submit from form;")
-	if nil != p.Order.Details {
-		for _, d := range p.Order.Details {
-			fmt.Println("\t---: ", d.OrderTrackNumber, d.Color, d.Size, " = ", d.Quantity, d.SellingPrice)
-		}
-	}
+
+	// fmt.Println(">>> original order details submit from form;")
+	// if nil != p.Order.Details {
+	// 	for _, d := range p.Order.Details {
+	// 		fmt.Println("\t---: ", d.OrderTrackNumber, d.Color, d.Size, " = ", d.Quantity, d.SellingPrice)
+	// 	}
+	// }
+	fmt.Println("\n\n--------------------------------------------------------------------------------")
+	fmt.Println(">>> ", p.ReturnThisPage)
 
 	if p.IsEdit() {
 		if _, err := service.Order.UpdateOrder(p.Order); err != nil {
@@ -120,7 +124,7 @@ func (p *OrderCreateDetail) OnSuccess() *exit.Exit {
 		}
 	}
 
-	if p.ReturnThisPage {
+	if p.ReturnThisPage == "saveonly" {
 		return nil
 	} else {
 		url := route.GetRefererFromURL(p.R)

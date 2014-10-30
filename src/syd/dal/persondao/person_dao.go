@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Tuesday, 2014-10-28 00:41:59>
+  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-30 17:51:15>
 
   Note: This is the latest Template for dao functions.
 
@@ -10,7 +10,6 @@ package persondao
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
@@ -94,23 +93,24 @@ func _one(query *db.QueryParser) (*model.Person, error) {
 
 // TODO: old version, should delete
 func Get(id int) (*model.Person, error) {
-	p := new(model.Person)
-	err := em.Select().Where("id", id).Query(
-		func(rows *sql.Rows) (bool, error) {
-			return false, rows.Scan(
-				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
-			)
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	// TODO can here use something like this db.StringNull????
-	if p.Id > 0 {
-		return p, nil
-	}
-	return nil, errors.New("Person not found!")
+	// p := new(model.Person)
+	return _one(em.NewQueryParser().Select().Where("id", id))
+	// err := em.Select().Where("id", id).Query(
+	// 	func(rows *sql.Rows) (bool, error) {
+	// 		return false, rows.Scan(
+	// 			&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
+	// 			&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+	// 		)
+	// 	},
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// // TODO can here use something like this db.StringNull????
+	// if p.Id > 0 {
+	// 	return p, nil
+	// }
+	// return nil, errors.New("Person not found!")
 }
 
 // personType: customer, factory
@@ -207,3 +207,21 @@ func ListPersonByIdSet(ids ...int64) (map[int64]*model.Person, error) {
 	}
 	return resultmap, nil
 }
+
+// the last part, read the list from rows
+// func _list(query *db.QueryParser) ([]*model.Person, error) {
+// 	models := make([]*model.Person, 0)
+// 	if err := query.Query(
+// 		func(rows *sql.Rows) (bool, error) {
+// 			p := &model.Person{}
+// 			err := rows.Scan(
+// 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
+// 				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime)
+// 			models = append(models, p)
+// 			return true, err
+// 		},
+// 	); err != nil {
+// 		return nil, err
+// 	}
+// 	return models, nil
+// }

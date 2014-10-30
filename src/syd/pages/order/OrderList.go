@@ -30,7 +30,7 @@ func (p *OrderList) Activate() {
 
 	// not injected with parameters.
 	if p.Tab == "" {
-		p.Tab = "all" // default go in toprint
+		p.Tab = "toprint" // default go in toprint
 	}
 }
 
@@ -39,21 +39,6 @@ func (p *OrderList) SetupRender() {
 	if p.PageItems <= 0 {
 		p.PageItems = config.LIST_PAGE_SIZE // TODO default pager number. Config this.
 	}
-
-	// 1. get total
-	// 2. get order list.
-	// var err error
-	// p.Total, err = orderservice.CountOrder(p.Tab)
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
-	// p.Orders, err = orderservice.ListOrderPager(p.Tab, p.Current, p.PageItems)
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
-	// --------------------------------------------------------------------------------
 
 	// fetch data
 	var err error
@@ -86,9 +71,6 @@ func (p *OrderList) SetupRender() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	// p.Orders = dal.ListOrder(p.Tab)
-
 }
 
 func (p *OrderList) TabStyle(tab string) string {
