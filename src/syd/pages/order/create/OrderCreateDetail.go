@@ -112,20 +112,31 @@ func (p *OrderCreateDetail) OnSuccess() *exit.Exit {
 	// 	}
 	// }
 	fmt.Println("\n\n--------------------------------------------------------------------------------")
-	fmt.Println(">>> ", p.ReturnThisPage)
+	if p.ReturnThisPage == "saveonly" {
+		// 临时保存，不允许自提情况；
+		if p.Order.DeliveryMethod == "TakeAway" {
+			p.Order.DeliveryMethod = ""
+		}
+	}
 
+	var err error
 	if p.IsEdit() {
-		if _, err := service.Order.UpdateOrder(p.Order); err != nil {
+		if p.Order, err = service.Order.UpdateOrder(p.Order); err != nil {
 			panic(err)
 		}
 	} else {
-		if _, err := service.Order.CreateOrder(p.Order); err != nil {
+		if p.Order, err = service.Order.CreateOrder(p.Order); err != nil {
 			panic(err)
 		}
 	}
 
 	if p.ReturnThisPage == "saveonly" {
-		return nil
+		if p.IsEdit() {
+			return nil
+		} else {
+			// create 需要返回编辑地址
+			return exit.Redirect(fmt.Sprintf("/order/create/detail/%d", p.Order.Id))
+		}
 	} else {
 		url := route.GetRefererFromURL(p.R)
 		return exit.RedirectFirstValid(url, p.SourceUrl, "/order/list/"+p.Order.Status)

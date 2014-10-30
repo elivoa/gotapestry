@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-30 17:51:15>
+  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-30 17:54:50>
 
   Note: This is the latest Template for dao functions.
 
@@ -93,24 +93,7 @@ func _one(query *db.QueryParser) (*model.Person, error) {
 
 // TODO: old version, should delete
 func Get(id int) (*model.Person, error) {
-	// p := new(model.Person)
 	return _one(em.NewQueryParser().Select().Where("id", id))
-	// err := em.Select().Where("id", id).Query(
-	// 	func(rows *sql.Rows) (bool, error) {
-	// 		return false, rows.Scan(
-	// 			&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-	// 			&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
-	// 		)
-	// 	},
-	// )
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// // TODO can here use something like this db.StringNull????
-	// if p.Id > 0 {
-	// 	return p, nil
-	// }
-	// return nil, errors.New("Person not found!")
 }
 
 // personType: customer, factory
