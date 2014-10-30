@@ -30,6 +30,7 @@
             {{.Customer.Name}}
             <input type="button" class="btn_a_s" value="临时保存" onclick="tempsave();"
                    style="margin-left:20px;">
+            <span style="font-size:13px;color:gray">   累计欠款：{{.Customer.AccountBallance}}</span>
           </h2>
           <t:order.productselector customerId=".Customer.Id" />
 
