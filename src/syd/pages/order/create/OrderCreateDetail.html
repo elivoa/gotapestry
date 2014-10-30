@@ -21,10 +21,16 @@
           {{/* TODO Here, too many hidden fields, some of these are parsed through url */}}
           <input type="hidden" name="Order.Type" value="{{.Order.Type}}" />
           <input type="hidden" name="Order.ParentTrackNumber" value="{{.Order.ParentTrackNumber}}" />
-          
-          <!-- 客户信息 -->
-          <t:order.customerinfo customer=".Customer" />
 
+          <input id="returnthispage" type="hidden" name="ReturnThisPage" value="true" />
+
+          <!-- 客户信息 -->
+          <!-- < t:order.customerinfo customer=".Customer" /> -->
+          <h2 style="margin:8px 0">
+            {{.Customer.Name}}
+            <input type="button" class="btn_a_s" value="临时保存" onclick="tempsave();"
+                   style="margin-left:20px;">
+          </h2>
           <t:order.productselector customerId=".Customer.Id" />
 
           <div class="">
@@ -81,7 +87,7 @@
 		    </div>
 		  </div>
           <div class="btn_content">
-            <input type="submit" class="btn_a_l" value="临时保存">
+            <input type="button" class="btn_a_l" value="临时保存" onclick="tempsave();">
             <input type="submit" class="btn_a_l" value="{{.SubmitButton}}">
           </div>
         </form>
@@ -92,14 +98,25 @@
 </html>
 
 <script type="text/javascript">
-  $(function(){
-    ocd = new OrderCreateDetail({{.CustomerId}})
-    
-    {{if .IsEdit}}
-    // Restore information
-    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
-    ocd.odf.setData({{.ProductDetailJson}})
-    {{end}}
-    
-  });
+           $(function(){
+             ocd = new OrderCreateDetail({{.CustomerId}})
+             
+             {{if .IsEdit}}
+             // Restore information
+             ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+             ocd.odf.setData({{.ProductDetailJson}})
+             {{end}}
+             
+           });
+
+// submit to return this page;
+function tempsave(){
+  form = $("#OrderDetailForm")
+  btn = $("#returnthispage")
+  if(btn){
+    btn.val("true")
+  }
+  // console.log(btn.val())
+  form.submit()
+}
 </script>

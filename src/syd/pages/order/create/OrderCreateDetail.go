@@ -33,6 +33,8 @@ type OrderCreateDetail struct {
 	// page msg resources
 	SubTitle     string // create or edit? TODO i18n resource file.
 	SubmitButton string // 确认下单？ 修改订单
+
+	ReturnThisPage bool // form submit return to this page;
 }
 
 // init page
@@ -118,8 +120,12 @@ func (p *OrderCreateDetail) OnSuccess() *exit.Exit {
 		}
 	}
 
-	url := route.GetRefererFromURL(p.R)
-	return exit.RedirectFirstValid(url, p.SourceUrl, "/order/list/"+p.Order.Status)
+	if p.ReturnThisPage {
+		return nil
+	} else {
+		url := route.GetRefererFromURL(p.R)
+		return exit.RedirectFirstValid(url, p.SourceUrl, "/order/list/"+p.Order.Status)
+	}
 
 	// // order, update details
 	// for _, detail := range p.Order.Details {
