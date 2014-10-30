@@ -75,8 +75,9 @@
               <td nowrap>
 
                 <if t='.IsStatus "toprint"'>
-                  <a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-                  <a href="{{$.PrintOrderLink .}}" style="font-weight:bolder;color:green"
+                  <!-- TODO solve this -->
+                  <a href="{{$.EditLink .}}?referer={{referer $}}">修改订单</a><span class="vline">|</span>
+                  <a href="{{$.PrintOrderLink .}}?referer={{referer $}}" style="font-weight:bolder;color:green"
                      onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
                   <span class="vline">|</span>
 
@@ -86,7 +87,7 @@
                 </if>
 
                 <if t='.IsStatus "todeliver"'>
-                  <a href="{{$.FixPrintOrderLink .}}">打印订单</a>
+                  <a href="{{$.FixPrintOrderLink .}}?referer={{referer $}}">打印订单</a>
                   <span class="vline">|</span>
                   <a t:type="order/DeliverButton" tid="deliverBtn" trackNumber=".TrackNumber"
                      deliveryMethod=".DeliveryMethod" deliveryTrackingNumber=".DeliveryTrackingNumber"
@@ -99,7 +100,7 @@
 
                 <if t='.StatusIs "delivering"'>
                   <if t='.DeliveryMethodIs "TakeAway"'>
-                    <a href="{{$.FixPrintOrderLink .}}">自提打印订单</a>
+                    <a href="{{$.FixPrintOrderLink .}}?referer={{referer $}}">自提打印订单</a>
                     <span class="vline">|</span>
                   </if>
                   

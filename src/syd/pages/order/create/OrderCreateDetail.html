@@ -27,10 +27,10 @@
           <!-- 客户信息 -->
           <!-- < t:order.customerinfo customer=".Customer" /> -->
           <h2 style="margin:8px 0">
-            {{.Customer.Name}}
+            <a href="/person/detail/{{.Customer.Id}}" target="blank">{{.Customer.Name}}</a>
+            <span style="font-size:13px;color:gray"> 累计欠款：{{.Customer.AccountBallance}}</span>
             <input type="button" class="btn_a_s" value="临时保存" onclick="tempsave();"
                    style="margin-left:20px;">
-            <span style="font-size:13px;color:gray">   累计欠款：{{.Customer.AccountBallance}}</span>
           </h2>
           <t:order.productselector customerId=".Customer.Id" />
 

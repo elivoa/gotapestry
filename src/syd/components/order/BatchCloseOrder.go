@@ -1,7 +1,6 @@
 package order
 
 import (
-	"fmt"
 	"github.com/elivoa/got/core"
 	"strconv"
 	"syd/model"
@@ -25,10 +24,10 @@ func (c *BatchCloseOrder) New() *BatchCloseOrder {
 }
 
 func (c *BatchCloseOrder) Setup() {
-	fmt.Println(">>>>>>>>>>>>>>> ", c.CustomerId)
+	// fmt.Println(">>>>>>>>>>>>>>> ", c.CustomerId)
 	c.Customer = personservice.GetPerson(c.CustomerId)
 	if c.Customer == nil {
 		panic("Customer not found! " + strconv.Itoa(c.CustomerId))
 	}
-	fmt.Println("------------------------======", c.Customer.AccountBallance)
+	// fmt.Println("------------------------======", c.Customer.AccountBallance)
 }

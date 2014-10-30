@@ -44,6 +44,9 @@ var SYDModule = &core.Module{
 			errorhandler.RedirectHandler("/account/login"),
 		)
 
+		// --------------------------------------------------------------------------------
+		config.LIST_PAGE_SIZE = 50
+
 	},
 }
 
