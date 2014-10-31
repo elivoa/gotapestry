@@ -1,4 +1,4 @@
-// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Friday, 2014-10-31 13:31:54>
+// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Friday, 2014-10-31 13:36:59>
 package model
 
 import (

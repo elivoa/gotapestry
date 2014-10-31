@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <t:layout.header title="Account" public="true"/>
+  </head>
+  <body>
+    <t:layout.headernav />
+
+    <div class="login">
+	  <div class="unit login_unit">
+    	<div class="tit"><strong>Sign in</strong></div>
+        
+        <div class="login_form">
+          <if t=".FormError">
+            <div class="tips_error">
+              <span class="txt_error">{{.FormError}}</span>
+              <!-- Username and password not mache. -->
+            </div>
+          </if>
+          
+          <form method="POST" id="LoginForm" action="">
+            <input type="hidden" name="t:id" value="LoginForm" todo="auto do this."/>
+            
+            <dl>
+              <dt>Username:</dt>
+              <dd>
+                <input type="text" id="username" name="LoginUser.Username" value=""
+                       class="inp_login" required minlength="3" maxlength="24"/>
+              </dd>
+            </dl>
+            <dl>
+              <dt>Password:</dt>
+              <dd>
+                <!-- TODO: remember username -->
+                <!-- TODO: 密码明文传输了，需要加密 -->
+                <input type="password" id="password" name="LoginUser.Password" value=""
+                       class="inp_login" required minlength="4" maxlength="24"/>
+            </dl>
+            <div class="login_btn">
+              <input type="submit" class="btn_a_l" value="Sign in" />
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+
+$(function(){
+  $('#username').focus();
+
+  // udpate timezone to server. // disable this in syd project.
+  $.ajax({
+    type: "GET",
+    url: "/account/login:SetTimeZone/" + new Date().getTimezoneOffset(),
+    data: {},
+    success: function(data) {
+      console.log('successfully set timezone!')
+      console.log(data)
+      $('.timezone_display_zone').html(data);
+    },
+    error: function() {
+      return console.log("error occured when set timezone");
+    }
+  });
+
+});
+
+
+$('#LoginForm').validate();
+
+</script>
+
+  </body>
+</html>

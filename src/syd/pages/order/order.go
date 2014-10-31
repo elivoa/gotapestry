@@ -3,6 +3,8 @@ package order
 import (
 	"fmt"
 	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route"
+	"github.com/elivoa/got/route/exit"
 	"strings"
 	"syd/dal/accountdao"
 	"syd/model"
@@ -86,7 +88,6 @@ func (p *ShippingInsteadList) _onStatusEvent(trackNumber int64, status string, t
 //
 type ButtonSubmitHere struct {
 	core.Page
-	Source      string
 	TrackNumber int64 // our order tracknumber
 
 	// need by deliver from
@@ -96,16 +97,18 @@ type ButtonSubmitHere struct {
 	DaoFu                  string
 
 	// need by close form
-	Money float64
+	Money   float64
+	Referer string
 }
 
 // **** important logic ****
 // TODO transaction. Move to right place
-func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
+func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
 	// 1/2 update delivery informantion to order.
 
 	// 1. get order form db.
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
+	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
+	fmt.Println(">>> ", p.Referer)
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
 		panic(err.Error())
@@ -161,14 +164,15 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() (string, string) {
 
 	}
 	fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
-
-	fmt.Println("_____ on deliver from devliver from --- success --- ")
-	return p.returnDispatch()
+	return route.RedirectDispatch(p.Referer, "/order/list")
 }
 
 // **** important logic ****
 // when close order. 结款， Close Order
-func (p *ButtonSubmitHere) OnSuccessFromCloseForm() (string, string) {
+func (p *ButtonSubmitHere) OnSuccessFromCloseForm() *exit.Exit {
+	fmt.Println("\n\n\n>>>>>>>>>>>>>>>>>>>> On success from close order.................", p.TrackNumber)
+	fmt.Println(">>> ", p.Referer, "<<<<<<<<<<<<<<<<<")
+
 	// 1/2 update delivery informantion to order.
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
@@ -199,15 +203,5 @@ func (p *ButtonSubmitHere) OnSuccessFromCloseForm() (string, string) {
 		RelatedOrderTN: order.TrackNumber,
 		Reason:         "",
 	})
-
-	return p.returnDispatch()
-}
-
-func (p *ButtonSubmitHere) returnDispatch() (string, string) {
-	if p.Source != "" {
-		return "redirect", p.Source
-	} else {
-		return "redirect", "/order/list/all"
-	}
-
+	return route.RedirectDispatch(p.Referer, "/order/list")
 }

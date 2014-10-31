@@ -16,10 +16,12 @@ type DeliveringUnclosedOrders struct {
 	core.Page
 	CustomerId int `path-param:"1"`
 	Orders     []*model.Order
+	Referer    string // return here.
 }
 
 // default: get all orders of one person
 func (p *DeliveringUnclosedOrders) Setup() (string, string) {
+	fmt.Print("\n\n\n\n>>>>>>>>>>>>>>>  ;;; referer is , ", p.Referer)
 	return ordersJsonByCustomerid(p.CustomerId)
 }
 

@@ -106,7 +106,7 @@
                   
                   {{/* TODO order/CloseButton */}}
                   <a t:type="order.CloseButton" Tid="CloseButton" id="close{{.TrackNumber}}_"
-                     TrackNumber=".TrackNumber" Source="/order/list{{$.Tab}}" />
+                     TrackNumber=".TrackNumber" Referer="referer $" />
                 </if>
 
                 <!--
@@ -130,11 +130,11 @@
       </if>
 
       <script type="text/javascript">
-  $(function(){
-    orderlist = new OrderList({
-      ClientId: {{.ClientId}}
-    })
-  });
+                   $(function(){
+                     orderlist = new OrderList({
+                       ClientId: {{.ClientId}}
+                     })
+                   });
       </script>
 
     </div>

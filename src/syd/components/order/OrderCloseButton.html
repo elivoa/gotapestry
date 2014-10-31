@@ -19,7 +19,7 @@ CloseOrderModal -- open modal box to close order
           onsubmit="return validateCloseForm('{{.ClientId}}');">
       <input type="hidden" name="t:id" value="CloseForm" />
       <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />      
-      <input type="hidden" name="Source" value="{{.Source}}" />
+      <input type="hidden" name="Referer" value="{{referer .}}" />
       
 	  <div class="L_account_info clearfix">
 	    <strong>{{.Customer.Name}}</strong>
@@ -52,41 +52,41 @@ CloseOrderModal -- open modal box to close order
   </div>
 </div>
 <script type="text/javascript">
-  // inline javascript example
-  function validateCloseForm(id){
-    if (confirm("确认结款么？")){
-      o = $("#"+id+"_modal input.money")
-      if (o.val() == "") {
-        alert('必须填写结账金额！')
-        o.focus()
-        return false
-      }
-      return true
-    } else{
-      return false
-    }
-  }
+       // inline javascript example
+       function validateCloseForm(id){
+         if (confirm("确认结款么？")){
+           o = $("#"+id+"_modal input.money")
+           if (o.val() == "") {
+             alert('必须填写结账金额！')
+             o.focus()
+             return false
+           }
+           return true
+         } else{
+           return false
+         }
+       }
 
-$(function(){
-  // TODO make these only appear once. use this in js files and control js import.
-  $("#{{.ClientId}}_trigger").click(function(){
-    var m = $("#{{.ClientId}}_modal")
-    return $.proxy(function(e){
-      e.preventDefault()
-      m.on('shown', function(){
-        m.find("input.money").focus()
-      });
-      m.modal("show")
-      
-      clearbtn = m.find(".money-clear")
-      m.find(".money-clear").click(function(){
-        if(clearbtn.prop('checked') == true){
-          m.find("input.money").val("{{.Order.SumOrderPrice}}")
-        }else{
-          m.find("input.money").focus()
-        }
-      })
-    },this)
-  }())
-});
-</script>
+       $(function(){
+         // TODO make these only appear once. use this in js files and control js import.
+         $("#{{.ClientId}}_trigger").click(function(){
+           var m = $("#{{.ClientId}}_modal")
+           return $.proxy(function(e){
+             e.preventDefault()
+             m.on('shown', function(){
+               m.find("input.money").focus()
+             });
+             m.modal("show")
+             
+             clearbtn = m.find(".money-clear")
+             m.find(".money-clear").click(function(){
+               if(clearbtn.prop('checked') == true){
+                 m.find("input.money").val("{{.Order.SumOrderPrice}}")
+               }else{
+                 m.find("input.money").focus()
+               }
+             })
+           },this)
+         }())
+       });
+       </script>

@@ -12,10 +12,9 @@ type OrderCloseButton struct {
 	core.Component
 
 	TrackNumber int64
-	Source      string // return to this place
-
-	Order    *model.Order
-	Customer *model.Person
+	Order       *model.Order
+	Customer    *model.Person
+	Referer     string
 }
 
 func (p *OrderCloseButton) Setup() {

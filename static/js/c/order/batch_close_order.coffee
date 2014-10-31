@@ -1,5 +1,5 @@
 ##
-## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Saturday, 2014-05-17 15:41:06>
+## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Friday, 2014-10-31 14:06:13>
 ##
 window.BatchCloseOrder =
 class BatchCloseOrder
