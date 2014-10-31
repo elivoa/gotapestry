@@ -1,7 +1,6 @@
-package exceptions
+package base
 
 // ___________________________________________________________________________
-// TODO: is this no use?
 
 // permisstion denied error
 type AccessDeniedError struct {

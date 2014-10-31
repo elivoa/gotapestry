@@ -1,4 +1,4 @@
-// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Saturday, 2014-06-21 21:25:11>
+// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Friday, 2014-10-31 13:31:54>
 package model
 
 import (
@@ -27,18 +27,47 @@ type User struct {
 	UpdateTime time.Time
 }
 
+// UserToken
 type UserToken struct {
+	Id       int64
+	Name     string
 	Username string
 	Password string
-	Roles    []string // roles
+	Roles    []string // roles, do not support multi roles now.
+	Store    string   // no use in syd
 	// TODO: timeout?
+}
+
+func (t *UserToken) Role() string {
+	if nil == t.Roles || len(t.Roles) == 0 {
+		return ""
+	}
+	return t.Roles[0]
+}
+
+func (s *UserToken) HasRole(role string) bool {
+	lowerRole := strings.ToLower(role)
+
+	if s == nil || s.Roles == nil {
+		return false
+	}
+	for _, r := range s.Roles {
+		if r == lowerRole {
+			return true
+		}
+	}
+	return false
 }
 
 func (u *User) ToUserToken() *UserToken {
 	userToken := &UserToken{
+		Id:       u.Id,
+		Name:     u.Name,
 		Username: u.Username,
 		Password: u.Password,
+		// Store:    u.Store,
 	}
+	// roles
 	rawRoles := strings.Split(u.Role, ",")
 	userToken.Roles = make([]string, 0)
 	for _, r := range rawRoles {

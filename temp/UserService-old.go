@@ -1,36 +1,27 @@
 package service
 
+// TODO chagne file to UserService
 import (
 	"fmt"
-	"github.com/elivoa/got/config"
-	"github.com/elivoa/got/core/exception"
 	"github.com/elivoa/got/coreservice/sessions"
-	"github.com/elivoa/got/db"
 	"net/http"
 	"strings"
-	"syd/base"
-	"syd/dal/useractiondao"
+	"syd"
 	"syd/dal/userdao"
 	"syd/model"
 	"time"
 )
 
-var USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN_SESSION_KEY"
-
-// TODO change session into longtime session.
-
 // 临时解决方案。全局唯一的service。TODO 研究一下Tapestry的IOC，看一下他们的service是每个request创建一个么？
 // 按照他的方法来解决。
-var User = &UserService{}
+var User *UserService = &UserService{}
 
 // TODO Need interface & implements Design pattern.
 type UserService struct {
 	// TODO: Inject request...
 }
 
-func (s *UserService) EntityManager() *db.Entity {
-	return userdao.EntityManager()
-}
+var USER_TOKEN_SESSION_KEY string = "USER_TOKEN_SESSION_KEY"
 
 /*
   1. User enter any page. AuthService check if there are UserToken in session.
@@ -46,25 +37,30 @@ func (s *UserService) EntityManager() *db.Entity {
 // used in methods.
 func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
 	if userToken := s.GetLogin(w, r); userToken == nil {
-		panic(&base.LoginError{Message: "User not login.", Reason: "some reason"})
+		panic(&syd.LoginError{Message: "User not login.", Reason: "some reason"})
 	} else {
 		return userToken
 	}
 }
 
 // RequireRole including RequireLogin
-func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, roles ...string) *model.UserToken {
+func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, role string) *model.UserToken {
 	userToken := s.RequireLogin(w, r)
-	for _, requiredRole := range roles {
-		requiredRole = strings.ToLower(requiredRole)
-		for _, r := range userToken.Roles {
-			if r == requiredRole {
-				return userToken
-			}
+	lowerRole := strings.ToLower(role)
+	found := false
+	for _, r := range userToken.Roles {
+		if r == lowerRole {
+			found = true
+			break
 		}
 	}
-	panic(exception.NewAccessDeniedErrorf(
-		"Access Denied. You need to be one of the following roles: %v", roles))
+	fmt.Println(found)
+	if found {
+		return userToken
+	} else {
+		fmt.Println("access denied?")
+		panic(&syd.AccessDeniedError{Message: "Access Denied."})
+	}
 }
 
 // will be very fast.
@@ -78,7 +74,7 @@ func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.Us
 	// 		fmt.Printf("key %v --> value: %v\n", k, v)
 	// 	}
 	// }
-	if userTokenRaw, ok := session.Values[config.USER_TOKEN_SESSION_KEY]; ok && userTokenRaw != nil {
+	if userTokenRaw, ok := session.Values[USER_TOKEN_SESSION_KEY]; ok && userTokenRaw != nil {
 		if userToken := userTokenRaw.(*model.UserToken); userToken != nil {
 			// TODO: check if userToken is outdated.
 			if outdated := false; !outdated {
@@ -104,21 +100,18 @@ func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.Us
 
 func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error) {
 	if credential := s.loadUserTokenFromCookie(r); credential != nil {
-		user, err := userdao.GetUserWithCredential(credential[0], credential[1])
-		if nil != user && err == nil {
+		user := userdao.GetUserWithCredential(credential[0], credential[1])
+		if nil != user {
 			// if pass := userdao.VerifyLogin(userToken.Username, userToken.Password); pass {
 			// fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 			// fmt.Println("login success.")
 			// fmt.Println(userToken)
 			return user.ToUserToken(), nil
 		} else {
-			if err == nil {
-				err = &base.LoginError{Message: "Username and password not matched."}
-			}
-			return nil, err
+			return nil, &syd.LoginError{Message: "Username and password not matched."}
 		}
 	}
-	return nil, &base.LoginError{Message: "User not login."}
+	return nil, &syd.LoginError{Message: "User not login."}
 }
 
 // return username & password pair
@@ -145,17 +138,14 @@ func (s *UserService) Login(username string, password string,
 	// 3. if not , return error.
 	// TEST: always return true.
 
-	user, err := userdao.GetUserWithCredential(username, password)
-	if nil != user && err == nil {
+	user := userdao.GetUserWithCredential(username, password)
+	if nil != user {
 		userToken := user.ToUserToken()
 		s.setToSession(w, r, userToken)
 		s.setToCookie(w, userToken)
 		return userToken, nil
 	} else {
-		if err == nil {
-			err = &base.LoginError{Message: "Username and password not matched."}
-		}
-		return nil, err
+		return nil, &syd.LoginError{Message: "Username and password not matched."}
 	}
 }
 
@@ -214,93 +204,4 @@ func (s *UserService) HasRole(w http.ResponseWriter, r *http.Request, role strin
 		}
 	}
 	return false
-}
-
-// --------------------------------------------------------------------------------
-// The following is helper function to fill user to models.
-func (s *UserService) _batchFetchUsers(ids []int64) (map[int64]*model.User, error) {
-	return userdao.ListUserByIdSet(ids...)
-}
-
-func (s *UserService) BatchFetchUsers(ids ...int64) (map[int64]*model.User, error) {
-	return s._batchFetchUsers(ids)
-}
-
-func (s *UserService) BatchFetchUsersByIdMap(idset map[int64]bool) (map[int64]*model.User, error) {
-	var idarray = []int64{}
-	if idset != nil {
-		for id, _ := range idset {
-			idarray = append(idarray, id)
-		}
-	}
-	return s._batchFetchUsers(idarray)
-}
-
-// func (s *UserService) GetUserById(id int64) (*model.User, error) {
-// 	return userdao.GetUserById(id)
-// }
-
-func (s *UserService) CreateUser(user *model.User) (*model.User, error) {
-	dbuser, err := userdao.GetUser("username", user.Username)
-	if err != nil {
-		// DONE: 如何使用error才不会导致调用栈的丢失？
-		panic(exception.NewCoreError(err, ""))
-	}
-	if dbuser != nil {
-		return nil, exception.NewCoreError(nil, "User already exists for name: %s", user.Username)
-	}
-	return userdao.CreateUser(user)
-}
-
-func (s *UserService) UpdateUser(user *model.User) (int64, error) {
-	return userdao.UpdateUser(user)
-}
-
-func (s *UserService) Total() int {
-	count, err := s.EntityManager().CountAll()
-	if err != nil {
-		panic(err)
-	}
-	return count
-}
-
-// --------------------------------------------------------------------------------
-// UserAction related
-func (s *UserService) UserActionEntityManager() *db.Entity {
-	return useractiondao.EntityManager()
-}
-
-func (s *UserService) LogUserAction(userId int64, action model.ActionType, contexts ...interface{}) error {
-	return useractiondao.LogUserAction(userId, action, contexts...)
-}
-
-func (s *UserService) ListUserActionWithUsers(parser *db.QueryParser) ([]*model.UserAction, error) {
-	if userActions, err := useractiondao.ListUserAction(parser); err != nil {
-		return nil, err
-	} else {
-		if err := s.FillUserActionListWithUser(userActions); err != nil {
-			return nil, err
-		}
-		return userActions, nil
-	}
-}
-
-// orderlist is passed by pointer.
-func (s *UserService) FillUserActionListWithUser(userActions []*model.UserAction) error {
-	var idset = map[int64]bool{}
-	for _, userAction := range userActions {
-		idset[userAction.UserId] = true
-	}
-	usermap, err := s.BatchFetchUsersByIdMap(idset)
-	if err != nil {
-		return err
-	}
-	if nil != usermap {
-		for _, userAction := range userActions {
-			if user, ok := usermap[userAction.UserId]; ok {
-				userAction.User = user
-			}
-		}
-	}
-	return nil
 }

@@ -1,52 +1,38 @@
+// latest-tag: [user_dao.go] Time-stamp: <[user_dao.go] Elivoa @ Friday, 2014-10-31 13:01:49>
 package userdao
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 	"syd/model"
+	"time"
 )
 
-// create a new entity.
+var core_fields = []string{
+	"username", "password", "gender", "qq", "mobile", "city", "role", "create_time",
+}
+
 var em = &db.Entity{
 	Table:        "user",
 	PK:           "id",
-	Fields:       []string{"id", "username", "password", "gender", "qq", "mobile", "city", "role", "create_time", "update_time"},
-	CreateFields: []string{"username", "password", "gender", "qq", "mobile", "city", "role", "update_time"},
-	UpdateFields: []string{"username", "password", "gender", "qq", "mobile", "city", "role"},
+	Fields:       append(append([]string{"id"}, core_fields...), "update_time"),
+	CreateFields: core_fields,
+	UpdateFields: core_fields,
 }
 
 func init() {
-	db.RegisterEntity("user", em)
+	db.RegisterEntity("syd/user", em)
 }
 
-func CreateUser(user *model.User) (*model.User, error) {
-	// password???
-	res, err := em.Insert().Exec(
-		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role, time.Now(),
-	)
-	if err != nil {
-		return nil, err
-	}
-	id, err := res.LastInsertId()
-	user.Id = id
-	return user, nil
+func EntityManager() *db.Entity {
+	return em
 }
 
-func DeleteUser(id int64) (int64, error) {
-	res, err := em.Delete().Exec(id)
-	if err != nil {
-		return 0, err
-	}
-	return res.RowsAffected()
-}
-
-func GetUserById(id int64) (*model.User, error) {
+func _one(query *db.QueryParser) (*model.User, error) {
 	p := new(model.User)
-	err := em.Select().Where("id", id).Query(
+	err := query.Query(
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&p.Id, &p.Username, &p.Password, &p.Gender, &p.QQ, &p.Mobile, &p.City, &p.Role,
@@ -60,36 +46,127 @@ func GetUserById(id int64) (*model.User, error) {
 	if p.Id > 0 {
 		return p, nil
 	}
-	return nil, errors.New("Person not found!")
+	return nil, nil
 }
 
-// TODO: password should be encripted.
-func GetUserWithCredential(username string, password string) *model.User {
-	fmt.Println("LoginService :> Get user with username/password pair : ", username, password)
-
-	p := new(model.User)
-	err := em.Select().Where("username", username).And("password", password).Query(
+func _list(query *db.QueryParser) ([]*model.User, error) {
+	models := make([]*model.User, 0)
+	if err := query.Query(
 		func(rows *sql.Rows) (bool, error) {
-			return false, rows.Scan(
+			p := &model.User{}
+			err := rows.Scan(
 				&p.Id, &p.Username, &p.Password, &p.Gender, &p.QQ, &p.Mobile, &p.City, &p.Role,
 				&p.CreateTime, &p.UpdateTime,
 			)
+			models = append(models, p)
+			return true, err
 		},
+	); err != nil {
+		return nil, err
+	}
+	return models, nil
+}
+
+func CreateUser(user *model.User) (*model.User, error) {
+	// password???
+	res, err := em.Insert().Exec(
+		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role, time.Now(),
+		// TODO: change time.Now() to user.CreateTime, need to assign all create time outside.
 	)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	if p.Id > 0 { // return p.Id if true
-		return p
+	id, err := res.LastInsertId()
+	user.Id = id
+	return user, nil
+}
+
+func UpdateUser(user *model.User) (int64, error) {
+	// update order
+	res, err := em.Update().Exec(
+		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role,
+		user.UpdateTime,
+		user.Id, // condition
+	)
+	if err != nil {
+		return 0, err
 	}
-	return nil
+	return res.RowsAffected()
+}
+
+func DeleteUser(id int64) (int64, error) {
+	res, err := em.Delete().Exec(id)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+func GetUser(field string, value interface{}) (*model.User, error) {
+	return _one(em.Select().Where(field, value))
+}
+
+// TODO: password should be encripted.
+func GetUserWithCredential(username string, password string) (*model.User, error) {
+	fmt.Println("LoginService :> Get user with username/password pair : ", username, password)
+	return _one(em.Select().Where("username", username).And("password", password))
+}
+
+func GetUserById(id int64) (*model.User, error) {
+	return GetUser(em.PK, id)
 }
 
 // TODO: password should be encripted.
 func VerifyLogin(username string, password string) bool {
-	user := GetUserWithCredential(username, password)
-	return user.Id > 0 // return p.Id if true.
+	user, err := GetUserWithCredential(username, password)
+	return user.Id > 0 && err == nil // return p.Id if true.
 }
+
+func ListUser() ([]*model.User, error) {
+	var query *db.QueryParser
+	parser := em.Select().Where()
+	query = parser.OrderBy("id", db.DESC)
+	return _list(query)
+}
+
+func ListUserByIdSet(ids ...int64) (map[int64]*model.User, error) {
+	if nil == ids || len(ids) == 0 {
+		return nil, nil
+	}
+	var query *db.QueryParser
+	parser := em.Select().Where()
+	query = parser.InInt64("id", ids...).OrderBy("id", db.DESC)
+
+	users, err := _list(query)
+	if err != nil {
+		return nil, err
+	}
+
+	// users := make([]*model.User, 0)
+	// if err := query.Query(
+	// 	func(rows *sql.Rows) (bool, error) {
+	// 		p := new(model.User)
+	// 		err := rows.Scan(
+	// 			&p.Id, &p.Name, &p.Position, &p.Username, &p.Password, &p.Gender, &p.QQ,
+	// 			&p.Mobile, &p.Mobile2, &p.Phone, &p.Country, &p.City, &p.Address, &p.Store, &p.Role, &p.Note,
+	// 			&p.CreateTime, &p.UpdateTime,
+	// 		)
+	// 		users = append(users, p)
+	// 		return true, err
+	// 	},
+	// ); err != nil {
+	// 	return nil, err
+	// }
+
+	// return the map
+	var usermap = map[int64]*model.User{}
+	for _, u := range users {
+		usermap[u.Id] = u
+	}
+	return usermap, nil
+}
+
+// old things
 
 // list all accounts by id.
 // func ListAccountChangeLogsByCustomerId(customerId int) ([]*model.AccountChangeLog, error) {

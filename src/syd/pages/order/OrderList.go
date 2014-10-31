@@ -26,7 +26,7 @@ type OrderList struct {
 }
 
 func (p *OrderList) Activate() {
-	// service.User.RequireRole(p.W, p.R, carfilm.RoleSet_Orders...)
+	// service.User.RequireRole(p.W, p.R, syd.RoleSet_Orders...)
 
 	// not injected with parameters.
 	if p.Tab == "" {

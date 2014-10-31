@@ -3,7 +3,8 @@
   <head>
     <link href="/static/css/pages/pg_account.css" rel="stylesheet" type="text/css">
     <link href="/static/css/layer/layer.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="圣衣蝶 | 账号" />
+
+    <t:layout.header title="Account" />
   </head>
   <body class="PG_list_person">
     <t:layout.headernav />
@@ -12,23 +13,26 @@
       <t:layout.leftnav curpage="" />
 
       <div class="main_content">
-    	<h1>圣衣蝶：账号</h1>
+    	<h1>Account</h1>
 
         <div class="" style="">
-          <div style="float:left;width:560px;">
-            <h2>当前账号信息</h2>
+          <div style="float:left;width:560px;margin:40px 80px">
+            <h2>Current Login Account</h2>
+            <br>
             <ul>
-              <li>AccountName is {{.UserToken.Username}}</li>
-              <li>AccountInformation: TODO...</li>
+              <li>
+                You are currently logined as :
+                <span style="color:green;font-size:20px;">{{.UserToken.Username}}</span>
+              </li>
+              <li>
+                Your role is:
+                <span style="color:red;font-size:20px;">{{.UserToken.Role}}</span>
+              </li>
             </ul>
+            <br><br>
+            <a href="/account/changepassword">Change Your Password</a> |
+            <a href="/account/logout">Logout</a>
           </div>
-          <div style="float:left;">
-            <h2>其他信息</h2>
-            <div style="margin:4px;border:solid 1px gray;padding:8px;">
-            </div>
-          </div>
-          <div style="clear:both"></div>
-          
         </div>
         
       </div>
