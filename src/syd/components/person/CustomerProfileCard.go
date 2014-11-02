@@ -4,7 +4,7 @@ import (
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/gxl"
 	"syd/model"
-	"syd/service/personservice"
+	"syd/service"
 )
 
 type CustomerProfileCard struct {
@@ -19,6 +19,10 @@ func (p *CustomerProfileCard) Setup() {
 			panic("Customer or CustomerId should not both be null!")
 		}
 		// TODO get person
-		p.Customer = personservice.GetPerson(p.CustomerId.Int)
+		var err error
+		p.Customer, err = service.Person.GetPersonById(p.CustomerId.Int)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

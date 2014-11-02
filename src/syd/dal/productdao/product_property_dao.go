@@ -1,10 +1,12 @@
-package dal
+package productdao
 
 import (
+	"bytes"
+	"database/sql"
 	"fmt"
 	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/debug"
 	_ "github.com/go-sql-driver/mysql"
+	"syd/model"
 )
 
 // Set customer private price, panic if any error occurs.
@@ -25,16 +27,6 @@ func AddProductProperty(productId int, propertyName string, property string) {
 	if db.Err(err) {
 		panic(err.Error())
 	}
-
-	// // update
-	// stmt, err := db.DB.Prepare("update customer_special_price set " +
-	// 	"person_id=?, product_id=?, price=?, last_used_time=? " +
-	// 	"where id = ?")
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// defer stmt.Close()
-	// stmt.Exec(personId, productId, price, time.Now(), customerPrice.Id)
 }
 
 // Delete Product Property by product, property name and value
@@ -129,103 +121,81 @@ func UpdateProductProperties(productId int, propertyName string, values ...strin
 	}
 }
 
-// ________________________________________________________________________________
-// product color-size special values.
-//
-// NOTE: 1. only stock used. price is not used here.
-//
-
-/* Set special value of product color*size: stock and unit prices. */
-func SetProductStock(productId int, color string, size string, stock int) {
-	setProductCSValue(productId, color, size, "stock", stock, 0)
-}
-
-func SetProductPrice(productId int, color string, size string, price float64) {
-	setProductCSValue(productId, color, size, "price", 0, price)
-}
-
-//   _________________
-func setProductCSValue(productId int, color string, size string,
-	field string, stock int, price float64) {
-
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
-
-	_sql := fmt.Sprintf("insert into product_cs_value (product_id, color, size, %v) values (?,?,?,?) on duplicate key update %v = ?", field, field)
-
-	stmt, err := conn.Prepare(_sql)
-	defer db.CloseStmt(stmt) // the safe way to close.
-	if db.Err(err) {
-		panic(err.Error())
+// fill color & sizes to product list.
+func FillProductPropertiesByIdSet(models []*model.Product) error {
+	if nil == models || len(models) == 0 {
+		return nil
 	}
 
-	if field == "stock" {
-		_, err := stmt.Exec(productId, color, size, stock, stock)
-		if err != nil {
-			debug.Error(err)
-		}
-	} else if field == "price" {
-		_, err := stmt.Exec(productId, color, size, price, stock)
-		if err != nil {
-			debug.Error(err)
-		}
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return err
 	}
-}
+	defer conn.Close()
 
-func ClearProductStock(productId int) error {
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
+	var _sql bytes.Buffer        // sql buffer
+	var params = []interface{}{} // params
+	var index = map[int]*model.Product{}
+	_sql.WriteString("select product_id, property_name, value from product_property where ")
+	_sql.WriteString("product_id in (")
+	for idx, m := range models {
+		if idx > 0 {
+			_sql.WriteRune(',')
+		}
+		_sql.WriteRune('?')
+		params = append(params, m.Id)
+		index[m.Id] = m
+	}
+	_sql.WriteRune(')')
 
-	stmt, err := conn.Prepare("delete from product_cs_value where product_id = ?")
-	if db.Err(err) {
+	if stmt, err = conn.Prepare(_sql.String()); err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(productId)
-	if db.Err(err) {
+	// 3. execute
+	rows, err := stmt.Query(params...)
+	if err != nil {
 		return err
+	}
+	defer rows.Close()
+
+	// execute
+	var productId int
+	var propertyName string
+	var value string
+
+	for rows.Next() {
+		err := rows.Scan(&productId, &propertyName, &value)
+		if err != nil {
+			return err
+		}
+
+		if product, ok := index[productId]; ok {
+			if propertyName == "color" {
+				if product.Colors == nil {
+					product.Colors = []string{}
+				}
+				product.Colors = append(product.Colors, value)
+			} else if propertyName == "size" {
+				if product.Sizes == nil {
+					product.Sizes = []string{}
+				}
+				product.Sizes = append(product.Sizes, value)
+			}
+		}
 	}
 	return nil
 }
 
-/*_______________________________________________________________________________
-  List Product Stocks
-*/
-func ListProductStocks(productId int) *map[string]int {
-	var err error
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
+// func extractIdset(models []*model.Product) map[int]bool {
+// 	var idarray = []int64{}
+// 	if idset != nil {
+// 		for id, _ := range idset {
+// 			idarray = append(idarray, id)
+// 		}
+// 	}
 
-	// 1. query
-	var queryString = "select color,size,stock from `product_cs_value` where product_id = ?"
-
-	// 2. prepare
-	stmt, err := conn.Prepare(queryString)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer stmt.Close()
-
-	// 3. query
-	rows, err := stmt.Query(productId)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
-
-	// 4. process results.
-	// big performance issue, maybe. who knows.
-	var (
-		color  string
-		size   string
-		stock  int
-		stocks = map[string]int{}
-	)
-
-	for rows.Next() {
-		rows.Scan(&color, &size, &stock)
-		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
-	}
-	return &stocks
-}
+// }

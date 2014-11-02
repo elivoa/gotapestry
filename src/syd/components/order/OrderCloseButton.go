@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
 )
 
 type OrderCloseButton struct {
@@ -23,7 +23,10 @@ func (p *OrderCloseButton) Setup() {
 		panic(err)
 	}
 	p.Order = order
-	person := personservice.GetPerson(order.CustomerId)
+	person, err := service.Person.GetPersonById(order.CustomerId)
+	if err != nil {
+		panic(err)
+	}
 	if person == nil {
 		panic(fmt.Sprintf("Customer not found, id: %v", order.CustomerId))
 	}

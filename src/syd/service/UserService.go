@@ -19,10 +19,6 @@ var USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN
 
 // TODO change session into longtime session.
 
-// 临时解决方案。全局唯一的service。TODO 研究一下Tapestry的IOC，看一下他们的service是每个request创建一个么？
-// 按照他的方法来解决。
-var User = &UserService{}
-
 // TODO Need interface & implements Design pattern.
 type UserService struct {
 	// TODO: Inject request...

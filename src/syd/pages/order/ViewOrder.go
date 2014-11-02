@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
 )
 
 /* ________________________________________________________________________________
@@ -24,7 +24,10 @@ func (p *ViewOrder) Setup() {
 		panic(err.Error())
 	}
 	p.Order = order
-	p.Customer = personservice.GetPerson(p.Order.CustomerId)
+	p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId)
+	if err != nil {
+		panic(err)
+	}
 	if p.Customer == nil {
 		panic(fmt.Sprintf("customer not found: id: %v", p.Order.CustomerId))
 	}

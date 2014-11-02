@@ -10,7 +10,6 @@ import (
 	"syd/model"
 	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
 	"time"
 )
 
@@ -46,7 +45,11 @@ func (p *PersonDetail) Setup() {
 		p.PageItems = config.LIST_PAGE_SIZE // TODO default pager number. Config this.
 	}
 
-	p.Person = personservice.GetPerson(p.Id.Int)
+	var err error
+	p.Person, err = service.Person.GetPersonById(p.Id.Int)
+	if err != nil {
+		panic(err)
+	}
 	if p.Person == nil {
 		// var err error
 		// p.Total, err = orderdao.CountOrderByCustomer("all", p.Person.Id)
@@ -62,7 +65,6 @@ func (p *PersonDetail) Setup() {
 	}
 
 	// fetch data
-	var err error
 	var parser = service.Order.EntityManager().NewQueryParser()
 	parser.Where("customer_id", p.Id.Int)
 	parser.Or("type", model.Wholesale, model.ShippingInstead) // restrict type
@@ -90,7 +92,7 @@ func (p *PersonDetail) Setup() {
 		panic(err.Error())
 	}
 	fmt.Println(">>>>>>> ")
-	
+
 	orderservice.LoadDetails(orders)
 	p.TodayOrders = orders
 

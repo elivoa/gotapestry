@@ -6,8 +6,8 @@ import (
 	"github.com/elivoa/got/core"
 	"html/template"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
 )
 
 // ________________________________________________________________________________
@@ -35,14 +35,16 @@ func (p *OrderPrint) Setup() {
 		panic(err.Error())
 	}
 	p.Order = order
-	if p.Customer = personservice.GetPerson(p.Order.CustomerId); p.Customer == nil {
+	if p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId); err != nil {
+		panic(err)
+	} else if p.Customer == nil {
 		panic("Customer does not exist!")
 	}
 
 	// logic: update order's accumulated
 	if p.Order.Accumulated != -p.Customer.AccountBallance {
 		p.Order.Accumulated = -p.Customer.AccountBallance
-		_, err := orderservice.UpdateOrder(p.Order)
+		_, err := service.Order.UpdateOrder(p.Order)
 		if err != nil {
 			panic(err.Error())
 		}

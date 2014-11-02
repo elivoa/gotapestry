@@ -6,9 +6,8 @@ import (
 	"github.com/elivoa/got/core"
 	"html/template"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
-	"syd/service/personservice"
-	"syd/service/productservice"
 )
 
 // ________________________________________________________________________________
@@ -43,7 +42,7 @@ func (p *ShippingInsteadPrint) Setup() {
 		panic(err.Error())
 	}
 	p.Order = order
-	if p.Customer = personservice.GetPerson(p.Order.CustomerId); p.Customer == nil {
+	if p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId); p.Customer == nil {
 		panic("Customer does not exist!")
 	}
 
@@ -51,7 +50,7 @@ func (p *ShippingInsteadPrint) Setup() {
 	// logic: update order's accumulated
 	if p.Order.Accumulated != -p.Customer.AccountBallance {
 		p.Order.Accumulated = -p.Customer.AccountBallance
-		_, err := orderservice.UpdateOrder(p.Order)
+		_, err := service.Order.UpdateOrder(p.Order)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -92,8 +91,8 @@ func (p *ShippingInsteadPrint) ShowProductName(productId int) string {
 	if ok {
 		return product.Name
 	} else {
-		product := productservice.GetProduct(productId)
-		if product != nil {
+		if product, err := service.Product.GetProduct(productId); err != nil {
+		} else if product != nil {
 			p.productcache[productId] = product
 			return product.Name
 		}

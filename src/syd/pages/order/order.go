@@ -8,6 +8,7 @@ import (
 	"strings"
 	"syd/dal/accountdao"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
 	"syd/service/personservice"
 )
@@ -127,8 +128,10 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
 	order.Status = "delivering"
 
 	// 3. get person, check if customer exists.
-	customer := personservice.GetPerson(order.CustomerId)
-	if customer == nil {
+	customer, err := service.Person.GetPersonById(order.CustomerId)
+	if err != nil {
+		panic(err)
+	} else if customer == nil {
 		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
 	}
 
@@ -136,8 +139,7 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
 	order.Accumulated = -customer.AccountBallance
 
 	// 5. save order changes.
-	_, err = orderservice.UpdateOrder(order)
-	if err != nil {
+	if _, err := service.Order.UpdateOrder(order); err != nil {
 		panic(err.Error())
 	}
 
@@ -179,13 +181,16 @@ func (p *ButtonSubmitHere) OnSuccessFromCloseForm() *exit.Exit {
 		panic(err.Error())
 	}
 	order.Status = "done"
-	_, err = orderservice.UpdateOrder(order)
+	_, err = service.Order.UpdateOrder(order)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	// 2/2 update customer's AccountBallance
-	customer := personservice.GetPerson(order.CustomerId)
+	customer, err := service.Person.GetPersonById(order.CustomerId)
+	if err != nil {
+		panic(err)
+	}
 	if customer == nil {
 		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
 	}

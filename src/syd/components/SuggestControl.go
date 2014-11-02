@@ -2,7 +2,7 @@ package components
 
 import (
 	"github.com/elivoa/got/core"
-	"syd/dal/productdao"
+	"syd/service"
 	"syd/service/personservice"
 )
 
@@ -40,7 +40,10 @@ func (c *SuggestControl) initSuggest() {
 	id := c.Value
 	switch c.Category {
 	case "factory":
-		person := personservice.GetPerson(id)
+		person, err := service.Person.GetPersonById(id)
+		if err != nil {
+			panic(err)
+		}
 		if person != nil {
 			c.DisplayValue = person.Name
 		}
@@ -50,7 +53,7 @@ func (c *SuggestControl) initSuggest() {
 			c.DisplayValue = person.Name
 		}
 	case "product":
-		product, err := productdao.Get(id)
+		product, err := service.Product.GetProduct(id)
 		if err == nil && product != nil {
 			c.DisplayValue = product.Name
 		}

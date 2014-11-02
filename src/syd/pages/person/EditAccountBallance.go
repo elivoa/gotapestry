@@ -2,10 +2,11 @@ package person
 
 import (
 	"fmt"
-	"github.com/elivoa/gxl"
 	"github.com/elivoa/got/core"
+	"github.com/elivoa/gxl"
 	"syd/dal/accountdao"
 	"syd/model"
+	"syd/service"
 	"syd/service/personservice"
 )
 
@@ -18,7 +19,11 @@ type EditAccountBallance struct {
 }
 
 func (p *EditAccountBallance) Setup() {
-	p.Person = personservice.GetPerson(p.Id.Int)
+	var err error
+	p.Person, err = service.Person.GetPersonById(p.Id.Int)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // on form submit

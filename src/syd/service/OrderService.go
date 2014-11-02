@@ -1,12 +1,15 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/debug"
 	"syd/dal"
+	"syd/dal/accountdao"
 	"syd/dal/orderdao"
 	"syd/model"
-	"syd/service/productservice"
+	"syd/service/personservice"
 )
 
 type OrderService struct{}
@@ -286,12 +289,14 @@ func _processOrderCustomerPrice(order *model.Order) {
 			// don't has customer price, load product price;
 
 			// TODO: performance issue, batch get product.
-			product := productservice.GetProduct(detail.ProductId)
-			if product == nil { // product error;
+			if product, err := Product.GetProduct(detail.ProductId); err != nil {
+				panic(err)
+			} else if nil == product {
 				panic(fmt.Sprint("Can not find product ", detail.ProductId))
-			}
-			if product.Price != detail.SellingPrice {
-				needUpdatePrice = true
+			} else {
+				if product.Price != detail.SellingPrice {
+					needUpdatePrice = true
+				}
 			}
 		}
 
@@ -350,22 +355,67 @@ func (s *OrderService) FillOrderSlicesWithPerson(orders []*model.Order) error {
 	return nil
 }
 
-// orderlist is passed by pointer.
-// func (s *OrderService) FillOrderSlicesWithPerson(orders []*model.Order) error {
-// 	var idset = map[int64]bool{}
-// 	for _, order := range orders {
-// 		idset[order.CustomerId] = true
-// 	}
-// 	usermap, err := User.BatchFetchUsersByIdMap(idset)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if nil != usermap {
-// 		for _, order := range orders {
-// 			if user, ok := usermap[order.UserId]; ok {
-// 				order.User = user
-// 			}
-// 		}
-// 	}
-// 	return nil
-// }
+// --------------------------------------------------------------------------------
+// special
+
+//
+func (s *OrderService) BatchCloseOrder(money float64, customerId int) {
+	debug.Log("Incoming Money: %v", money)
+	person, err := Person.GetPersonById(customerId)
+	if err != nil {
+		panic(err.Error())
+	}
+	// get unclosed orders for somebody
+	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// collect totalorder price
+	var totalOrderPrice float64
+	for _, o := range orders {
+		totalOrderPrice += o.SumOrderPrice()
+	}
+
+	// money used as total shouldbe: inputmoney + (accountballance - allorder's price)
+	totalmoney := money + (person.AccountBallance + totalOrderPrice)
+
+	for _, order := range orders {
+		if totalmoney-order.SumOrderPrice() >= 0 {
+			err := s.ChangeOrderStatus(order.TrackNumber, "done")
+			if err != nil {
+				panic(err.Error())
+			}
+			totalmoney -= order.SumOrderPrice()
+		}
+	}
+	accountdao.CreateIncoming(&model.AccountIncoming{
+		CustomeId: person.Id,
+		Incoming:  money,
+	})
+	// modify customer's accountballance
+	person.AccountBallance += money
+	personservice.Update(person) // TODO: chagne place
+
+	// create chagne log at the same time:
+	accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+		CustomerId: person.Id,
+		Delta:      money,
+		Account:    person.AccountBallance,
+		Type:       2, // create order
+		// RelatedOrderTN: 0,
+		Reason: "Batch insert",
+	})
+
+}
+
+func (s *OrderService) ChangeOrderStatus(trackNumber int64, status string) error {
+	rowsAffacted, err := orderdao.UpdateOrderStatus(trackNumber, status)
+	if err != nil {
+		return err
+	}
+	if rowsAffacted == 0 {
+		return errors.New("No rows affacted!")
+	}
+	return nil
+}

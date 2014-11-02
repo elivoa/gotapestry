@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/gxl"
-	"syd/dal/persondao"
 	"syd/model"
+	"syd/service"
 	"syd/service/personservice"
 )
 
@@ -74,7 +74,7 @@ func (p *PersonEdit) Setup() {
 	p.Title = "create/edit Person"
 
 	if p.Id != nil {
-		person, err := persondao.Get(p.Id.Int)
+		person, err := service.Person.GetPersonById(p.Id.Int)
 		if err != nil {
 			// TODO how to handle error on page object?
 			panic(err.Error())
@@ -89,7 +89,11 @@ func (p *PersonEdit) Setup() {
 
 func (p *PersonEdit) OnPrepareForSubmit() {
 	if p.Id != nil {
-		p.Person = personservice.GetPerson(p.Id.Int)
+		var err error
+		p.Person, err = service.Person.GetPersonById(p.Id.Int)
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		// No Need to edit.
 	}

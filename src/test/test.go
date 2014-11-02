@@ -43,15 +43,6 @@ func main() {
 	// time.Sleep(time.Second * 8)
 }
 
-func testLoad3() {
-	// fmt.Println("---- start loading...")
-	// customer := personservice.GetPerson(25)
-	customer, err := persondao.Get(35)
-	if err != nil {
-		panic(err.Error())
-	}
-	fmt.Println("-----------------", customer)
-}
 
 func testLoad() {
 	fmt.Println("---- start loading...")

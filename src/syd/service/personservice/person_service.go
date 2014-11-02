@@ -9,7 +9,7 @@ import (
 
 // is this correct?
 func GetProducer(id int) *model.Producer {
-	person, _ := persondao.Get(id)
+	person, _ := persondao.Get(persondao.EntityManager().PK, id)
 	if nil == person {
 		return nil
 	}
@@ -20,22 +20,8 @@ func GetProducer(id int) *model.Producer {
 }
 
 // is this correct?
-func GetPerson(id int) *model.Person {
-	person, err := persondao.Get(id)
-	if err != nil {
-		//panic(err.Error())
-		// Important! Need more to parse error type here.
-		return nil
-	}
-	if nil == person {
-		return nil
-	}
-	return person
-}
-
-// is this correct?
 func GetCustomer(customerId int) *model.Customer {
-	person, _ := persondao.Get(customerId)
+	person, _ := persondao.Get(persondao.EntityManager().PK, customerId)
 	if nil == person {
 		return nil
 	}

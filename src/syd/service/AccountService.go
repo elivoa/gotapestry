@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"syd/dal/accountdao"
-	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/personservice"
 )
@@ -14,7 +13,7 @@ type AccountService struct{}
 func (s *AccountService) UpdateAccountBalance(personId int, delta float64,
 	reason string, relatedOrderTrackingNo int64) {
 
-	if person, err := persondao.GetPersonById(personId); err != nil {
+	if person, err := Person.GetPersonById(personId); err != nil {
 		panic(err)
 	} else if person == nil {
 		panic(fmt.Sprintf("Person %d not found!", personId))

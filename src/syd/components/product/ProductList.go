@@ -8,9 +8,9 @@ import (
 	"github.com/elivoa/got/route"
 	"github.com/elivoa/got/route/exit"
 	"html/template"
-	"syd/dal"
+	"syd/dal/inventorydao"
 	"syd/model"
-	"syd/service/productservice"
+	"syd/service"
 )
 
 type ProductList struct {
@@ -22,17 +22,21 @@ type ProductList struct {
 // NOTE: event name is case sensitive. Kill this when add cache.
 func (p *ProductList) Ondelete(productId int) *exit.Exit {
 	debug.Log("Delete Product %d", productId)
-	productservice.DeleteProduct(productId)
+	service.Product.DeleteProduct(productId)
 	// TODO make this default redirect.
 	return route.RedirectDispatch(p.Source, "/product/list")
 }
 
 // returns a string contains available size and color.
-func (p *ProductList) ShowSpecification(productId int) template.HTML {
-	product := productservice.GetProduct(productId)
+func (p *ProductList) ShowSpecification(product *model.Product) template.HTML {
+	// product, err := service.Product.GetProduct(productId)
+	// if err != nil {
+	// 	return template.HTML(err.Error())
+	// }
 	if nil == product {
 		return template.HTML("ERROR: PRODUCT IS NIL!")
 	}
+
 	var spec bytes.Buffer
 	if product.Colors == nil || len(product.Colors) > 0 {
 		i := 0
@@ -61,9 +65,9 @@ func (p *ProductList) ShowSpecification(productId int) template.HTML {
 
 // display: total stocks
 func (p *ProductList) NStock(productId int) (sum int) {
-	stockmap := dal.ListProductStocks(productId)
+	stockmap := inventorydao.ListProductStocks(productId)
 	if stockmap != nil {
-		for _, stock := range *stockmap {
+		for _, stock := range stockmap {
 			if stock > 0 {
 				sum += stock
 			}

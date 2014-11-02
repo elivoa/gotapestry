@@ -12,8 +12,7 @@ import (
 	"github.com/elivoa/got/debug"
 	"syd/dal"
 	"syd/dal/productdao"
-	"syd/service/personservice"
-	"syd/service/productservice"
+	"syd/service"
 )
 
 type Api struct {
@@ -27,11 +26,17 @@ type Api struct {
 func (p *Api) Setup() (string, string) {
 	switch p.APIName {
 	case "person":
-		person := personservice.GetPerson(p.Param1)
+		person, err := service.Person.GetPersonById(p.Param1)
+		if err != nil {
+			panic(err) // TODO: error handling.
+		}
 		return toJson(person)
 
 	case "product":
-		product := productservice.GetProduct(p.Param1)
+		product, err := service.Product.GetProduct(p.Param1)
+		if err != nil {
+			panic(err)
+		}
 		return toJson(product)
 
 	case "customer_price":

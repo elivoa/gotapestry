@@ -8,6 +8,7 @@ import (
 	"strings"
 	"syd/dal/orderdao"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
 	"time"
 )
@@ -37,7 +38,7 @@ func (p *DeliveringUnclosedOrders) OnbyTrackingNumber(tns string) (string, strin
 // TODO::GOT: add t:ac="xxx" to restore activate parameters.
 func (p *DeliveringUnclosedOrders) Onbatchclose(money float64, customerId int) (string, string) {
 	// TODO SYD: strict privileges validation
-	orderservice.BatchCloseOrder(money, customerId)
+	service.Order.BatchCloseOrder(money, customerId)
 	return ordersJsonByCustomerid(customerId)
 }
 

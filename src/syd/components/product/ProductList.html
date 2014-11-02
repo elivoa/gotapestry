@@ -21,10 +21,7 @@
       <span class="price">{{.Price | prettycurrency}}</span>
     </td>
     <td nowrap style="color:#a1a1a1">
-      {{$.ShowSpecification .Id}}
-      <!-- 红色：S / M / L<span class="vline">|</span>
-           黑色：S / M / <span title="缺货" class="B_sold_out">L</span> / XL
-           <span class="vline">|</span>绿色：S / M / L / XL -->
+      {{$.ShowSpecification .}}
     </td>
     <td nowrap>
       <a href="#TODO">填写入库信息</a><span class="vline">|</span>
@@ -37,3 +34,8 @@
   {{end}}
 
 </table>
+
+
+<!--    S / M / L<span class="vline">|</span>
+        S / M / <span title="  " class="B_sold_out">L</span> / XL
+        <span class="vline">|</span>   S / M / L / XL -->

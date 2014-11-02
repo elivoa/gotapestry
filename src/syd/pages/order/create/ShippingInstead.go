@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"syd/model"
+	"syd/service"
 	"syd/service/orderservice"
 	"syd/service/personservice"
-	"syd/service/productservice"
 )
 
 //
@@ -93,8 +93,9 @@ func (p *ShippingInstead) ShowProductName(productId int) string {
 	if ok {
 		return product.Name
 	} else {
-		product := productservice.GetProduct(productId)
-		if product != nil {
+		if product, err := service.Product.GetProduct(productId); err != nil {
+			panic(err)
+		} else if product != nil {
 			p.productcache[productId] = product
 			return product.Name
 		}
@@ -124,7 +125,9 @@ func (p *ShippingInstead) OnPrepareForSubmit() {
 // After post data is injected, override to p.Order. Thus p.Order here
 // is full and ready to persist.
 func (p *ShippingInstead) OnSuccess() (string, string) {
-	orderservice.UpdateOrder(p.Order)
+	if _, err := service.Order.CreateOrder(p.Order); err != nil {
+		panic(err)
+	}
 	return "redirect", p.ThisPage()
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 // modified version of Convert
-// return many strings: for syd-糖果小开衫(黄色)
+// return many strings: for syd-     (  )
 //   1. syd-TangGuoXiaoKaiShan(HuangSe)
 //   2. sydtgxkshs
 //   3. syd-tgxks(hs)

@@ -4,7 +4,7 @@ import (
 	"github.com/elivoa/got/core"
 	"strconv"
 	"syd/model"
-	"syd/service/personservice"
+	"syd/service"
 )
 
 type BatchCloseOrder struct {
@@ -24,10 +24,12 @@ func (c *BatchCloseOrder) New() *BatchCloseOrder {
 }
 
 func (c *BatchCloseOrder) Setup() {
-	// fmt.Println(">>>>>>>>>>>>>>> ", c.CustomerId)
-	c.Customer = personservice.GetPerson(c.CustomerId)
+	var err error
+	c.Customer, err = service.Person.GetPersonById(c.CustomerId)
+	if err != nil {
+		panic(err)
+	}
 	if c.Customer == nil {
 		panic("Customer not found! " + strconv.Itoa(c.CustomerId))
 	}
-	// fmt.Println("------------------------======", c.Customer.AccountBallance)
 }

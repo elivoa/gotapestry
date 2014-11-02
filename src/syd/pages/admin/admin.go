@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/elivoa/got/core"
-	"syd/service/productservice"
+	"syd/service"
 )
 
 //________________________________________________________________________________
@@ -13,5 +13,5 @@ type AdminIndex struct {
 }
 
 func (p *AdminIndex) OnRebuildProductPinyin() {
-	productservice.RebuildProductPinyinCapital()
+	service.Product.RebuildProductPinyinCapital()
 }

@@ -12,6 +12,14 @@ func (s *PersonService) EntityManager() *db.Entity {
 	return persondao.EntityManager()
 }
 
+func (s *PersonService) Get(field string, value interface{}) (*model.Person, error) {
+	return persondao.Get(field, value)
+}
+
+func (s *PersonService) GetPersonById(id int) (*model.Person, error) {
+	return s.Get(s.EntityManager().PK, id)
+}
+
 // --------------------------------------------------------------------------------
 // The following is helper function to fill user to models.
 func (s *PersonService) _batchFetchPerson(ids []int64) (map[int64]*model.Person, error) {

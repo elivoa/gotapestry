@@ -18,12 +18,12 @@ type Product struct {
 	Stock        int    // 库存量 || not used again?
 	ShelfNo      string // 货架号
 	Capital      string // captical letter to quick access.
-	Note       string
-	CreateTime time.Time
-	UpdateTime time.Time
+	Note         string
+	CreateTime   time.Time
+	UpdateTime   time.Time
 
 	Pictures string // picture keys splited by ';' filenamne can't contain ';'
-	
+
 	// additional information, not in persistence
 	Colors     []string // these two information stores in product_properties table.
 	Sizes      []string
@@ -42,7 +42,16 @@ func NewProduct() *Product {
 		Colors: []string{"", "", ""},
 		Sizes:  []string{"", "", ""},
 		// Stocks: map[string]int{},
+		CreateTime: time.Now(),
 	}
+}
+
+// used for fetch;
+type ProductCSValue struct {
+	Id        int
+	ProductId int
+	Color     []string
+	Size      []string
 }
 
 func (p *Product) ClearValues() {

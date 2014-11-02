@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Thursday, 2014-10-30 17:54:50>
+  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2014-11-02 11:17:57>
 
   Note: This is the latest Template for dao functions.
 
@@ -44,13 +44,13 @@ func init() {
 // Get person by person id
 //
 
-// new version
-func GetPersonById(id int) (*model.Person, error) {
-	return GetPerson(em.PK, id)
-}
+// // new version
+// func GetPersonById(id int) (*model.Person, error) {
+// 	return Get(em.PK, id)
+// }
 
 // new version
-func GetPerson(field string, value interface{}) (*model.Person, error) {
+func Get(field string, value interface{}) (*model.Person, error) {
 	var query = em.Select().Where(field, value)
 	return _one(query)
 }
@@ -89,11 +89,6 @@ func _one(query *db.QueryParser) (*model.Person, error) {
 		return nil, err
 	}
 	return m, nil
-}
-
-// TODO: old version, should delete
-func Get(id int) (*model.Person, error) {
-	return _one(em.NewQueryParser().Select().Where("id", id))
 }
 
 // personType: customer, factory

@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Saturday, 2014-07-12 11:27:23>
+  Time-stamp: <[suggest.go] Elivoa @ Sunday, 2014-11-02 15:13:38>
 */
 package suggest
 
@@ -92,7 +92,9 @@ func load() {
 		}
 	}
 
-	products, err := productdao.ListAll()
+	// TODO: chagne to step load.
+	parser := productdao.EntityManager().NewQueryParser().Where().Limit(10000) // all limit to 1w
+	products, err := productdao.List(parser)
 	if err != nil {
 		panic(err.Error())
 	}

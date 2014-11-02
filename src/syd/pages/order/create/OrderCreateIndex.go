@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"syd/model"
-	"syd/service/orderservice"
+	"syd/service"
 )
 
 /* ________________________________________________________________________________
@@ -31,7 +31,9 @@ func (p *OrderCreateIndex) OnSuccessFromCustomerForm() (string, string) {
 			order := model.NewOrder()
 			order.Type = uint(model.ShippingInstead)
 			order.CustomerId = p.CustomerId
-			orderservice.CreateOrder(order)
+			if _, err := service.Order.CreateOrder(order); err != nil {
+				panic(err)
+			}
 			url = fmt.Sprintf("/order/create/shippinginstead/%v", order.TrackNumber)
 		} else {
 			url = fmt.Sprintf("/order/create/detail?customer=%v", p.CustomerId)

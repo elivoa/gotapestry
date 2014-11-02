@@ -4,16 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/elivoa/got/debug"
 	"github.com/elivoa/gxl"
 	"math"
 	"strconv"
-	"syd/dal"
-	"syd/dal/accountdao"
 	"syd/dal/orderdao"
-	"syd/dal/persondao"
 	"syd/model"
-	"syd/service/productservice"
+	"syd/service"
 	"time"
 )
 
@@ -54,69 +50,6 @@ func ListOrderPager(status string, limit int, n int) ([]*model.Order, error) {
 
 func ListOrderByType(orderType model.OrderType, status string) ([]*model.Order, error) {
 	return orderdao.ListOrderByType(orderType, status)
-}
-
-// >> copied to service.Order
-func CreateOrder(order *model.Order) error {
-	_processOrderCustomerPrice(order)
-	_calculateOrder(order)
-	return orderdao.CreateOrder(order)
-}
-
-// >> copied to service.Order
-func UpdateOrder(order *model.Order) (int64, error) {
-	_processOrderCustomerPrice(order)
-	_calculateOrder(order)
-	return orderdao.UpdateOrder(order)
-}
-
-// >> copied to service.Order
-// calculate order by type
-func _calculateOrder(order *model.Order) {
-	switch model.OrderType(order.Type) {
-	case model.SubOrder, model.Wholesale:
-		if order.Details != nil && len(order.Details) > 0 {
-			order.CalculateOrder()
-		}
-	case model.ShippingInstead:
-		// this type of order's total price is calculated by sub
-		// orders, which is difficult to calculate, so I calclate sum
-		// in page, and then submit to the parent order. So, here do
-		// nothing.
-	}
-}
-
-// >> copied to service.Order
-// save customerized price for order
-func _processOrderCustomerPrice(order *model.Order) {
-	if order.Details == nil {
-		return
-	}
-	sets := map[int]bool{}
-	for _, detail := range order.Details {
-		if _, ok := sets[detail.ProductId]; ok {
-			continue
-		}
-		if detail.ProductId == 0 { // pass invalid detail item
-			continue
-		}
-		sets[detail.ProductId] = true
-
-		product := productservice.GetProduct(detail.ProductId)
-		if product == nil {
-			panic(fmt.Sprint("Can not find product ", detail.ProductId))
-		}
-		if detail.SellingPrice != product.Price {
-			// if different, update
-			cp := dal.GetCustomerPrice(order.CustomerId, detail.ProductId)
-			if cp == nil || cp.Price != detail.SellingPrice {
-				if err := dal.SetCustomerPrice(order.CustomerId, detail.ProductId,
-					detail.SellingPrice); err != nil {
-					panic(err.Error())
-				}
-			}
-		}
-	}
 }
 
 func CancelOrder(trackNumber int64) error {
@@ -167,57 +100,6 @@ func LoadSubOrders(order *model.Order) ([]*model.Order, error) {
 	return suborders, nil
 }
 
-// 批量结款
-func BatchCloseOrder(money float64, customerId int) {
-	debug.Log("Incoming Money: %v", money)
-	person, err := persondao.Get(customerId)
-	if err != nil {
-		panic(err.Error())
-	}
-	// get unclosed orders for somebody
-	orders, err := orderdao.DeliveringUnclosedOrdersByCustomer(customerId)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// collect totalorder price
-	var totalOrderPrice float64
-	for _, o := range orders {
-		totalOrderPrice += o.SumOrderPrice()
-	}
-
-	// money used as total shouldbe: inputmoney + (accountballance - allorder's price)
-	totalmoney := money + (person.AccountBallance + totalOrderPrice)
-
-	for _, order := range orders {
-		if totalmoney-order.SumOrderPrice() >= 0 {
-			err := ChangeOrderStatus(order.TrackNumber, "done")
-			if err != nil {
-				panic(err.Error())
-			}
-			totalmoney -= order.SumOrderPrice()
-		}
-	}
-	accountdao.CreateIncoming(&model.AccountIncoming{
-		CustomeId: person.Id,
-		Incoming:  money,
-	})
-	// modify customer's accountballance
-	person.AccountBallance += money
-	persondao.Update(person)
-
-	// create chagne log at the same time:
-	accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
-		CustomerId: person.Id,
-		Delta:      money,
-		Account:    person.AccountBallance,
-		Type:       2, // create order
-		// RelatedOrderTN: 0,
-		Reason: "Batch insert",
-	})
-
-}
-
 // ________________________________________________________________________________
 // ProductJson generator
 func OrderDetailsJson(order *model.Order) *OrderDetailJson {
@@ -234,7 +116,10 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 			jsonStruct, ok := products[strconv.Itoa(detail.ProductId)]
 			if !ok {
 				// get product
-				product := productservice.GetProduct(detail.ProductId)
+				product, err := service.Product.GetProduct(detail.ProductId)
+				if err != nil {
+					panic(err) // // TODO:
+				}
 				// product, err := productdao.Get(detail.ProductId)
 				if product == nil {
 					panic("can not find product")

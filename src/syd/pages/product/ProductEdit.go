@@ -3,12 +3,12 @@ package product
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/gxl"
-	"github.com/elivoa/got/core"
 	"strings"
 	"syd/model"
-	"syd/service/productservice"
+	"syd/service"
 )
 
 /* ________________________________________________________________________________
@@ -45,8 +45,10 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	fmt.Println(p.Product)
 	if p.Id != nil {
 		fmt.Printf("\t >>> get product by id\n")
-
-		p.Product = productservice.GetProduct(p.Id.Int)
+		var err error
+		if p.Product, err = service.Product.GetProduct(p.Id.Int); err != nil {
+			panic(err)
+		}
 		p.SubTitle = "编辑"
 	} else {
 		p.Product = model.NewProduct()
@@ -90,14 +92,14 @@ func (p *ProductEdit) OnSuccessFromProductForm() *exit.Exit {
 
 	// write to db
 	if p.Id != nil {
-		productservice.UpdateProduct(p.Product)
+		service.Product.UpdateProduct(p.Product)
 	} else {
-		productservice.CreateProduct(p.Product)
+		service.Product.CreateProduct(p.Product)
 	}
 
 	if p.Referer == "view" {
 		return exit.Redirect(fmt.Sprintf("/product/detail/%v", p.Product.Id))
 	}
+	// TODO: return to original page.
 	return exit.Redirect("/product/list")
-	// return "redirect", "/product/list"
 }

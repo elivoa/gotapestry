@@ -3,7 +3,7 @@ package product
 import (
 	"github.com/elivoa/got/core"
 	"syd/model"
-	"syd/service/productservice"
+	"syd/service"
 )
 
 // ________________________________________________________________________________
@@ -20,5 +20,9 @@ type ProductColorSizeTable struct {
 }
 
 func (p *ProductColorSizeTable) Setup() {
-	p.Product = productservice.GetProduct(p.ProductId)
+	if product, err := service.Product.GetProduct(p.ProductId); err != nil {
+		panic(err)
+	} else {
+		p.Product = product
+	}
 }
