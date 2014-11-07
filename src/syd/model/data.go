@@ -15,3 +15,13 @@ type SearchCondition struct {
 // 		s.EndTime.After(time.Date(0, 0, 0, 23, 59, 59, 9999, time.UTC))
 // 	}
 // }
+
+// In angularjs, simple array can't bind. Should use like this: [{value:4},{value:5},...]
+// This model is used to change any array into object array;
+type Object struct {
+	Value interface{}
+}
+
+func NewObject(value interface{}) *Object {
+	return &Object{Value: value}
+}

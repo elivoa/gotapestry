@@ -6,9 +6,9 @@ import (
 	"syd/dal/statdao"
 	"syd/service/orderservice"
 	// "syd/service/personservice"
-	"syd/dal/persondao"
+	"strconv"
+	"strings"
 	"syd/service/statservice"
-	"time"
 )
 
 var va = 1 << 0
@@ -17,32 +17,15 @@ var vc = 1 << 2
 var vd = 1 << 3
 
 func main() {
-	// now := time.Now()
-	// end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0)
-	// start := end.AddDate(0, 0, 1)
-	a := va | vc
-	fmt.Println("va ", a&va > 0)
-	fmt.Println("vb ", a&vb > 0)
-	fmt.Println("vc ", a&vc > 0)
-	fmt.Println("vd ", a&vd > 0)
-	// userdao.ListUserByIdSet(1, 3, 4)
 
-	fmt.Println("----------------------------------------------------------------------------------------------------")
-	fmt.Println(time.Now())
-	var t time.Time
-	fmt.Println(t)
-	fmt.Println(utils.ValidTime(time.Now()))
-	// for i := 0; i < 20; i++ {
-	// 	testLoad3()
-	// 	time.Sleep(time.Microsecond * 500)
-	// }
+	a := "http://tittyandco.net/fw/shop/img/product/TIT14F####/TIT14F####_pz_a001.jpg"
+	for i := 301; i < 350; i++ {
+		b := strconv.Itoa(10000 + i)[1:5]
+		// fmt.Println(b)
+		fmt.Println(strings.Replace(a, "####", b, -1))
+	}
 
-	// fmt.Println("first call done!")
-
-	// fmt.Println("Waiting 2 seconds...")
-	// time.Sleep(time.Second * 8)
 }
-
 
 func testLoad() {
 	fmt.Println("---- start loading...")

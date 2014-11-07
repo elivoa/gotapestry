@@ -47,11 +47,22 @@ func NewProduct() *Product {
 }
 
 // used for fetch;
-type ProductCSValue struct {
-	Id        int
-	ProductId int
-	Color     []string
-	Size      []string
+// type ProductCSValue struct {
+// 	Id        int
+// 	ProductId int
+// 	Color     []string
+// 	Size      []string
+// }
+
+func (p *Product) TotalStock() int {
+	if nil != p.Stocks && len(p.Stocks) > 0 {
+		var totalstock = 0
+		for _, s := range p.Stocks {
+			totalstock += s
+		}
+		return totalstock
+	}
+	return 0
 }
 
 func (p *Product) ClearValues() {

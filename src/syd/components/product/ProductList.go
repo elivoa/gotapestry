@@ -8,6 +8,7 @@ import (
 	"github.com/elivoa/got/route"
 	"github.com/elivoa/got/route/exit"
 	"html/template"
+	"strconv"
 	"syd/dal/inventorydao"
 	"syd/model"
 	"syd/service"
@@ -61,6 +62,21 @@ func (p *ProductList) ShowSpecification(product *model.Product) template.HTML {
 		}
 	}
 	return template.HTML(spec.String())
+}
+
+func (p *ProductList) StockDescription(product *model.Product) template.HTML {
+	if nil != product {
+		if nil != product.Stocks && len(product.Stocks) > 0 {
+			var buffer bytes.Buffer
+			for key, s := range product.Stocks {
+				buffer.WriteString(key)
+				buffer.WriteString(":")
+				buffer.WriteString(strconv.Itoa(s))
+				buffer.WriteString(";&#10; ")
+			}
+		}
+	}
+	return "没有库存或尚未清点库存！"
 }
 
 // display: total stocks

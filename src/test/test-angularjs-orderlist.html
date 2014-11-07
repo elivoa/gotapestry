@@ -8,6 +8,11 @@
 
     <div ng-controller="TestController">  
 
+      <form>
+        <input type="text" ng-model="name" />
+      </form>
+
+      
       <table class="tbl_main" border="1">
         <tr>
           <th width="10" align="left">
@@ -32,6 +37,7 @@
       </table>
 
       <a href="javascript:void(0)" ng-click="changeData()">Change</a>
+      <a href="javascript:void(0)" ng-click="showName()">ShowName</a>
       
       <div class="test">
         {{'yeah ' + test + ' !'}}
@@ -46,65 +52,26 @@
 
 var testApp = angular.module('testApp', []);
 testApp.controller('TestController', function($scope){
-  $scope.test="去你妈蛋的！"
+  $scope.test="去你妈蛋的！";
   $scope.loops = [1,2,3,4,5];
   $scope.data = [
     {'client': 'Nexus S', 'ordernumber':'20934804785', 'price':235, 'status':'sending'},
     {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
     {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
     {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
-    {'client': 'GooglePhone', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
-    {'client': 'Teacher Yu', 'ordernumber':'3858', 'price':2450, 'status':'sending'},
-    {'client': 'Elivoa', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
+    {'client': 'GooglePhone6', 'ordernumber':'3882994', 'price':1098, 'status':'sending'},
+    {'client': 'Elivoax', 'ordernumber':'20998404785', 'price':3399, 'status':'done'},
   ];
   $scope.changeData = function(){
     $scope.data[3].client='我要扯淡扯淡';
   };
+
+  $scope.showName = function(){
+    console.log($scope.name)
+  };
+
+  $scope.name="sss"
+  
 });
       </script>
 

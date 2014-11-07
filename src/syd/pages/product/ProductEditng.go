@@ -14,7 +14,7 @@ import (
 /* ________________________________________________________________________________
    Product Create Page
 */
-type ProductEdit struct {
+type ProductEditng struct {
 	core.Page
 
 	// field
@@ -27,49 +27,24 @@ type ProductEdit struct {
 	Stocks   []int          // receive stock numbers, transfer to product later.
 	Pictures []string       // uploaded picture's key
 
-	// helper used because angularjs
-	Colors []*model.Object
-	Sizes  []*model.Object
-
-	// ...
 	Referer string `query:"referer"` // referer page, view or list
 
 	// display
-	StockJson string
-}
-
-func (p *ProductEdit) ProductJson() *model.Product {
-	return p.Product
+	StockJson string // TODO kill this;
 }
 
 // init this page
-func (p *ProductEdit) New() *ProductEdit {
+func (p *ProductEditng) New() *ProductEdit {
 	return &ProductEdit{}
 }
 
-func (p *ProductEdit) Setup() { // (string, string) {
+func (p *ProductEditng) Setup() { // (string, string) {
 	// page values
 	p.Title = "create product post"
-	fmt.Println(p.Id)
-	fmt.Println(p.Product)
 	if p.Id != nil {
-		fmt.Printf("\t >>> get product by id\n")
 		var err error
 		if p.Product, err = service.Product.GetProduct(p.Id.Int); err != nil {
 			panic(err)
-		}
-		// fill Colors and Sizes for ng.
-		if p.Product != nil {
-			if p.Product.Colors != nil {
-				for _, c := range p.Product.Colors {
-					p.Colors = append(p.Colors, model.NewObject(c))
-				}
-			}
-			if p.Product.Sizes != nil {
-				for _, c := range p.Product.Sizes {
-					p.Sizes = append(p.Sizes, model.NewObject(c))
-				}
-			}
 		}
 		p.SubTitle = "编辑"
 	} else {
@@ -90,27 +65,7 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	}
 }
 
-func (p *ProductEdit) OnPrepareForSubmitFromProductForm() {
-	if p.Id == nil { // if create
-		p.Product = model.NewProduct()
-	} else {
-		// if edit
-		// for security reason, TODO security check here.
-		// 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
-		model, err := service.Product.GetProduct(p.Id.Int)
-		if err != nil {
-			panic(err.Error())
-		}
-		p.Product = model
-		// 但是这样做就必须清除form更新的时候需要删除的值，否则form提交和原有值是叠加的，会引起错误；
-		// 这里只需要清除列表等数据，这个Order中只有Details是列表。
-		p.Product.ClearColors()
-		p.Product.ClearSizes()
-		p.Product.ClearValues()
-	}
-}
-
-func (p *ProductEdit) OnSuccessFromProductForm() *exit.Exit {
+func (p *ProductEditng) OnSuccessFromProductForm() *exit.Exit {
 	// clear values
 	p.Product.ClearValues()
 
