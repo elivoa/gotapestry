@@ -18,7 +18,7 @@ type ProductDetail struct {
 
 func (p *ProductDetail) Setup() {
 	var err error
-	p.Product, err = service.Product.GetProduct(p.Id.Int)
+	p.Product, err = service.Product.GetFullProduct(p.Id.Int)
 	if err != nil {
 		panic(err)
 	}

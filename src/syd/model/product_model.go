@@ -1,7 +1,7 @@
 package model
 
 import (
-	// "fmt"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -33,7 +33,7 @@ type Product struct {
 	// special values in stock table
 	//   stock = -1 means this pair of combination doesn't exist.
 	//   stock = -2 means the pair is deleted.(may be price is available)
-	Stocks map[string]int
+	Stocks []*ProductStockItem // map[string]int
 }
 
 // Create default empty Product
@@ -44,6 +44,17 @@ func NewProduct() *Product {
 		// Stocks: map[string]int{},
 		CreateTime: time.Now(),
 	}
+}
+
+// Stock Item
+type ProductStockItem struct {
+	Color string
+	Size  string
+	Stock int
+}
+
+func (s ProductStockItem) Key() string {
+	return fmt.Sprintf("%s__%s", s.Color, s.Size)
 }
 
 // used for fetch;
@@ -58,7 +69,7 @@ func (p *Product) TotalStock() int {
 	if nil != p.Stocks && len(p.Stocks) > 0 {
 		var totalstock = 0
 		for _, s := range p.Stocks {
-			totalstock += s
+			totalstock += s.Stock
 		}
 		return totalstock
 	}

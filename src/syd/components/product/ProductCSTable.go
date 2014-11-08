@@ -20,7 +20,7 @@ type ProductColorSizeTable struct {
 }
 
 func (p *ProductColorSizeTable) Setup() {
-	if product, err := service.Product.GetProduct(p.ProductId); err != nil {
+	if product, err := service.Product.GetFullProduct(p.ProductId); err != nil {
 		panic(err)
 	} else {
 		p.Product = product

@@ -93,7 +93,7 @@ func (p *ShippingInstead) ShowProductName(productId int) string {
 	if ok {
 		return product.Name
 	} else {
-		if product, err := service.Product.GetProduct(productId); err != nil {
+		if product, err := service.Product.GetFullProduct(productId); err != nil {
 			panic(err)
 		} else if product != nil {
 			p.productcache[productId] = product

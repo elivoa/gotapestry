@@ -66,36 +66,14 @@ func (s *ProductService) UpdateProduct(product *model.Product) {
 	// update stock information
 	if product.Stocks != nil {
 		inventorydao.ClearProductStock(product.Id) // clear
-		for key, stock := range product.Stocks {
-			ps := strings.Split(key, "__")
-			if len(ps) != 2 {
-				panic("Key format not correct!" + key)
-			}
-			inventorydao.SetProductStock(product.Id, ps[0], ps[1], stock)
+		for _, stock := range product.Stocks {
+			inventorydao.SetProductStock(product.Id, stock.Color, stock.Size, stock.Stock)
 		}
 	}
 
 	// update suggest
 	suggest.Update(suggest.Product, product.Name, product.Id)
 
-}
-
-//
-// Get Product, with product's size and color properties.
-// TODO get all properties.
-// TODO add with.
-//
-func (s *ProductService) GetProduct(id int) (*model.Product, error) {
-	if product, err := productdao.Get(id); err != nil {
-		return nil, err
-	} else if nil != product {
-		// fill properties
-		product.Colors = productdao.GetProductProperties(id, "color")
-		product.Sizes = productdao.GetProductProperties(id, "size")
-		product.Stocks = inventorydao.ListProductStocks(id)
-		return product, nil
-	}
-	return nil, nil
 }
 
 func (s *ProductService) DeleteProduct(id int) (affacted int64, err error) {
@@ -151,8 +129,40 @@ func (s *ProductService) List(parser *db.QueryParser, withs Withs) ([]*model.Pro
 				return nil, err
 			}
 		}
+		if withs&WITH_PRODUCT_INVENTORY > 0 {
+			if err := inventorydao.FillProductStocksByIdSet(models); err != nil {
+				return nil, err
+			}
+		}
 		return models, nil
 	}
+}
+
+//
+// Get Product, with product's size and color properties.
+//
+func (s *ProductService) GetProduct(id int, withs Withs) (*model.Product, error) {
+	if product, err := productdao.Get(id); err != nil {
+		return nil, err
+	} else if nil != product {
+		models := []*model.Product{product}
+		if withs&WITH_PRODUCT_DETAIL > 0 {
+			if err := productdao.FillProductPropertiesByIdSet(models); err != nil {
+				return nil, err
+			}
+		}
+		if withs&WITH_PRODUCT_INVENTORY > 0 {
+			if err := inventorydao.FillProductStocksByIdSet(models); err != nil {
+				return nil, err
+			}
+		}
+		return product, nil
+	}
+	return nil, nil
+}
+
+func (s *ProductService) GetFullProduct(id int) (*model.Product, error) {
+	return s.GetProduct(id, WITH_PRODUCT_DETAIL|WITH_PRODUCT_INVENTORY)
 }
 
 // No use // TODO: delete this;

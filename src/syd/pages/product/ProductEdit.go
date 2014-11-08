@@ -22,14 +22,15 @@ type ProductEdit struct {
 	SubTitle string
 
 	// property
-	Id       *gxl.Int       `path-param:"1"`
-	Product  *model.Product `` // Product Model
-	Stocks   []int          // receive stock numbers, transfer to product later.
-	Pictures []string       // uploaded picture's key
+	Id      *gxl.Int       `path-param:"1"`
+	Product *model.Product `` // Product Model
 
 	// helper used because angularjs
 	Colors []*model.Object
 	Sizes  []*model.Object
+	Stocks []int // receive stock numbers, transfer to product later.
+
+	Pictures []string // uploaded picture's key
 
 	// ...
 	Referer string `query:"referer"` // referer page, view or list
@@ -55,9 +56,10 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	if p.Id != nil {
 		fmt.Printf("\t >>> get product by id\n")
 		var err error
-		if p.Product, err = service.Product.GetProduct(p.Id.Int); err != nil {
+		if p.Product, err = service.Product.GetFullProduct(p.Id.Int); err != nil {
 			panic(err)
 		}
+
 		// fill Colors and Sizes for ng.
 		if p.Product != nil {
 			if p.Product.Colors != nil {
@@ -97,7 +99,7 @@ func (p *ProductEdit) OnPrepareForSubmitFromProductForm() {
 		// if edit
 		// for security reason, TODO security check here.
 		// 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
-		model, err := service.Product.GetProduct(p.Id.Int)
+		model, err := service.Product.GetFullProduct(p.Id.Int)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -116,12 +118,18 @@ func (p *ProductEdit) OnSuccessFromProductForm() *exit.Exit {
 
 	// transfer stocks value to product.Stocks
 	if p.Stocks != nil {
-		p.Product.Stocks = map[string]int{}
+		p.Product.Stocks = make([]*model.ProductStockItem, len(p.Product.Colors)*len(p.Product.Sizes))
+
 		i := 0
 		for _, color := range p.Product.Colors {
 			for _, size := range p.Product.Sizes {
-				key := fmt.Sprintf("%v__%v", color, size)
-				p.Product.Stocks[key] = p.Stocks[i]
+				fmt.Println("?>>>>", i)
+				// key := fmt.Sprintf("%v__%v", color, size)
+				p.Product.Stocks[i] = &model.ProductStockItem{
+					Color: color,
+					Size:  size,
+					Stock: p.Stocks[i],
+				}
 				i = i + 1
 			}
 		}

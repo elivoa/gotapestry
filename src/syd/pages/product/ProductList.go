@@ -26,7 +26,7 @@ func (p *ProductList) Setup() {
 	} else {
 		parser.Where("capital", p.Capital)
 	}
-	p.Products, err = service.Product.List(parser, service.WITH_PRODUCT_DETAIL)
+	p.Products, err = service.Product.List(parser, service.WITH_PRODUCT_DETAIL|service.WITH_PRODUCT_INVENTORY)
 	if nil != err {
 		panic(err.Error())
 	}

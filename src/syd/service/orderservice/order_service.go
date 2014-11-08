@@ -116,7 +116,7 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 			jsonStruct, ok := products[strconv.Itoa(detail.ProductId)]
 			if !ok {
 				// get product
-				product, err := service.Product.GetProduct(detail.ProductId)
+				product, err := service.Product.GetFullProduct(detail.ProductId)
 				if err != nil {
 					panic(err) // // TODO:
 				}

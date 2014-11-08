@@ -3,7 +3,6 @@ package productdao
 import (
 	"bytes"
 	"database/sql"
-	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
@@ -110,11 +109,9 @@ func IsPropertyExist(productId string, propertyName string, propertyValue string
 // delete product properties && create new properties.
 // TODO add transaction here.
 func UpdateProductProperties(productId int, propertyName string, values ...string) {
-	// properties := GetProperties(productId, propertyName)
 	// TODO performance issue.
 	DeleteOneProductProperty(productId, propertyName)
 	if values != nil {
-		fmt.Printf(">>>>>>>>>>>> properties: %v ; productId: %v\n", values, productId)
 		for _, value := range values {
 			AddProductProperty(productId, propertyName, value)
 		}
@@ -148,8 +145,7 @@ func FillProductPropertiesByIdSet(models []*model.Product) error {
 		params = append(params, m.Id)
 		index[m.Id] = m
 	}
-	_sql.WriteRune(')')
-
+	_sql.WriteString(") order by id asc")
 	if stmt, err = conn.Prepare(_sql.String()); err != nil {
 		return err
 	}

@@ -53,7 +53,7 @@ func (c *SuggestControl) initSuggest() {
 			c.DisplayValue = person.Name
 		}
 	case "product":
-		product, err := service.Product.GetProduct(id)
+		product, err := service.Product.GetFullProduct(id)
 		if err == nil && product != nil {
 			c.DisplayValue = product.Name
 		}

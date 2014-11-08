@@ -289,7 +289,7 @@ func _processOrderCustomerPrice(order *model.Order) {
 			// don't has customer price, load product price;
 
 			// TODO: performance issue, batch get product.
-			if product, err := Product.GetProduct(detail.ProductId); err != nil {
+			if product, err := Product.GetFullProduct(detail.ProductId); err != nil {
 				panic(err)
 			} else if nil == product {
 				panic(fmt.Sprint("Can not find product ", detail.ProductId))

@@ -33,7 +33,7 @@ func (p *Api) Setup() (string, string) {
 		return toJson(person)
 
 	case "product":
-		product, err := service.Product.GetProduct(p.Param1)
+		product, err := service.Product.GetProduct(p.Param1, service.WITH_PRODUCT_DETAIL|service.WITH_PRODUCT_INVENTORY)
 		if err != nil {
 			panic(err)
 		}

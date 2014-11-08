@@ -1,10 +1,13 @@
 package inventorydao
 
 import (
+	"bytes"
+	"database/sql"
 	"fmt"
 	"github.com/elivoa/got/db"
 	"github.com/elivoa/got/debug"
 	_ "github.com/go-sql-driver/mysql"
+	"syd/model"
 )
 
 // ________________________________________________________________________________
@@ -146,4 +149,76 @@ func filter(productId int) *map[string]int {
 		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
 	}
 	return &stocks
+}
+
+// ----------------------------------------------------------------------------------------------------
+// fill stocks
+func FillProductStocksByIdSet(models []*model.Product) error {
+	if nil == models || len(models) == 0 {
+		return nil
+	}
+
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	var _sql bytes.Buffer        // sql buffer
+	var params = []interface{}{} // params
+	var index = map[int]*model.Product{}
+	_sql.WriteString("select id, product_id, color, size, stock from product_cs_value where ")
+	_sql.WriteString("product_id in (")
+	for idx, m := range models {
+		if idx > 0 {
+			_sql.WriteRune(',')
+		}
+		_sql.WriteRune('?')
+		params = append(params, m.Id)
+		index[m.Id] = m
+	}
+	_sql.WriteRune(')')
+
+	if stmt, err = conn.Prepare(_sql.String()); err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	// 3. execute
+	rows, err := stmt.Query(params...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	// execute
+	var (
+		id        int
+		productId int
+		color     string
+		size      string
+		// price     float32
+		stock int
+	)
+
+	for rows.Next() {
+		err := rows.Scan(&id, &productId, &color, &size /*&price,*/, &stock)
+		if err != nil {
+			return err
+		}
+
+		if product, ok := index[productId]; ok {
+			if product.Stocks == nil {
+				product.Stocks = []*model.ProductStockItem{}
+			}
+			product.Stocks = append(product.Stocks, &model.ProductStockItem{
+				Color: color,
+				Size:  size,
+				Stock: stock,
+			})
+		}
+	}
+	return nil
 }

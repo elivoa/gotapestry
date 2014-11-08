@@ -1,23 +1,29 @@
 <!DOCTYPE HTML>
-<html>
+<!--
+    Time-stamp: <[ProductEdit.html] Elivoa @ Saturday, 2014-11-08 15:49:33>
+    NG-enabled;
+  -->
+
+<html ng-app="syd">
   <head>
     <link href="/static/css/pages/pg_create_product.css" rel="stylesheet" type="text/css">
     <t:layout.header title="新增订单" />
-    <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
-    <script type="text/javascript" src="/static/js/p/product/product_edit.js"></script>
+    <!-- <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script> -->
+    <!-- <script type="text/javascript" src="/static/js/p/product/product_edit.js"></script> -->
   </head>
 
-  <body class="PG_create_product">
+  <body ng-controller="ProductCtrl" class="PG_create_product" >
     <t:layout.headernav />
 
     <div class="container">
       <t:layout.leftnav curPage="/product/create" />
 
       <div class="main_content">
-
+        
         {{with .Product}}
 
-        <form method="POST" id="ProductForm" t:id="ProductForm" action="">
+        <form method="POST" name="ProductForm" ng-submit="submit()" action=""
+              t:id="ProductForm" id="ProductForm" >
           <input type="hidden" name="Product.Id" value="{{.Id}}" />
           {{/* [tmp] support redirect to form */}}
           <input type="hidden" name="t:id" value="ProductForm" />
@@ -28,34 +34,36 @@
             <div class="form_main">
               <dl class="clearfix">
                 <dt><i>*</i>商品名称：</dt>
-                <dd><input type="text" name="Product.Name" value="{{.Name}}" size="45" /></dd>
+                <dd>
+                  <input type="text" ng-model="Product.Name" size="45" />
+                </dd>
                 <dd class=""></dd>
               </dl>
               <dl class="clearfix">
                 <dt>货号：</dt>
                 <dd>
-                  <input type="text" name="Product.ProductId" value="{{.ProductId}}" size="12">
+                  <input type="text" ng-model="Product.ProductId" size="12">
                 </dd>
                 <dd></dd>
               </dl>
               <dl class="clearfix">
                 <dt>货架号：</dt>
                 <dd>
-                  <input type="text" name="Product.ShelfNo" value="{{.ShelfNo}}" size="12">
+                  <input type="text" ng-model="Product.ShelfNo" size="12">
                 </dd>
                 <dd></dd>
               </dl>
               <dl class="clearfix">
                 <dt>品牌：</dt>
                 <dd>
-                  <input type="text" name="Product.Brand" value="{{.Brand}}" size="12">
+                  <input type="text" ng-model="Product.Brand" size="12">
                 </dd>
                 <dd></dd>
               </dl>
               <dl class="clearfix">
                 <dt>销售单价：</dt>
                 <dd>
-                  <input type="text" name="Product.Price" value="{{.Price}}" size="12">
+                  <input type="number" ng-model="Product.Price" size="12">
                 </dd>
                 <dd></dd>
               </dl>
@@ -67,61 +75,50 @@
                 <dd class="B_prd_attr">
                   <h4>颜色（不填为默认颜色）</h4>
                   <ul class="clearfix mt-container" id="color-area">
-                    <li class="mt-line" style="display:none">
-                      <input type="text" name="Product.Colors" size="12" class="csq-trigger"/>
-                      <a class="B_btn_del mt-remove" href="#"></a>
+                    <li ng-repeat="Color in Colors track by $index" class="mt-line">
+                      <input type="text" ng-model="Color.Value" name="Product.Colors" size="12" />
+                      <a class="B_btn_del mt-remove" ng-click="removeColor($index)"></a>
                     </li>
-                    {{range .Colors}}
-                    <li class="mt-line">
-                      <input type="text" name="Product.Colors" value="{{.}}"
-                             size="12" class="csq-trigger"/>
-                      <a class="B_btn_del mt-remove" href="#"></a>
-                    </li>
-                    {{end}}
                     <li class="add">
-                      <a href="###" class="B_btn_add mt-add"></a>
+                      <a class="B_btn_add mt-add" ng-click="addColor()"></a>
                     </li>
                   </ul>
 
                   <h4 class="mar_t">尺码（不填为均码）</h4>
                   <ul class="clearfix mt-container" id="size-area">
-                    <li class="mt-line" style="display:none">
-                      <input type="text" name="Product.Sizes" size="12" class="csq-trigger"/>
-                      <a class="B_btn_del mt-remove" href="#"></a>
+                    <li ng-repeat="Size in Sizes track by $index" class="mt-line">
+                      <input type="text" ng-model="Size.Value" name="Product.Sizes" size="12" />
+                      <a class="B_btn_del mt-remove" ng-click="removeSize($index)"></a>
                     </li>
-                    {{range .Sizes}}
-                    <li class="mt-line">
-                      <input type="text" name="Product.Sizes" value="{{.}}"
-                             size="12" class="csq-trigger"/>
-                      <a class="B_btn_del mt-remove" href="#"></a>
-                    </li>
-                    {{end}}
                     <li class="add">
-                      <a href="###" class="B_btn_add mt-add"></a>
+                      <a class="B_btn_add mt-add" ng-click="addSize()"></a>
                     </li>
                   </ul>
                 </dd>
+
                 <dd>
                   <div id="cs-container">
                     <!-- Generated Table, input quantity here [NO USE HERE] -->
 
                     <table class="tbl_s">
-                      <tr>
-                        <th align="left">颜色</th>
-                        <th align="left">尺码</th>
-                        <th align="left">数量</th>
-                      </tr>
-                      <tr>
-                        <td rowspan="2">白色</td>
-                        <td>M</td>
-                        <td><input type="text" size="8" value=""></td>
-                      </tr>
-                      <tr>
-                        <td>L</td>
-                        <td><input type="text" size="8" value=""></td>
-                      </tr>
+                      <thead>
+                        <tr>
+                          <th align="left">颜色</th>
+                          <th align="left">尺码</th>
+                          <th align="left">数量</th>
+                        </tr>
+                      </thead>
+                      <tbody ng-repeat="color in Colors track by $index" ng-init="c = $index">
+                        <tr ng-repeat="size in Sizes track by $index">
+                          <td rowspan="[[Sizes.length]]" ng-show="$first">[[color.Value]]</td>
+                          <td>[[size.Value]]</td>
+                          <td>
+                            <input type="number" size="8" value="[[stock(color.Value, size.Value)]]"
+                                   name="Stocks" xxx-ng-model="Stocks[color.Value][size.Value]"/>
+                          </td>
+                        </tr>
+                      </tbody>
                     </table>
-
                   </div>
                 </dd>
               </dl>
@@ -173,7 +170,9 @@
               </dl>
             </div>
           </div>
-          <div class="btn_content"><input type="submit" class="btn_a_l" value="提交新商品"></div>
+          <div class="btn_content">
+            <input type="submit" class="btn_a_l" value="提交新商品" />
+          </div>
 
         </form>
         {{end}}
@@ -181,13 +180,19 @@
         
       </div>
     </div>
+    <script src="/static/js/angular.min.js" ></script>
+    <script src="/static/js/p/product/product_edit_ng.js" ></script>
   </body>
 </html>
 
 <script type="text/javascript">
-  $(function() {
-    pe =  new ProductEdit({{.StockJson}});
-  });
+
+//
+p_ProductEdit({
+  Product: {{.Product}},
+  Colors: {{.Colors}},
+  Sizes: {{.Sizes}}
+});
 </script>
 
 

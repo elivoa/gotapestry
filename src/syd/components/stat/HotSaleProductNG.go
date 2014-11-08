@@ -19,7 +19,7 @@ func (p *HotSaleProduct2) Setup() {
 	p.products = make(map[int]*model.Product)
 	p.HotSales = statservice.CalcHotSaleProducts(0, 0, -p.Days)
 	for _, hsp := range p.HotSales.HSProduct {
-		if product, err := service.Product.GetProduct(hsp.ProductId); err != nil {
+		if product, err := service.Product.GetFullProduct(hsp.ProductId); err != nil {
 			panic(err)
 		} else if product != nil {
 			p.products[hsp.ProductId] = product
