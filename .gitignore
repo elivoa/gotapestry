@@ -5,3 +5,4 @@ pkg/*
 .DS_Store
 src/generated/*.go
 src/generated/main.go
+static/from_lili/*

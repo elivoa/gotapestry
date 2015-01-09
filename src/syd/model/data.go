@@ -25,3 +25,14 @@ type Object struct {
 func NewObject(value interface{}) *Object {
 	return &Object{Value: value}
 }
+
+func NewObjectArray(n int, fillValue interface{}) []*Object {
+	if n <= 0 {
+		return []*Object{}
+	}
+	array := make([]*Object, n)
+	for i := 0; i < n; i++ {
+		array[i] = &Object{Value: fillValue}
+	}
+	return array
+}

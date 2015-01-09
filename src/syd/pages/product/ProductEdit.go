@@ -77,6 +77,8 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	} else {
 		p.Product = model.NewProduct()
 		p.SubTitle = "新建"
+		p.Colors = model.NewObjectArray(2, "")
+		p.Sizes = model.NewObjectArray(2, "")
 	}
 
 	// stock json

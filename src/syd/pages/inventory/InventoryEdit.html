@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<!--
+Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-09 22:43:57>
+  NG-enabled;
+  -->
+<html ng-app="syd">
+  <head>
+    <link href="/static/css/pages/pg_create_product.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="新增入库" />
+  </head>
+
+  <body ng-controller="InventoryEditCtrl" class="PG_create_product" >
+    <t:layout.headernav />
+
+    <div class="container">
+      <t:layout.leftnav curPage="/inventory" />
+
+      <div class="main_content">
+
+
+
+        <div style="border:solid 1px red;padding:8px;margin:4px;">
+          需要做一个Component，来替代输入商品和显示商品的表格；
+        </div>
+
+        <div style="border:solid 1px green;padding:8px;margin:4px;">
+          <t:inventory.productselector inventories=".InventoryGroup.Inventories" />
+          <span>( [[ 1+1 ]] )</span>
+        </div>
+
+
+
+        
+        {{with .InventoryGroup}}
+
+        <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
+              t:id="InventoryForm" id="InventoryForm" >
+          <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
+          {{/* [tmp] support redirect to form */}}
+          <input type="hidden" name="t:id" value="InventoryForm" />
+
+    	  <h1>{{$.SubTitle}}入库</h1>
+          <div class="unit">
+            <div class="tit"><strong>入库</strong></div>
+            <div class="form_main">
+              
+              <dl class="clearfix">
+                <dt><i>*</i>商品名称：</dt>
+                <dd>
+                  <input type="text" ng-model="Product.Name" size="45" />
+                </dd>
+                <dd class=""></dd>
+              </dl>
+
+              <!-- THIS IS PRODUCT COLOR & SIZE SELECTOR -->
+
+              <dl class="clearfix">
+                <dt>商品规格：</dt>
+                <dd class="B_prd_attr">
+                  <h4>颜色（不填为默认颜色）</h4>
+                  <ul class="clearfix mt-container" id="color-area">
+                    <li ng-repeat="Color in Colors track by $index" class="mt-line">
+                      <input type="text" ng-model="Color.Value" name="Product.Colors" size="12" />
+                      <a class="B_btn_del mt-remove" ng-click="removeColor($index)"></a>
+                    </li>
+                    <li class="add">
+                      <a class="B_btn_add mt-add" ng-click="addColor()"></a>
+                    </li>
+                  </ul>
+
+                  <h4 class="mar_t">尺码（不填为均码）</h4>
+                  <ul class="clearfix mt-container" id="size-area">
+                    <li ng-repeat="Size in Sizes track by $index" class="mt-line">
+                      <input type="text" ng-model="Size.Value" name="Product.Sizes" size="12" />
+                      <a class="B_btn_del mt-remove" ng-click="removeSize($index)"></a>
+                    </li>
+                    <li class="add">
+                      <a class="B_btn_add mt-add" ng-click="addSize()"></a>
+                    </li>
+                  </ul>
+                </dd>
+
+                <dd>
+                  <div id="cs-container">
+                    <!-- Generated Table, input quantity here [NO USE HERE] -->
+
+                    <table class="tbl_s">
+                      <thead>
+                        <tr>
+                          <th align="left">颜色</th>
+                          <th align="left">尺码</th>
+                          <th align="left">数量</th>
+                        </tr>
+                      </thead>
+                      <tbody ng-repeat="color in Colors track by $index" ng-init="c = $index">
+                        <tr ng-repeat="size in Sizes track by $index">
+                          <td rowspan="[[Sizes.length]]" ng-show="$first">[[color.Value]]</td>
+                          <td>[[size.Value]]</td>
+                          <td>
+                            <input type="number" size="8" value="[[stock(color.Value, size.Value)]]"
+                                   name="Stocks" xxx-ng-model="Stocks[color.Value][size.Value]"/>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="unit">
+            <div class="tit"><strong>其他信息</strong></div>
+            <div class="form_main">
+              <dl class="clearfix">
+                <dt>备注：</dt>
+                <dd>
+                  <textarea name="Product.Note" cols="80" rows="4">{{.Note}}</textarea>
+                </dd>
+                <dd></dd>
+              </dl>
+            </div>
+          </div>
+          <div class="btn_content">
+            <input type="submit" class="btn_a_l" value="提交" />
+          </div>
+
+        </form>
+        {{end}}
+
+        
+      </div>
+    </div>
+    <script src="/static/js/angular.min.js" ></script>
+    <script src="/static/js/angular.init.js" ></script>
+    <script src="/static/js/p/inventory/inventory_edit_ng.js" ></script>
+  </body>
+</html>
+
+<script type="text/javascript">
+
+//
+console.log('init method of components.')
+p_InventoryEdit({
+  InventoryGroup: {{.InventoryGroup}},
+});
+</script>
+
+

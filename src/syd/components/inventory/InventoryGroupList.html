@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+  <head></head>
+  <body ng-controller="InventoryGroupListCtrl" >
+
+    <div id="{{.ClientId}}">
+      
+      <if t="len .Inventories | not">
+        <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+
+        <else/>
+
+        <table class="tbl_main" width="100%">
+          <tr>
+            <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
+            <th align="left">ID</th>
+            <th align="left">Group</th>
+            <th align="left">Product</th>
+            <th align="left">Color</th>
+            <th align="left">Size</th>
+            <th align="left">Stock</th>
+            <th align="left">Provider</th>
+            <th align="left">Operator</th>
+            <th align="left">Status</th>
+            <th align="left">Type</th>
+            <th align="left">Send Time /<br />Receive Time</th>
+            <th align="left" style="width:80px;">Operation</th>
+          </tr>
+
+          <range source=".Inventories">
+            <tr>
+              <td>{{.Id}}</td>
+              <td nowrap>
+                <t:a page="inventory/view" context="{{print .Id}}" label="print .GroupId"></t:a>
+              </td>
+              <!-- <td nowrap>{{.Id}}</td> -->
+              
+              <if t=".Product">
+                <td>
+                  <if t=".Product.ProductId">
+                    {{.Product.ProductId}}#<br/>
+                  </if>
+                  {{.Product.Name}}
+                </td>
+                <else />
+                <td><<{{.ProductId}}>></td>
+              </if>
+
+              <td>{{.Color}}</td>
+              <td>{{.Size}}</td>
+              <td>{{.Stock}}</td>
+
+              <if t=".Provider">
+                <td>{{.Provider.Name}}</td>
+                <else />
+                <td><<{{.ProviderId}}>></td>
+              </if>
+
+              <if t=".Operator">
+                <td>{{.Operator.Username}}</td>
+                <else />
+                <td><<{{.OperatorId}}>></td>
+              </if>
+
+              <td>{{.Status}}</td>
+              <td>{{.Type}}</td>
+
+              <td nowrap title="发: {{.SendTime | prettytime}} &#10;到: {{.ReceiveTime|prettytime}}">
+                <if t=".SendTime|validtime">{{.SendTime | date}}<else>-</if>
+                <br />
+                <if t=".ReceiveTime|validtime">{{.ReceiveTime | date}}<else>-</if>
+              </td>
+              
+              <td title="{{.Note}}">{{.Note | truncate 40 "..."}}</td>
+
+            </tr>
+          </range>
+        </table>
+      </if>
+
+    </div>
+
+    <script src="/static/js/angular.min.js" ></script>
+    <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script>
+    
+    <script type="text/javascript">
+  
+// var a = { {.InventoriesJson} }
+p_InventoryGroupList({
+  // Product: { {.InventoryGroup} },
+});
+
+    </script>
+
+
+  </body>
+</html>
+

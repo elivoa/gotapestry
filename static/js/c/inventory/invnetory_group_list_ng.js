@@ -1,25 +1,27 @@
-// ProductEdit
-// Time-stamp: <[product_edit_ng.js] Elivoa @ Saturday, 2015-01-03 12:40:31>
+// inventory_group_list.js
+// Time-stamp: <[invnetory_group_list_ng.js] Elivoa @ Friday, 2015-01-02 18:13:48>
 
 //
+// TODO need to rewrite.
 // $master.Product -- product json.
 // $master.Colors  -- Colors [{Value:xxx}, {Value:xxx},...] structure.
 // $master.Sizes   -- The same with Colors
 //
-function p_ProductEdit($master){
+function p_InventoryGroupList($master){
+  console.log("init inventory_group_list_ng.js ...");
 
   var sydapp = angular.module('syd', [], function($interpolateProvider){
     $interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');
   });
 
-  sydapp.controller('ProductCtrl', function($scope){
+  sydapp.controller('InventoryGroupListCtrl', function($scope){
     $scope.init = function() {
       // init values
       $scope.Product = angular.copy($master.Product);
       $scope.Colors = angular.copy($master.Colors);
       $scope.Sizes = angular.copy($master.Sizes);
-      $scope.Stocks = transforStocks($scope);
+      // $scope.Stocks = transforStocks($scope);
       // bind methods. bind in html.
     };
     $scope.init();

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html ng-app="syd">
+  <head></head>
+  <body ng-controller="InventoryListCtrl" >
+
+    <div id="{{.ClientId}}">
+
+      <if t="len .Inventories | not">
+        <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+
+        <else/>
+
+        <table class="tbl_main" width="100%">
+          <tr>
+            <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
+            <th align="left">ID</th>
+            <th align="left">Group</th>
+            <th align="left">Product</th>
+            <th align="left">Color</th>
+            <th align="left">Size</th>
+            <th align="left">Stock</th>
+            <th align="left">Provider</th>
+            <th align="left">Operator</th>
+            <th align="left">Status</th>
+            <th align="left">Type</th>
+            <th align="left">Send Time /<br />Receive Time</th>
+            <th align="left" style="width:80px;">Operation</th>
+          </tr>
+
+          <tr ng-repeat="inv in Inventories track by $index">
+            <td>[[inv.Id]]</td>
+            <td nowrap>
+              <a href="/inventory/view/[[inv.Id]]">[[inv.GroupId]]</a>
+            </td>
+            <!-- <td nowrap>[[inv.Id]]</td> -->
+
+            <td ng-if="inv">
+              <span ng-if="inv.Product.ProductId">
+                [[inv.Product.ProductId]]#<br/>
+              </span>
+              [[inv.Product.Name]]
+            </td>
+            <td ng-if="!inv"><<[[inv.ProductId]]>></td>
+
+            <td></td>
+            <td></td>
+            <td></td>
+
+            <td ng-if="inv.Provider">[[inv.Provider.Name]]</td>
+            <td ng-if="!inv.Provider"><<[[inv.ProviderId]]>></td>
+
+            <td ng-if="inv.Operator">[[inv.Operator.Username]]</td>
+            <td ng-if="!inv.Operator"><<[[inv.OperatorId]]>></td>
+
+            <td>[[inv.Status]]</td>
+            <td>[[inv.Type]]</td>
+
+            <td nowrap title="发: [[inv.SendTime]] &#10;到: [[inv.ReceiveTime]]">
+              <!-- SendTime|validtime TODO: format date -->
+              <span ng-if="inv.SendTime">[[inv.SendTime]]<br /></span>
+              <span ng-if="inv.ReceiveTime">[[inv.ReceiveTime]]</span>
+            </td>
+            <!-- TODO: truncate 40 -->
+            <td title="[[inv.Note]]">[[inv.Note]]</td>
+
+          </tr>
+          
+        </table>
+      </if>
+
+    </div>
+
+    <script src="/static/js/angular.min.js" ></script>
+    <script src="/static/js/c/inventory/inventory_list.js" ></script>
+    <script type="text/javascript">
+  
+// var a = { {.InventoriesJson} }
+$InventoryList({
+  Inventories: {{.Inventories}},
+});
+
+    </script>
+
+  </body>
+</html>
+

@@ -1,224 +1,170 @@
 package inventorydao
 
 import (
-	"bytes"
 	"database/sql"
-	"fmt"
+	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/debug"
 	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
 )
 
-// ________________________________________________________________________________
-// product color-size special values.
+var logdebug = true
+
+func init() {
+	db.RegisterEntity("syd/inventory", em)
+}
+
+var core_fields = []string{"group_id", "product_id", "color", "size", "stock", "provider_id",
+	"operator_id", "status", "type", "note", "send_time", "receive_time", "create_time"}
+
+var em = &db.Entity{
+	Table:        "inventory",
+	PK:           "id",
+	Fields:       append(append([]string{"id"}, core_fields...), "update_time"),
+	CreateFields: core_fields,
+	UpdateFields: core_fields,
+}
+
+func EntityManager() *db.Entity {
+	return em
+}
+
 //
-// NOTE: 1. only stock used. price is not used here.
+// Universal one and list private
 //
 
-/* Set special value of product color*size: stock and unit prices. */
-func SetProductStock(productId int, color string, size string, stock int) {
-	setProductCSValue(productId, color, size, "stock", stock, 0)
-}
-
-func SetProductPrice(productId int, color string, size string, price float64) {
-	setProductCSValue(productId, color, size, "price", 0, price)
-}
-
-func setProductCSValue(productId int, color string, size string,
-	field string, stock int, price float64) {
-
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
-
-	_sql := fmt.Sprintf("insert into product_cs_value (product_id, color, size, %v) values (?,?,?,?) on duplicate key update %v = ?", field, field)
-
-	stmt, err := conn.Prepare(_sql)
-	defer db.CloseStmt(stmt) // the safe way to close.
-	if db.Err(err) {
-		panic(err.Error())
-	}
-
-	if field == "stock" {
-		_, err := stmt.Exec(productId, color, size, stock, stock)
-		if err != nil {
-			debug.Error(err)
-		}
-	} else if field == "price" {
-		_, err := stmt.Exec(productId, color, size, price, stock)
-		if err != nil {
-			debug.Error(err)
-		}
-	}
-}
-
-func ClearProductStock(productId int) error {
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
-
-	stmt, err := conn.Prepare("delete from product_cs_value where product_id = ?")
-	if db.Err(err) {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(productId)
-	if db.Err(err) {
-		return err
-	}
-	return nil
-}
-
-/*_______________________________________________________________________________
-  List Product Stocks
-*/
-func ListProductStocks(productId int) map[string]int {
-	var err error
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
-
-	// 1. query
-	var queryString = "select color,size,stock from `product_cs_value` where product_id = ?"
-
-	// 2. prepare
-	stmt, err := conn.Prepare(queryString)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer stmt.Close()
-
-	// 3. query
-	rows, err := stmt.Query(productId)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
-
-	// 4. process results.
-	// big performance issue, maybe. who knows.
-	var (
-		color  string
-		size   string
-		stock  int
-		stocks = map[string]int{}
+func _one(query *db.QueryParser) (*model.Inventory, error) {
+	m := new(model.Inventory)
+	err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			return false, rows.Scan(
+				&m.Id, &m.GroupId, &m.ProductId, &m.Color, &m.Size, &m.Stock, &m.ProviderId, &m.OperatorId,
+				&m.Status, &m.Type, &m.Note, &m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
+			)
+		},
 	)
-
-	for rows.Next() {
-		rows.Scan(&color, &size, &stock)
-		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
+	if err != nil {
+		return nil, err
 	}
-	return stocks
+	if m.Id > 0 {
+		return m, nil
+	}
+	return nil, nil
 }
 
-/*_______________________________________________________________________________
-  Fill order Lists.
-*/
-func filter(productId int) *map[string]int {
-	var err error
-	conn := db.Connectp()
-	defer db.CloseConn(conn)
-
-	// 1. query
-	var queryString = "select color,size,stock from `product_cs_value` where product_id = ?"
-
-	// 2. prepare
-	stmt, err := conn.Prepare(queryString)
-	if err != nil {
-		panic(err.Error())
+// the last part, read the list from rows
+func _list(query *db.QueryParser) ([]*model.Inventory, error) {
+	models := make([]*model.Inventory, 0)
+	if err := query.Query(
+		func(rows *sql.Rows) (bool, error) {
+			m := &model.Inventory{}
+			err := rows.Scan(
+				&m.Id, &m.GroupId, &m.ProductId, &m.Color, &m.Size, &m.Stock, &m.ProviderId, &m.OperatorId,
+				&m.Status, &m.Type, &m.Note, &m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
+			)
+			models = append(models, m)
+			return true, err
+		},
+	); err != nil {
+		return nil, err
 	}
-	defer stmt.Close()
 
-	// 3. query
-	rows, err := stmt.Query(productId)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
+	return models, nil
+}
 
-	// 4. process results.
-	// big performance issue, maybe. who knows.
-	var (
-		color  string
-		size   string
-		stock  int
-		stocks = map[string]int{}
+//
+// Universal Get and List Public
+//
+
+func Get(field string, value interface{}) (*model.Inventory, error) {
+	return _one(em.Select().Where(field, value))
+}
+
+func List(parser *db.QueryParser) ([]*model.Inventory, error) {
+	// var query *db.QueryParser
+	parser.SetEntity(em) // set entity manager into query parser.
+	parser.Reset()       // to prevent if parser is used before. TODO:Is this necessary?
+	// append default behavore.
+	parser.DefaultOrderBy("send_time", db.DESC)
+	parser.DefaultLimit(0, config.LIST_PAGE_SIZE)
+	parser.Select()
+	return _list(parser)
+}
+
+func GetInventoryById(id int64) (*model.Inventory, error) {
+	return _one(em.Select().Where(em.PK, id))
+}
+
+//
+// Create
+//
+
+func Create(m *model.Inventory) (*model.Inventory, error) {
+	res, err := em.Insert().Exec(
+		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProductId, m.OperatorId,
+		m.Status, m.Type, m.Note, m.SendTime, m.ReceiveTime, m.CreateTime,
 	)
-
-	for rows.Next() {
-		rows.Scan(&color, &size, &stock)
-		stocks[fmt.Sprintf("%v__%v", color, size)] = stock
-	}
-	return &stocks
-}
-
-// ----------------------------------------------------------------------------------------------------
-// fill stocks
-func FillProductStocksByIdSet(models []*model.Product) error {
-	if nil == models || len(models) == 0 {
-		return nil
-	}
-
-	var conn *sql.DB
-	var stmt *sql.Stmt
-	var err error
-	if conn, err = db.Connect(); err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	var _sql bytes.Buffer        // sql buffer
-	var params = []interface{}{} // params
-	var index = map[int]*model.Product{}
-	_sql.WriteString("select id, product_id, color, size, stock from product_cs_value where ")
-	_sql.WriteString("product_id in (")
-	for idx, m := range models {
-		if idx > 0 {
-			_sql.WriteRune(',')
-		}
-		_sql.WriteRune('?')
-		params = append(params, m.Id)
-		index[m.Id] = m
-	}
-	_sql.WriteRune(')')
-
-	if stmt, err = conn.Prepare(_sql.String()); err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	// 3. execute
-	rows, err := stmt.Query(params...)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer rows.Close()
-
-	// execute
-	var (
-		id        int
-		productId int
-		color     string
-		size      string
-		// price     float32
-		stock int
-	)
-
-	for rows.Next() {
-		err := rows.Scan(&id, &productId, &color, &size /*&price,*/, &stock)
-		if err != nil {
-			return err
-		}
-
-		if product, ok := index[productId]; ok {
-			if product.Stocks == nil {
-				product.Stocks = []*model.ProductStockItem{}
-			}
-			product.Stocks = append(product.Stocks, &model.ProductStockItem{
-				Color: color,
-				Size:  size,
-				Stock: stock,
-			})
-		}
-	}
-	return nil
+	liid, err := res.LastInsertId()
+	m.Id = liid
+	return m, nil
 }
+
+func Update(m *model.Inventory) (int64, error) {
+	res, err := em.Update().Exec(
+		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProductId, m.OperatorId,
+		m.Status, m.Type, m.Note, m.SendTime, m.ReceiveTime, m.CreateTime,
+		m.Id,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+func Delete(id int64) (int64, error) {
+	return em.DeleteByPK(id)
+}
+
+// old things.
+// func SearchInventoryInUseByPattern(pattern string) ([]*model.Inventory, error) {
+// 	var conn *sql.DB
+// 	var stmt *sql.Stmt
+// 	var err error
+// 	if conn, err = db.Connect(); err != nil {
+// 		return nil, err
+// 	}
+// 	defer conn.Close()
+
+// 	sql := "select i.id, i.product_id, i.serialno, i.store, i.status, i.note, p.name, p.type, p.property from inventory i left join product p on p.id=i.product_id where i.status=? and p.name like ? limit 100"
+// 	if stmt, err = conn.Prepare(sql); err != nil {
+// 		return nil, err
+// 	}
+// 	defer stmt.Close()
+
+// 	rows, err := stmt.Query(model.InventoryStatus_InUse, pattern)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
+
+// 	models := []*model.Inventory{}
+// 	for rows.Next() {
+// 		m := &model.Inventory{}
+// 		p := &model.Product{}
+// 		err := rows.Scan(
+// 			&m.Id, &m.ProductId, &m.SerialNo, &m.Store, &m.Status, &m.Note,
+// 			&p.Name, &p.Type, &p.Property,
+// 		)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+
+// 		p.Id = int(m.ProductId)
+// 		m.Product = p
+// 		models = append(models, m)
+// 	}
+// 	return models, nil
+// }
