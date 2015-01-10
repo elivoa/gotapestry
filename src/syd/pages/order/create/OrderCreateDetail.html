@@ -29,8 +29,11 @@
           <h2 style="margin:8px 0">
             <a href="/person/detail/{{.Customer.Id}}" target="blank">{{.Customer.Name}}</a>
             <span style="font-size:13px;color:gray"> 累计欠款：{{.Customer.AccountBallance}}</span>
-            <input type="button" class="btn_a_s" value="临时保存" onclick="tempsave();"
-                   style="margin-left:20px;">
+            <if t="not .IsDaifa">
+              <input type="button" class="btn_a_s" value="临时保存" onclick="tempsave();"
+                     style="margin-left:20px;">
+            </if>
+            
           </h2>
           <t:order.productselector customerId=".Customer.Id" />
 
@@ -67,7 +70,7 @@
               <div class="B_fare">
                 运费：<input type="text" size="10" class="express-fee"
                              name="Order.ExpressFee" value="{{.Order.ExpressFee}}" /> 
-				<label><input type="checkbox" class="daofu" name="DaoFu" /> 到付</label>
+			    <label><input type="checkbox" class="daofu" name="DaoFu" /> 到付</label>
               </div>
               -------------------------------------------------------------------------------- */}}
               {{if .ShowAddress}}
@@ -81,19 +84,21 @@
             </div>
           </div>
           
-		  <div class="unit">
+	      <div class="unit">
             <div class="tit"><strong>订单备注</strong></div>
-		    <div class="B_order_remark">
-			  <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
-		    </div>
-		  </div>
+	        <div class="B_order_remark">
+		      <textarea rows="4" name="Order.Note">{{.Order.Note}}</textarea>
+	        </div>
+	      </div>
           <div class="btn_content">
-            <input type="button" class="btn_a_l" value="临时保存" onclick="tempsave();">
+            <if t="not .IsDaifa">
+              <input type="button" class="btn_a_l" value="临时保存" onclick="tempsave();">
+            </if>
             <input type="submit" class="btn_a_l" value="{{.SubmitButton}}">
           </div>
         </form>
       </div>
-      
+
     </div>
   </body>
 </html>

@@ -11,9 +11,10 @@ import (
 type InventoryProductSelector struct {
 	core.Component
 
-	Inventories []*model.Inventory
-	TotalPrice  float64 // all order's price
-	Referer     string  // return to this place
+	GroupId     int64
+	Inventories []*model.Inventory // Inventory items in InventoryGroup.
+	TotalPrice  float64            // all order's price
+	Referer     string             // return to this place
 
 	// TimeZone *model.TimeZoneInfo
 }

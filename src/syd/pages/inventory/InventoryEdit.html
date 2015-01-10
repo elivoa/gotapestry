@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
 <!--
-Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-09 22:43:57>
+Time-stamp: <[InventoryEdit.html] Elivoa @ Saturday, 2015-01-10 00:12:53>
   NG-enabled;
   -->
 <html ng-app="syd">
   <head>
-    <link href="/static/css/pages/pg_create_product.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/pages/pg_inventory_edit.css" rel="stylesheet" type="text/css">
     <t:layout.header title="新增入库" />
   </head>
 
@@ -17,20 +17,10 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-09 22:43:57>
 
       <div class="main_content">
 
-
-
         <div style="border:solid 1px red;padding:8px;margin:4px;">
           需要做一个Component，来替代输入商品和显示商品的表格；
         </div>
 
-        <div style="border:solid 1px green;padding:8px;margin:4px;">
-          <t:inventory.productselector inventories=".InventoryGroup.Inventories" />
-          <span>( [[ 1+1 ]] )</span>
-        </div>
-
-
-
-        
         {{with .InventoryGroup}}
 
         <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
@@ -41,7 +31,7 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-09 22:43:57>
 
     	  <h1>{{$.SubTitle}}入库</h1>
           <div class="unit">
-            <div class="tit"><strong>入库</strong></div>
+            <div class="tit"><strong>入库 [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
               <dl class="clearfix">
@@ -52,6 +42,13 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-09 22:43:57>
                 <dd class=""></dd>
               </dl>
 
+
+              <div style="border:solid 1px green;padding:8px;margin:4px;">
+                <t:inventory.productselector
+                   GroupId=".Id" inventories=".Inventories" />
+              </div>
+
+              
               <!-- THIS IS PRODUCT COLOR & SIZE SELECTOR -->
 
               <dl class="clearfix">

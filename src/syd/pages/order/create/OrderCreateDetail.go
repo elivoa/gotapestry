@@ -77,6 +77,10 @@ func (p *OrderCreateDetail) Setup() {
 	}
 }
 
+func (p *OrderCreateDetail) IsDaifa() bool {
+	return p.Type == 2
+}
+
 // before inject submit values, init fields.
 func (p *OrderCreateDetail) OnPrepareForSubmit() {
 	if p.Id == nil {

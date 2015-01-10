@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Friday, 2015-01-09 22:57:24>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Saturday, 2015-01-10 15:29:36>
 
 //
 // TODO need to rewrite.
@@ -13,10 +13,13 @@ function $InventoryProductSelector(app, $master){
   console.log("init inventory_product_selector.js ...");
 
   app.controller('InventoryProductSelectorCtrl', function($scope){
+
     $scope.init = function() {
       // init values
       $scope.Inventories = angular.copy($master.Inventories);
-      console.log($master.Inventories);
+
+      $scope.quickinput = "please input capital letter!";
+
       // bind methods. bind in html.
     };
     $scope.init();
