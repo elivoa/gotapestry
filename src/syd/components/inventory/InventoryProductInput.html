@@ -1,0 +1,74 @@
+<!--
+    Time-stamp: <[InventoryProductInput.html] Elivoa @ Wednesday, 2015-01-14 00:10:02>
+  -->
+<div id="{{.ClientId}}" ng-controller="InventoryProductInputCtrl" style="display:inline">
+  <input type="text" ng-model="query"
+         ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
+         size="45" />
+  <span ng-if="product">[[ product.Name ]]</span>
+
+  <table class="B_prd_att">
+    <tbody>
+      <tr>
+	    <td>
+          <div id="cs-container" desc="Order Product Selector">
+
+            <table class="tbl_s">
+              <thead>
+                <tr>
+                  <th align="left">颜色</th>
+                  <th align="left">尺码</th>
+                  <th align="left">数量</th>
+                </tr>
+              </thead>
+              <tbody ng-repeat="color in product.Colors track by $index" ng-init="c = $index">
+                <tr ng-repeat="size in product.Sizes track by $index">
+                  <td rowspan="[[product.Sizes.length]]" ng-show="$first">[[color]]</td>
+                  <td>[[size]]</td>
+                  <td>
+                    <input type="number" size="8" name="Stocks" 
+                           value="[[ stock(color, size) ]]"
+                           ng-keyup="setStock(color,size,$event)"
+                           ng-blur="setStock(color,size,$event)"
+                           />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+	    </td>
+	    <td>
+		  <div class="B_prd_price">
+		    <p class="price">0.00</p>
+		    <p class="B_info info"></p>
+		  </div>
+	    </td>
+	    <td>
+		  <p class="B_text">填写商品备注</p>
+		  <textarea class="notes" rows="3" cols="50"></textarea>
+	    </td>    
+	  </tr>
+	  <tr>
+	    <td class="B_btn" colspan="3" align="center">
+          <input type="button" class="btn_b_s ops-add" value="加入库存" ng-click="addToInventory()">
+        </td>
+	  </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script src="/static/js/angular.init.js" ></script>
+<script src="/static/js/c/inventory/inventory_product_input.js" ></script>
+
+<script type="text/javascript">
+  ngRegisterComponent({
+    name: "InventoryProductInput",
+    init: function(app){
+      $InventoryProductInput(app, {
+        query: "",
+      });
+    }
+  });
+</script>

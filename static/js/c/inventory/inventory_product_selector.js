@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Saturday, 2015-01-10 15:29:36>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Sunday, 2015-01-11 15:26:24>
 
 //
 // TODO need to rewrite.

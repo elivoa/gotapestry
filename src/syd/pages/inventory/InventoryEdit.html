@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!--
-Time-stamp: <[InventoryEdit.html] Elivoa @ Saturday, 2015-01-10 00:12:53>
-  NG-enabled;
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Tuesday, 2015-01-13 22:52:52>
+    NG-enabled;
   -->
 <html ng-app="syd">
   <head>
@@ -29,23 +29,14 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Saturday, 2015-01-10 00:12:53>
           {{/* [tmp] support redirect to form */}}
           <input type="hidden" name="t:id" value="InventoryForm" />
 
-    	  <h1>{{$.SubTitle}}入库</h1>
           <div class="unit">
             <div class="tit"><strong>入库 [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
-              <dl class="clearfix">
-                <dt><i>*</i>商品名称：</dt>
-                <dd>
-                  <input type="text" ng-model="Product.Name" size="45" />
-                </dd>
-                <dd class=""></dd>
-              </dl>
-
-
-              <div style="border:solid 1px green;padding:8px;margin:4px;">
-                <t:inventory.productselector
-                   GroupId=".Id" inventories=".Inventories" />
+              <div style="border:solid 0px green;padding:8px;margin:4px;" class="">
+                
+                <t:inventory.productselector GroupId=".Id" inventories=".Inventories" />
+                
               </div>
 
               
@@ -137,7 +128,6 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Saturday, 2015-01-10 00:12:53>
 <script type="text/javascript">
 
 //
-console.log('init method of components.')
 p_InventoryEdit({
   InventoryGroup: {{.InventoryGroup}},
 });

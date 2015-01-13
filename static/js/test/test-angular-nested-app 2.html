@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html ng-app="MainApp">
+  <head>
+    <meta charset="UTF-8">
+    <title>Nested App</title>
+    <script src="../angular.min.js" ></script>
+    <script>
+  
+
+// 宣告 MainApp module
+(function() {
+  var mainApp = angular.module("MainApp", [] ,  function($interpolateProvider){
+    // TODO move this into global config;
+    $interpolateProvider.startSymbol('[[');
+    $interpolateProvider.endSymbol(']]');
+  });
+  mainApp.controller("MainCtrl", function($scope) {
+    $scope.name = "MainApp得到的";
+    console.log("MainApp.MainCtrl();");
+  });
+  mainApp.directive("subApp", function() {
+    return {
+      restrict: "CA",
+      terminal: true,
+      link: function(scope, iElement, iAttrs, controllers) {
+        // iElement.children().removeAttr("ng-non-bindable");
+        // angular.bootstrap(iElement.children(), [iAttrs.subApp]);
+        console.log(iElement.children())
+      }
+    };
+  });
+
+})();
+
+
+// 宣告 ChildApp module
+(function() {
+  var subApp = angular.module("ChildApp", []);
+  var mainCtrlFn = function($scope) {
+    $scope.name = "ChildApp";
+    console.log("ChildApp.MainCtrl();");
+  };
+  subApp.controller("MainCtrl", mainCtrlFn);
+
+  var logDirective = function() {
+    return function(scope, iElement, iAttrs) {
+      console.log("log:", iAttrs.log);
+    };
+  };
+  subApp.directive("log", logDirective);
+})();
+
+    </script>
+    
+  </head>
+  <body ng-controller="MainCtrl">
+    <input type="text" ng-model="name"
+           ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }">
+    [[name]]
+
+    <div sub-app="ChildApp2">
+      <div ng-controller="MainCtrl" log="Hello!">
+        [[ name ]]
+      </div>
+    </div>
+
+    <div sub-app="ChildApp">
+      <div ng-controller="MainCtrl" log="Hello!">
+        [[ name ]]
+      </div>
+    </div>
+  </body>
+</html>

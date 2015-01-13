@@ -1,5 +1,9 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Friday, 2015-01-09 22:53:12>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Monday, 2015-01-12 19:38:16>
+
+// Development Notes:
+// Treat all sub components as one html page, use component just split them.
+// Later use directive as really component of angularjs.
 
 //
 // $master.Product -- product json.
@@ -9,12 +13,10 @@
 function p_InventoryEdit($master){
 
   var sydapp = angular.module('syd', [], function($interpolateProvider){
+    // TODO move this into global config;
     $interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');
   });
-
-  // register app to window parameter. TODO: maybe this is no use.
-  window['app'] = sydapp;
 
   // if has components, init it first; then init this page;
   ngLoadComponent(sydapp);
@@ -84,7 +86,6 @@ function p_InventoryEdit($master){
     $scope.submit = function() {
       fillFormNameWithNGModel(ProductForm);
     };
-
 
     // TEST --------------------------------------------------
     $scope.changeData = function(){

@@ -1,6 +1,7 @@
-// Time-stamp: <[angular.init.js] Elivoa @ Friday, 2015-01-09 22:53:20>
+// Time-stamp: <[angular.init.js] Elivoa @ Sunday, 2015-01-11 14:32:05>
 // Init file of got framework using angularjs framework;
 
+var got = window.got || (window.got = {});
 
 // spec: 初始化funtino的结构
 /*

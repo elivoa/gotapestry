@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Saturday, 2015-01-10 15:28:47> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Tuesday, 2015-01-13 22:53:13> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -6,14 +6,14 @@
   <body >
 
     -->
-<div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl" >
+<div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl">
 
   <div style="border-bottom:solid 1px red;margin:20px;padding 8px;">
     发货单序号: {{.GroupId}}
   </div>
 
   <div style="margin:8px;padding 8px;">
-    <label>输入产品：<input type="text" ng-model="quickinput" size="45" /></label>
+    <label>输入产品：<t:inventory.ProductInput /></label>
   </div>
   
   <if t="len .Inventories | not">
@@ -92,7 +92,8 @@
 <script src="/static/js/angular.init.js" ></script>
 <script src="/static/js/c/inventory/inventory_product_selector.js" ></script>
 <script type="text/javascript">
-  console.log('{{.Inventories}}');
+
+// console.log('{{.Inventories}}');
 ngRegisterComponent({
   name: "InventoryProductSelector",
   init: function(app){
@@ -101,7 +102,6 @@ ngRegisterComponent({
     });
   }
 });
-
 
 </script>
 
