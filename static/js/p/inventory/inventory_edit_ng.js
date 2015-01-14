@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Monday, 2015-01-12 19:38:16>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Wednesday, 2015-01-14 19:34:27>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
@@ -22,78 +22,11 @@ function p_InventoryEdit($master){
   ngLoadComponent(sydapp);
 
   sydapp.controller('InventoryEditCtrl', function($scope){
-    $scope.init = function() {
-      // init values
-      $scope.Product = angular.copy($master.Product);
-      // $scope.Colors = angular.copy($master.Colors);
-      // $scope.Sizes = angular.copy($master.Sizes);
-      // $scope.Stocks = transforStocks($scope);
-      // bind methods. bind in html.
-    };
-    $scope.init();
 
-    // functions
-    function transforStocks($scope){
-      // init struct
-      stocks = {};
-      for (i=0;i<$scope.Colors.length;i++){
-        var color  = $scope.Colors[i].Value;
-        for (j=0;j<$scope.Sizes.length;j++){
-          var size  = $scope.Sizes[j].Value;
-          if (stocks[color] == undefined){
-            stocks[color] = {};
-          }
-          stocks[color][size] = 0;
-        }
-      }
-      if ($scope.Product.Stocks != undefined){
-        // fill by stocks;
-        for (i=0;i<$scope.Product.Stocks.length;i++){
-          item = $scope.Product.Stocks[i];
-          if (stocks[item.Color]!=undefined){
-            if (stocks[item.Color][item.Size] !=undefined){
-              stocks[item.Color][item.Size] = item.Stock;
-              continue;
-            }
-          }
-          console.log("NOTE: SKU溢出", item.Color, item.Size, item.Stock);
-        }
-      }
-      return stocks;
-    }
 
-    $scope.stock = function(color,size){
-      if ($scope != undefined && $scope.Stocks[color]!=undefined ){
-        return  $scope.Stocks[color][size];
-      }
-      return 0;
-    };
-
-    // events
-    $scope.addColor = function(){
-      $scope.Colors.push({Value:""});
-    };
-    $scope.addSize = function(){
-      $scope.Sizes.push({Value:""});
-    };
-    $scope.removeColor = function(idx){
-      $scope.Colors.remove(idx,idx);
-    };
-    $scope.removeSize = function(idx){
-      $scope.Sizes.remove(idx,idx);
-    };
-
+    // nothing is useful in this page. all things is in components / directives;
     $scope.submit = function() {
       fillFormNameWithNGModel(ProductForm);
-    };
-
-    // TEST --------------------------------------------------
-    $scope.changeData = function(){
-      $scope.data[3].client='我要扯淡扯淡';
-    };
-
-    $scope.test = function(){
-      console.log($scope.Colors);
     };
 
   });

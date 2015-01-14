@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_input.js] Elivoa @ Wednesday, 2015-01-14 00:20:50>
+// Time-stamp: <[inventory_product_input.js] Elivoa @ Wednesday, 2015-01-14 19:36:01>
 
 //
 // TODO Rewrite this using Directive.
@@ -13,7 +13,7 @@
 // app is passed from page's config;
 function $InventoryProductInput(app, $master){
 
-  app.controller('InventoryProductInputCtrl', function($scope,$http){
+  app.controller('InventoryProductInputCtrl', function($scope,$rootScope,$http){
     console.log("init InventoryProductInput component...");
 
     // if ($scope.selector == undefined){
@@ -90,7 +90,7 @@ function $InventoryProductInput(app, $master){
         }
 
         // TODO should load it's price;
-        
+
       }).error(function(data, status, headers, config) {
         alert("AJAX failed!");
       });
@@ -104,9 +104,40 @@ function $InventoryProductInput(app, $master){
       return 0;
     };
 
+    // click addToInventory
     $scope.addToInventory = function(){
-      console.log("add to inventory");
-      console.log($scope.stocks);
+      if($scope.product == undefined){
+        alert("请选择商品先！"); // TODO make alert more humanreadable!
+        return;
+      }
+      // Here need to change product into inventories;
+      var p = $scope.product;
+      var inventory = {
+        Id         :0,
+	    GroupId    :0,         // TODO
+	    ProductId  : p.Id,
+	    Stocks     : $scope.stocks, // This is stocks matrix;
+	    ProviderId : 0,        // factory person id.
+	    OperatorId : 0,        // TODO
+	    Note       : $scope.Note,
+
+        // extended
+        Product : p
+
+        // ~ the following items 
+	    // Status     : 0,
+	    // Type       : 0,
+	    // SendTime    time.Time // 发货时间
+	    // ReceiveTime time.Time // 收到货的时间
+	    // CreateTime  time.Time // 创建收货单的时间
+	    // UpdateTime  time.Time
+
+      };
+      if ($scope.AddToProducts){
+        $scope.AddToProducts(inventory); // call upper function
+      }else{
+        console.log('WARRNING! No AddToProducts method found!');
+      }
     };
 
     $scope.setStock = function(color, size, $event){
@@ -147,3 +178,4 @@ function $InventoryProductInput(app, $master){
   });
 
 }
+

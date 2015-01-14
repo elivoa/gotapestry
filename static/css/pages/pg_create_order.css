@@ -9,6 +9,7 @@
 @import "../../css/module/express.css";
 @import "../../css/module/print_instead_order.css";
 @import "../../css/layer/layer.css";
+
 .PG_create_order .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
 .PG_create_order .unit{margin:40px 0 20px;}
 .PG_create_order .form_main{margin:30px 0 40px;}

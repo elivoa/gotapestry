@@ -1,5 +1,5 @@
 <!--
-    Time-stamp: <[InventoryProductInput.html] Elivoa @ Wednesday, 2015-01-14 00:10:02>
+    Time-stamp: <[InventoryProductInput.html] Elivoa @ Wednesday, 2015-01-14 18:33:43>
   -->
 <div id="{{.ClientId}}" ng-controller="InventoryProductInputCtrl" style="display:inline">
   <input type="text" ng-model="query"
@@ -7,7 +7,7 @@
          size="45" />
   <span ng-if="product">[[ product.Name ]]</span>
 
-  <table class="B_prd_att">
+  <table class="B_prd_att" style="margin-top: 12px;">
     <tbody>
       <tr>
 	    <td>
@@ -26,11 +26,10 @@
                   <td rowspan="[[product.Sizes.length]]" ng-show="$first">[[color]]</td>
                   <td>[[size]]</td>
                   <td>
-                    <input type="number" size="8" name="Stocks" 
+                    <input type="number" size="8" name="Stocks" autocomplete="off"
                            value="[[ stock(color, size) ]]"
                            ng-keyup="setStock(color,size,$event)"
-                           ng-blur="setStock(color,size,$event)"
-                           />
+                           ng-blur="setStock(color,size,$event)" />
                   </td>
                 </tr>
               </tbody>
@@ -41,12 +40,12 @@
 	    <td>
 		  <div class="B_prd_price">
 		    <p class="price">0.00</p>
-		    <p class="B_info info"></p>
+		    <p class="B_info info">TODO: Load Price!</p>
 		  </div>
 	    </td>
 	    <td>
 		  <p class="B_text">填写商品备注</p>
-		  <textarea class="notes" rows="3" cols="50"></textarea>
+		  <textarea class="notes" ng-model="Note" rows="3" cols="50"></textarea>
 	    </td>    
 	  </tr>
 	  <tr>

@@ -27,8 +27,8 @@ type Inventory struct {
 
 	// extended:
 	Product  *Product
-	Provider *Person
-	Operator *User // operator
+	Provider *Person // factory
+	Operator *User   // operator
 }
 
 // no need to persist to db?

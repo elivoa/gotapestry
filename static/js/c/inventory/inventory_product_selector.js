@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Sunday, 2015-01-11 15:26:24>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Wednesday, 2015-01-14 19:14:19>
 
 //
 // TODO need to rewrite.
@@ -16,13 +16,23 @@ function $InventoryProductSelector(app, $master){
 
     $scope.init = function() {
       // init values
-      $scope.Inventories = angular.copy($master.Inventories);
+      // $scope.Inventories = angular.copy($master.Inventories);
 
       $scope.quickinput = "please input capital letter!";
 
       // bind methods. bind in html.
     };
     $scope.init();
+
+    // add global functions.
+    $scope.AddToProducts = function(inventory){
+      if($scope.Inventories==undefined){
+        $scope.Inventories = [];
+      }
+      $scope.Inventories.push(inventory);
+      console.log(">> success add addtoproducts")
+      console.log($scope.Inventories)
+    };
 
     // events
     $scope.addColor = function(){
@@ -40,16 +50,6 @@ function $InventoryProductSelector(app, $master){
 
     $scope.submit = function() {
       fillFormNameWithNGModel(ProductForm);
-    };
-
-
-    // TEST --------------------------------------------------
-    $scope.changeData = function(){
-      $scope.data[3].client='我要扯淡扯淡';
-    };
-
-    $scope.test = function(){
-      console.log($scope.Colors);
     };
 
   });
