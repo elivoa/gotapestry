@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-14 19:40:30>
+Time-stamp: <[InventoryEdit.html] Elivoa @ Thursday, 2015-01-15 22:36:20>
   NG-enabled;
   -->
 <html ng-app="syd">
@@ -9,17 +9,13 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-14 19:40:30>
     <t:layout.header title="新增入库" />
   </head>
 
-  <body ng-controller="InventoryEditCtrl" class="PG_create_product" >
+  <body ng-controller="InventoryEditCtrl" class="PG_edit_inventory" >
     <t:layout.headernav />
 
-    <div class="container">
+    <div class="container ">
       <t:layout.leftnav curPage="/inventory" />
 
       <div class="main_content">
-
-        <div style="border:solid 1px red;padding:8px;margin:4px;">
-          需要做一个Component，来替代输入商品和显示商品的表格；
-        </div>
 
         {{with .InventoryGroup}}
 
@@ -30,7 +26,7 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-14 19:40:30>
           <input type="hidden" name="t:id" value="InventoryForm" />
 
           <div class="unit">
-            <div class="tit"><strong>入库 [<span>组ID : {{.Id}}</span>]</strong></div>
+            <div class="tit"><strong>{{$.SubTitle}}入库 [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
               <div style="border:solid 0px green;padding:8px;margin:4px;" class="">
@@ -42,7 +38,7 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-14 19:40:30>
             </div>
           </div>
 
-          <div class="unit" style="margin-top:36px;">
+          <div class="unit">
             <div class="tit"><strong>其他信息</strong></div>
             <div class="form_main">
               <dl class="clearfix">
@@ -73,8 +69,13 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-14 19:40:30>
 
 //
 p_InventoryEdit({
-  // InventoryGroup: {{.InventoryGroup}},
+  InventoryGroup: {{.InventoryGroup}},
 });
+
+
+$(document).ready(function(){
+  angular.element('._temp_query_box').focus(); 
+})
 </script>
 
 

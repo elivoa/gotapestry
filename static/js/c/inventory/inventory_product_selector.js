@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Wednesday, 2015-01-14 19:14:19>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-15 22:52:35>
 
 //
 // TODO need to rewrite.
@@ -12,41 +12,39 @@
 function $InventoryProductSelector(app, $master){
   console.log("init inventory_product_selector.js ...");
 
-  app.controller('InventoryProductSelectorCtrl', function($scope){
-
-    $scope.init = function() {
-      // init values
-      // $scope.Inventories = angular.copy($master.Inventories);
-
-      $scope.quickinput = "please input capital letter!";
-
-      // bind methods. bind in html.
-    };
-    $scope.init();
+  app.controller('InventoryProductSelectorCtrl', function($scope, $rootScope){
 
     // add global functions.
     $scope.AddToProducts = function(inventory){
+      initInv();
+      if($scope.InventoryMap[inventory.ProductId]==undefined){
+        $scope.InventoryMap[inventory.ProductId] = inventory;
+        $scope.Inventories.push(inventory);
+      }else{
+        $rootScope.errmsg = "重复添加同一个商品, 更新现有数据";
+        $scope.InventoryMap[inventory.ProductId].Stocks = inventory.Stocks; // update stock value;
+      }
+    };
+
+    $scope.GetInventory = function(productId) {
+      if($scope.InventoryMap !=undefined){
+        inv = $scope.InventoryMap[productId];
+        if(inv!=undefined){
+          return inv;
+        }
+      }
+      return undefined;
+    };
+
+    function initInv(){
       if($scope.Inventories==undefined){
         $scope.Inventories = [];
       }
-      $scope.Inventories.push(inventory);
-      console.log(">> success add addtoproducts")
-      console.log($scope.Inventories)
-    };
+      if($scope.InventoryMap==undefined){
+        $scope.InventoryMap = {};
+      }
 
-    // events
-    $scope.addColor = function(){
-      $scope.Colors.push({Value:""});
-    };
-    $scope.addSize = function(){
-      $scope.Sizes.push({Value:""});
-    };
-    $scope.removeColor = function(idx){
-      $scope.Colors.remove(idx,idx);
-    };
-    $scope.removeSize = function(idx){
-      $scope.Sizes.remove(idx,idx);
-    };
+    }
 
     $scope.submit = function() {
       fillFormNameWithNGModel(ProductForm);

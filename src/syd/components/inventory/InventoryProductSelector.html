@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Wednesday, 2015-01-14 19:18:11> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Thursday, 2015-01-15 23:24:10> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -7,10 +7,6 @@
 
     -->
 <div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl">
-
-  <div style="border-bottom:solid 1px red;margin:20px;padding 8px;">
-    发货单序号: {{.GroupId}}
-  </div>
 
   <div style="margin:8px;padding 8px;">
     <div><label>输入产品：</label><t:inventory.ProductInput /></div>
@@ -22,12 +18,10 @@
     <thead>
       <tr>
         <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
-        <th align="left">ID</th>
+        <!-- <th align="left">ID</th> -->
         <th align="left">货单</th>
         <th align="left">货品</th>
-        <th align="left">颜色</th>
-        <th align="left">尺码</th>
-        <th align="left">数量</th>
+        <th align="left">颜色/尺码/数量</th>
         <th align="left">厂家</th>
         <th align="left">操作员</th>
         <th align="left">状态</th>
@@ -45,12 +39,10 @@
     </tbody>
     
     <tbody ng-if="Inventories">
-      <tr>
-        <!-- <span style="color:#666"> DEV: ([[Inventories]])</span> -->
-      </tr>
+      <tr> <!-- <span style="color:#666"> DEV: ([[Inventories]])</span> --> </tr>
 
       <tr ng-repeat="inv in Inventories track by $index">
-        <td>[[inv.Id]]</td>
+        <!-- <td>[[inv.Id]]</td> -->
         <td nowrap>
           <a href="/inventory/view/[[inv.Id]]">[[inv.GroupId]]</a>
         </td>
@@ -64,9 +56,17 @@
         </td>
         <td ng-if="!inv"><<[[inv.ProductId]]>></td>
 
-        <td>[[inv.Color]]</td>
-        <td>[[inv.Size]]</td>
-        <td>[[inv.Stock]]</td>
+        <td class="innercontainer">
+          <table class="innertable">
+            <tbody ng-repeat="(color, sizemap) in inv.Stocks">
+              <tr ng-repeat="(size, stock) in sizemap" ng-show="stock>0">
+                <td class="color">[[color]]</td>
+                <td class="size">[[size]]</td>
+                <td class="stock">[[stock]]</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
 
         <td ng-if="inv.Provider">[[inv.Provider.Name]]</td>
         <td ng-if="!inv.Provider"><<[[inv.ProviderId]]>></td>

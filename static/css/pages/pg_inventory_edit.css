@@ -12,12 +12,12 @@
 
 /* copied from pg_order_create_detail.css */
 
-.PG_create_order .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
-.PG_create_order .unit{margin:40px 0 20px;}
-.PG_create_order .form_main{margin:30px 0 40px;}
-.PG_create_order .form_main label{margin-right:20px;}
-.PG_create_order .btn_content{margin-bottom:100px;}
-.PG_create_order .btn_content a{margin:0 10px;}
+.PG_edit_inventory .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
+.PG_edit_inventory .unit{margin:40px 0 20px;}
+.PG_edit_inventory .form_main{margin:30px 0 40px;}
+.PG_edit_inventory .form_main label{margin-right:20px;}
+.PG_edit_inventory .btn_content{margin-bottom:100px;}
+.PG_edit_inventory .btn_content a{margin:0 10px;}
 /*下单步骤图*/
 .B_order_step1,.B_order_step2,.B_order_step3{background:url(../../images/order/order_step.png) no-repeat;width:750px;height:31px;}
 .B_order_step2{background-position:0 -40px;}
@@ -51,3 +51,11 @@
 .B_main_info{margin:0 0 6px;}
 
 .print_instead_order{margin:30px 0 20px;}
+
+
+.innertable {width:100%;}
+.innertable td{border:solid 1px #eee;padding:6px;text-align:center;}
+.innertable td.color{width:60px;}
+.innertable td.size{width:60px;}
+.innertable td.stock{width:32px;text-align:right}
+.innercontainer {padding:0 !important;}

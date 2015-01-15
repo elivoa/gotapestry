@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_input.js] Elivoa @ Wednesday, 2015-01-14 19:36:01>
+// Time-stamp: <[inventory_product_input.js] Elivoa @ Thursday, 2015-01-15 19:04:17>
 
 //
 // TODO Rewrite this using Directive.
@@ -14,19 +14,8 @@
 function $InventoryProductInput(app, $master){
 
   app.controller('InventoryProductInputCtrl', function($scope,$rootScope,$http){
-    console.log("init InventoryProductInput component...");
 
-    // if ($scope.selector == undefined){
-    //   $scope.selector = {};
-    // };
-    // var selector = $scope.selector;
-
-    $scope.init = function() {
-      // init values
-      $scope.query = $master.query;
-      // $scope.Inventories = angular.copy($master.Inventories);
-    };
-    $scope.init();
+    $scope.query = $master.query;
 
     // 1. when change occured in `query` box.
     $scope.$watch('query', function(newValue, oldValue) {
@@ -36,13 +25,13 @@ function $InventoryProductInput(app, $master){
         return $scope.refreshCST(); // call with empty parameter to clear.
       }
       // ajax send
-      var responsePromise = $http.get("/api/suggest:product?query="+ trimedValue);
-      responsePromise.success(function(data, status, headers, config) {
-        $scope.refreshCandidates(data);
-      });
-      responsePromise.error(function(data, status, headers, config) {
-        alert("AJAX failed!");
-      });
+      $http.get("/api/suggest:product?query="+ trimedValue)
+        .success(function(data, status, headers, config) {
+          $scope.refreshCandidates(data);
+        })
+        .error(function(data, status, headers, config) {
+          alert("AJAX failed!");
+        });
 
       return undefined;
     });
@@ -64,11 +53,13 @@ function $InventoryProductInput(app, $master){
       return false;
     };
 
+    // 3. refresh PKU Stock table;
     $scope.refreshCST = function(productId){
       if(productId == undefined){
         $scope.product = undefined;
         return;
       }
+
       // call service to get product details;
       $http.get("/api/product/"+ productId).success(function(data, status, headers, config) {
         $scope.product = data;
@@ -77,7 +68,6 @@ function $InventoryProductInput(app, $master){
         $scope.stocks = {};
         if (angular.isArray(data.Colors)){
           for (i=0;i<data.Colors.length;i++){
-            // console.log("colors: ", data.Colors[i]);
             var color  = data.Colors[i];
             for (j=0;j<data.Sizes.length;j++){
               var size  = data.Sizes[j];
@@ -87,6 +77,24 @@ function $InventoryProductInput(app, $master){
               $scope.stocks[color][size] = 0;
             }
           }
+        }
+
+        // 如果Product重复，将stocks的值还原；
+        if($scope.GetInventory){
+          var existInv = $scope.GetInventory(productId);
+          if (existInv!=undefined){
+            var stocks = existInv.Stocks;
+            for(color in stocks){
+              var sizemap = stocks[color];
+              if(sizemap != undefined){
+                for(size in sizemap){
+                  $scope.stocks[color][size] = sizemap[size];
+                }
+              }
+            }
+          }
+        }else{
+          console.log("Warrning: no GetProduct method found!");
         }
 
         // TODO should load it's price;
@@ -106,59 +114,72 @@ function $InventoryProductInput(app, $master){
 
     // click addToInventory
     $scope.addToInventory = function(){
+      $scope.errmsg = ""; // clear error message.
       if($scope.product == undefined){
-        alert("请选择商品先！"); // TODO make alert more humanreadable!
+        // alert("请选择商品先！"); // TODO make alert more humanreadable!
+        $scope.errmsg = "请选择商品先！";
+        $scope.focusQuery();
         return;
       }
+
       // Here need to change product into inventories;
       var p = $scope.product;
       var inventory = {
         Id         :0,
 	    GroupId    :0,         // TODO
 	    ProductId  : p.Id,
-	    Stocks     : $scope.stocks, // This is stocks matrix;
+	    Stocks     : angular.copy($scope.stocks), // This is stocks matrix;
 	    ProviderId : 0,        // factory person id.
 	    OperatorId : 0,        // TODO
 	    Note       : $scope.Note,
-
-        // extended
-        Product : p
-
-        // ~ the following items 
-	    // Status     : 0,
-	    // Type       : 0,
-	    // SendTime    time.Time // 发货时间
-	    // ReceiveTime time.Time // 收到货的时间
-	    // CreateTime  time.Time // 创建收货单的时间
-	    // UpdateTime  time.Time
-
+        Product    : p         // extened
       };
+
+      // calculate sum stock if le 0, don't allow to add.
+      var sumStock = 0;
+      if (inventory.Stocks!=undefined){
+        var colors = Object.keys(inventory.Stocks);
+        for(i=0;i<colors.length;i++){
+          var color = colors[i];
+          var sizemap = inventory.Stocks[color];
+          var sizes = Object.keys(sizemap);
+          for(j=0;j<sizes.length;j++){
+            var size = sizes[j];
+            var stock = sizemap[size];
+            // TODO convert to number;
+            if(stock>0){
+              sumStock+=stock;
+            }
+          }
+        }
+      }
+      if (sumStock<=0){
+        // alert("库存必须大于0!");
+        $scope.errmsg = "库存必须大于0";
+        return;
+      }
+
+      // console.log("stocks for display is : ", stocksForDisplay)
+
       if ($scope.AddToProducts){
         $scope.AddToProducts(inventory); // call upper function
+        // add success, remove product
+        $scope.product = undefined;
+        $scope.query = "";
+        $scope.stocks = undefined;
+        $scope.focusQuery();
+
+        // $scope.form.query.focus(); // why this does not work?
       }else{
         console.log('WARRNING! No AddToProducts method found!');
       }
     };
 
+    // blur and keyup
     $scope.setStock = function(color, size, $event){
-      $scope.stocks[color][size] = $event.target.value; // TODO is this right?
-    };
-
-
-
-
-    // events
-    $scope.addColor = function(){
-      $scope.Colors.push({Value:""});
-    };
-    $scope.addSize = function(){
-      $scope.Sizes.push({Value:""});
-    };
-    $scope.removeColor = function(idx){
-      $scope.Colors.remove(idx,idx);
-    };
-    $scope.removeSize = function(idx){
-      $scope.Sizes.remove(idx,idx);
+      var intstock = parseInt($event.target.value);
+      intstock = isNaN(intstock)? 0 : intstock;
+      $scope.stocks[color][size] = intstock;
     };
 
     $scope.submit = function() {
@@ -166,15 +187,10 @@ function $InventoryProductInput(app, $master){
     };
 
 
-    // TEST --------------------------------------------------
-    $scope.changeData = function(){
-      $scope.data[3].client='我要扯淡扯淡';
+    // focus on query box
+    $scope.focusQuery = function(){
+      $('._temp_query_box').focus();
     };
-
-    $scope.test = function(){
-      console.log($scope.Colors);
-    };
-
   });
 
 }

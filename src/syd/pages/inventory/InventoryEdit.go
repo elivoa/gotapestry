@@ -1,6 +1,7 @@
 package inventory
 
 import (
+	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/db"
 	"github.com/elivoa/gxl"
@@ -46,7 +47,7 @@ func (p *InventoryEdit) New() *InventoryEdit {
 
 func (p *InventoryEdit) Setup() {
 	// debug group id as 1
-	p.GroupId = gxl.NewInt(1)
+	// p.GroupId = gxl.NewInt(1)
 
 	// page values
 	p.Title = "create input post"
@@ -62,12 +63,10 @@ func (p *InventoryEdit) Setup() {
 		// construct group;
 		p.InventoryGroup = model.NewInventoryGroup(list)
 		p.SubTitle = "编辑"
-
 	} else {
 		p.InventoryGroup = model.NewInventoryGroup(nil)
 		p.SubTitle = "新建"
 	}
-
 }
 
 func (p *InventoryEdit) InventoriesJson() []*model.Inventory {

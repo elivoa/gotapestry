@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[product_edit_ng.js] Elivoa @ Saturday, 2015-01-03 12:40:31>
+// Time-stamp: <[product_edit_ng.js] Elivoa @ Thursday, 2015-01-15 23:32:24>
 
 //
 // $master.Product -- product json.
@@ -79,16 +79,5 @@ function p_ProductEdit($master){
       fillFormNameWithNGModel(ProductForm);
     };
 
-
-    // TEST --------------------------------------------------
-    $scope.changeData = function(){
-      $scope.data[3].client='我要扯淡扯淡';
-    };
-
-    $scope.test = function(){
-      console.log($scope.Colors);
-    };
-
   });
-
 }
