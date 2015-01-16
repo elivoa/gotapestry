@@ -1,68 +1,65 @@
 <!--
-    Time-stamp: <[InventoryProductInput.html] Elivoa @ Thursday, 2015-01-15 14:15:58>
+    Time-stamp: <[InventoryProductInput.html] Elivoa @ Friday, 2015-01-16 21:03:56>
   -->
 <div id="{{.ClientId}}" ng-controller="InventoryProductInputCtrl" style="display:inline">
-  <form name="form" novalidate>
-    <input type="text" ng-model="query" class="_temp_query_box"
-           ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
-           size="45" />
-    <span ng-if="product">[[ product.Name ]]</span>
+  <input type="text" ng-model="query" class="_temp_query_box"
+         ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
+         size="45" />
+  <span ng-if="product">[[ product.Name ]]</span>
+  
+  <table class="B_prd_att" style="margin-top: 12px;">
+    <tbody>
+      <tr>
+	    <td>
+          <div id="cs-container" desc="Order Product Selector">
 
-    
-    <table class="B_prd_att" style="margin-top: 12px;">
-      <tbody>
-        <tr>
-	      <td>
-            <div id="cs-container" desc="Order Product Selector">
+            <table class="tbl_s">
+              <thead>
+                <tr>
+                  <th align="left">颜色</th>
+                  <th align="left">尺码</th>
+                  <th align="left">数量</th>
+                </tr>
+              </thead>
+              <tbody ng-repeat="color in product.Colors track by $index" ng-init="c = $index">
+                <tr ng-repeat="size in product.Sizes track by $index">
+                  <td rowspan="[[product.Sizes.length]]" ng-show="$first">[[color]]</td>
+                  <td>[[size]]</td>
+                  <td>
+                    <input type="number" size="8" name="Stocks" autocomplete="off"
+                           value="[[ stock(color, size) ]]"
+                           ng-keyup="setStock(color,size,$event)"
+                           ng-blur="setStock(color,size,$event)" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+	    </td>
+	    <td>
+		  <div class="B_prd_price">
+		    <p class="price">0.00</p>
+		    <p class="B_info info">TODO: Load Price!</p>
+		  </div>
+	    </td>
+	    <td>
+		  <p class="B_text">填写商品备注</p>
+		  <textarea class="notes" ng-model="Note" rows="3" cols="50"></textarea>
+	    </td>    
+	  </tr>
+	  <tr>
+	    <td class="B_btn" colspan="3" align="center">
+          <a class="btn_b_s ops-add" ng-click="addToInventory()">加入库存</a>
+        </td>
+	  </tr>
+      <tr>
+        <td style="color:red">[[ errmsg ]]</td>
+      </tr>
 
-              <table class="tbl_s">
-                <thead>
-                  <tr>
-                    <th align="left">颜色</th>
-                    <th align="left">尺码</th>
-                    <th align="left">数量</th>
-                  </tr>
-                </thead>
-                <tbody ng-repeat="color in product.Colors track by $index" ng-init="c = $index">
-                  <tr ng-repeat="size in product.Sizes track by $index">
-                    <td rowspan="[[product.Sizes.length]]" ng-show="$first">[[color]]</td>
-                    <td>[[size]]</td>
-                    <td>
-                      <input type="number" size="8" name="Stocks" autocomplete="off"
-                             value="[[ stock(color, size) ]]"
-                             ng-keyup="setStock(color,size,$event)"
-                             ng-blur="setStock(color,size,$event)" />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-	      </td>
-	      <td>
-		    <div class="B_prd_price">
-		      <p class="price">0.00</p>
-		      <p class="B_info info">TODO: Load Price!</p>
-		    </div>
-	      </td>
-	      <td>
-		    <p class="B_text">填写商品备注</p>
-		    <textarea class="notes" ng-model="Note" rows="3" cols="50"></textarea>
-	      </td>    
-	    </tr>
-	    <tr>
-	      <td class="B_btn" colspan="3" align="center">
-            <a class="btn_b_s ops-add" ng-click="addToInventory()">加入库存</a>
-          </td>
-	    </tr>
-        <tr>
-          <td style="color:red">[[ errmsg ]]</td>
-        </tr>
-
-      </tbody>
-    </table>
-
-  </form>
+    </tbody>
+  </table>
+  
 </div>
 
 <script src="/static/js/angular.init.js" ></script>

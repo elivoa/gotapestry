@@ -1,29 +1,73 @@
+// Time-stamp: <[InventoryIndex.go] Elivoa @ Friday, 2015-01-16 23:58:56>
 package inventory
 
 import (
+	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
+	"strings"
 	"syd/model"
+	"syd/service"
 )
 
-type InventoryGroupList struct {
-	core.Component
+type InventoryIndex struct {
+	core.Page
 
 	InventoryGroups []*model.InventoryGroup
-	TotalPrice      float64 // all order's price
-	Referer         string  // return to this place
+	Tab             string `path-param:"1"`
+	Current         int    `path-param:"2"` // pager: the current item. in pager.
+	PageItems       int    `path-param:"3"` // pager: page size.
+
+	// properties
+	Total int // pager: total items available
+
+	Referer string // return to this place
+
+	// TimeZone *model.TimeZoneInfo
 }
 
-func (p *InventoryGroupList) SetupRender() {
-	// verify user role.
-	// service.User.RequireRole(p.W, p.R, "admin") // TODO remove w, r. use service injection.
-	// p.TimeZone = service.TimeZone.UserTimeZoneSafe(p.R)
+func (p *InventoryIndex) Activate() {
+	// service.User.RequireRole(p.W, p.R, syd.RoleSet_Orders...)
 
-	if p.InventoryGroups == nil {
-		return
+	// not injected with parameters.
+	if p.Tab == "" {
+		p.Tab = "all" // default go in toprint
 	}
 }
 
-// func (p *InventoryGroupList) ShowProduct(r *model.Inventory) string {
+func (p *InventoryIndex) SetupRender() {
+	// verify user role.
+	// service.User.RequireRole(p.W, p.R, "admin") // TODO remove w, r. use service injection.
+
+	// fix the pagers
+	if p.PageItems <= 0 {
+		p.PageItems = config.LIST_PAGE_SIZE // TODO default pager number. Config this.
+	}
+
+	// load inventory group
+	var err error
+	parser := service.InventoryGroup.EntityManager().NewQueryParser().Where()
+	switch strings.ToLower(p.Tab) {
+	case "all", "":
+	default:
+		// parser.And("status", p.Tab)
+	}
+	// parser.Or("type", model.Wholesale, model.ShippingInstead) // restrict type
+
+	// get total
+	p.Total, err = parser.Count()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// 2. get order list.
+	parser.Limit(p.Current, p.PageItems) // pager
+	p.InventoryGroups, err = service.InventoryGroup.List(parser, 0)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+// func (p *InventoryIndex) ShowProduct(r *model.Inventory) string {
 // 	if nil != r.Product {
 // 		return r.Product.Name
 // 	} else {
@@ -34,7 +78,7 @@ func (p *InventoryGroupList) SetupRender() {
 // ________________________________________________________________________________
 // Events
 //
-// func (p *InventoryGroupList) Ondelete(id int64, tab string) interface{} {
+// func (p *InventoryIndex) Ondelete(id int64, tab string) interface{} {
 // 	if _, err := service.Inventory.DeleteInventory(id); err != nil {
 // 		panic(err)
 // 	}

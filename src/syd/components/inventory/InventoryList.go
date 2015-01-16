@@ -18,12 +18,6 @@ type InventoryList struct {
 	// TimeZone *model.TimeZoneInfo
 }
 
-// func (p *InventoryList) New() *InventoryList {
-// 	return &InventoryList{
-// 		inventoryService: service.Inventory,
-// 	}
-// }
-
 func (p *InventoryList) SetupRender() {
 	// verify user role.
 	// service.User.RequireRole(p.W, p.R, "admin") // TODO remove w, r. use service injection.

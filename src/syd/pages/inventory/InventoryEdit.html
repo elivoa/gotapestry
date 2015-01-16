@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-Time-stamp: <[InventoryEdit.html] Elivoa @ Thursday, 2015-01-15 22:36:20>
+Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-16 21:16:12>
   NG-enabled;
   -->
 <html ng-app="syd">
@@ -21,9 +21,8 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Thursday, 2015-01-15 22:36:20>
 
         <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
               t:id="InventoryForm" id="InventoryForm" >
-          <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
-          {{/* [tmp] support redirect to form */}}
           <input type="hidden" name="t:id" value="InventoryForm" />
+          <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
 
           <div class="unit">
             <div class="tit"><strong>{{$.SubTitle}}入库 [<span>组ID : {{.Id}}</span>]</strong></div>

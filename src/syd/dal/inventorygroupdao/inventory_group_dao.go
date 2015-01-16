@@ -88,7 +88,7 @@ func List(parser *db.QueryParser) ([]*model.InventoryGroup, error) {
 	return _list(parser)
 }
 
-func GetInventoryById(id int64) (*model.InventoryGroup, error) {
+func GetInventoryGroupById(id int64) (*model.InventoryGroup, error) {
 	return _one(em.Select().Where(em.PK, id))
 }
 
