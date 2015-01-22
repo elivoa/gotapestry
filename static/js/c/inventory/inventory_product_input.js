@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_input.js] Elivoa @ Thursday, 2015-01-15 19:04:17>
+// Time-stamp: <[inventory_product_input.js] Elivoa @ Wednesday, 2015-01-21 23:36:40>
 
 //
 // TODO Rewrite this using Directive.
@@ -180,6 +180,12 @@ function $InventoryProductInput(app, $master){
       var intstock = parseInt($event.target.value);
       intstock = isNaN(intstock)? 0 : intstock;
       $scope.stocks[color][size] = intstock;
+    };
+
+    // click edit on operator column
+    $scope.onEdit = function(invId){
+      console.log(">>>>>>>>>>>>> ", invId);
+      $scope.refreshCST(invId);
     };
 
     $scope.submit = function() {

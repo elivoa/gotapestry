@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[product_edit_ng.js] Elivoa @ Thursday, 2015-01-15 23:32:24>
+// Time-stamp: <[product_edit_ng.js] Elivoa @ Monday, 2015-01-19 00:47:24>
 
 //
 // $master.Product -- product json.
@@ -76,7 +76,7 @@ function p_ProductEdit($master){
     };
 
     $scope.submit = function() {
-      fillFormNameWithNGModel(ProductForm);
+      fillFormNameWithNGModel(ProductForm); // call ng-got submit helper;
     };
 
   });

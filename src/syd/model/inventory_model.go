@@ -15,6 +15,8 @@ type Inventory struct {
 	ProviderId int64 // factory person id.
 	OperatorId int64 // user id.
 
+	Price string // 价格
+
 	Status inventory.Status
 	Type   inventory.Type
 	Note   string
@@ -29,6 +31,9 @@ type Inventory struct {
 	Product  *Product
 	Provider *Person // factory
 	Operator *User   // operator
+
+	// Used in json, when unmarshal from client json;
+	Stocks map[string]map[string]int // color, size, stock
 }
 
 // no need to persist to db?
@@ -39,6 +44,9 @@ type InventoryGroup struct {
 	Status inventory.Status
 	Type   inventory.Type
 	Note   string
+
+	ProviderId int64 // factory person id.
+	OperatorId int64 // user id.
 
 	// copied from Inventory
 	SendTime    time.Time // 发货时间

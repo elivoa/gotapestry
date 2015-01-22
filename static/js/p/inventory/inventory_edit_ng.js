@@ -1,14 +1,13 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Thursday, 2015-01-15 23:09:52>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Thursday, 2015-01-22 14:30:03>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
 // Later use directive as really component of angularjs.
 
 //
-// $master.Product -- product json.
-// $master.Colors  -- Colors [{Value:xxx}, {Value:xxx},...] structure.
-// $master.Sizes   -- The same with Colors
+// $scope.Inventories    -- inventories equals to InventoryGroup.Inventories
+// $scope.InventoryMap   -- id -> Inventory map
 //
 function p_InventoryEdit($master){
 
@@ -57,10 +56,14 @@ function p_InventoryEdit($master){
       $scope.InventoryMap = idmap;
     };
 
-
+    // set master variables into $scope
     if($master.InventoryGroup!=undefined ){
       $scope.initInventories($master.InventoryGroup.Inventories);
+      $scope.InventoryGroup = $master.InventoryGroup;
     }
+    $scope.Factories = $master.Factories;
+    $scope.SendTime = Date.now();
+
 
     // nothing is useful in this page. all things is in components / directives;
     $scope.submit = function() {

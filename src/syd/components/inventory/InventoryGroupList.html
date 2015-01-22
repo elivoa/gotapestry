@@ -14,35 +14,39 @@
           <tr>
             <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
             <th align="left">ID</th>
-            <th align="left">Status</th>
-            <th align="left">Type</th>
-            <th align="left">Note</th>
-            <th align="left">Send Time</th>
-            <th align="left">Receive Time</th>
-            <th align="left">Provider</th>
+            <th align="left">发货日期</th>
+            <th align="left">负责人</th>
+            <th align="left">状态</th>
+            <th align="left">备注</th>
             <th align="left">Operator</th>
             <th align="left" style="width:80px;">Operation</th>
           </tr>
 
           <range source=".InventoryGroups">
             <tr>
-              <td>{{.Id}}</td>
-              <td nowrap>
-                <t:a page="inventory/view" context="{{print .Id}}" label="print .Id"></t:a>
+              <td><t:a page="inventory/edit" context="{{print .Id}}" label="print .Id"></t:a></td>
+              <td nowrap title="发货: {{.SendTime|prettytime}} &#10;到货: {{.ReceiveTime|prettytime}} &#10;创建: {{.CreateTime|prettytime}} &#10;更新: {{.CreateTime|prettytime}}">
+                {{.SendTime | date}}
               </td>
-              <!-- <td nowrap>{{.Id}}</td> -->
+              <td nowrap>
+                Factory
+              </td>
               
               <td>{{.Status}}</td>
-              <td>{{.Type}}</td>
-
-              <td nowrap title="发: {{.SendTime | prettytime}} &#10;到: {{.ReceiveTime|prettytime}}">
-                <if t=".SendTime|validtime">{{.SendTime | date}}<else>-</if>
-                <br />
-                <if t=".ReceiveTime|validtime">{{.ReceiveTime | date}}<else>-</if>
-              </td>
-              
+              <!-- <td>{{.Type}}</td> -->
               <td title="{{.Note}}">{{.Note | truncate 40 "..."}}</td>
 
+              <!--
+                  <td nowrap title="发: {{.SendTime | prettytime}} &#10;到: {{.ReceiveTime|prettytime}}">
+                    <if t=".SendTime|validtime">{{.SendTime | date}}<else>-</if>
+                    <br />
+                    <if t=".ReceiveTime|validtime">{{.ReceiveTime | date}}<else>-</if>
+                  </td>
+                  -->
+
+              <td>TODO</td>
+              <td><t:a page="inventory/edit" context="{{print .Id}}" label="Edit"></t:a></td>
+              
             </tr>
           </range>
         </table>
@@ -54,11 +58,11 @@
     <!-- <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script> -->
     
     <!-- <script type="text/javascript"> -->
-                 <!--              // var a = { {.InventoriesJson} } -->
-                 <!--              p_InventoryGroupList({ -->
-                                                          <!--                // Product: { {.InventoryGroup} }, -->
-                                                          <!--              }); -->
-                                                          <!-- </script> -->
+  <!--              // var a = { {.InventoriesJson} } -->
+  <!--              p_InventoryGroupList({ -->
+                                           <!--                // Product: { {.InventoryGroup} }, -->
+                                           <!--              }); -->
+  <!-- </script> -->
 
 
   </body>

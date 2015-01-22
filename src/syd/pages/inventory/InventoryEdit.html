@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!--
-Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-16 21:16:12>
-  NG-enabled;
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-21 16:48:18>
+    NG-enabled;
   -->
 <html ng-app="syd">
   <head>
@@ -23,13 +23,29 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-16 21:16:12>
               t:id="InventoryForm" id="InventoryForm" >
           <input type="hidden" name="t:id" value="InventoryForm" />
           <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
+          <input type="hidden" name="InventoriesJson" value="[[Inventories]]" />
 
           <div class="unit">
             <div class="tit"><strong>{{$.SubTitle}}入库 [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
-              <div style="border:solid 0px green;padding:8px;margin:4px;" class="">
-                
+              <label>
+                厂家：<<[[InventoryGroup.ProviderId]]>>
+                <select ng-model="InventoryGroup.ProviderId"
+                        ng-options="factory.Id as factory.Name for factory in Factories"
+                        required></select>
+              </label>
+              <label>
+                发货时间：[[SendTime]]
+                <input type="date" dng-model="SendTime"/>
+              </label>
+              <label>
+                到货时间：
+                <input type="date" ng-model="ReceiveTime" />
+              </label>
+              
+              <div style="padding:8px;margin:4px;" class="">
+
                 <t:inventory.productselector GroupId=".Id" inventories=".Inventories" />
                 
               </div>
@@ -69,6 +85,7 @@ Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-01-16 21:16:12>
 //
 p_InventoryEdit({
   InventoryGroup: {{.InventoryGroup}},
+  Factories : {{.Factories}}, // factories option
 });
 
 

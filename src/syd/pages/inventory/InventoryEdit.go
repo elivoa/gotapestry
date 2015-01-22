@@ -1,12 +1,15 @@
 package inventory
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/gxl"
+	"syd/base/person"
 	"syd/model"
 	"syd/service"
+	"time"
 )
 
 /* ________________________________________________________________________________
@@ -23,23 +26,13 @@ type InventoryEdit struct {
 	GroupId        *gxl.Int              `path-param:"1"`
 	InventoryGroup *model.InventoryGroup ``
 
-	// helper used because angularjs
-	// Sizes  []*model.Object
+	// ** special ** for angularjs form submit. this is json.
+	InventoriesJson string
 
-	// Pictures []string // uploaded picture's key
-
-	// ...
 	Referer string `query:"referer"` // referer page, view or list
 
-	// display
-	StockJson string
 }
 
-// func (p *InventoryEdit) ProductJson() *model.Product {
-// 	return p.InventoryGroup
-// }
-
-// init this page
 func (p *InventoryEdit) New() *InventoryEdit {
 	return &InventoryEdit{}
 }
@@ -50,7 +43,8 @@ func (p *InventoryEdit) Setup() {
 	p.Title = "create input post"
 	if p.GroupId != nil {
 		var err error
-		ig, err := service.InventoryGroup.GetInventoryGroup((int64)(p.GroupId.Int), service.WITH_INVENTORIES)
+		ig, err := service.InventoryGroup.GetInventoryGroup((int64)(p.GroupId.Int),
+			service.WITH_INVENTORIES|service.WITH_PRODUCT)
 		if err != nil {
 			panic(err)
 		}
@@ -72,77 +66,71 @@ func (p *InventoryEdit) Setup() {
 	}
 }
 
-func (p *InventoryEdit) InventoriesJson() []*model.Inventory {
-	if p.InventoryGroup != nil {
-		return p.InventoryGroup.Inventories
+func (p *InventoryEdit) Factories() []*model.Person {
+	if persons, err := service.Person.GetPersons(person.TYPE_FACTORY); err != nil {
+		panic(err)
+	} else {
+		return persons
 	}
-	return nil
 }
+
+/** For form submit. */
 
 func (p *InventoryEdit) OnPrepareForSubmitFromInventoryForm() {
 	if p.GroupId == nil { // if create
 		// p.InventoryGroup = model.NewProduct()
-	} else {
-		// if edit
-		// for security reason, TODO security check here.
+	} else { // if edit
 		// 读取了数据库的order是为了保证更新的时候不会丢失form中没有的数据；
-		ig, err := service.InventoryGroup.GetInventoryGroup((int64)(p.GroupId.Int), service.WITH_INVENTORIES)
+		ig, err := service.InventoryGroup.GetInventoryGroup((int64)(p.GroupId.Int),
+			0 /* service.WITH_INVENTORIES*/)
 		if err != nil {
 			panic(err.Error())
 		}
 
 		p.InventoryGroup = ig
-		// 但是这样做就必须清除form更新的时候需要删除的值，否则form提交和原有值是叠加的，会引起错误；
-		// 这里只需要清除列表等数据，这个Order中只有Details是列表。
-		// p.Product.ClearColors()
-		// p.Product.ClearSizes()
-		// p.Product.ClearValues()
 	}
 }
 
 func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 
-	// TODO continue here.
-	fmt.Println("__________________________________________________________________________________________")
-	fmt.Println(">> slfj;adkjf")
+	invs, err := p.unmarshalInventories(p.InventoriesJson)
+	if err != nil {
+		panic(err)
+	}
+	p.InventoryGroup.Inventories = invs
 
-	// clear values
-	// p.Product.ClearValues()
+	// FOR DEBUG
+	p.InventoryGroup.ProviderId = 5
+	p.InventoryGroup.SendTime = time.Now()
+	p.InventoryGroup.ReceiveTime = time.Now()
+	p.InventoryGroup.CreateTime = time.Now()
 
-	// transfer stocks value to product.Stocks
-	// if p.Stocks != nil {
-	// 	p.Product.Stocks = make([]*model.ProductStockItem, len(p.Product.Colors)*len(p.Product.Sizes))
+	nig, err := service.InventoryGroup.SaveInventoryGroupByNGLIST(p.InventoryGroup)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("_____________\n\n_______ ", nig, err)
 
-	// 	i := 0
-	// 	for _, color := range p.Product.Colors {
-	// 		for _, size := range p.Product.Sizes {
-	// 			fmt.Println("?>>>>", i)
-	// 			// key := fmt.Sprintf("%v__%v", color, size)
-	// 			p.Product.Stocks[i] = &model.ProductStockItem{
-	// 				Color: color,
-	// 				Size:  size,
-	// 				Stock: p.Stocks[i],
-	// 			}
-	// 			i = i + 1
-	// 		}
-	// 	}
-	// }
+	// return exit.Redirect("/product/list")
+	return nil
+}
 
-	// transfer pictures value to pictures.
-	// if p.Pictures != nil {
-	// 	p.Product.Pictures = strings.Join(p.Pictures, ";")
-	// }
-
-	// write to db
-	// if p.Id != nil {
-	// 	service.Product.UpdateProduct(p.Product)
-	// } else {
-	// 	service.Product.CreateProduct(p.Product)
-	// }
-
-	// if p.Referer == "view" {
-	// 	return exit.Redirect(fmt.Sprintf("/product/detail/%v", p.Product.Id))
-	// }
-	// // TODO: return to original page.
-	return exit.Redirect("/product/list")
+// return []*model.Inventory with Stocks(temp variable) in it;
+func (p *InventoryEdit) unmarshalInventories(invsJson string) ([]*model.Inventory, error) {
+	invs := []*model.Inventory{}
+	if err := json.Unmarshal([]byte(invsJson), &invs); err == nil {
+		if invs != nil {
+			fmt.Println("invs is not nil")
+			for idx, a := range invs {
+				if a != nil {
+					fmt.Println(idx, " : ", a)
+					fmt.Println(" id: ", a.Id, "; productId: ", a.ProductId)
+					fmt.Println("Stocks is", a.Stocks)
+				}
+			}
+		}
+	} else {
+		return nil, err
+	}
+	return invs, nil
 }

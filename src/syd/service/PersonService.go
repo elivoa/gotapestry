@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/elivoa/got/db"
+	"syd/base/person"
 	"syd/dal/persondao"
 	"syd/model"
 )
@@ -18,6 +19,11 @@ func (s *PersonService) Get(field string, value interface{}) (*model.Person, err
 
 func (s *PersonService) GetPersonById(id int) (*model.Person, error) {
 	return s.Get(s.EntityManager().PK, id)
+}
+
+// return list of person
+func (s *PersonService) GetPersons(t person.Type) ([]*model.Person, error) {
+	return persondao.ListAll(string(t))
 }
 
 // --------------------------------------------------------------------------------

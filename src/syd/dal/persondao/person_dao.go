@@ -1,7 +1,7 @@
 /*
   Data Access Object for person module.
 
-  Time-stamp: <[person_dao.go] Elivoa @ Sunday, 2014-11-02 11:17:57>
+  Time-stamp: <[person_dao.go] Elivoa @ Monday, 2015-01-19 00:12:42>
 
   Note: This is the latest Template for dao functions.
 
@@ -92,7 +92,7 @@ func _one(query *db.QueryParser) (*model.Person, error) {
 }
 
 // personType: customer, factory
-// The very old method.
+// The very old method. Change to new version use person.Type
 func ListAll(personType string) ([]*model.Person, error) {
 	persons := make([]*model.Person, 0)
 	err := em.Select().Where("type", personType).Query(
