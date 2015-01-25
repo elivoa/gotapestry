@@ -120,18 +120,13 @@ func (p *ProductEdit) OnSuccessFromProductForm() *exit.Exit {
 
 	// transfer stocks value to product.Stocks
 	if p.Stocks != nil {
-		p.Product.Stocks = make([]*model.ProductStockItem, len(p.Product.Colors)*len(p.Product.Sizes))
 
+		// p.Product.Stocks = make([]*model.ProductStockItem, len(p.Product.Colors)*len(p.Product.Sizes))
+		p.Product.Stocks = model.NewStocks()
 		i := 0
 		for _, color := range p.Product.Colors {
 			for _, size := range p.Product.Sizes {
-				fmt.Println("?>>>>", i)
-				// key := fmt.Sprintf("%v__%v", color, size)
-				p.Product.Stocks[i] = &model.ProductStockItem{
-					Color: color,
-					Size:  size,
-					Stock: p.Stocks[i],
-				}
+				p.Product.Stocks.Set(color, size, p.Stocks[i])
 				i = i + 1
 			}
 		}

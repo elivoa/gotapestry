@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/elivoa/got/db"
 	"syd/dal/inventorydao"
 	"syd/model"
@@ -77,8 +78,42 @@ func (s *InventoryService) List(parser *db.QueryParser, withs Withs) ([]*model.I
 				return nil, err
 			}
 		}
+		if withs&WITH_STOCKS > 0 {
+			if err := s.FillWithStocks(inventories); err != nil {
+				return nil, err
+			}
+		}
 		return inventories, nil
 	}
+}
+
+func (s *InventoryService) FillWithStocks(models []*model.Inventory) error {
+	var idset = map[int64]bool{}
+	for _, m := range models {
+		idset[m.ProductId] = true
+	}
+	fmt.Println(">> ", idset)
+	// TOOD fetch with it;
+	if stocks, err := inventorydao.GetAllStocksByIdSet(idset); err != nil {
+		return err
+	} else {
+		fmt.Println("", stocks)
+
+		if nil != stocks {
+			for _, inv := range models {
+				if colors, ok := stocks[inv.ProductId]; ok && nil != colors {
+					if sizes, ok := colors[inv.Color]; ok && nil != sizes {
+						if stock, ok := sizes[inv.Size]; ok && stock > 0 {
+							inv.LeftStock = stock
+						} else {
+							inv.LeftStock = 0
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // func (s *InventoryService) SearchInventoryInUseByPattern(pattern string) ([]*model.Inventory, error) {

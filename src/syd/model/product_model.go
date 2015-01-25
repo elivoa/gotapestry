@@ -33,7 +33,14 @@ type Product struct {
 	// special values in stock table
 	//   stock = -1 means this pair of combination doesn't exist.
 	//   stock = -2 means the pair is deleted.(may be price is available)
-	Stocks []*ProductStockItem // map[string]int
+	Stocks Stocks // map[string]int
+}
+
+// TODO make a new structure of stocks;
+type Stocks map[string]map[string]int
+
+func NewStocks() Stocks {
+	return map[string]map[string]int{}
 }
 
 // Create default empty Product
@@ -44,6 +51,38 @@ func NewProduct() *Product {
 		// Stocks: map[string]int{},
 		CreateTime: time.Now(),
 	}
+}
+
+func (s Stocks) Set(color, size string, stock int) {
+	sizes, ok := s[color]
+	if !ok {
+		sizes = map[string]int{}
+		s[color] = sizes
+	}
+	sizes[size] = stock
+}
+
+func (s Stocks) Loop(callback func(color, size string, stock int)) {
+	for color, sizes := range s {
+		if sizes != nil {
+			for size, stock := range sizes {
+				callback(color, size, stock)
+			}
+		}
+	}
+}
+
+func (s Stocks) Total() int {
+	total := 0
+	for _, sizes := range s {
+		if sizes != nil {
+			for _, stock := range sizes {
+				total += stock
+				fmt.Println("+++", total)
+			}
+		}
+	}
+	return total
 }
 
 // Stock Item
@@ -57,24 +96,16 @@ func (s ProductStockItem) Key() string {
 	return fmt.Sprintf("%s__%s", s.Color, s.Size)
 }
 
-// used for fetch;
-// type ProductCSValue struct {
-// 	Id        int
-// 	ProductId int
-// 	Color     []string
-// 	Size      []string
+// func (p *Product) TotalStock() int {
+// 	if nil != p.Stocks && len(p.Stocks) > 0 {
+// 		var totalstock = 0
+// 		for _, s := range p.Stocks {
+// 			totalstock += s.Stock
+// 		}
+// 		return totalstock
+// 	}
+// 	return 0
 // }
-
-func (p *Product) TotalStock() int {
-	if nil != p.Stocks && len(p.Stocks) > 0 {
-		var totalstock = 0
-		for _, s := range p.Stocks {
-			totalstock += s.Stock
-		}
-		return totalstock
-	}
-	return 0
-}
 
 func (p *Product) ClearValues() {
 	if p != nil {

@@ -24,16 +24,25 @@ func (s *InventoryGroupService) GetInventoryGroup(id int64, withs Withs) (*model
 	}
 	// load inventories.
 	if withs&WITH_INVENTORIES > 0 {
+
 		parser := db.NewQueryParser().Where(inventory.FGroupId, id)
-		invs, err := inventorydao.List(parser)
-		if err != nil {
+		if list, err := Inventory.List(parser, withs); err != nil {
 			return nil, err
+		} else {
+			ig.Inventories = list
 		}
-		ig.Inventories = invs
+		// invs, err := inventorydao.List(parser)
+		// if err != nil {
+		// 	return nil, err
+		// }
 	}
+	// TODO this should be in list.
 	if withs&WITH_PRODUCT > 0 {
 		s.FillWithProducts(ig)
 	}
+	// if withs&WITH_STOCKS > 0 {
+	// 	s.FillWithStocks(ig)
+	// }
 	return ig, err
 }
 
@@ -55,6 +64,25 @@ func (s *InventoryGroupService) FillWithProducts(ig *model.InventoryGroup) error
 	}
 	return nil
 }
+
+// func (s *InventoryGroupService) FillWithStocks(ig *model.InventoryGroup) error {
+// 	var idset = map[int64]bool{}
+// 	for _, inv := range ig.Inventories {
+// 		idset[inv.ProductId] = true
+// 	}
+// 	productmap, err := Product.BatchFetchProductByIdMap(idset)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if nil != productmap && len(productmap) > 0 {
+// 		for _, inv := range ig.Inventories {
+// 			if product, ok := productmap[inv.ProductId]; ok {
+// 				inv.Product = product
+// 			}
+// 		}
+// 	}
+// 	return nil
+// }
 
 // With Users, product, person;
 func (s *InventoryGroupService) List(parser *db.QueryParser, withs Withs) ([]*model.InventoryGroup, error) {

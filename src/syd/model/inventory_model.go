@@ -11,7 +11,7 @@ type Inventory struct {
 	ProductId  int64
 	Color      string
 	Size       string
-	Stock      int
+	Stock      int   // should be named Quantity. Stock should be leftStock.
 	ProviderId int64 // factory person id.
 	OperatorId int64 // user id.
 
@@ -28,9 +28,10 @@ type Inventory struct {
 	UpdateTime  time.Time
 
 	// extended:
-	Product  *Product
-	Provider *Person // factory
-	Operator *User   // operator
+	LeftStock int // 剩余库存量; 可以被填充.
+	Product   *Product
+	Provider  *Person // factory
+	Operator  *User   // operator
 
 	// Used in json, when unmarshal from client json;
 	Stocks map[string]map[string]int // color, size, stock

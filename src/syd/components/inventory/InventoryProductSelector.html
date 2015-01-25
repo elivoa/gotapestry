@@ -1,0 +1,206 @@
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Sunday, 2015-01-25 11:53:23> -->
+<!--
+    <!DOCTYPE HTML>
+<html ng-app="syd">
+  <head></head>
+  <body >
+
+    -->
+<div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl">
+  <input type="hidden" ng-model="Inventories" />
+
+  <!-- Selector!  -->
+  <div style="margin:8px;padding 8px;">
+    <div>
+      <label>输入产品：</label>
+      <input type="text" ng-model="query" class="_temp_query_box"
+             ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
+             size="45" />
+      <span ng-if="product">[[ product.Name ]]</span>
+      
+      <table class="B_prd_att" style="margin-top: 12px;">
+        <tbody>
+          <tr>
+	        <td>
+              <div id="cs-container" desc="Order Product Selector">
+
+                <table class="tbl_s">
+                  <thead>
+                    <tr>
+                      <th align="left">颜色</th>
+                      <th align="left">尺码</th>
+                      <th align="left">数量</th>
+                      <th align="left">当前库存</th>
+                    </tr>
+                  </thead>
+                  <tbody ng-repeat="color in product.Colors track by $index" ng-init="c = $index">
+                    <tr ng-repeat="size in product.Sizes track by $index">
+                      <td rowspan="[[product.Sizes.length]]" ng-show="$first">[[color]]</td>
+                      <td>[[size]]</td>
+                      <td>
+                        <input type="number" size="4" name="Stocks" autocomplete="off"
+                               style="width:46px;text-align:right"
+                               value="[[ stock(color, size) ]]"
+                               ng-keyup="setStock(color,size,$event)"
+                               ng-blur="setStock(color,size,$event)" />
+                      </td>
+                      <td align="right">[[CurrentLeftStock(color, size)]]</td>
+                    </tr>
+                  </tbody>
+                  <tbody>
+                    <tr style="background-color:#efefef">
+                      <td colspan="2" align="center">合计</td>
+                      <td align="right">
+                        <input type="number" size="4" name="Stocks" autocomplete="off"
+                               style="width:46px;text-align:right" disabled="disabled"
+                               value="[[currentSumQuantity()]]"
+                               style="background-color:#efefef"
+                               />
+                      </td>
+                      <td align="right">[[product.Stock]]</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+	        </td>
+	        <td>
+		      <div class="B_prd_price">
+		        <p class="price" ng-if="product.Price">[[product.Price]]</p>
+		        <p class="price" ng-if="!product.Price">0.00</p>
+		        <p class="B_info info">TODO: 读取成本价格!</p>
+		      </div>
+	        </td>
+	        <td>
+		      <p class="B_text">填写商品备注</p>
+              <p ng-if="product.Note">（产品备注：[[product.Note]]）</p>
+		      <textarea class="notes" ng-model="Note" rows="3" cols="50"></textarea>
+	        </td>    
+	      </tr>
+	      <tr>
+	        <td class="B_btn" colspan="3" align="center">
+              <a class="btn_b_s ops-add" ng-click="addToInventory()">加入库存</a>
+            </td>
+	      </tr>
+          <tr>
+            <td style="color:red">[[ errmsg ]]</td>
+          </tr>
+
+        </tbody>
+      </table>
+      
+    </div>
+  </div>
+  
+  <!-- show contents table -->
+  
+  <table class="tbl_main" width="100%">
+    <thead>
+      <tr>
+        <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
+        <!-- <th align="left">ID</th> -->
+        <th align="left">序号</th>
+        <th align="left">货品</th>
+        <th align="left">颜色/尺码/数量/库存</th>
+        <th>总件数</th>
+        <!-- <th align="left">厂家</th> -->
+        <!-- <th align="left">操作员</th> -->
+        <!-- <th align="left">状态</th> -->
+        <!-- <th align="left">类型</th> -->
+        <!-- <th aplign="left">发货日期<br />到货日期</th> -->
+        <th>备注</th>
+        <th align="left" style="width:80px;">操作</th>
+      </tr>
+    </thead>
+
+    <tbody ng-if="! Inventories">
+      <tr><td colspan="12" style="text-align:center;">
+          <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+      </td></tr>
+    </tbody>
+    
+    <tbody ng-if="Inventories">
+      <tr> <!-- <span style="color:#666"> DEV: ([[Inventories]])</span> --> </tr>
+
+      <tr ng-repeat="inv in Inventories track by $index" ng-if="inv">
+        <td nowrap>[[$index+1]]</td>
+        <td ng-if="inv">
+          <a href="/product/detail/[[inv.ProductId]]">
+            <span ng-if="inv.Product.ProductId">[[inv.Product.ProductId]]#<br/></span>
+            [[inv.Product.Name]]
+          </a>
+        </td>
+        <td ng-if="!inv"><<[[inv.ProductId]]>></td>
+
+        <td class="innercontainer">
+          <table class="innertable" style="width:auto">
+            <tbody ng-repeat="(color, sizemap) in inv.Stocks">
+              <tr ng-repeat="(size, stock) in sizemap" ng-show="stock>0">
+                <td class="color">[[color]]</td>
+                <td class="size">[[size]]</td>
+                <td class="stock">[[stock]]</td>
+                <td class="stock">TODO</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+
+        <td>[[inv.sumStock]]</td>
+        <!--
+            <td ng-if="inv.Provider">[[inv.Provider.Name]]</td>
+        <td ng-if="!inv.Provider"><<[[inv.ProviderId]]>></td>
+
+        <td ng-if="inv.Operator">[[inv.Operator.Username]]</td>
+        <td ng-if="!inv.Operator"><<[[inv.OperatorId]]>></td>
+        <td>[[inv.Status]]</td>
+        <td>[[inv.Type]]</td>
+
+        <td nowrap title="发: [[inv.SendTime]] &#10;到: [[inv.ReceiveTime]]">
+          <span ng-if="inv.SendTime">[[inv.SendTime]]<br /></span>
+          <span ng-if="inv.ReceiveTime">[[inv.ReceiveTime]]</span>
+        </td>
+        -->
+
+        <!-- TODO: truncate 40 -->
+        <td title="[[inv.Note]]">[[inv.Note]]</td>
+        <td>
+          <a ng-click="onEdit(inv.ProductId)" href="javascript:void(0)">EDIT</a> | 
+          <a ng-click="onDelete(inv.ProductId)" href="javascript:void(0)">DELETE</a>
+          
+        </td>
+      </tr>
+      
+      <tr>
+        <td colspan="3">合计:</td>
+        <td>[[totalQuantity()]]</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+
+    
+  </table>
+</div>
+
+<!-- TODO 需要统一的资源管理办法； --> 
+<script src="/static/js/angular.min.js" ></script>
+<script src="/static/js/angular.init.js" ></script>
+<script src="/static/js/c/inventory/inventory_product_selector.js" ></script>
+<script type="text/javascript">
+
+// console.log('{{.Inventories}}');
+ngRegisterComponent({
+  name: "InventoryProductSelector",
+  init: function(app){
+    $InventoryProductSelector(app, {
+      Inventories: {{.Inventories}},
+    });
+  }
+});
+
+</script>
+
+<!--
+    </body>
+</html>
+-->

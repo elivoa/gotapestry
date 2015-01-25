@@ -14,6 +14,7 @@ var (
 	WITH_PRODUCT_INVENTORY Withs = 1 << 11 // 是否返回产品的库存信息
 
 	WITH_INVENTORIES Withs = 1 << 15 // 包含Inventories列表
+	WITH_STOCKS      Withs = 1 << 16 // 包含Inventlry的库存数量.
 )
 
 // 临时这样初始化service, 以后要用Inject的方式初始化这些东西；

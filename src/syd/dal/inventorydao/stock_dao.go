@@ -152,44 +152,75 @@ func filter(productId int) *map[string]int {
 }
 
 // ----------------------------------------------------------------------------------------------------
-// fill stocks
+// fill product.Stocks and product.Stock
 func FillProductStocksByIdSet(models []*model.Product) error {
 	if nil == models || len(models) == 0 {
 		return nil
 	}
 
+	var idset = map[int64]bool{}
+	for _, m := range models {
+		idset[int64(m.Id)] = true
+	}
+	if allstocks, err := GetAllStocksByIdSet(idset); err != nil {
+		return err
+	} else {
+		if nil != allstocks {
+			for _, m := range models {
+				if stock, ok := allstocks[int64(m.Id)]; ok {
+					m.Stocks = stock
+					fmt.Println("\n\n9999999999999")
+					fmt.Println("____", stock.Total())
+					m.Stock = stock.Total()
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// ----------------------------------------------------------------------------------------------------
+// fill stocks to inventory
+func GetAllStocksByIdSet(idset map[int64]bool) (map[int64]model.Stocks, error) {
+	if nil == idset || len(idset) == 0 {
+		return nil, nil
+	}
 	var conn *sql.DB
 	var stmt *sql.Stmt
 	var err error
 	if conn, err = db.Connect(); err != nil {
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 
 	var _sql bytes.Buffer        // sql buffer
 	var params = []interface{}{} // params
-	var index = map[int]*model.Product{}
+	// var index = map[int]*model.Product{}
 	_sql.WriteString("select id, product_id, color, size, stock from product_sku where ")
 	_sql.WriteString("product_id in (")
-	for idx, m := range models {
-		if idx > 0 {
-			_sql.WriteRune(',')
+	var idx = 0
+	for id, b := range idset {
+		if b {
+			if idx > 0 {
+				_sql.WriteRune(',')
+			}
+			_sql.WriteRune('?')
+			params = append(params, id)
+			// index[id] = m
+			idx += 1
 		}
-		_sql.WriteRune('?')
-		params = append(params, m.Id)
-		index[m.Id] = m
 	}
 	_sql.WriteRune(')')
 
 	if stmt, err = conn.Prepare(_sql.String()); err != nil {
-		return err
+		return nil, err
 	}
 	defer stmt.Close()
 
 	// 3. execute
 	rows, err := stmt.Query(params...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -203,22 +234,18 @@ func FillProductStocksByIdSet(models []*model.Product) error {
 		stock int
 	)
 
+	returns := map[int64]model.Stocks{} // productId -> color -> size : stock
 	for rows.Next() {
 		err := rows.Scan(&id, &productId, &color, &size /*&price,*/, &stock)
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		if product, ok := index[productId]; ok {
-			if product.Stocks == nil {
-				product.Stocks = []*model.ProductStockItem{}
-			}
-			product.Stocks = append(product.Stocks, &model.ProductStockItem{
-				Color: color,
-				Size:  size,
-				Stock: stock,
-			})
+		colors, ok := returns[int64(productId)]
+		if !ok {
+			colors = model.NewStocks()
+			returns[int64(productId)] = colors
 		}
+		colors.Set(color, size, stock)
 	}
-	return nil
+	return returns, nil
 }

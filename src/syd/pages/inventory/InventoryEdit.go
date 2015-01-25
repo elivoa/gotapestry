@@ -44,7 +44,7 @@ func (p *InventoryEdit) Setup() {
 	if p.GroupId != nil {
 		var err error
 		ig, err := service.InventoryGroup.GetInventoryGroup((int64)(p.GroupId.Int),
-			service.WITH_INVENTORIES|service.WITH_PRODUCT)
+			service.WITH_INVENTORIES|service.WITH_PRODUCT|service.WITH_STOCKS)
 		if err != nil {
 			panic(err)
 		}
@@ -109,7 +109,7 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("_____________\n\n_______ ", nig, err)
+	fmt.Println("__________jj___\n\n_______ ", nig, err)
 
 	// return exit.Redirect("/product/list")
 	return nil

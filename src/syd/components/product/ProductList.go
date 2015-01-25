@@ -58,12 +58,16 @@ func (p *ProductList) StockDescription(product *model.Product) template.HTML {
 	if nil != product {
 		if nil != product.Stocks && len(product.Stocks) > 0 {
 			var buffer bytes.Buffer
-			for _, stock := range product.Stocks {
-				buffer.WriteString(stock.Key())
+
+			product.Stocks.Loop(func(color, size string, stock int) {
+				// inventorydao.SetProductStock(product.Id, color, size, stock)
+				buffer.WriteString(color)
+				buffer.WriteString("/")
+				buffer.WriteString(size)
 				buffer.WriteString(":")
-				buffer.WriteString(strconv.Itoa(stock.Stock))
+				buffer.WriteString(strconv.Itoa(stock))
 				buffer.WriteString(";&#10; ")
-			}
+			})
 		}
 	}
 	return "没有库存或尚未清点库存！"

@@ -65,10 +65,11 @@ func (s *ProductService) UpdateProduct(product *model.Product) {
 
 	// update stock information
 	if product.Stocks != nil {
+		// TODO change to edit/create/delete;
 		inventorydao.ClearProductStock(product.Id) // clear
-		for _, stock := range product.Stocks {
-			inventorydao.SetProductStock(product.Id, stock.Color, stock.Size, stock.Stock)
-		}
+		product.Stocks.Loop(func(color, size string, stock int) {
+			inventorydao.SetProductStock(product.Id, color, size, stock)
+		})
 	}
 
 	// update suggest
@@ -112,11 +113,6 @@ func (s *ProductService) getCapital(text string) string {
 	}
 	return "-"
 }
-
-// TODO: multi with version;
-// func (s *ProductService) ListProducts() ([]*model.Product, error) {
-// 	return productdao.ListAll()
-// }
 
 func (s *ProductService) List(parser *db.QueryParser, withs Withs) ([]*model.Product, error) {
 	if models, err := productdao.List(parser); err != nil {

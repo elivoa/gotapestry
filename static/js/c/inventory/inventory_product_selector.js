@@ -1,12 +1,10 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-22 14:45:45>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Sunday, 2015-01-25 00:27:10>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){
-  console.log("init inventory_product_selector.js ...");
 
   app.controller('InventoryProductSelectorCtrl', function($scope,$rootScope,$http){
-
 
     $scope.query = $master.query;
 
@@ -50,6 +48,7 @@ function $InventoryProductSelector(app, $master){
     $scope.refreshCST = function(productId){
       if(productId == undefined){
         $scope.product = undefined;
+        $scope.stocks = undefined;
         return;
       }
 
@@ -97,6 +96,18 @@ function $InventoryProductSelector(app, $master){
       });
     };
 
+    // 显示当前选择框的当前库存
+    $scope.CurrentLeftStock = function(color, size){
+      if($scope.product!=undefined && $scope.product.Stocks!=undefined){
+        var stocks = $scope.product.Stocks;
+        var sizes = stocks[color];
+        if(sizes!=undefined){
+          return sizes[size];// stock
+        }
+      }
+      return 0;
+    };
+
     // get stock
     $scope.stock = function(color,size){
       if ($scope != undefined && $scope.stocks[color]!=undefined ){
@@ -129,30 +140,12 @@ function $InventoryProductSelector(app, $master){
       };
 
       // calculate sum stock if le 0, don't allow to add.
-      var sumStock = 0;
-      if (inventory.Stocks!=undefined){
-        var colors = Object.keys(inventory.Stocks);
-        for(i=0;i<colors.length;i++){
-          var color = colors[i];
-          var sizemap = inventory.Stocks[color];
-          var sizes = Object.keys(sizemap);
-          for(j=0;j<sizes.length;j++){
-            var size = sizes[j];
-            var stock = sizemap[size];
-            // TODO convert to number;
-            if(stock>0){
-              sumStock+=stock;
-            }
-          }
-        }
-      }
+      var sumStock = $scope.calculateSumStocks(inventory.Stocks);
+      inventory.sumStock = sumStock;
       if (sumStock<=0){
-        // alert("库存必须大于0!");
         $scope.errmsg = "库存必须大于0";
         return;
       }
-
-      // console.log("stocks for display is : ", stocksForDisplay)
 
       if ($scope.AddToProducts){
         $scope.AddToProducts(inventory); // call upper function
@@ -184,6 +177,7 @@ function $InventoryProductSelector(app, $master){
       }else{
         $rootScope.errmsg = "重复添加同一个商品, 更新现有数据";
         $scope.InventoryMap[inventory.ProductId].Stocks = inventory.Stocks; // update stock value;
+        $scope.InventoryMap[inventory.ProductId].sumStock = inventory.sumStock;
       }
     };
 
@@ -220,14 +214,24 @@ function $InventoryProductSelector(app, $master){
       $scope.Inventories[idx] = undefined;
     };
 
-
-    $scope.totalCount = function(inv){
-      if (inv!=undefined && inv.Stocks != undefined){
-        for(i=0;i<inv.Stocks;i++){
-          console.log(inv.Stocks[i])
+    $scope.totalQuantity = function(){
+      var total = 0;
+      if ($scope.Inventories != undefined){
+        for(i=0;i<$scope.Inventories.length;i++){
+          var inv = $scope.Inventories[i];
+          if (inv!=undefined && inv.sumStock > 0){
+            total += inv.sumStock;
+          }
         }
       }
-      // $scope.InventoryMap
+      return total;
+    };
+
+    $scope.currentSumQuantity = function(){
+      if ($scope.stocks != undefined){
+        return $scope.calculateSumStocks($scope.stocks);
+      }
+      return 0;
     };
 
     $scope.submit = function() {

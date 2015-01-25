@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Thursday, 2015-01-22 14:30:03>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Thursday, 2015-01-22 22:23:25>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
@@ -21,6 +21,28 @@ function p_InventoryEdit($master){
   ngLoadComponent(sydapp);
 
   sydapp.controller('InventoryEditCtrl', function($scope){
+
+    // calculate the sum of stocks from Stocks structure.
+    $scope.calculateSumStocks = function(stocks){
+      var sumStock = 0;
+      if (stocks!=undefined){
+        var colors = Object.keys(stocks);
+        for(j=0;j<colors.length;j++){
+          var color = colors[j];
+          var sizemap = stocks[color];
+          var sizes = Object.keys(sizemap);
+          for(l=0;l<sizes.length;l++){
+            var size = sizes[l];
+            var stock = sizemap[size];
+            if(stock>0){
+              sumStock+=stock;
+            }
+          }
+        }
+      }
+      return sumStock;
+    };
+
 
     // 将inventories 初始化到系统内部格式
     $scope.initInventories = function(invs){
@@ -49,6 +71,7 @@ function p_InventoryEdit($master){
           inv.Stocks[color] = {};
         }
         inv.Stocks[color][size] = stock;
+        inv.sumStock = $scope.calculateSumStocks(inv.Stocks); // calculate stocks
       }
 
       // final assign
