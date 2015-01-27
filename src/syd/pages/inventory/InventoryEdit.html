@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[InventoryEdit.html] Elivoa @ Tuesday, 2015-01-27 15:42:28>
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Tuesday, 2015-01-27 23:19:40>
     NG-enabled;
   -->
 <html ng-app="syd">
@@ -39,11 +39,11 @@
                             required></select>
                   </label>
                   <label>
-                    发货时间：[[SendTime]]
-                    <input type="date" dng-model="SendTime"/>
+                    发货时间：
+                    <input type="date" ng-model="InventoryGroup.SendTime"/> （票日期）
                   </label>
                   <label>
-                    到货时间：
+                    到货时间： （无效；提交后自动加2天）
                     <input type="date" ng-model="ReceiveTime" />
                   </label>
                 </div>

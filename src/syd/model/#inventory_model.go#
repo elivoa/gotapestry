@@ -64,7 +64,7 @@ func NewInventoryGroup(invs []*Inventory) *InventoryGroup {
 		}
 	}
 	first := invs[0]
-	if nil == first {
+	if nil == first {inventory
 		return &InventoryGroup{}
 	}
 	return &InventoryGroup{

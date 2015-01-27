@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Tuesday, 2015-01-27 15:29:17>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Tuesday, 2015-01-27 22:32:54>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
@@ -85,12 +85,15 @@ function p_InventoryEdit($master){
       $scope.InventoryGroup = $master.InventoryGroup;
     }
     $scope.Factories = $master.Factories;
-    $scope.SendTime = Date.now();
+    // console.log("parseGoDate($scope.InventoryGroup.SendTime): ", parseGoDate($scope.InventoryGroup.SendTime))
+    // change it.
+    $scope.InventoryGroup.SendTime = parseGoDate($scope.InventoryGroup.SendTime);
+    $scope.ReceiveTime =  new Date();
 
     // Submit my
     $scope.submit = function(form) {
       fillFormNameWithNGModel(InventoryForm);
-      // InventoryForm.submit();
+      InventoryForm.submit();
     };
 
   });

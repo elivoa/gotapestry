@@ -1,5 +1,5 @@
 // Basic Functions
-// Time-stamp: <[core.js] Elivoa @ Tuesday, 2015-01-27 15:06:31>
+// Time-stamp: <[core.js] Elivoa @ Tuesday, 2015-01-27 22:33:49>
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
@@ -23,7 +23,7 @@ function fillFormNameWithNGModel(form){
 function fillElementWithNG(target){
   tt = $(target);
   tp = tt.attr("type");
-  if (tp == "text" || tp == "hidden" || tp == "textarea" || tp == "number" ){
+  if (tp == "text" || tp == "hidden" || tp == "textarea" || tp == "number" || tp == "date"){
     if (tt.attr("ng-model") != undefined && tt.attr("name") == undefined){
       tt.attr("name", tt.attr("ng-model"));
     }
@@ -37,4 +37,15 @@ function fillElementWithNGNonInput(target){
   }
 }
 
-
+// TODO make this to Angular filter
+function parseGoDate(goDateString){
+  if(goDateString!=undefined){
+    try{
+      date = goDateString.replace(/[TZ]/g, " ");
+      return new Date(Date.parse(date));
+    }catch(error){
+      consle.log("Error when parse date", goDateString);
+    }
+  }
+  return undefined;
+}

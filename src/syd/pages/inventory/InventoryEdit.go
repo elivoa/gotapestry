@@ -9,11 +9,10 @@ import (
 	"syd/base/person"
 	"syd/model"
 	"syd/service"
-	"time"
 )
 
 /* ________________________________________________________________________________
-   Product Create Page
+   Product Craete Page
 */
 type InventoryEdit struct {
 	core.Page
@@ -99,10 +98,7 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	}
 	p.InventoryGroup.Inventories = invs
 
-	// FOR DEBUG
-	p.InventoryGroup.SendTime = time.Now()
-	p.InventoryGroup.ReceiveTime = time.Now()
-	p.InventoryGroup.CreateTime = time.Now()
+	p.InventoryGroup.ReceiveTime = p.InventoryGroup.SendTime.AddDate(0, 0, 2)
 
 	nig, err := service.InventoryGroup.SaveInventoryGroupByNGLIST(p.InventoryGroup)
 	if err != nil {
