@@ -18,15 +18,6 @@ func (s *OrderService) EntityManager() *db.Entity {
 	return orderdao.EntityManager()
 }
 
-// TODO: how to get logined user.
-// func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
-// 	now := time.Now()
-// 	order.CreateTime = now
-// 	order.UpdateTime = now // not useable.
-// 	order.TrackNumber = GenerateOrderId()
-// 	return orderdao.CreateOrder(order)
-// }
-
 func (s *OrderService) GetOrder(id int) (*model.Order, error) {
 	return orderdao.GetOrder("id", id)
 }
@@ -51,21 +42,25 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 			needUpdateBallance = true
 		}
 		// update order
-		_processOrderCustomerPrice(order)
-		_calculateOrder(order)
-
-		// update order detail into db;
-		_processingUpdateOrderDetails(order)
+		_processOrderCustomerPrice(order)    // update order custumize price when confirm order.
+		_calculateOrder(order)               // calculate order statistic fields.
+		_processingUpdateOrderDetails(order) // update order detail into db;
 		// update order
 		if _, err := orderdao.UpdateOrder(order); err != nil {
 			return nil, err
 		}
 	}
 
-	// update account ballance.
+	// update account ballance. upate stocks left.
 	if needUpdateBallance {
 		Account.UpdateAccountBalance(order.CustomerId, -order.SumOrderPrice(),
 			"Create Order", order.TrackNumber)
+
+		// update stocks
+		for _, od := range order.Details {
+			Stock.UpdateStockDelta(int64(od.ProductId), od.Color, od.Size, -od.Quantity)
+		}
+
 	}
 	return order, nil
 }

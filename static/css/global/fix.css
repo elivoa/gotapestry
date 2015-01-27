@@ -10,3 +10,18 @@ table.tbl_main tr:hover{background-color:#eee}
 .c_order_list .tbl_main tr.order_status_canceled:hover{background-color:#eee}
 .c_order_list .tbl_main tr.order_status_canceled a{color:#aaa}
 .c_order_list .tbl_main tr.order_status_canceled .price{color:#aaa;font-weight:normal;}
+
+
+/* 全局的一些css，临时放到这里，之后整理的时候换其他地方，LILI同学不许叫唤 ^_^ */
+
+.suggestion_zone {width:300px;padding: 3px 5px; white-space: nowrap; overflow: hidden;} /* Add Debug Border */
+.suggestion_zone ul {}
+.suggestion_zone ul li {border:solid 0px red;padding:2px;float:left;clear:both;width:100%}
+.suggestion_zone ul li:hover {Background-color:#ddd}
+.suggestion_zone ul li.selected {Background-color:#ddd}
+.suggestion_zone ul li span {display:block;float:left;margin:0 2px 0 0;border:solid 1px transparent;}
+.suggestion_zone ul li span.uid {width:40px;}
+.suggestion_zone ul li span.name {width:auto;}
+.suggestion_zone ul li span.stock {float:right;}
+
+.ghost {width:0;height:0;border:none;padding:0;margin:0;visibility:hidden;}

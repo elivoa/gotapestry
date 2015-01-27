@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[product_edit_ng.js] Elivoa @ Monday, 2015-01-19 00:47:24>
+// Time-stamp: <[product_edit_ng.js] Elivoa @ Monday, 2015-01-26 00:28:39>
 
 //
 // $master.Product -- product json.
@@ -35,27 +35,33 @@ function p_ProductEdit($master){
           if (stocks[color] == undefined){
             stocks[color] = {};
           }
-          stocks[color][size] = 0;
-        }
-      }
-      if ($scope.Product.Stocks != undefined){
-        // fill by stocks;
-        for (i=0;i<$scope.Product.Stocks.length;i++){
-          item = $scope.Product.Stocks[i];
-          if (stocks[item.Color]!=undefined){
-            if (stocks[item.Color][item.Size] !=undefined){
-              stocks[item.Color][item.Size] = item.Stock;
-              continue;
-            }
+          var ss = $scope.Product.Stocks;
+          if(ss != undefined && ss[color] != undefined){
+            var leftstock = ss[color][size];
+            stocks[color][size] = leftstock;
+          }else{
+            stocks[color][size] = 0;
           }
-          console.log("NOTE: SKU溢出", item.Color, item.Size, item.Stock);
         }
       }
+      // if ($scope.Product.Stocks != undefined){
+      //   // fill by stocks;
+      //   for (i=0;i<$scope.Product.Stocks.length;i++){
+      //     item = $scope.Product.Stocks[i];
+      //     if (stocks[item.Color]!=undefined){
+      //       if (stocks[item.Color][item.Size] !=undefined){
+      //         stocks[item.Color][item.Size] = item.Stock;
+      //         continue;
+      //       }
+      //     }
+      //     console.log("NOTE: SKU溢出", item.Color, item.Size, item.Stock);
+      //   }
+      // }
       return stocks;
     }
 
     $scope.stock = function(color,size){
-      if ($scope != undefined && $scope.Stocks[color]!=undefined ){
+      if ($scope.Stocks != undefined & $scope.Stocks[color]!=undefined ){
         return  $scope.Stocks[color][size];
       }
       return 0;
@@ -74,7 +80,6 @@ function p_ProductEdit($master){
     $scope.removeSize = function(idx){
       $scope.Sizes.remove(idx,idx);
     };
-
     $scope.submit = function() {
       fillFormNameWithNGModel(ProductForm); // call ng-got submit helper;
     };

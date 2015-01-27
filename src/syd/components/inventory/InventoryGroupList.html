@@ -15,8 +15,8 @@
             <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
             <th align="left">ID</th>
             <th align="left">发货日期</th>
-            <th align="left">负责人</th>
-            <th align="left">状态</th>
+            <th align="left">厂家</th>
+            <!-- <th align="left">状态</th> -->
             <th align="left">备注</th>
             <th align="left">Operator</th>
             <th align="left" style="width:80px;">Operation</th>
@@ -29,10 +29,10 @@
                 {{.SendTime | date}}
               </td>
               <td nowrap>
-                Factory
+                黄楚辉
               </td>
               
-              <td>{{.Status}}</td>
+              <!-- <td>{{.Status}}</td> -->
               <!-- <td>{{.Type}}</td> -->
               <td title="{{.Note}}">{{.Note | truncate 40 "..."}}</td>
 
@@ -44,7 +44,7 @@
                   </td>
                   -->
 
-              <td>TODO</td>
+              <td>Bo Gao</td>
               <td><t:a page="inventory/edit" context="{{print .Id}}" label="Edit"></t:a></td>
               
             </tr>

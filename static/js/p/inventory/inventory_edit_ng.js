@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Thursday, 2015-01-22 22:23:25>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Tuesday, 2015-01-27 15:29:17>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
@@ -87,14 +87,13 @@ function p_InventoryEdit($master){
     $scope.Factories = $master.Factories;
     $scope.SendTime = Date.now();
 
-
-    // nothing is useful in this page. all things is in components / directives;
-    $scope.submit = function() {
-      fillFormNameWithNGModel(ProductForm);
+    // Submit my
+    $scope.submit = function(form) {
+      fillFormNameWithNGModel(InventoryForm);
+      // InventoryForm.submit();
     };
 
   });
-
 }
 
 

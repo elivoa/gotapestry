@@ -65,6 +65,7 @@ func (p *Suggest) Onproduct() *exit.Exit {
 	for idx, item := range items {
 		sj.Suggestions[idx] = ProductSuggestionItem{
 			Id:          item.Id,
+			ProductId:   item.SN,
 			Name:        item.Text,
 			QueryString: item.QuickString,
 			// Data: fmt.Sprint(item.Id),
@@ -89,6 +90,7 @@ type ProductSuggestions struct {
 
 type ProductSuggestionItem struct {
 	Id          int    `json:"id"`
+	ProductId   string `json:"productId"`
 	Name        string `json:"name"`
 	QueryString string `json:"value"`
 	// Value       string `json:"value"`

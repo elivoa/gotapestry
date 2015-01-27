@@ -109,25 +109,18 @@ func (s *InventoryGroupService) List(parser *db.QueryParser, withs Withs) ([]*mo
 	}
 }
 
-// func (s *InventoryGroupService) CreateInventoryGroupOnly(ig *model.InventoryGroup) (
-// 	*model.InventoryGroup, error) {
-// 	return nil, nil
-// }
-
 // If InvemtoryGroup has GroupId property, Update, else Create one.
 // 注意：参数传进来的invneotries的库存信息存放在Stocks里面。而数据库中读取出来的库存信息放在.Stock中。
 func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGroup) (
 	*model.InventoryGroup, error) {
-
-	fmt.Println("\n\n\n === --- >>> TODO CreateInventoryGroupByNGLIST")
-	fmt.Println("inventory group is  : ", ig.Id)
 
 	// nil check
 	if nil == ig {
 		return nil, errors.New("InventoryGroup can't be nil!")
 	}
 	if ig.ProviderId <= 0 {
-		return nil, errors.New("Provider Id can't be nil!")
+		// return nil, errors.New("Provider Id can't be nil!")
+		fmt.Printf("Provider Id can't be nil!\n")
 	}
 
 	if ig.Id <= 0 {
@@ -140,7 +133,9 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		// TODO: save InventoryGroup to create GroupId.
 	} else {
 		// update inventory group
-		fmt.Printf("update one: groupid is %d\n", ig.Id)
+		if _, err := inventorygroupdao.Update(ig); err != nil {
+			return nil, err
+		}
 	}
 
 	// assign basic properties into sub-inventories
@@ -161,6 +156,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		createGroup = []*model.Inventory{}
 		updateGroup = []*model.Inventory{}
 		deleteGroup = []*model.Inventory{}
+		oldStocks   = map[int64]int{}
 	)
 
 	// load existing inventories
@@ -183,7 +179,6 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 				}
 			}
 		}
-
 	} else {
 		var deleteWhoIsFalse = make([]bool, len(invs))
 		if ig.Inventories != nil {
@@ -209,6 +204,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 											inv2.Note != inv.Note {
 											if stock > 0 {
 												updateGroup = append(updateGroup, inv)
+												oldStocks[inv.ProductId] = inv.Stock
 											}
 										}
 										find = true
@@ -234,7 +230,9 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		// who will be deleted?
 		for idx, b := range deleteWhoIsFalse {
 			if !b {
-				deleteGroup = append(deleteGroup, invs[idx])
+				inv := invs[idx]
+				deleteGroup = append(deleteGroup, inv)
+				oldStocks[inv.ProductId] = inv.Stock // cache old values
 			}
 		}
 	}
@@ -258,31 +256,40 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	// --------------------------------------------------------------------------------
 
 	// final process: create, update, and delete
-	fmt.Println("\n===============================================================")
 	if createGroup != nil {
-		for _, inventory := range createGroup {
-
-			if _, err := inventorydao.Create(inventory); err != nil {
+		for _, inv := range createGroup {
+			// create inventory item;
+			if _, err := inventorydao.Create(inv); err != nil {
 				return nil, err
 			}
+			// increase left stock.
+			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock)
 		}
 	}
 	if updateGroup != nil {
-		for _, inventory := range updateGroup {
-			if _, err := inventorydao.Update(inventory); err != nil {
+		for _, inv := range updateGroup {
+			// update
+			if _, err := inventorydao.Update(inv); err != nil {
 				return nil, err
 			}
+			// increase stock = leftstock - inv.Stock// TODO... ehrererere
+			oldstock := oldStocks[inv.ProductId]
+			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock-oldstock)
 		}
 	}
 	if deleteGroup != nil {
-		for _, inventory := range deleteGroup {
-			if _, err := inventorydao.Delete(inventory.Id); err != nil {
+		for _, inv := range deleteGroup {
+			// delete inventory
+			if _, err := inventorydao.Delete(inv.Id); err != nil {
 				return nil, err
 			}
+			// decrease the stocks;
+			oldstock := oldStocks[inv.ProductId]
+			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, -oldstock)
 		}
 	}
 
-	return nil, nil
+	return ig, nil
 }
 
 func _cloneInentory(inv *model.Inventory, color, size string, stock int) *model.Inventory {

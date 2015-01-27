@@ -1,5 +1,5 @@
 // Basic Functions
-// Time-stamp: <[core.js] Elivoa @ Thursday, 2014-11-06 17:30:06>
+// Time-stamp: <[core.js] Elivoa @ Tuesday, 2015-01-27 15:06:31>
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
@@ -16,7 +16,7 @@ function fillFormNameWithNGModel(form){
     fillElementWithNG(t);
   });
   $(form).find("textarea").each(function(idx, t){
-    fillElementWithNG(t);
+    fillElementWithNGNonInput(t);
   });
 }
 
@@ -29,4 +29,12 @@ function fillElementWithNG(target){
     }
   }
 }
+
+function fillElementWithNGNonInput(target){
+  tt = $(target);
+  if (tt.attr("ng-model") != undefined && tt.attr("name") == undefined){
+    tt.attr("name", tt.attr("ng-model"));
+  }
+}
+
 

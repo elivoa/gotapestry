@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Sunday, 2014-11-02 15:13:38>
+  Time-stamp: <[suggest.go] Elivoa @ Monday, 2015-01-26 00:52:54>
 */
 package suggest
 
@@ -26,9 +26,10 @@ var loaded bool
 
 // var suggestCache
 type Item struct {
-	Id          int
-	Text        string
-	QuickString string
+	Id          int    // for Product
+	SN          string // Product Id
+	Text        string // Product Name
+	QuickString string // capital of pinyin
 	Type        string
 }
 
@@ -105,6 +106,7 @@ func load() {
 	for i, product := range products {
 		productItems[i] = &Item{
 			Id:          product.Id,
+			SN:          product.ProductId,
 			Text:        product.Name,
 			QuickString: parseQuickText(product.Name), // TODO
 		}

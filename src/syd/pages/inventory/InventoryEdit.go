@@ -100,7 +100,6 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	p.InventoryGroup.Inventories = invs
 
 	// FOR DEBUG
-	p.InventoryGroup.ProviderId = 5
 	p.InventoryGroup.SendTime = time.Now()
 	p.InventoryGroup.ReceiveTime = time.Now()
 	p.InventoryGroup.CreateTime = time.Now()
@@ -109,10 +108,11 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("__________jj___\n\n_______ ", nig, err)
+	// sometimes return to edit this's page.
+	return exit.Redirect(fmt.Sprintf("/inventory/edit/%d", nig.Id))
 
 	// return exit.Redirect("/product/list")
-	return nil
+	// return nil
 }
 
 // return []*model.Inventory with Stocks(temp variable) in it;

@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Sunday, 2015-01-25 00:27:10>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Monday, 2015-01-26 23:20:10>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){
@@ -34,15 +34,33 @@ function $InventoryProductSelector(app, $master){
           console.log("~~~~~~~~~~ no suggestion ~~~~~~~~~~~~~");
           return $scope.refreshCST(); // call with empty parameter to clear.
         }else{
+          $scope.showCandidates(data);
           // TODO! Fake select one. TODO make this real select;
-          var first = data.suggestions[0];
-          $scope.refreshCST(data.suggestions[0].id);
+          // var first = data.suggestions[0];
+          // $scope.refreshCST(data.suggestions[0].id);
         }
       }
 
       // fake here to directly call the first value.
       return false;
     };
+
+    // --------------------------------------------------------------------------------
+    // Suggestion Area
+    // --------------------------------------------------------------------------------
+    $scope.showCandidates = function(data){
+      $scope.suggestionIndex = 0;
+      if(data.suggestions!=undefined){
+        $scope.candidates = data.suggestions;
+      }
+    };
+
+    $scope.hovsuggestKeydown = function(e){
+      console.log(e)
+    };
+
+
+
 
     // 3. refresh PKU Stock table;
     $scope.refreshCST = function(productId){
@@ -232,10 +250,6 @@ function $InventoryProductSelector(app, $master){
         return $scope.calculateSumStocks($scope.stocks);
       }
       return 0;
-    };
-
-    $scope.submit = function() {
-      fillFormNameWithNGModel(ProductForm);
     };
 
     // focus on query box

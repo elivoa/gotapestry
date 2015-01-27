@@ -52,6 +52,31 @@ func setProductCSValue(productId int, color string, size string,
 	}
 }
 
+// update stock with delta.
+func UpdateProductStockWithDelta(productId int64, color string, size string, stock int) error {
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	var _sql = fmt.Sprintf("insert into product_sku (product_id, color, size, price, stock, create_time) values (?,?,?,0,?, now() ) on duplicate key update stock = stock + ?")
+
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	// 3. execute
+	_, err = stmt.Exec(productId, color, size, stock, stock)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func ClearProductStock(productId int) error {
 	conn := db.Connectp()
 	defer db.CloseConn(conn)

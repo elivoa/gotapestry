@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[InventoryEdit.html] Elivoa @ Wednesday, 2015-01-21 16:48:18>
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Tuesday, 2015-01-27 15:42:28>
     NG-enabled;
   -->
 <html ng-app="syd">
@@ -20,7 +20,7 @@
         {{with .InventoryGroup}}
 
         <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
-              t:id="InventoryForm" id="InventoryForm" >
+              t:id="InventoryForm" novalidate>
           <input type="hidden" name="t:id" value="InventoryForm" />
           <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
           <input type="hidden" name="InventoriesJson" value="[[Inventories]]" />
@@ -29,25 +29,26 @@
             <div class="tit"><strong>{{$.SubTitle}}入库 [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
-              <label>
-                厂家：<<[[InventoryGroup.ProviderId]]>>
-                <select ng-model="InventoryGroup.ProviderId"
-                        ng-options="factory.Id as factory.Name for factory in Factories"
-                        required></select>
-              </label>
-              <label>
-                发货时间：[[SendTime]]
-                <input type="date" dng-model="SendTime"/>
-              </label>
-              <label>
-                到货时间：
-                <input type="date" ng-model="ReceiveTime" />
-              </label>
-              
-              <div style="padding:8px;margin:4px;" class="">
+              <div style="padding:8px;margin:4px;" class="">              
 
-                <t:inventory.productselector GroupId=".Id" inventories=".Inventories" />
+                <div style="margin:8px 8px 16px 8px;">
+                  <label>
+                    厂家： <input type="text" ng-model="InventoryGroup.ProviderId" class="ghost"/>
+                    <select ng-model="InventoryGroup.ProviderId"
+                            ng-options="factory.Id as factory.Name for factory in Factories"
+                            required></select>
+                  </label>
+                  <label>
+                    发货时间：[[SendTime]]
+                    <input type="date" dng-model="SendTime"/>
+                  </label>
+                  <label>
+                    到货时间：
+                    <input type="date" ng-model="ReceiveTime" />
+                  </label>
+                </div>
                 
+                <t:inventory.productselector GroupId=".Id" inventories=".Inventories" />
               </div>
               
             </div>
@@ -59,14 +60,17 @@
               <dl class="clearfix">
                 <dt>备注：</dt>
                 <dd>
-                  <textarea name="Product.Note" cols="80" rows="4">{{.Note}}</textarea>
+                  <textarea ng-model="InventoryGroup.Note" cols="80" rows="4"></textarea>
                 </dd>
                 <dd></dd>
               </dl>
             </div>
           </div>
           <div class="btn_content">
-            <input type="submit" class="btn_a_l" value="提交" />
+            <!-- <input type="button" class="btn_b_l" value="返回列表" -->
+            <!--        onclick="window.location.href='/inventory'"/> -->
+            <input type="button" class="btn_a_l" value="提交" ng-click="submit(InventoryForm)"
+                   xxonclick="$('#InventoryForm').submit()" />
           </div>
 
         </form>

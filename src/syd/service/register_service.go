@@ -24,6 +24,7 @@ var (
 	Person         = new(PersonService)
 	User           = new(UserService)
 	Product        = new(ProductService)
-	Inventory      = new(InventoryService)
-	InventoryGroup = new(InventoryGroupService)
+	Inventory      = new(InventoryService)      // 入库
+	InventoryGroup = new(InventoryGroupService) // 入库组
+	Stock          = new(StockService)          // 库存数量
 )

@@ -54,7 +54,6 @@ func (p *ProductEdit) Setup() { // (string, string) {
 	fmt.Println(p.Id)
 	fmt.Println(p.Product)
 	if p.Id != nil {
-		fmt.Printf("\t >>> get product by id\n")
 		var err error
 		if p.Product, err = service.Product.GetFullProduct(p.Id.Int); err != nil {
 			panic(err)

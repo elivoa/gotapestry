@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Sunday, 2015-01-25 11:53:23> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Monday, 2015-01-26 22:48:44> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -15,7 +15,22 @@
       <label>输入产品：</label>
       <input type="text" ng-model="query" class="_temp_query_box"
              ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
+             ng-keydown="suggestKeydown($event)"
              size="45" />
+
+      <br />
+
+      <!-- Suggestion Area -->
+      <div class="autocomplete-suggestions suggestion_zone" ng-if="candidates">
+        <ul ng-repeat="cand in candidates track by $index">
+          <li>
+            <span class="uid">[[cand.productId]]</span>
+            <span class="name">[[cand.name]]</span>
+            <span class="stock">???</span>
+          </li>
+        </ul>
+      </div>
+      
       <span ng-if="product">[[ product.Name ]]</span>
       
       <table class="B_prd_att" style="margin-top: 12px;">
@@ -139,7 +154,7 @@
                 <td class="color">[[color]]</td>
                 <td class="size">[[size]]</td>
                 <td class="stock">[[stock]]</td>
-                <td class="stock">TODO</td>
+                <td class="stock">[TODO]</td>
               </tr>
             </tbody>
           </table>
