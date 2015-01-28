@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Monday, 2015-01-26 23:20:10>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-29 00:22:47>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){
@@ -7,6 +7,10 @@ function $InventoryProductSelector(app, $master){
   app.controller('InventoryProductSelectorCtrl', function($scope,$rootScope,$http){
 
     $scope.query = $master.query;
+
+    // register document's keyboard management. ?? How to do bind this method;
+    // var d = angular.element("body");
+    // d.on('keyDown', $scope.suggestKeycontrol;
 
     // 1. when change occured in `query` box.
     $scope.$watch('query', function(newValue, oldValue) {
@@ -32,6 +36,7 @@ function $InventoryProductSelector(app, $master){
       if (data && data.suggestions && angular.isArray(data.suggestions)){
         if (data.suggestions.length == 0 ){
           console.log("~~~~~~~~~~ no suggestion ~~~~~~~~~~~~~");
+          $scope.cancelSuggest();
           return $scope.refreshCST(); // call with empty parameter to clear.
         }else{
           $scope.showCandidates(data);
@@ -50,17 +55,88 @@ function $InventoryProductSelector(app, $master){
     // --------------------------------------------------------------------------------
     $scope.showCandidates = function(data){
       $scope.suggestionIndex = 0;
+      $scope.suggestionMaxItems = 0;
       if(data.suggestions!=undefined){
         $scope.candidates = data.suggestions;
+        $scope.suggestionMaxItems = data.suggestions.length;
       }
     };
 
-    $scope.hovsuggestKeydown = function(e){
-      console.log(e)
+    $scope.suggestKeycontrol = function(e){
+      // console.log("keydown: keyCode is ", e.keyCode, "; Modifier:",e.Modifier,
+      //             "; index=", $scope.suggestionIndex);
+      //     console.log(e);
+      if(e.keyCode == 40 || (e.keyCode==78 && (e.ctrlKey==true))){ // arrow-down, ctrl+p
+        $scope.suggestionIndex += 1;
+        if ($scope.suggestionIndex >= $scope.suggestionMaxItems){
+          $scope.suggestionIndex = $scope.suggestionMaxItems;
+        }
+      }
+      if(e.keyCode == 38 || (e.keyCode==80 && (e.ctrlKey==true))){ // arrow-up
+        $scope.suggestionIndex-=1;
+        if ($scope.suggestionIndex <=0 ){
+          $scope.suggestionIndex = 0;
+        }
+      }
+
+      if(e.keyCode == 13){ // enter
+        $scope.selectSuggest($scope.suggestionIndex - 1);
+      }
+
+      if(e.keyCode == 91 || (e.keyCode==70 && (e.ctrlKey==true))){ // arrow-right, ctrl+f
+        $scope.showTotalInventory($scope.suggestionIndex - 1);
+      }
     };
 
+    // clear suggest candidates dropbox.
+    $scope.cancelSuggest = function($event){
+      $scope.suggestions = undefined;
+      $scope.suggestionIndex = 0;
+      $scope.suggestionMaxItems = 0;
+      $scope.candidates = undefined;
+    };
 
+    $scope.selectSuggest = function(idx){
+      if($scope.candidates==undefined){
+        return;
+      }
+      var cur = $scope.candidates[idx];
+      if (cur!=undefined){
+        $scope.cancelSuggest();
+        $scope.refreshCST(cur.id);
+      }else{
+        console.log("error find index ", $scope.suggestionIndex);
+      }
+    };
 
+    $scope.showTotalInventory = function(idx){
+      if($scope.candidates==undefined){
+        return;
+      }
+      var cur = $scope.candidates[idx];
+      if (cur!=undefined){
+        $http.get("/api/product/"+ cur.id).success(function(data, status, headers, config) {
+          if(data!=undefined){
+            cur.totalStock = data.Stock;
+          }
+        }).error(function(data, status, headers, config) {
+          alert("AJAX failed!");
+        });
+      }else{
+        console.log("error find index ", $scope.suggestionIndex);
+      }
+    };
+
+    $scope.suggestSelectedClass = function(idx){
+      if (idx+1 == $scope.suggestionIndex){
+        return "selected";
+      }
+      return "";
+    };
+
+    $scope.suggestMouseover = function($index) {
+      $scope.suggestionIndex = $index+1;
+    };
 
     // 3. refresh PKU Stock table;
     $scope.refreshCST = function(productId){

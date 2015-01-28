@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Monday, 2015-01-26 22:48:44> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Thursday, 2015-01-29 00:08:40> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -6,7 +6,8 @@
   <body >
 
     -->
-<div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl">
+<div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl"
+     ng-click="cancelSuggest($event)">
   <input type="hidden" ng-model="Inventories" />
 
   <!-- Selector!  -->
@@ -14,19 +15,21 @@
     <div>
       <label>输入产品：</label>
       <input type="text" ng-model="query" class="_temp_query_box"
-             ng-model-options="{ updateOn: 'default blur', debounce: { default: 200, blur: 0 } }"
-             ng-keydown="suggestKeydown($event)"
+             ng-model-options="{ updateOn: 'default blur', debounce: { default: 100, blur: 0 } }"
+             ng-keydown="suggestKeycontrol($event)"
              size="45" />
 
       <br />
 
       <!-- Suggestion Area -->
-      <div class="autocomplete-suggestions suggestion_zone" ng-if="candidates">
+      <div class="autocomplete-suggestions suggestion_zone" ng-if="candidates"
+           ng-keydown="suggestKeycontrol($event)">
         <ul ng-repeat="cand in candidates track by $index">
-          <li>
+          <li class="[[suggestSelectedClass($index)]]" ng-mouseover="suggestMouseover($index)"
+              ng-click="selectSuggest($index)">
             <span class="uid">[[cand.productId]]</span>
             <span class="name">[[cand.name]]</span>
-            <span class="stock">???</span>
+            <span class="stock">[[cand.totalStock]]</span>
           </li>
         </ul>
       </div>
@@ -89,7 +92,8 @@
 	        <td>
 		      <p class="B_text">填写商品备注</p>
               <p ng-if="product.Note">（产品备注：[[product.Note]]）</p>
-		      <textarea class="notes" ng-model="Note" rows="3" cols="50"></textarea>
+		      <textarea class="notes" ng-model="Note" rows="3" cols="50"
+                        ng-focus="cancelSuggest($event)"></textarea>
 	        </td>    
 	      </tr>
 	      <tr>

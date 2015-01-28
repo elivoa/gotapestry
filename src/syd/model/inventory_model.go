@@ -56,6 +56,7 @@ type InventoryGroup struct {
 	UpdateTime  time.Time
 }
 
+// parameter here is useless, change this into empty parameter methods;
 func NewInventoryGroup(invs []*Inventory) *InventoryGroup {
 	if nil == invs || len(invs) == 0 {
 		return &InventoryGroup{
