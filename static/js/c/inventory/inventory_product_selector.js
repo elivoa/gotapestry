@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-29 00:22:47>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-29 16:42:46>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){
@@ -63,8 +63,8 @@ function $InventoryProductSelector(app, $master){
     };
 
     $scope.suggestKeycontrol = function(e){
-      // console.log("keydown: keyCode is ", e.keyCode, "; Modifier:",e.Modifier,
-      //             "; index=", $scope.suggestionIndex);
+      console.log("keydown: keyCode is ", e.keyCode, "; Modifier:",e.Modifier,
+                  "; index=", $scope.suggestionIndex);
       //     console.log(e);
       if(e.keyCode == 40 || (e.keyCode==78 && (e.ctrlKey==true))){ // arrow-down, ctrl+p
         $scope.suggestionIndex += 1;
@@ -83,7 +83,7 @@ function $InventoryProductSelector(app, $master){
         $scope.selectSuggest($scope.suggestionIndex - 1);
       }
 
-      if(e.keyCode == 91 || (e.keyCode==70 && (e.ctrlKey==true))){ // arrow-right, ctrl+f
+      if(e.keyCode == 39 || (e.keyCode==70 && (e.ctrlKey==true))){ // arrow-right, ctrl+f
         $scope.showTotalInventory($scope.suggestionIndex - 1);
       }
     };
@@ -139,7 +139,8 @@ function $InventoryProductSelector(app, $master){
     };
 
     // 3. refresh PKU Stock table;
-    $scope.refreshCST = function(productId){
+    // if invenotryModel is not undefined, assign back it's stock and inventoryNote back into product.
+    $scope.refreshCST = function(productId, inventoryModel){
       if(productId == undefined){
         $scope.product = undefined;
         $scope.stocks = undefined;
@@ -183,6 +184,11 @@ function $InventoryProductSelector(app, $master){
           console.log("Warrning: no GetProduct method found!");
         }
 
+        if(inventoryModel!=undefined && inventoryModel.ProductId == $scope.product.Id){
+          $scope.product.InventoryNote = inventoryModel.Note;
+          $scope.stocks = angular.copy(inventoryModel.Stocks);
+        }
+
         // TODO should load it's price;
 
       }).error(function(data, status, headers, config) {
@@ -204,7 +210,7 @@ function $InventoryProductSelector(app, $master){
 
     // get stock
     $scope.stock = function(color,size){
-      if ($scope != undefined && $scope.stocks[color]!=undefined ){
+      if ($scope.stocks[color]!=undefined ){
         return $scope.stocks[color][size];
       }
       return 0;
@@ -223,14 +229,15 @@ function $InventoryProductSelector(app, $master){
       // Here need to change product into inventories;
       var p = $scope.product;
       var inventory = {
-        Id         :0,
-	    GroupId    :0,         // TODO
+        Id         : 0,
+	    GroupId    : 0,         // TODO
 	    ProductId  : p.Id,
 	    Stocks     : angular.copy($scope.stocks), // This is stocks matrix;
 	    ProviderId : 0,        // factory person id.
 	    OperatorId : 0,        // TODO
 	    Note       : $scope.Note,
-        Product    : p         // extened
+        Product    : p,         // extened
+        Note       : p.InventoryNote
       };
 
       // calculate sum stock if le 0, don't allow to add.
@@ -297,7 +304,8 @@ function $InventoryProductSelector(app, $master){
 
     // click edit on operator column
     $scope.onEdit = function(invId){
-      $scope.refreshCST(invId);
+      // call with invmodel to retireve Note and stock back;
+      $scope.refreshCST(invId, $scope.InventoryMap[invId]);
     };
 
     // click edit on operator column

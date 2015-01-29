@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Thursday, 2015-01-29 00:08:40> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Thursday, 2015-01-29 16:14:37> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -58,7 +58,7 @@
                       <td>
                         <input type="number" size="4" name="Stocks" autocomplete="off"
                                style="width:46px;text-align:right"
-                               value="[[ stock(color, size) ]]"
+                               value="stock(color, size)"
                                ng-keyup="setStock(color,size,$event)"
                                ng-blur="setStock(color,size,$event)" />
                       </td>
@@ -92,7 +92,7 @@
 	        <td>
 		      <p class="B_text">填写商品备注</p>
               <p ng-if="product.Note">（产品备注：[[product.Note]]）</p>
-		      <textarea class="notes" ng-model="Note" rows="3" cols="50"
+		      <textarea class="notes" ng-model="product.InventoryNote" rows="3" cols="50"
                         ng-focus="cancelSuggest($event)"></textarea>
 	        </td>    
 	      </tr>
