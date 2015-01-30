@@ -1,5 +1,6 @@
 package product
 
+// Deprecated, TODO chagne this into angularjs module.
 import (
 	"bytes"
 	"github.com/elivoa/got/core"

@@ -1,12 +1,11 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="syd">
   <head>
-    
     <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
     <t:layout.header title="商品列表" />
-    
   </head>
-  <body class="PG_list_product">
+  
+  <body ng-controller="ProductListCtrl" class="PG_list_product">
     <t:layout.headernav />
 
     <div class="container">
@@ -15,39 +14,65 @@
       <div class="main_content">
     	<h1>商品列表</h1>
         <div class="tab_s clearfix">
-          <a class="first {{.TabClass `all`}}" href="/product/list">全部商品</a>
-          <a class="{{.TabClass `A`}}" href="/product/list/A">A</a>
-          <a class="{{.TabClass `b`}}" href="/product/list/B">B</a>
-          <a class="{{.TabClass `c`}}" href="/product/list/C">C</a>
-          <a class="{{.TabClass `d`}}" href="/product/list/D">D</a>
-          <a class="{{.TabClass `e`}}" href="/product/list/E">E</a>
-          <a class="{{.TabClass `f`}}" href="/product/list/F">F</a>
-          <a class="{{.TabClass `g`}}" href="/product/list/G">G</a>
-          <a class="{{.TabClass `h`}}" href="/product/list/H">H</a>
-          <a class="{{.TabClass `i`}}" href="/product/list/I">I</a>
-          <a class="{{.TabClass `j`}}" href="/product/list/J">J</a>
-          <a class="{{.TabClass `k`}}" href="/product/list/K">K</a>
-          <a class="{{.TabClass `l`}}" href="/product/list/L">L</a>
-          <a class="{{.TabClass `m`}}" href="/product/list/M">M</a>
-          <a class="{{.TabClass `n`}}" href="/product/list/N">N</a>
-          <a class="{{.TabClass `o`}}" href="/product/list/O">O</a>
-          <a class="{{.TabClass `p`}}" href="/product/list/P">P</a>
-          <a class="{{.TabClass `q`}}" href="/product/list/Q">Q</a>
-          <a class="{{.TabClass `r`}}" href="/product/list/R">R</a>
-          <a class="{{.TabClass `s`}}" href="/product/list/S">S</a>
-          <a class="{{.TabClass `t`}}" href="/product/list/T">T</a>
-          <a class="{{.TabClass `u`}}" href="/product/list/U">U</a>
-          <a class="{{.TabClass `v`}}" href="/product/list/V">V</a>
-          <a class="{{.TabClass `w`}}" href="/product/list/W">W</a>
-          <a class="{{.TabClass `x`}}" href="/product/list/X">X</a>
-          <a class="{{.TabClass `y`}}" href="/product/list/Y">Y</a>
-          <a class="{{.TabClass `z`}}" href="/product/list/Z">Z</a>
+          <a  ng-repeat="tab in tabs track by $index"
+              class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
+              href="/product/list/[[tab]]">
+            [[tab]]
+          </a>
         </div>
 
         <div class="list_product">
 
-          <t:product.list products=".Products" source="(print `/product/list/` .Capital)" />
-          <hide>{{t_product_list $ "Products" .Products "Source" (print `/product/list/` .Capital) }}</hide>
+          <table class="tbl_main">
+            <tr>
+              <th align="left">货号</th>
+              <th align="left">商品名称</th>
+              <th align="right">销售单价</th>
+              <th align="right">库存</th>
+              <th align="left">产品规格</th>
+              <th align="left">操作</th>
+            </tr>
+
+            <tr ng-if="!Products">
+              <td>
+                <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+              </td>
+            </tr>
+            
+            <tr ng-repeat="p in Products">
+              <td nowrap>
+                <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
+              </td>
+              <td nowrap>
+                <a href="/product/detail/[[p.Id]]">[[p.Name]]</a>
+              </td>
+              <td align="right">
+                <span class="price">[[p.Price]]</span> <!-- PrettyCurrency filter -->
+              </td>
+              <td title="{ {$.StockDescription .} }">
+                <span class="inventory">[[p.Stock]]</span>
+              </td>
+              <td nowrap style="color:#a1a1a1">
+                { {$.ShowSpecification .}}
+              </td>
+              <td nowrap>
+                <a href="#TODO">填写入库信息</a><span class="vline">|</span>
+                <a href="/product/edit/[[p.Id]]">修改商品</a><span class="vline">|</span>
+                {{/* This will be generated */}}
+                <a href="/product/list.ProductList.delete/[[p.Id]]?source={ {$.Source}}"
+                   onclick="return confirm('确认删除?')">删除</a>
+              </td>
+            </tr>
+            
+          </table>
+
+
+          <!--    S / M / L<span class="vline">|</span>
+                  S / M / <span title="  " class="B_sold_out">L</span> / XL
+                  <span class="vline">|</span>   S / M / L / XL -->
+
+
+          <!-- < t:product.list products=".Products" source="(print `/product/list/` .Capital)" /> -->
           
           <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 
@@ -55,6 +80,23 @@
         
       </div>
     </div>
+    <script src="/static/js/angular.min.js" ></script>
+    <script src="/static/js/angular.init.js" ></script>
+    <script src="/static/js/p/product/product_list.js" ></script>
   </body>
 </html>
+
+<script type="text/javascript">
+
+             //
+             p_ProductList({
+               Products: {{.Products .Capital}},
+               //  Factories : { {.Factories}}, // factories option
+             });
+
+             // $(document).ready(function(){
+             //   angular.element('._temp_query_box').focus(); 
+             // })
+             </script>
+
 
