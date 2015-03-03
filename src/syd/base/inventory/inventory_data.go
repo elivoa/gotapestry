@@ -1,4 +1,4 @@
-// Time-stamp: <[inventory_data.go] Elivoa @ Sunday, 2014-11-23 14:03:33>
+// Time-stamp: <[inventory_data.go] Elivoa @ Tuesday, 2015-03-03 11:04:48>
 
 package inventory
 
@@ -15,6 +15,7 @@ var (
 
 // Fields
 var (
-	FID      = "id"
-	FGroupId = "group_id"
+	FID       = "id"
+	FGroupId  = "group_id"
+	FSendTime = "send_time"
 )

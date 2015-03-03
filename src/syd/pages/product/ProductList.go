@@ -3,6 +3,8 @@ package product
 import (
 	"fmt"
 	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/debug"
+	"github.com/elivoa/got/route/exit"
 	"strings"
 	"syd/model"
 	"syd/service"
@@ -37,4 +39,13 @@ func (p *ProductList) Products(letter string) []*model.Product {
 		panic(err.Error())
 	}
 	return products
+}
+
+// NOTE: event name is case sensitive. Kill this when add cache.
+func (p *ProductList) Ondelete(productId int) *exit.Exit {
+	debug.Log("Delete Product xxx %d", productId)
+	service.Product.DeleteProduct(productId)
+	// TODO make this default redirect.
+	// return route.RedirectDispatch(p.Source, "/product/list")
+	return nil
 }

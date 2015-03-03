@@ -49,11 +49,19 @@ type InventoryGroup struct {
 	ProviderId int64 // factory person id.
 	OperatorId int64 // user id.
 
+	// some statistics for view only, add these fields to db.
+	ProductCount  int
+	TotalQuantity int
+
 	// copied from Inventory
 	SendTime    time.Time // 发货时间
 	ReceiveTime time.Time // 收到货的时间
 	CreateTime  time.Time
 	UpdateTime  time.Time
+
+	// extended:
+	Provider *Person // factory
+	Operator *User   // operator
 }
 
 // parameter here is useless, change this into empty parameter methods;

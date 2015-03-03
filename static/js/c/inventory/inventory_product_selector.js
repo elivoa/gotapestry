@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Thursday, 2015-01-29 16:42:46>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Tuesday, 2015-03-03 17:20:49>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){
@@ -262,10 +262,13 @@ function $InventoryProductSelector(app, $master){
       }
     };
 
-    // blur and keyup
+    // when blur or keyup
     $scope.setStock = function(color, size, $event){
       var intstock = parseInt($event.target.value);
       intstock = isNaN(intstock)? 0 : intstock;
+      if($scope.stocks[color] == undefined){
+        $scope.stocks[color] = {};
+      }
       $scope.stocks[color][size] = intstock;
     };
 
@@ -305,6 +308,7 @@ function $InventoryProductSelector(app, $master){
     // click edit on operator column
     $scope.onEdit = function(invId){
       // call with invmodel to retireve Note and stock back;
+      console.log(">> ", invId, $scope.InventoryMap[invId]);
       $scope.refreshCST(invId, $scope.InventoryMap[invId]);
     };
 

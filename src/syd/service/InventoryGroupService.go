@@ -100,13 +100,32 @@ func (s *InventoryGroupService) List(parser *db.QueryParser, withs Withs) ([]*mo
 		// 		return nil, err
 		// 	}
 		// }
-		// if withs&WITH_PERSON > 0 {
-		// 	if err := s.FillWithPersons(inventories); err != nil {
-		// 		return nil, err
-		// 	}
-		// }
+		if withs&WITH_PERSON > 0 {
+			if err := s.FillWithPersons(igs); err != nil {
+				return nil, err
+			}
+		}
 		return igs, nil
 	}
+}
+
+func (s *InventoryGroupService) FillWithPersons(models []*model.InventoryGroup) error {
+	var idset = map[int64]bool{}
+	for _, m := range models {
+		idset[m.ProviderId] = true
+	}
+	personmap, err := Person.BatchFetchPersonByIdMap(idset)
+	if err != nil {
+		return err
+	}
+	if nil != personmap {
+		for _, m := range models {
+			if provider, ok := personmap[m.ProviderId]; ok {
+				m.Provider = provider
+			}
+		}
+	}
+	return nil
 }
 
 // If InvemtoryGroup has GroupId property, Update, else Create one.

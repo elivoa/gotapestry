@@ -1,10 +1,12 @@
-// Time-stamp: <[InventoryIndex.go] Elivoa @ Friday, 2015-01-16 23:58:56>
+// Time-stamp: <[InventoryIndex.go] Elivoa @ Tuesday, 2015-03-03 11:09:22>
 package inventory
 
 import (
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/db"
 	"strings"
+	"syd/base/inventory"
 	"syd/model"
 	"syd/service"
 )
@@ -52,6 +54,7 @@ func (p *InventoryIndex) SetupRender() {
 		// parser.And("status", p.Tab)
 	}
 	// parser.Or("type", model.Wholesale, model.ShippingInstead) // restrict type
+	parser.OrderBy(inventory.FSendTime, db.DESC)
 
 	// get total
 	p.Total, err = parser.Count()
@@ -61,7 +64,7 @@ func (p *InventoryIndex) SetupRender() {
 
 	// 2. get order list.
 	parser.Limit(p.Current, p.PageItems) // pager
-	p.InventoryGroups, err = service.InventoryGroup.List(parser, 0)
+	p.InventoryGroups, err = service.InventoryGroup.List(parser, service.WITH_PERSON)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -16,6 +16,8 @@
             <th align="left">ID</th>
             <th align="left">发货日期</th>
             <th align="left">厂家</th>
+            <th align="left">种类</th>
+            <th align="left">件数</th>
             <!-- <th align="left">状态</th> -->
             <th align="left">备注</th>
             <th align="left">Operator</th>
@@ -29,11 +31,18 @@
                 {{.SendTime | date}}
               </td>
               <td nowrap>
-                黄楚辉
+                <if t=".Provider">
+                  <a href="####">{{.Provider.Name}}</a>
+                  <else>
+                    <a href="##" style="color:gray">未知ID {{.ProviderId}}</a>
+                  </else>
+                </if>
               </td>
               
               <!-- <td>{{.Status}}</td> -->
               <!-- <td>{{.Type}}</td> -->
+              <td>3种(TODO)</td>
+              <td>390件</td>
               <td title="{{.Note}}">{{.Note | truncate 40 "..."}}</td>
 
               <!--
@@ -45,7 +54,10 @@
                   -->
 
               <td>Bo Gao</td>
-              <td><t:a page="inventory/edit" context="{{print .Id}}" label="Edit"></t:a></td>
+              <td>
+                <t:a page="inventory/edit" context="{{print .Id}}" label="Edit"></t:a> |
+                <span style="color: brown">DEL(TODO)</span>
+              </td>
               
             </tr>
           </range>
@@ -58,11 +70,11 @@
     <!-- <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script> -->
     
     <!-- <script type="text/javascript"> -->
-  <!--              // var a = { {.InventoriesJson} } -->
-  <!--              p_InventoryGroupList({ -->
-                                           <!--                // Product: { {.InventoryGroup} }, -->
-                                           <!--              }); -->
-  <!-- </script> -->
+                 <!--              // var a = { {.InventoriesJson} } -->
+                 <!--              p_InventoryGroupList({ -->
+                                                          <!--                // Product: { {.InventoryGroup} }, -->
+                                                          <!--              }); -->
+                 <!-- </script> -->
 
 
   </body>

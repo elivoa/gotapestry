@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Friday, 2015-01-30 13:07:52>
+// Time-stamp: <[product_list.js] Elivoa @ Sunday, 2015-02-01 16:29:04>
 
 function p_ProductList($master){
 
@@ -33,8 +33,63 @@ function p_ProductList($master){
     // init products.
     $scope.Products = $master.Products;
 
+    $scope.StockDescription = function(product){
+      var str = [];
+      if(product.Colors!=undefined){
+        for(i=0;i<product.Colors.length;i++){
+          if(product.Sizes!=undefined){
+            for(j=0;j<product.Sizes.length;j++){
+              var color = product.Colors[i];
+              var size = product.Sizes[j];
+              var has = false;
+              // console.log(product);
+              if(product.Stocks!=undefined){
+                var sizes = product.Stocks[color];
+                if(sizes!=undefined){
+                  var stock = sizes[size];
+                  str.push(stock);
+                  has=true;
+                }
+              }
+              if(!has){
+                str.push("n/a");
+              }
+              str.push(" - ");
+              str.push(color);
+              str.push("/");
+              str.push(size);
+              str.push("\n");
+            }
+          }
+        }
+      }
+      return str.join("");
+    };
 
-    
+    $scope.SpecDescription = function(product){
+      var str = [];
+      if(product.Colors!=undefined){
+        for(i=0;i<product.Colors.length;i++){
+          var color = product.Colors[i];
+          if(i>0){
+            str.push(" / ");
+          }
+          str.push(color);
+        }
+        str.push(' | ');
+        if(product.Sizes!=undefined){
+          for(j=0;j<product.Sizes.length;j++){
+            var size = product.Sizes[j];
+            if(j>0){
+              str.push(" / ");
+            }
+            str.push(size);
+          }
+        }
+      }
+      return str.join("");
+    };
+
     // // calculate the sum of stocks from Stocks structure.
     // $scope.calculateSumStocks = function(stocks){
     //   var sumStock = 0;

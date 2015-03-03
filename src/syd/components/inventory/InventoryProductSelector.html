@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Thursday, 2015-01-29 16:44:47> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Tuesday, 2015-03-03 15:40:32> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -59,7 +59,7 @@
                         <!-- Here value not refresh automatically, how to update this? -->
                         <input type="number" size="4" name="Stocks" autocomplete="off"
                                style="width:46px;text-align:right"
-                               value="stock(color, size)"
+                               value="[[stock(color, size)]]"
                                ng-keyup="setStock(color,size,$event)"
                                ng-blur="setStock(color,size,$event)" />
                       </td>
@@ -186,7 +186,6 @@
         <td>
           <a ng-click="onEdit(inv.ProductId)" href="javascript:void(0)">EDIT</a> | 
           <a ng-click="onDelete(inv.ProductId)" href="javascript:void(0)">DELETE</a>
-          
         </td>
       </tr>
       
