@@ -98,7 +98,12 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	}
 	p.InventoryGroup.Inventories = invs
 
-	p.InventoryGroup.ReceiveTime = p.InventoryGroup.SendTime.AddDate(0, 0, 2)
+	if p.GroupId == nil { // if create
+		// Auto add 2 days to ReceiveTime.
+		p.InventoryGroup.ReceiveTime = p.InventoryGroup.SendTime.AddDate(0, 0, 2)
+	} else { // if edit
+		// TODO...
+	}
 
 	nig, err := service.InventoryGroup.SaveInventoryGroupByNGLIST(p.InventoryGroup)
 	if err != nil {

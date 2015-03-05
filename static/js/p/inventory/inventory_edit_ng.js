@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Tuesday, 2015-01-27 22:32:54>
+// Time-stamp: <[inventory_edit_ng.js] Elivoa @ Tuesday, 2015-03-03 22:09:14>
 
 // Development Notes:
 // Treat all sub components as one html page, use component just split them.
@@ -88,7 +88,8 @@ function p_InventoryEdit($master){
     // console.log("parseGoDate($scope.InventoryGroup.SendTime): ", parseGoDate($scope.InventoryGroup.SendTime))
     // change it.
     $scope.InventoryGroup.SendTime = parseGoDate($scope.InventoryGroup.SendTime);
-    $scope.ReceiveTime =  new Date();
+    $scope.InventoryGroup.ReceiveTime = parseGoDate($scope.InventoryGroup.ReceiveTime);
+    // TODO how to add date by one day using javascript;
 
     // Submit my
     $scope.submit = function(form) {

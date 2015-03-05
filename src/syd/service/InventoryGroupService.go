@@ -175,15 +175,16 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		createGroup = []*model.Inventory{}
 		updateGroup = []*model.Inventory{}
 		deleteGroup = []*model.Inventory{}
-		oldStocks   = map[int64]int{}
+		oldStocks   = map[int64]int{} // invId->stock
 	)
 
-	// load existing inventories
+	// load existing inventories. invs is inventories in db.
 	invs, e := inventorydao.List(db.NewQueryParser().Where(inventory.FGroupId, ig.Id))
 	if e != nil {
 		return nil, e
 	}
 	if invs == nil || len(invs) == 0 {
+		// DB中无信息，全部存入createGroup！
 		// createGroup = invs // 格式不对怎办？ 这里有问题，使用Clone方法；
 		for _, i := range ig.Inventories {
 			if nil != i.Stocks {
@@ -201,13 +202,15 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	} else {
 		var deleteWhoIsFalse = make([]bool, len(invs))
 		if ig.Inventories != nil {
-			for _, inv := range ig.Inventories { // 1 level loop: inv, color, size, stock
+
+			// Loop Level 1: inv, color, size, stock
+			for _, inv := range ig.Inventories {
 				if nil != inv && inv.Stocks != nil {
 					for color, sizemap := range inv.Stocks {
 						if sizemap != nil {
 							for size, stock := range sizemap {
 
-								// level 2 loop
+								// Loop Level 2: inv2 is inventory in db.
 								var find = false
 								for idx2, inv2 := range invs {
 
@@ -216,14 +219,25 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 										inv2.Color == color && inv2.Size == size {
 
 										// assign database's matched id to post inv.
-										inv.Id = inv2.Id
+										currentSubInv := _cloneInentory(inv, color, size, stock)
+										currentSubInv.Id = inv2.Id
 
-										// if any values changes, or if quantity chagne to 0, delete it.
-										if stock != inv2.Stock || inv2.Price != inv.Price ||
-											inv2.Note != inv.Note {
+										// fmt.Println("==== ", color, size, ">", currentSubInv.Stock)
+										// fmt.Println("\t new: ", stock, currentSubInv.Price, currentSubInv.Note)
+										// fmt.Println("\t old: ", inv2.Stock, inv2.Price, inv2.Note)
+										// fmt.Println("\t 1", stock != inv2.Stock)
+										// fmt.Println("\t 2", inv2.Price != currentSubInv.Price)
+										// fmt.Println("\t 3", inv2.Note != currentSubInv.Note)
+
+										// if any values changes(sotck, price or note),
+										// or if quantity/stock chagne to 0, delete it.
+										if stock != inv2.Stock || inv2.Price != currentSubInv.Price ||
+											inv2.Note != currentSubInv.Note {
+											fmt.Println("====<< mark update")
+											//这里会有bug，导致丢失。修改信息；
 											if stock > 0 {
-												updateGroup = append(updateGroup, inv)
-												oldStocks[inv.ProductId] = inv.Stock
+												updateGroup = append(updateGroup, currentSubInv)
+												oldStocks[currentSubInv.Id] = inv2.Stock
 											}
 										}
 										find = true
@@ -251,7 +265,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			if !b {
 				inv := invs[idx]
 				deleteGroup = append(deleteGroup, inv)
-				oldStocks[inv.ProductId] = inv.Stock // cache old values
+				oldStocks[inv.Id] = inv.Stock // cache old values
 			}
 		}
 	}
@@ -268,6 +282,16 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			fmt.Println("\torder details: ", inv.Id, inv.Color, inv.Size, " = ", inv.Stock, inv.Price)
 		}
 	}
+	// debug upgrade group::
+	// fmt.Println(">>>> ig.Inventories> upgrade groups: ")
+	// if updateGroup != nil {
+	// 	for _, d := range updateGroup {
+	// 		fmt.Println("\tig.inventories: ", d)
+	// 		fmt.Println("\t\t old stock: ", oldStocks[d.ProductId])
+	// 		fmt.Println("\t\t new stock: ", d.Stock)
+	// 		//d, d.Color, d.Size, " = ", d.Quantity, d.SellingPrice
+	// 	}
+	// }
 	// fmt.Println(">>>> who is false?")
 	// for idx, b := range deleteWhoIsFalse {
 	// 	fmt.Println("\t >> who is false: ", idx, b)
@@ -285,14 +309,22 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock)
 		}
 	}
+
+	fmt.Println(">>>> ig.Inventories> upgrade groups: ") // print debug info.
 	if updateGroup != nil {
 		for _, inv := range updateGroup {
+
+			// print debug information:
+			// fmt.Println("\tig.inventories: ", inv)
+			// fmt.Println("\t\t old stock: ", oldStocks[inv.Id])
+			// fmt.Println("\t\t new stock: ", inv.Stock)
+
 			// update
 			if _, err := inventorydao.Update(inv); err != nil {
 				return nil, err
 			}
 			// increase stock = leftstock - inv.Stock// TODO... ehrererere
-			oldstock := oldStocks[inv.ProductId]
+			oldstock := oldStocks[inv.Id]
 			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock-oldstock)
 		}
 	}
@@ -303,7 +335,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 				return nil, err
 			}
 			// decrease the stocks;
-			oldstock := oldStocks[inv.ProductId]
+			oldstock := oldStocks[inv.Id]
 			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, -oldstock)
 		}
 	}
