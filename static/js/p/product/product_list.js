@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Sunday, 2015-02-01 16:29:04>
+// Time-stamp: <[product_list.js] Elivoa @ Thursday, 2015-03-05 15:02:54>
 
 function p_ProductList($master){
 
@@ -32,6 +32,7 @@ function p_ProductList($master){
 
     // init products.
     $scope.Products = $master.Products;
+    $scope.showall = $master.ShowAll;
 
     $scope.StockDescription = function(product){
       var str = [];

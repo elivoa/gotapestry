@@ -194,8 +194,6 @@ func FillProductStocksByIdSet(models []*model.Product) error {
 			for _, m := range models {
 				if stock, ok := allstocks[int64(m.Id)]; ok {
 					m.Stocks = stock
-					fmt.Println("\n\n9999999999999")
-					fmt.Println("____", stock.Total())
 					m.Stock = stock.Total()
 				}
 			}

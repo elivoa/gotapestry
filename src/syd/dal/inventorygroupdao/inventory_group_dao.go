@@ -2,7 +2,6 @@ package inventorygroupdao
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
@@ -111,8 +110,6 @@ func Create(m *model.InventoryGroup) (*model.InventoryGroup, error) {
 }
 
 func Update(m *model.InventoryGroup) (int64, error) {
-	fmt.Println(" 9999999999999999999999999999999 ")
-	fmt.Println("providerid is : ", m.ProviderId)
 	res, err := em.Update().Exec(
 		m.Status, m.Type, m.Note, m.ProviderId, m.OperatorId, m.SendTime, m.ReceiveTime, m.CreateTime,
 		m.Id,

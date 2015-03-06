@@ -5,6 +5,7 @@ import (
 	"github.com/elivoa/got/db"
 	"path/filepath"
 	"strings"
+	"syd/base/product"
 	"syd/dal/inventorydao"
 	"syd/dal/productdao"
 	"syd/model"
@@ -82,6 +83,16 @@ func (s *ProductService) DeleteProduct(id int) (affacted int64, err error) {
 		return -1, err
 	} else {
 		suggest.Delete(suggest.Product, id)
+		return
+	}
+}
+
+func (s *ProductService) ChangeStatus(id int, status product.Status) (affacted int64, err error) {
+	if affacted, err = productdao.ChangeStatus(id, status); err != nil {
+		return -1, err
+	} else {
+		// TODO affact suggest ???? should change status's status.
+		// suggest.Delete(suggest.Product, id)
 		return
 	}
 }

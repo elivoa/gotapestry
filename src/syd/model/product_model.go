@@ -3,14 +3,16 @@ package model
 import (
 	"fmt"
 	"strings"
+	"syd/base/product"
 	"time"
 )
 
 // TODO Design:model, how to split model data and fields.
 type Product struct {
-	Id           int    // id
-	Name         string // product name
-	ProductId    string // 传说中的货号
+	Id           int            // id
+	Name         string         // product name
+	ProductId    string         // 传说中的货号
+	Status       product.Status //
 	Brand        string
 	Price        float64
 	Supplier     int

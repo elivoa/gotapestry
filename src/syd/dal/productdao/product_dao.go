@@ -3,16 +3,18 @@ package productdao
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"syd/base/product"
 	"syd/model"
 )
 
 var logdebug = true
 var core_fields = []string{
-	"name", "productId", "brand", "price", "supplier", "factoryPrice",
+	"name", "productId", "status", "brand", "price", "supplier", "factoryPrice",
 	"stock", "shelfno", "capital", "note", "pictures", "createtime",
 }
 var em = &db.Entity{
@@ -40,7 +42,7 @@ func _one(query *db.QueryParser) (*model.Product, error) {
 	err := query.Query(
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
-				&m.Id, &m.Name, &m.ProductId, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
+				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
 				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
 			)
 		},
@@ -60,7 +62,7 @@ func _list(query *db.QueryParser) ([]*model.Product, error) {
 		func(rows *sql.Rows) (bool, error) {
 			m := &model.Product{}
 			err := rows.Scan(
-				&m.Id, &m.Name, &m.ProductId, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
+				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
 				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
 			)
 			models = append(models, m)
@@ -104,7 +106,7 @@ func List(parser *db.QueryParser) ([]*model.Product, error) {
 //
 func Create(product *model.Product) (*model.Product, error) {
 	res, err := em.Insert().Exec(
-		product.Name, product.ProductId, product.Brand, product.Price, product.Supplier,
+		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
 		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
 		product.Note, product.Pictures, product.CreateTime,
 	)
@@ -122,7 +124,7 @@ func UpdateProduct(product *model.Product) (int64, error) {
 	}
 	// update order
 	res, err := em.Update().Exec(
-		product.Name, product.ProductId, product.Brand, product.Price, product.Supplier,
+		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
 		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
 		product.Note, product.Pictures, product.CreateTime,
 		product.Id,
@@ -142,6 +144,29 @@ func Delete(id int) (int64, error) {
 		return 0, err
 	}
 	return res.RowsAffected()
+}
+
+// update stock with delta.
+func ChangeStatus(productId int, status product.Status) (affacted int64, err error) {
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	if conn, err = db.Connect(); err != nil {
+		return
+	}
+	defer conn.Close()
+
+	var _sql = fmt.Sprintf("update product p set p.status = ? where p.id = ? limit 1")
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	// 3. execute
+	_, err = stmt.Exec(status, productId)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func ListProductsByIdSet(ids ...int64) (map[int64]*model.Product, error) {

@@ -57,9 +57,11 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 			"Create Order", order.TrackNumber)
 
 		// update stocks
-		for _, od := range order.Details {
-			Stock.UpdateStockDelta(int64(od.ProductId), od.Color, od.Size, -od.Quantity)
-		}
+		_reduceProductStocks(order.Details)
+
+		// for _, od := range order.Details {
+		// 	Stock.UpdateStockDelta(int64(od.ProductId), od.Color, od.Size, -od.Quantity)
+		// }
 
 	}
 	return order, nil
@@ -227,8 +229,31 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 	if needUpdateBallance {
 		Account.UpdateAccountBalance(order.CustomerId, -order.SumOrderPrice(),
 			"Create Order", order.TrackNumber)
+
+		// last step: update stocks. 修改累计欠款的时候就修改库存；
+		_reduceProductStocks(order.Details)
+
 	}
+
 	return order, nil
+}
+
+// 订单中剪掉库存数量；
+func _reduceProductStocks(orderDetails []*model.OrderDetail) error {
+	if nil == orderDetails || len(orderDetails) == 0 {
+		return nil
+	}
+	fmt.Println("\n\n========== reduce product stocks")
+	for _, detail := range orderDetails {
+		if detail == nil {
+			continue
+		}
+		err := Stock.UpdateStockDelta((int64)(detail.ProductId), detail.Color, detail.Size, -detail.Quantity)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Make sure order tracking number not conflict, by checking if tn exists,

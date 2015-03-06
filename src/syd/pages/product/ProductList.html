@@ -16,7 +16,7 @@
         <div class="tab_s clearfix">
           <a  ng-repeat="tab in tabs track by $index"
               class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
-              href="/product/list/[[tab]]">
+              href="/product/list/[[tab]]?showall=[[showall]]">
             [[tab]]
           </a>
         </div>
@@ -39,12 +39,14 @@
               </td>
             </tr>
             
-            <tr ng-repeat="p in Products">
+            <tr ng-repeat="p in Products" ng-if="p.Status!=1 || showall">
               <td nowrap>
                 <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
               </td>
               <td nowrap>
                 <a href="/product/detail/[[p.Id]]">[[p.Name]]</a>
+                <!-- TODO: chagne this into string name; -->
+                <span style="color:#ddd" ng-if="p.Status==1">[隐藏]</span>
               </td>
               <td align="right">
                 <span class="price">[[p.Price]]</span> <!-- PrettyCurrency filter -->
@@ -56,22 +58,26 @@
                 [[SpecDescription(p)]]
               </td>
               <td nowrap>
-                <a href="/product/edit/[[p.Id]]">修改商品</a><span class="vline">|</span>
+                <a href="/product/edit/[[p.Id]]">修改商品</a>
+                <!-- 隐藏和显示 --> <span class="vline">|</span>
+                <a ng-if="p.Status!=1"
+                   href="/product/list:hide/[[p.Id]]?referer={{referer $}}"
+                   onclick="return confirm('确认隐藏?')">
+                  隐藏
+                </a>
+                <a ng-if="p.Status==1"
+                   href="/product/list:show/[[p.Id]]?referer={{referer $}}"
+                   onclick="return confirm('确认显示?')">
+                  显示
+                </a>
+                <!-- 删除 --> <span class="vline">|</span>
                 {{/* This will be generated */}}
-                <a href="/product/list:delete/[[p.Id]]?source={ {$.Source}}"
+                <a href="/product/list:delete/[[p.Id]]?referer={{referer $}}"
                    onclick="return confirm('确认删除?')">删除</a>
               </td>
             </tr>
             
           </table>
-
-
-          <!--    S / M / L<span class="vline">|</span>
-                  S / M / <span title="  " class="B_sold_out">L</span> / XL
-                  <span class="vline">|</span>   S / M / L / XL -->
-
-
-          <!-- < t:product.list products=".Products" source="(print `/product/list/` .Capital)" /> -->
           
           <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><A href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 
@@ -87,9 +93,10 @@
 
 <script type="text/javascript">
 
-//
+           //
 p_ProductList({
   Products: {{.Products .Capital}},
+  ShowAll: {{.ShowAll}},
   //  Factories : { {.Factories}}, // factories option
 });
 
