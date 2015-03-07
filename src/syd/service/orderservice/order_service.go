@@ -329,24 +329,31 @@ func LeavingMessage(bigOrder *model.Order) string {
 	// shipping. sum multi
 	switch bigOrder.DeliveryMethod {
 	case "SF":
-		msg.WriteString("顺风运费")
+		msg.WriteString("顺风")
 	case "YTO":
-		msg.WriteString("圆通运费")
+		msg.WriteString("圆通")
 	case "Depoon":
 		msg.WriteString("德邦物流")
 	case "Freight":
-		msg.WriteString("货运物流")
+		msg.WriteString("货运")
+	case "TakeAway":
+		msg.WriteString("自提")
 	default:
-		msg.WriteString("【" + bigOrder.DeliveryMethod + "】 运费")
+		msg.WriteString("【" + bigOrder.DeliveryMethod + "】")
 	}
 
-	if bigOrder.ExpressFee > 0 {
+	if bigOrder.DeliveryMethod != "TakeAway" {
+		msg.WriteString("，运费")
 		msg.WriteString(fmt.Sprint(bigOrder.ExpressFee))
-		msg.WriteString("元；")
+		msg.WriteString("元，")
+		msg.WriteString("单号")
+		if bigOrder.DeliveryTrackingNumber != "" {
+			msg.WriteString(bigOrder.DeliveryTrackingNumber)
+		} else {
+			msg.WriteString("无")
+		}
 	}
-	msg.WriteString("单号")
-	msg.WriteString(bigOrder.DeliveryTrackingNumber)
-	// msg.WriteString("; ")
+	msg.WriteString("；")
 
 	// 总计
 	msg.WriteString("总计")
