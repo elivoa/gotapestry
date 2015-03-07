@@ -125,7 +125,7 @@ func (p *ShippingInstead) OnPrepareForSubmit() {
 // After post data is injected, override to p.Order. Thus p.Order here
 // is full and ready to persist.
 func (p *ShippingInstead) OnSuccess() (string, string) {
-	if _, err := service.Order.CreateOrder(p.Order); err != nil {
+	if _, err := service.Order.UpdateOrder(p.Order); err != nil {
 		panic(err)
 	}
 	return "redirect", p.ThisPage()
