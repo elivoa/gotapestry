@@ -88,3 +88,22 @@ func NewInventoryGroup(invs []*Inventory) *InventoryGroup {
 		UpdateTime:  first.UpdateTime,
 	}
 }
+
+// ----------------------------------------------------------------------------------------------------
+// Inventory Change log
+//
+
+// InventoryTrackItem Stores all stock changes into database, used when track error.
+type InventoryTrackItem struct {
+	Id            int64
+	ProductId     int64
+	Color         string
+	Size          string
+	StockChagneTo int
+	OldStock      int
+	Delta         int
+	UserId        int64
+	Reason        string
+	Context       string
+	Time          time.Time
+}

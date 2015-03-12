@@ -1,12 +1,13 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[InventoryEdit.html] Elivoa @ Tuesday, 2015-03-03 22:07:24>
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Monday, 2015-03-09 12:56:59>
     NG-enabled;
   -->
 <html ng-app="syd">
   <head>
     <link href="/static/css/pages/pg_inventory_edit.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="新增入库" />
+    <t:layout.header title="新增入库" ng="true"/>
+    <script src="/static/js/p/inventory/inventory_edit_ng.js" ></script>
   </head>
 
   <body ng-controller="InventoryEditCtrl" class="PG_edit_inventory">
@@ -78,9 +79,6 @@
         
       </div>
     </div>
-    <script src="/static/js/angular.min.js" ></script>
-    <script src="/static/js/angular.init.js" ></script>
-    <script src="/static/js/p/inventory/inventory_edit_ng.js" ></script>
   </body>
 </html>
 

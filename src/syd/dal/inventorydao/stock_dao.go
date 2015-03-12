@@ -135,6 +135,36 @@ func ListProductStocks(productId int) map[string]int {
 	return stocks
 }
 
+func GetProductStocks(productId int64, color, size string) (int, error) {
+	var err error
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
+
+	// 1. query
+	var queryString = "select `stock` from `product_sku` where product_id = ? and color=? and size=? "
+
+	// 2. prepare
+	stmt, err := conn.Prepare(queryString)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	// 3. query
+	rows, err := stmt.Query(productId, color, size)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// 4. process results.
+	var stock int = 0
+	if rows.Next() {
+		rows.Scan(&stock)
+	}
+	return stock, nil
+}
+
 /*_______________________________________________________________________________
   Fill order Lists.
 */

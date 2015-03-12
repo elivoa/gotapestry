@@ -1,7 +1,9 @@
 package inventory
 
 import (
+	"fmt"
 	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route/exit"
 	"syd/model"
 )
 
@@ -23,23 +25,18 @@ func (p *InventoryGroupList) SetupRender() {
 	}
 }
 
-// func (p *InventoryGroupList) ShowProduct(r *model.Inventory) string {
-// 	if nil != r.Product {
-// 		return r.Product.Name
-// 	} else {
-// 		return strconv.FormatInt(r.ProductId, 10)
-// 	}
-// }
-
 // ________________________________________________________________________________
 // Events
 //
-// func (p *InventoryGroupList) Ondelete(id int64, tab string) interface{} {
-// 	if _, err := service.Inventory.DeleteInventory(id); err != nil {
-// 		panic(err)
-// 	}
-// 	return exit.RedirectFirstValid(p.Referer, "/inventory")
-// }
+func (p *InventoryGroupList) OnDelete(id int64) *exit.Exit {
+	fmt.Printf("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk\n TODO: delete id , %d\n", id)
+	// TODO delete inventories
+	// TODO delete inventory groups.
+	// if _, err := service.Inventory.DeleteInventory(id); err != nil {
+	// 	panic(err)				//
+	// }							//
+	return exit.RedirectFirstValid(p.Referer, "/inventory")
+}
 
 // func (p *InventoryList) OnMarkInUse(id int64) interface{} {
 // 	token := service.User.GetLogin(p.W, p.R)

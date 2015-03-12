@@ -26,5 +26,6 @@ var (
 	Product        = new(ProductService)
 	Inventory      = new(InventoryService)      // 入库
 	InventoryGroup = new(InventoryGroupService) // 入库组
+	InventoryTrack = new(InventoryTrackService) // Inventory Track
 	Stock          = new(StockService)          // 库存数量
 )

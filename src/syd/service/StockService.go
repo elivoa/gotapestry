@@ -11,10 +11,25 @@ type StockService struct {
 	stockLock sync.Mutex
 }
 
-// TODO batch this;
-func (s *StockService) UpdateStockDelta(productId int64, color, size string, stockDelta int) error {
+// TODO Batch this
+// return old stock and new stock;
+func (s *StockService) UpdateStockDelta(productId int64, color, size string, stockDelta int) (
+	oldStock int, newStock int, err error) {
 	// TODO lock
 	s.stockLock.Lock()
 	defer s.stockLock.Unlock()
-	return inventorydao.UpdateProductStockWithDelta(productId, color, size, stockDelta)
+	// get old stock
+	if oldStock, err = inventorydao.GetProductStocks(productId, color, size); err != nil {
+		return
+	}
+
+	// modify stock
+	if err = inventorydao.UpdateProductStockWithDelta(productId, color, size, stockDelta); err != nil {
+		return
+	}
+	// get new stock
+	if newStock, err = inventorydao.GetProductStocks(productId, color, size); err != nil {
+		return
+	}
+	return
 }

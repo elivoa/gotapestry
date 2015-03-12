@@ -13,6 +13,8 @@ type Header struct {
 	core.Component
 	Title  string
 	Public bool
+
+	Ng string // enable angularjs libraries.
 }
 
 func (c *Header) Setup() {
@@ -22,17 +24,4 @@ func (c *Header) Setup() {
 		fmt.Println("********************************************************************************")
 		service.User.RequireRole(c.W, c.R, "admin") // TODO remove w, r. use service injection.
 	}
-}
-
-// ________________________________________________________________________________
-type LeftNav struct {
-	core.Component
-	CurPage string
-}
-
-func (c *LeftNav) Style(page string) string {
-	if page == c.CurPage {
-		return "cur"
-	}
-	return ""
 }

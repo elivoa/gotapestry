@@ -248,7 +248,9 @@ func _reduceProductStocks(orderDetails []*model.OrderDetail) error {
 		if detail == nil {
 			continue
 		}
-		err := Stock.UpdateStockDelta((int64)(detail.ProductId), detail.Color, detail.Size, -detail.Quantity)
+		// Log oldStock? newStock?
+		_, _, err := Stock.UpdateStockDelta(
+			(int64)(detail.ProductId), detail.Color, detail.Size, -detail.Quantity)
 		if err != nil {
 			return err
 		}

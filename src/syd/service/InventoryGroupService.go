@@ -222,18 +222,10 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 										currentSubInv := _cloneInentory(inv, color, size, stock)
 										currentSubInv.Id = inv2.Id
 
-										// fmt.Println("==== ", color, size, ">", currentSubInv.Stock)
-										// fmt.Println("\t new: ", stock, currentSubInv.Price, currentSubInv.Note)
-										// fmt.Println("\t old: ", inv2.Stock, inv2.Price, inv2.Note)
-										// fmt.Println("\t 1", stock != inv2.Stock)
-										// fmt.Println("\t 2", inv2.Price != currentSubInv.Price)
-										// fmt.Println("\t 3", inv2.Note != currentSubInv.Note)
-
 										// if any values changes(sotck, price or note),
 										// or if quantity/stock chagne to 0, delete it.
 										if stock != inv2.Stock || inv2.Price != currentSubInv.Price ||
 											inv2.Note != currentSubInv.Note {
-											fmt.Println("====<< mark update")
 											//这里会有bug，导致丢失。修改信息；
 											if stock > 0 {
 												updateGroup = append(updateGroup, currentSubInv)
@@ -271,17 +263,17 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	}
 
 	// --------------------------------------------------------------------------------
-	fmt.Println(">>>> ig.Inventories and db invs:")
+	// fmt.Println(">>>> ig.Inventories and db invs:")
 	// if nil != ig.Inventories {
 	// 	for _, inv := range ig.Inventories {
 	// 		fmt.Println("\tig.inventories: ", inv, d.Color, d.Size, " = ", d.Quantity, d.SellingPrice)
 	// 	}
 	// }
-	if nil != invs {
-		for _, inv := range invs {
-			fmt.Println("\torder details: ", inv.Id, inv.Color, inv.Size, " = ", inv.Stock, inv.Price)
-		}
-	}
+	// if nil != invs {
+	// 	for _, inv := range invs {
+	// 		fmt.Println("\torder details: ", inv.Id, inv.Color, inv.Size, " = ", inv.Stock, inv.Price)
+	// 	}
+	// }
 	// debug upgrade group::
 	// fmt.Println(">>>> ig.Inventories> upgrade groups: ")
 	// if updateGroup != nil {
@@ -306,7 +298,27 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 				return nil, err
 			}
 			// increase left stock.
-			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock)
+			if oldStock, newStock, err := Stock.UpdateStockDelta(
+				inv.ProductId, inv.Color, inv.Size, inv.Stock); err != nil {
+				return nil, err
+			} else {
+				// TODO create new Track method to create track.
+				if _, err := InventoryTrack.Create(
+					&model.InventoryTrackItem{
+						ProductId:     inv.ProductId,
+						Color:         inv.Color,
+						Size:          inv.Size,
+						StockChagneTo: newStock,  // unknown
+						OldStock:      oldStock,  // unknown
+						Delta:         inv.Stock, // delta is not calculated.
+						UserId:        0,         // TODO
+						Reason:        "新增入库",
+						Context:       fmt.Sprint(ig.Id),
+					},
+				); err != nil {
+					return nil, err
+				}
+			}
 		}
 	}
 
@@ -325,7 +337,29 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			}
 			// increase stock = leftstock - inv.Stock// TODO... ehrererere
 			oldstock := oldStocks[inv.Id]
-			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, inv.Stock-oldstock)
+			delta := inv.Stock - oldstock
+			// modify left stock
+			if oldStock, newStock, err := Stock.UpdateStockDelta(
+				inv.ProductId, inv.Color, inv.Size, delta); err != nil {
+				return nil, err
+			} else {
+				// TODO create new Track method to create track.
+				if _, err := InventoryTrack.Create(
+					&model.InventoryTrackItem{
+						ProductId:     inv.ProductId,
+						Color:         inv.Color,
+						Size:          inv.Size,
+						StockChagneTo: newStock, // unknown
+						OldStock:      oldStock, // unknown
+						Delta:         delta,    // delta is not calculated.
+						UserId:        0,        // TODO
+						Reason:        "修改入库",
+						Context:       fmt.Sprint(ig.Id),
+					},
+				); err != nil {
+					return nil, err
+				}
+			}
 		}
 	}
 	if deleteGroup != nil {
@@ -336,7 +370,30 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			}
 			// decrease the stocks;
 			oldstock := oldStocks[inv.Id]
-			Stock.UpdateStockDelta(inv.ProductId, inv.Color, inv.Size, -oldstock)
+
+			// modify left stock
+			if oldStock, newStock, err := Stock.UpdateStockDelta(
+				inv.ProductId, inv.Color, inv.Size, -oldstock); err != nil {
+				return nil, err
+			} else {
+				// TODO create new Track method to create track.
+				if _, err := InventoryTrack.Create(
+					&model.InventoryTrackItem{
+						ProductId:     inv.ProductId,
+						Color:         inv.Color,
+						Size:          inv.Size,
+						StockChagneTo: newStock,  // unknown
+						OldStock:      oldStock,  // unknown
+						Delta:         -oldstock, // delta is not calculated.
+						UserId:        0,         // TODO
+						Reason:        "删除入库",
+						Context:       fmt.Sprint(ig.Id),
+					},
+				); err != nil {
+					return nil, err
+				}
+			}
+
 		}
 	}
 

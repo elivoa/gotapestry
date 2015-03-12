@@ -2,7 +2,10 @@
 <html ng-app="syd">
   <head>
     <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="商品列表" />
+
+    <t:layout.header title="商品列表" deps="ng TODO" ng="true"/>
+
+    <script src="/static/js/p/product/product_list.js" ></script>
   </head>
   
   <body ng-controller="ProductListCtrl" class="PG_list_product">
@@ -25,11 +28,11 @@
 
           <table class="tbl_main">
             <tr>
-              <th align="left">货号</th>
-              <th align="left">商品名称</th>
+              <th align="left" style="width:10px;">货号</th>
+              <th align="left" style="width:150px;">商品名称</th>
               <th align="right">销售单价</th>
               <th align="right">库存</th>
-              <th align="left">产品规格</th>
+              <th align="left" style="width:150px;">产品规格</th>
               <th align="left">操作</th>
             </tr>
 
@@ -51,10 +54,10 @@
               <td align="right">
                 <span class="price">[[p.Price]]</span> <!-- PrettyCurrency filter -->
               </td>
-              <td title="[[StockDescription(p)]]">
+              <td title="[[StockDescription(p)]]" style="text-align:right">
                 <span class="inventory">[[p.Stock]]</span>
               </td>
-              <td nowrap style="color:#a1a1a1">
+              <td nowrap style="color:#a1a1a1;min-width:120px;max-width:200px;">
                 [[SpecDescription(p)]]
               </td>
               <td nowrap>
@@ -85,15 +88,12 @@
         
       </div>
     </div>
-    <script src="/static/js/angular.min.js" ></script>
-    <script src="/static/js/angular.init.js" ></script>
-    <script src="/static/js/p/product/product_list.js" ></script>
   </body>
 </html>
 
 <script type="text/javascript">
 
-           //
+//
 p_ProductList({
   Products: {{.Products .Capital}},
   ShowAll: {{.ShowAll}},

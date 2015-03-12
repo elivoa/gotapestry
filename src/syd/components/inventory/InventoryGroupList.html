@@ -55,8 +55,10 @@
 
               <td>Bo Gao</td>
               <td>
-                <t:a page="inventory/edit" context="{{print .Id}}" label="Edit"></t:a> |
-                <span style="color: brown">DEL(TODO)</span>
+                <t:a page="inventory/edit" context="{{print .Id}}" label="编辑"></t:a> |
+                <t:a event="Delete" context="{{print .Id}}" label="删除[X]"
+                     parameters="(print `referer=` ($|refer))"
+                     onclick="return confirm('确认删除?')" style="color: brown" />
               </td>
               
             </tr>
@@ -70,11 +72,11 @@
     <!-- <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script> -->
     
     <!-- <script type="text/javascript"> -->
-                 <!--              // var a = { {.InventoriesJson} } -->
-                 <!--              p_InventoryGroupList({ -->
-                                                          <!--                // Product: { {.InventoryGroup} }, -->
-                                                          <!--              }); -->
-                 <!-- </script> -->
+  <!--              // var a = { {.InventoriesJson} } -->
+  <!--              p_InventoryGroupList({ -->
+                                           <!--                // Product: { {.InventoryGroup} }, -->
+                                           <!--              }); -->
+  <!-- </script> -->
 
 
   </body>

@@ -1,4 +1,4 @@
-<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Tuesday, 2015-03-03 17:49:50> -->
+<!-- Time-stamp: <[InventoryProductSelector.html] Elivoa @ Monday, 2015-03-09 13:42:03> -->
 <!--
     <!DOCTYPE HTML>
 <html ng-app="syd">
@@ -6,6 +6,9 @@
   <body >
 
     -->
+<!-- TODO 需要统一的资源管理办法； NOTE: 要求包含这个component的页面启用ng。所以这里不需要再引入库了；--> 
+<script src="/static/js/c/inventory/inventory_product_selector.js" ></script>
+
 <div id="{{.ClientId}}" ng-controller="InventoryProductSelectorCtrl"
      ng-click="cancelSuggest($event)">
   <input type="hidden" ng-model="Inventories" />
@@ -184,8 +187,8 @@
         <!-- TODO: truncate 40 -->
         <td title="[[inv.Note]]">[[inv.Note]]</td>
         <td>
-          <a ng-click="onEdit(inv.ProductId)" href="javascript:void(0)">EDIT</a> | 
-          <a ng-click="onDelete(inv.ProductId)" href="javascript:void(0)">DELETE</a>
+          <a ng-click="onEdit(inv.ProductId)" href="javascript:void(0)">编辑</a> | 
+          <a ng-click="onDelete(inv.ProductId)" href="javascript:void(0)">删除</a>
         </td>
       </tr>
       
@@ -201,10 +204,6 @@
   </table>
 </div>
 
-<!-- TODO 需要统一的资源管理办法； --> 
-<script src="/static/js/angular.min.js" ></script>
-<script src="/static/js/angular.init.js" ></script>
-<script src="/static/js/c/inventory/inventory_product_selector.js" ></script>
 <script type="text/javascript">
 
 // console.log('{{.Inventories}}');
