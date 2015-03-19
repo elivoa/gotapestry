@@ -103,70 +103,86 @@ type ButtonSubmitHere struct {
 }
 
 // **** important logic ****
-// TODO transaction. Move to right place
+// TODO transaction. Move to right place. 发货
 func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
-	// 1/2 update delivery informantion to order.
 
-	// 1. get order form db.
-	fmt.Println(">>>>>>>>>>>>>>>>>>>> update order......................", p.TrackNumber)
-	fmt.Println(">>> ", p.Referer)
-	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// 2. set data back to order.
-	order.DeliveryTrackingNumber = p.DeliveryTrackingNumber
-	order.DeliveryMethod = p.DeliveryMethod
+	var expressFee int64 = 0
 	if p.DaoFu == "on" {
 		// if order.ExpressFee == -1, means this is `daofu`, don't add -1 to 累计欠款.
 		// TODO add field isDaofu to order table. Change ExpressFee to 0;
-		order.ExpressFee = -1
+		expressFee = -1
 	} else {
-		order.ExpressFee = p.ExpressFee
-	}
-	order.Status = "delivering"
-
-	// 3. get person, check if customer exists.
-	customer, err := service.Person.GetPersonById(order.CustomerId)
-	if err != nil {
-		panic(err)
-	} else if customer == nil {
-		panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+		expressFee = p.ExpressFee
 	}
 
-	// 4. the last chance to update accumulated.
-	order.Accumulated = -customer.AccountBallance
+	service.Order.DeliverOrder(p.TrackNumber, p.DeliveryTrackingNumber, p.DeliveryMethod, expressFee)
+	return route.RedirectDispatch(p.Referer, "/order/list")
 
-	// 5. save order changes.
-	if _, err := service.Order.UpdateOrder(order); err != nil {
-		panic(err.Error())
-	}
+	if false { // backup, has been replace with above.
 
-	// 6. update customer's AccountBallance
-	switch model.OrderType(order.Type) {
-	case model.Wholesale, model.SubOrder: // 代发不参与, 代发订单由其子订单负责参与累计欠款的统计；
-		customer.AccountBallance -= order.TotalPrice
-		if order.ExpressFee > 0 {
-			customer.AccountBallance -= float64(order.ExpressFee)
-		}
-		if _, err = personservice.Update(customer); err != nil {
+		/////////////
+
+		// 1/2 update delivery informantion to order.
+
+		// 1. get order form db.
+		order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
+		if err != nil {
 			panic(err.Error())
 		}
 
-		// create chagne log.
-		accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
-			CustomerId:     customer.Id,
-			Delta:          -order.TotalPrice,
-			Account:        customer.AccountBallance,
-			Type:           2, // order.send
-			RelatedOrderTN: order.TrackNumber,
-			Reason:         "",
-		})
+		// 2. set data back to order.
+		order.DeliveryTrackingNumber = p.DeliveryTrackingNumber
+		order.DeliveryMethod = p.DeliveryMethod
+		if p.DaoFu == "on" {
+			// if order.ExpressFee == -1, means this is `daofu`, don't add -1 to 累计欠款.
+			// TODO add field isDaofu to order table. Change ExpressFee to 0;
+			order.ExpressFee = -1
+		} else {
+			order.ExpressFee = p.ExpressFee
+		}
+		order.Status = "delivering"
 
+		// 3. get person, check if customer exists.
+		customer, err := service.Person.GetPersonById(order.CustomerId)
+		if err != nil {
+			panic(err)
+		} else if customer == nil {
+			panic(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+		}
+
+		// 4. the last chance to update accumulated.
+		order.Accumulated = -customer.AccountBallance
+
+		// 5. save order changes.
+		if _, err := service.Order.UpdateOrder(order); err != nil {
+			panic(err.Error())
+		}
+
+		// 6. update customer's AccountBallance
+		switch model.OrderType(order.Type) {
+		case model.Wholesale, model.SubOrder: // 代发不参与, 代发订单由其子订单负责参与累计欠款的统计；
+			customer.AccountBallance -= order.TotalPrice
+			if order.ExpressFee > 0 {
+				customer.AccountBallance -= float64(order.ExpressFee)
+			}
+			if _, err = personservice.Update(customer); err != nil {
+				panic(err.Error())
+			}
+
+			// create chagne log.
+			accountdao.CreateAccountChangeLog(&model.AccountChangeLog{
+				CustomerId:     customer.Id,
+				Delta:          -order.TotalPrice,
+				Account:        customer.AccountBallance,
+				Type:           2, // order.send
+				RelatedOrderTN: order.TrackNumber,
+				Reason:         "",
+			})
+
+		}
+		fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
 	}
-	fmt.Println(">>>>>>>>>>>>>>>>>>>> update all done......................")
-	return route.RedirectDispatch(p.Referer, "/order/list")
+	return nil
 }
 
 // **** important logic ****

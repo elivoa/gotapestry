@@ -101,7 +101,7 @@ func GetInventoryById(id int64) (*model.Inventory, error) {
 
 func Create(m *model.Inventory) (*model.Inventory, error) {
 	res, err := em.Insert().Exec(
-		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProductId, m.OperatorId,
+		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProviderId, m.OperatorId,
 		m.Status, m.Type, m.Note, m.SendTime, m.ReceiveTime, m.CreateTime,
 	)
 	if err != nil {
@@ -114,7 +114,7 @@ func Create(m *model.Inventory) (*model.Inventory, error) {
 
 func Update(m *model.Inventory) (int64, error) {
 	res, err := em.Update().Exec(
-		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProductId, m.OperatorId,
+		m.GroupId, m.ProductId, m.Color, m.Size, m.Stock, m.ProviderId, m.OperatorId,
 		m.Status, m.Type, m.Note, m.SendTime, m.ReceiveTime, m.CreateTime,
 		m.Id,
 	)

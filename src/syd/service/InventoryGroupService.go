@@ -133,6 +133,8 @@ func (s *InventoryGroupService) FillWithPersons(models []*model.InventoryGroup) 
 func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGroup) (
 	*model.InventoryGroup, error) {
 
+	// var need_update_provider = false // if provider, sendTime, receiveTime changed.
+
 	// nil check
 	if nil == ig {
 		return nil, errors.New("InventoryGroup can't be nil!")
@@ -294,6 +296,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	if createGroup != nil {
 		for _, inv := range createGroup {
 			// create inventory item;
+			inv.ProviderId = ig.ProviderId // force set providerId.
 			if _, err := inventorydao.Create(inv); err != nil {
 				return nil, err
 			}
@@ -325,13 +328,8 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	fmt.Println(">>>> ig.Inventories> upgrade groups: ") // print debug info.
 	if updateGroup != nil {
 		for _, inv := range updateGroup {
-
-			// print debug information:
-			// fmt.Println("\tig.inventories: ", inv)
-			// fmt.Println("\t\t old stock: ", oldStocks[inv.Id])
-			// fmt.Println("\t\t new stock: ", inv.Stock)
-
 			// update
+			inv.ProviderId = ig.ProviderId // force set providerId.
 			if _, err := inventorydao.Update(inv); err != nil {
 				return nil, err
 			}

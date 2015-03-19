@@ -22,7 +22,7 @@ type DeliveringUnclosedOrders struct {
 
 // default: get all orders of one person
 func (p *DeliveringUnclosedOrders) Setup() (string, string) {
-	fmt.Print("\n\n\n\n>>>>>>>>>>>>>>>  ;;; referer is , ", p.Referer)
+	// fmt.Print("\n\n\n\n>>>>>>>>>>>>>>>  ;;; referer is , ", p.Referer)
 	return ordersJsonByCustomerid(p.CustomerId)
 }
 

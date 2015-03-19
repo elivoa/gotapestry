@@ -22,6 +22,10 @@ func (s *OrderService) GetOrder(id int) (*model.Order, error) {
 	return orderdao.GetOrder("id", id)
 }
 
+func (s *OrderService) GetOrderByTrackingNumber(trackNumber int64) (*model.Order, error) {
+	return orderdao.GetOrder("track_number", trackNumber)
+}
+
 // Update Order 的所有逻辑都在这里了；
 func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 
@@ -37,10 +41,25 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 	if oldOrder, err := s.GetOrder(order.Id); err != nil {
 		return nil, err // panic(err)
 	} else {
+		// This check should move to other place?
+		if oldOrder.DeliveryMethod == "TakeAway" {
+			return nil, errors.New("自提状态的订单不能再修改！")
+		}
+
+		// 自提，非自提；状态是发货中，和其他
+		// 更新情况1： 修改订单时，由非自提状态改为自提状态，需要修改累计欠款;
 		if oldOrder.DeliveryMethod != "TakeAway" && order.DeliveryMethod == "TakeAway" {
 			order.Status = "delivering"
 			needUpdateBallance = true
 		}
+		// 更新情况2： 非自提状态点发货，
+		if order.Status == "delivering" { // 需要修改累计欠款
+			if oldOrder.Status == "done" || oldOrder.Status == "canceled" {
+				return nil, errors.New(fmt.Sprintf("%s状态的订单状态不能修改为delivering！", oldOrder.Status))
+			}
+			needUpdateBallance = true
+		}
+
 		// update order
 		_processOrderCustomerPrice(order)    // update order custumize price when confirm order.
 		_calculateOrder(order)               // calculate order statistic fields.
@@ -53,15 +72,20 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 
 	// update account ballance. upate stocks left.
 	if needUpdateBallance {
-		Account.UpdateAccountBalance(order.CustomerId, -order.SumOrderPrice(),
-			"Create Order", order.TrackNumber)
+		// 代发的父订单不参与非累计欠款, 代发订单由其子订单负责参与累计欠款的统计；
+		// 代发父订单的逻辑应该也到不了这里。
+		fmt.Println(">> update account ballance. delta: ", -order.SumOrderPrice())
+
+		switch model.OrderType(order.Type) {
+		case model.Wholesale, model.SubOrder:
+
+			Account.UpdateAccountBalance(order.CustomerId, -order.SumOrderPrice(),
+				"Create Order", order.TrackNumber)
+
+		}
 
 		// update stocks
 		_reduceProductStocks(order.Details)
-
-		// for _, od := range order.Details {
-		// 	Stock.UpdateStockDelta(int64(od.ProductId), od.Color, od.Size, -od.Quantity)
-		// }
 
 	}
 	return order, nil
@@ -144,7 +168,7 @@ func _processingUpdateOrderDetails(order *model.Order) error {
 		}
 	}
 
-	var debugdetails = true
+	var debugdetails = false
 	if debugdetails {
 		fmt.Println("\n\n\n--------------------------------------------------------------------------------")
 		fmt.Println("Order Detail Create Group:")
@@ -240,6 +264,7 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 
 // 订单中剪掉库存数量；
 func _reduceProductStocks(orderDetails []*model.OrderDetail) error {
+
 	if nil == orderDetails || len(orderDetails) == 0 {
 		return nil
 	}
@@ -256,6 +281,38 @@ func _reduceProductStocks(orderDetails []*model.OrderDetail) error {
 		}
 	}
 	return nil
+}
+
+// 发货
+func (s *OrderService) DeliverOrder(trackNumber int64, deliveryTrackingNumber, deliveryMethod string,
+	expressFee int64) (
+	*model.Order, error) {
+
+	// 1. get order form db.
+	order, err := s.GetOrderByTrackingNumber(trackNumber)
+	if err != nil {
+		return order, err
+	}
+
+	// 2. set data back to order.
+	order.DeliveryTrackingNumber = deliveryTrackingNumber
+	order.DeliveryMethod = deliveryMethod
+	order.ExpressFee = expressFee
+	order.Status = "delivering"
+
+	// 3. get person, check if customer exists.
+	customer, err := Person.GetPersonById(order.CustomerId)
+	if err != nil {
+		return order, err
+	} else if customer == nil {
+		return order, errors.New(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+	}
+
+	// 5. save order changes.
+	if _, err := s.UpdateOrder(order); err != nil {
+		return order, err
+	}
+	return order, nil
 }
 
 // Make sure order tracking number not conflict, by checking if tn exists,

@@ -1,5 +1,5 @@
 //
-// Time-stamp: <[inventory_product_selector.js] Elivoa @ Tuesday, 2015-03-03 17:20:49>
+// Time-stamp: <[inventory_product_selector.js] Elivoa @ Tuesday, 2015-03-17 18:41:57>
 
 // app is passed from page's config;
 function $InventoryProductSelector(app, $master){

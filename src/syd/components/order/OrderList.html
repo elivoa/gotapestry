@@ -77,8 +77,11 @@
                 <if t='.IsStatus "toprint"'>
                   <!-- TODO solve this -->
                   <a href="{{$.EditLink .}}?referer={{referer $}}">修改订单</a><span class="vline">|</span>
-                  <a href="{{$.PrintOrderLink .}}?referer={{referer $}}" style="font-weight:bolder;color:green"
-                     onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">打印订单</a>
+                  <a href="{{$.PrintOrderLink .}}?referer={{referer $}}"
+                     style="font-weight:bolder;color:green"
+                     onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">
+                    打印订单
+                  </a>
                   <span class="vline">|</span>
 
                   <t:a event="CancelOrder" context="{{print .TrackNumber}}" label="取消订单"
@@ -130,11 +133,11 @@
       </if>
 
       <script type="text/javascript">
-                   $(function(){
-                     orderlist = new OrderList({
-                       ClientId: {{.ClientId}}
-                     })
-                   });
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
       </script>
 
     </div>
