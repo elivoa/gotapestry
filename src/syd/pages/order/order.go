@@ -115,7 +115,10 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
 		expressFee = p.ExpressFee
 	}
 
-	service.Order.DeliverOrder(p.TrackNumber, p.DeliveryTrackingNumber, p.DeliveryMethod, expressFee)
+	if _, err := service.Order.DeliverOrder(
+		p.TrackNumber, p.DeliveryTrackingNumber, p.DeliveryMethod, expressFee); err != nil {
+		panic(err)
+	}
 	return route.RedirectDispatch(p.Referer, "/order/list")
 
 	if false { // backup, has been replace with above.

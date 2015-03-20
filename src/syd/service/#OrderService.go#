@@ -284,7 +284,9 @@ func _reduceProductStocks(orderDetails []*model.OrderDetail) error {
 }
 
 // 发货
-func (s *OrderService) DeliverOrder(trackNumber int64, deliveryTrackingNumber, deliveryMethod string,
+func (s *OrderService)
+
+(trackNumber int64, deliveryTrackingNumber, deliveryMethod string,
 	expressFee int64) (*model.Order, error) {
 
 	// 1. get order form db.
