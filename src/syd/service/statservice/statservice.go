@@ -63,7 +63,7 @@ func CalcHotSaleProducts(years, months, days int) *HotSales {
 }
 
 func timeRangeWeek(years, months, days int) (start, end time.Time) {
-	end = time.Now()
+	end = time.Now().Truncate(time.Hour * 24)
 	start = end.AddDate(years, months, days)
 	return
 }

@@ -297,12 +297,8 @@ func (s *OrderService) DeliverOrder(trackNumber int64, deliveryTrackingNumber, d
 	if order == nil {
 		return nil, errors.New(fmt.Sprintf("Order %d doesn't exist!", trackNumber))
 	}
-	fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-	fmt.Println("status is : ", order.Status)
 	switch order.Status {
 	case "delivering", "done", "canceled":
-		fmt.Println("status is : ", order.Status)
-		fmt.Println("return error ...............")
 		return order, errors.New(fmt.Sprintf("状态为%s的订单不能发货！", order.Status))
 	}
 
