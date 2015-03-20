@@ -41,10 +41,10 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 	if oldOrder, err := s.GetOrder(order.Id); err != nil {
 		return nil, err // panic(err)
 	} else {
-		// This check should move to other place?
-		if oldOrder.DeliveryMethod == "TakeAway" {
-			return nil, errors.New("自提状态的订单不能再修改！")
-		}
+		// this makes mistake.
+		// if oldOrder.DeliveryMethod == "TakeAway" {
+		// 	return nil, errors.New("自提状态的订单不能再修改！")
+		// }
 
 		// 自提，非自提；状态是发货中，和其他
 		// 更新情况1： 修改订单时，由非自提状态改为自提状态，需要修改累计欠款;
@@ -52,7 +52,7 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 			order.Status = "delivering"
 			needUpdateBallance = true
 		}
-		// 更新情况2： 非自提状态点发货，
+		// 更新情况2： 非自提状态点发货，}
 		if order.Status == "delivering" { // 需要修改累计欠款
 			if oldOrder.Status == "done" || oldOrder.Status == "canceled" {
 				return nil, errors.New(fmt.Sprintf("%s状态的订单状态不能修改为delivering！", oldOrder.Status))

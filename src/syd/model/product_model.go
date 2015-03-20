@@ -80,7 +80,6 @@ func (s Stocks) Total() int {
 		if sizes != nil {
 			for _, stock := range sizes {
 				total += stock
-				fmt.Println("+++", total)
 			}
 		}
 	}
