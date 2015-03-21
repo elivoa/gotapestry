@@ -18,17 +18,28 @@ type OrderCloseButton struct {
 }
 
 func (p *OrderCloseButton) Setup() {
-	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
-	if err != nil {
-		panic(err)
+	if p.Order == nil {
+		order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
+		if err != nil {
+			panic(err)
+		}
+		p.Order = order
+	} else {
+		// set customer if nil
+		if p.Customer == nil && p.Order.Customer != nil {
+			p.Customer = p.Order.Customer
+		}
 	}
-	p.Order = order
-	person, err := service.Person.GetPersonById(order.CustomerId)
-	if err != nil {
-		panic(err)
+
+	if p.Customer == nil {
+
+		person, err := service.Person.GetPersonById(p.Order.CustomerId)
+		if err != nil {
+			panic(err)
+		}
+		if person == nil {
+			panic(fmt.Sprintf("Customer not found, id: %v", p.Order.CustomerId))
+		}
+		p.Customer = person
 	}
-	if person == nil {
-		panic(fmt.Sprintf("Customer not found, id: %v", order.CustomerId))
-	}
-	p.Customer = person
 }
