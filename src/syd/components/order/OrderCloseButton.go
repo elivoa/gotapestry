@@ -29,6 +29,7 @@ func (p *OrderCloseButton) Setup() {
 		if p.Customer == nil && p.Order.Customer != nil {
 			p.Customer = p.Order.Customer
 		}
+		p.TrackNumber = p.Order.TrackNumber
 	}
 
 	if p.Customer == nil {

@@ -192,7 +192,6 @@ func (p *ButtonSubmitHere) OnSuccessFromDeliverForm() *exit.Exit {
 // when close order. 结款， Close Order
 func (p *ButtonSubmitHere) OnSuccessFromCloseForm() *exit.Exit {
 	fmt.Println("\n\n\n>>>>>>>>>>>>>>>>>>>> On success from close order.................", p.TrackNumber)
-	fmt.Println(">>> ", p.Referer, "<<<<<<<<<<<<<<<<<")
 
 	// 1/2 update delivery informantion to order.
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
