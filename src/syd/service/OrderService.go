@@ -316,6 +316,9 @@ func (s *OrderService) DeliverOrder(trackNumber int64, deliveryTrackingNumber, d
 		return order, errors.New(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
 	}
 
+	// 5. 设置累计欠款；
+	order.Accumulated = -customer.AccountBallance
+
 	// 5. save order changes.
 	if _, err := s.UpdateOrder(order); err != nil {
 		return order, err

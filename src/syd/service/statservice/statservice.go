@@ -24,7 +24,8 @@ func (p HotSaleProducts) Len() int           { return len(p) }
 func (p HotSaleProducts) Less(i, j int) bool { return p[i].Sales > p[j].Sales }
 func (p HotSaleProducts) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-// TODO make this meaningful
+// TODO make this meaningful.
+// TODO 使用sql的方式查询统计。
 func CalcHotSaleProducts(years, months, days int) *HotSales {
 	orders, err := orderdao.ListOrderByTime(timeRangeWeek(years, months, days))
 	if err != nil {

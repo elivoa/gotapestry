@@ -25,10 +25,8 @@ type PersonDetail struct {
 	PageItems int `path-param:"3"` // pager: page size.
 	Total     int
 
-	Person *model.Person
-	Orders []*model.Order
-	// TheBigOrder    *model.Order
-	// LeavingMessage string
+	Person      *model.Person
+	Orders      []*model.Order
 	TodayOrders []*model.Order
 }
 
@@ -46,8 +44,7 @@ func (p *PersonDetail) Setup() {
 	}
 
 	var err error
-	p.Person, err = service.Person.GetPersonById(p.Id.Int)
-	if err != nil {
+	if p.Person, err = service.Person.GetPersonById(p.Id.Int); err != nil {
 		panic(err)
 	}
 	if p.Person == nil {
@@ -81,8 +78,6 @@ func (p *PersonDetail) Setup() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	fmt.Println("\n\n\n--------------------------------------------------------------------------------")
 	// Get today orders.
 	date := time.Now()
 	start := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
@@ -91,10 +86,16 @@ func (p *PersonDetail) Setup() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println(">>>>>>> ")
 
 	orderservice.LoadDetails(orders)
 	p.TodayOrders = orders
+
+	// debug print
+
+	fmt.Println("\n\n\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+	for _, oo := range p.TodayOrders {
+		fmt.Println(">>>>>>> order: ", oo.Accumulated, " >>> ", oo)
+	}
 
 	// p.TheBigOrder, p.LeavingMessage = orderservice.GenerateLeavingMessage(p.Person.Id, time.Now())
 	if true {

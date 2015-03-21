@@ -160,6 +160,9 @@ func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
 
 // CombineOrderDetails combines OrderDetails into one order, others are ignored.
 func CombineOrderDetials(orders ...*model.Order) *model.Order {
+	fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^222")
+	fmt.Println(orders)
+
 	finalOrder := &model.Order{}
 	if nil == orders || len(orders) == 0 {
 		return finalOrder
@@ -172,7 +175,6 @@ func CombineOrderDetials(orders ...*model.Order) *model.Order {
 
 	// can't combined:
 	//   detail.SellingPrice
-
 	for idx, o := range orders {
 		if o.Details == nil || len(o.Details) == 0 {
 			continue
@@ -208,6 +210,8 @@ func CombineOrderDetials(orders ...*model.Order) *model.Order {
 		} else {
 			finalOrder.DeliveryTrackingNumber += "【单号欠缺】; "
 		}
+		fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^222")
+		fmt.Println(o.Accumulated)
 		// Accumulated we choose the bigest, instead of sum them.
 		if idx == 0 {
 			finalOrder.Accumulated = o.Accumulated
@@ -240,33 +244,36 @@ func LoadDetails(orders []*model.Order) error {
 	return nil
 }
 
-func GenerateLeavingMessage(customerId int, date time.Time) (*model.Order, string) {
-	start := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
-	end := start.AddDate(0, 0, 1)
-	orders, err := orderdao.ListOrderByCustomer_Time(customerId, start, end)
-	if err != nil {
-		panic(err.Error())
-		// return err.Error()
-	}
-	return CombinedLeavingMessage(orders...)
-}
+// func GenerateLeavingMessage(customerId int, date time.Time) (*model.Order, string) {
+// 	start := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+// 	end := start.AddDate(0, 0, 1)
+// 	orders, err := orderdao.ListOrderByCustomer_Time(customerId, start, end)
+// 	if err != nil {
+// 		panic(err.Error())
+// 		// return err.Error()
+// 	}
+// 	return CombinedLeavingMessage(orders...)
+// }
 
-func CombinedLeavingMessage(orders ...*model.Order) (*model.Order, string) {
-	if orders == nil || len(orders) == 0 {
-		return nil, "<<今日无订单!>>"
-	}
-	neworders := []*model.Order{}
-	for _, o := range orders {
-		if o != nil {
-			if o.Type == uint(model.Wholesale) {
-				neworders = append(neworders, o)
-			}
-		}
-	}
-	LoadDetails(neworders)
-	bigOrder := CombineOrderDetials(neworders...)
-	return bigOrder, LeavingMessage(bigOrder)
-}
+// func CombinedLeavingMessage(orders ...*model.Order) (*model.Order, string) {
+// 	fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^222")
+// 	fmt.Println(orders)
+
+// 	if orders == nil || len(orders) == 0 {
+// 		return nil, "<<今日无订单!>>"
+// 	}
+// 	neworders := []*model.Order{}
+// 	for _, o := range orders {
+// 		if o != nil {
+// 			if o.Type == uint(model.Wholesale) {
+// 				neworders = append(neworders, o)
+// 			}
+// 		}
+// 	}
+// 	LoadDetails(neworders)
+// 	bigOrder := CombineOrderDetials(neworders...)
+// 	return bigOrder, LeavingMessage(bigOrder)
+// }
 
 func LeavingMessage(bigOrder *model.Order) string {
 	var msg bytes.Buffer
@@ -366,6 +373,9 @@ func LeavingMessage(bigOrder *model.Order) string {
 	msg.WriteString("；")
 
 	// 累计欠款
+	fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+	fmt.Println("bigOrder.Accumulated", bigOrder.Accumulated)
+
 	if bigOrder.Accumulated > 0 {
 		// TODO 多个订单的时候累积欠款是错的。
 		msg.WriteString("累计欠款：")
