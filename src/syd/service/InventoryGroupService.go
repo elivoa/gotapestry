@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/elivoa/got/db"
@@ -144,6 +145,9 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		fmt.Printf("Provider Id can't be nil!\n")
 	}
 
+	// update summary and total quantity.
+	ig.Summary, ig.TotalQuantity = _makeSummary(ig.Inventories)
+
 	if ig.Id <= 0 {
 		// create inventory group, make new id.
 		var err error
@@ -159,7 +163,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		}
 	}
 
-	// assign basic properties into sub-inventories
+	// assign basic properties into sub-inventories. Make summary and total quantity.
 	if nil != ig.Inventories {
 		for _, i := range ig.Inventories {
 			if i != nil {
@@ -396,6 +400,37 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 	}
 
 	return ig, nil
+}
+
+func _makeSummary(inventories []*model.Inventory) (summary string, totalQuantity int) {
+	var buff bytes.Buffer
+	if nil != inventories {
+		for idx, inv := range inventories {
+			if idx > 0 {
+				buff.WriteString(", ")
+			}
+
+			if inv.Product != nil {
+				buff.WriteString(inv.Product.Name)
+			} else {
+				buff.WriteString(fmt.Sprintf("[%d]", inv.ProductId))
+			}
+			// buff.WriteTo(w io.Writer)
+			if nil != inv && inv.Stocks != nil {
+				for color, sizemap := range inv.Stocks {
+					if sizemap != nil {
+						for size, stock := range sizemap {
+							totalQuantity += stock
+							if color == size {
+								// remove unused error.
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return buff.String(), totalQuantity
 }
 
 func _cloneInentory(inv *model.Inventory, color, size string, stock int) *model.Inventory {

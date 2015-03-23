@@ -13,7 +13,7 @@ func init() {
 }
 
 var core_fields = []string{"status", "type", "note", "provider_id", "operator_id",
-	"send_time", "receive_time", "create_time"}
+	"summary", "total_quantity", "send_time", "receive_time", "create_time"}
 
 var em = &db.Entity{
 	Table:        "inventory_group",
@@ -37,7 +37,7 @@ func _one(query *db.QueryParser) (*model.InventoryGroup, error) {
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&m.Id, &m.Status, &m.Type, &m.Note, &m.ProviderId, &m.OperatorId,
-				&m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
+				&m.Summary, &m.TotalQuantity, &m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
 			)
 		},
 	)
@@ -58,7 +58,7 @@ func _list(query *db.QueryParser) ([]*model.InventoryGroup, error) {
 			m := &model.InventoryGroup{}
 			err := rows.Scan(
 				&m.Id, &m.Status, &m.Type, &m.Note, &m.ProviderId, &m.OperatorId,
-				&m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
+				&m.Summary, &m.TotalQuantity, &m.SendTime, &m.ReceiveTime, &m.CreateTime, &m.UpdateTime,
 			)
 			models = append(models, m)
 			return true, err
@@ -99,7 +99,8 @@ func GetInventoryGroupById(id int64) (*model.InventoryGroup, error) {
 
 func Create(m *model.InventoryGroup) (*model.InventoryGroup, error) {
 	res, err := em.Insert().Exec(
-		m.Status, m.Type, m.Note, m.ProviderId, m.OperatorId, m.SendTime, m.ReceiveTime, m.CreateTime,
+		m.Status, m.Type, m.Note, m.ProviderId, m.OperatorId, m.Summary, m.TotalQuantity,
+		m.SendTime, m.ReceiveTime, m.CreateTime,
 	)
 	if err != nil {
 		return nil, err
@@ -111,7 +112,8 @@ func Create(m *model.InventoryGroup) (*model.InventoryGroup, error) {
 
 func Update(m *model.InventoryGroup) (int64, error) {
 	res, err := em.Update().Exec(
-		m.Status, m.Type, m.Note, m.ProviderId, m.OperatorId, m.SendTime, m.ReceiveTime, m.CreateTime,
+		m.Status, m.Type, m.Note, m.ProviderId, m.OperatorId, m.Summary, m.TotalQuantity,
+		m.SendTime, m.ReceiveTime, m.CreateTime,
 		m.Id,
 	)
 	if err != nil {

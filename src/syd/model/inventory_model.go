@@ -50,8 +50,8 @@ type InventoryGroup struct {
 	OperatorId int64 // user id.
 
 	// some statistics for view only, add these fields to db.
-	ProductKindSummary string
-	TotalQuantity      int
+	Summary       string
+	TotalQuantity int
 
 	// copied from Inventory
 	SendTime    time.Time // 发货时间

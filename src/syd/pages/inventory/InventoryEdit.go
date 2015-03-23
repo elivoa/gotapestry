@@ -109,11 +109,13 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	if err != nil {
 		panic(err)
 	}
-	// sometimes return to edit this's page.
-	return exit.Redirect(fmt.Sprintf("/inventory/edit/%d", nig.Id))
 
-	// return exit.Redirect("/product/list")
-	// return nil
+	// return to refer first
+	return exit.RedirectFirstValid(
+		p.Referer,
+		"/product/list",
+		fmt.Sprintf("/inventory/edit/%d", nig.Id),
+	)
 }
 
 // return []*model.Inventory with Stocks(temp variable) in it;

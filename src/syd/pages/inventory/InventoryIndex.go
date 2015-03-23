@@ -1,7 +1,8 @@
-// Time-stamp: <[InventoryIndex.go] Elivoa @ Tuesday, 2015-03-03 11:09:22>
+// Time-stamp: <[InventoryIndex.go] Elivoa @ Monday, 2015-03-23 14:49:17>
 package inventory
 
 import (
+	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/db"
@@ -16,14 +17,14 @@ type InventoryIndex struct {
 
 	InventoryGroups []*model.InventoryGroup
 	Tab             string `path-param:"1"`
-	Current         int    `path-param:"2"` // pager: the current item. in pager.
-	PageItems       int    `path-param:"3"` // pager: page size.
+	Current         int    `path-param:"2"`   // pager: the current item. in pager.
+	PageItems       int    `path-param:"3"`   // pager: page size.
+	Provider        int64  `query:"provider"` // filter by provider Id.
 
 	// properties
 	Total int // pager: total items available
 
 	Referer string // return to this place
-
 	// TimeZone *model.TimeZoneInfo
 }
 
@@ -53,6 +54,14 @@ func (p *InventoryIndex) SetupRender() {
 	default:
 		// parser.And("status", p.Tab)
 	}
+
+	// filter by provider
+	if p.Provider > 0 {
+		fmt.Println("_______________")
+		fmt.Println("And filter by provider_id ", p.Provider)
+		parser.And(inventory.F_ProviderId, p.Provider)
+	}
+
 	// parser.Or("type", model.Wholesale, model.ShippingInstead) // restrict type
 	parser.OrderBy(inventory.FSendTime, db.DESC)
 
