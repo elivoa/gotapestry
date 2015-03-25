@@ -21,7 +21,7 @@ func (c *Header) Setup() {
 	if !c.Public {
 		// verify user role.
 		// 临时加到这里，没登陆是的用户不得查看任何东西。
-		fmt.Println("********************************************************************************")
+		fmt.Println("* TRACE USER LOGIN CHECK *************************************************************")
 		service.User.RequireRole(c.W, c.R, "admin") // TODO remove w, r. use service injection.
 	}
 }

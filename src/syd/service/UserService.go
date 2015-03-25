@@ -6,6 +6,7 @@ import (
 	"github.com/elivoa/got/core/exception"
 	"github.com/elivoa/got/coreservice/sessions"
 	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/logs"
 	"net/http"
 	"strings"
 	"syd/base"
@@ -21,7 +22,7 @@ var USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN
 
 // TODO Need interface & implements Design pattern.
 type UserService struct {
-	// TODO: Inject request...
+	logs *logs.Logger // TODO: Inject request...
 }
 
 func (s *UserService) EntityManager() *db.Entity {
@@ -41,6 +42,9 @@ func (s *UserService) EntityManager() *db.Entity {
 
 // used in methods.
 func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
+	if s.logs.Trace() {
+		s.logs.Printf("enter function: RequireLogin")
+	}
 	if userToken := s.GetLogin(w, r); userToken == nil {
 		panic(&base.LoginError{Message: "User not login.", Reason: "some reason"})
 	} else {
@@ -67,6 +71,10 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, roles 
 // return true if user is login and login is available.
 // return false if
 func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
+	if s.logs.Trace() {
+		s.logs.Printf("enter function: GetLogin")
+	}
+
 	session := sessions.LongCookieSession(r)
 	// { // debug print.
 	// 	fmt.Printf("\t >>>>>>>>>>>>>>>>>>>>>>>>>>> Session.Values: %v\n", session.Values)

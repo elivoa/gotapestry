@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
@@ -37,13 +36,7 @@ func (p *Suggest) Setup() *exit.Exit {
 		}
 	}
 
-	// marshal // use auto marshal.
-	jsonbytes, err := json.Marshal(sj)
-	if err != nil {
-		return exit.Error(err)
-	}
-	jsonstr := string(jsonbytes)
-	return exit.Json(jsonstr)
+	return exit.MarshalJson(sj)
 }
 
 // Query product
@@ -73,13 +66,7 @@ func (p *Suggest) Onproduct() *exit.Exit {
 		}
 	}
 
-	// marshal // use auto marshal.
-	jsonbytes, err := json.Marshal(sj)
-	if err != nil {
-		return exit.Error(err)
-	}
-	jsonstr := string(jsonbytes)
-	return exit.Json(jsonstr)
+	return exit.MarshalJson(sj)
 }
 
 // product suggest json

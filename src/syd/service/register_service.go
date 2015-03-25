@@ -1,5 +1,9 @@
 package service
 
+import (
+	"github.com/elivoa/got/logs"
+)
+
 type Withs int
 
 var (
@@ -22,10 +26,11 @@ var (
 	Order          = new(OrderService)
 	Account        = new(AccountService)
 	Person         = new(PersonService)
-	User           = new(UserService)
 	Product        = new(ProductService)
 	Inventory      = new(InventoryService)      // 入库
 	InventoryGroup = new(InventoryGroupService) // 入库组
 	InventoryTrack = new(InventoryTrackService) // Inventory Track
 	Stock          = new(StockService)          // 库存数量
+
+	User = &UserService{logs: logs.Get("SERVICE:USER:LoginCheck")}
 )

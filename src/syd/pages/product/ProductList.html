@@ -17,9 +17,9 @@
       <div class="main_content">
     	<h1>商品列表</h1>
         <div class="tab_s clearfix">
-          <a  ng-repeat="tab in tabs track by $index"
-              class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
-              href="/product/list/[[tab]]?showall=[[showall]]">
+          <a ng-repeat="tab in tabs track by $index"
+             class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
+             href="/product/list/[[tab]]?showall=[[showall]]">
             [[tab]]
           </a>
         </div>
@@ -36,8 +36,8 @@
               <th align="left">操作</th>
             </tr>
 
-            <tr ng-if="!Products">
-              <td>
+            <tr ng-if="Products & len(Products)==0">
+              <td colspan="8">
                 <div class="tips_content"><i class="icon_warning"></i> No Records</div>
               </td>
             </tr>
@@ -93,9 +93,10 @@
 
 <script type="text/javascript">
 
-//
+           //
 p_ProductList({
-  Products: {{.Products .Capital}},
+  ProductsLink: "/product/list:getproducts/{{.Capital}}",
+  // Products: {{.Products .Capital}}, 
   ShowAll: {{.ShowAll}},
   //  Factories : { {.Factories}}, // factories option
 });

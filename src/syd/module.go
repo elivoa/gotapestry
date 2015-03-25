@@ -8,6 +8,7 @@ import (
 	"github.com/elivoa/got/errorhandler"
 	"github.com/elivoa/got/templates"
 	"github.com/elivoa/got/utils"
+	"github.com/elivoa/gxl"
 	"net/http"
 	"reflect"
 	"strings"
@@ -31,7 +32,7 @@ var SYDModule = &core.Module{
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
 		c.AddStaticResource("/static/", "../static/") // TODO: test this, is this works now?
 
-		c.Port = 8080 //13062
+		c.Port = 8080 //13062 for server
 		c.DBPort = 3306
 		c.DBName = "syd"
 		c.DBUser = "root"
@@ -53,6 +54,8 @@ var SYDModule = &core.Module{
 		// --------------------------------------------------------------------------------
 		config.LIST_PAGE_SIZE = 50
 		config.ReloadTemplate = true // disable reload template?
+
+		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.
 	},
 }
 

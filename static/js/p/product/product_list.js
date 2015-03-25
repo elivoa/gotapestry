@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Thursday, 2015-03-05 15:02:54>
+// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2015-03-25 15:21:23>
 
 function p_ProductList($master){
 
@@ -11,7 +11,7 @@ function p_ProductList($master){
   // if has components, init it first; then init this page;
   ngLoadComponent(sydapp);
 
-  sydapp.controller('ProductListCtrl', function($scope){
+  sydapp.controller('ProductListCtrl', function($scope, $http){
 
     $scope.tabs = ["ALL", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
                    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"];
@@ -31,7 +31,11 @@ function p_ProductList($master){
     };
 
     // init products.
-    $scope.Products = $master.Products;
+    // $scope.Products = $master.Products; // TODO change to load something.
+    $http.get($master.ProductsLink)
+      .success(function (data) {
+        $scope.Products = data;
+      });
     $scope.showall = $master.ShowAll;
 
     $scope.StockDescription = function(product){

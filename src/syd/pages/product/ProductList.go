@@ -1,7 +1,6 @@
 package product
 
 import (
-	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/debug"
 	"github.com/elivoa/got/route"
@@ -29,8 +28,6 @@ func (p *ProductList) Setup() {
 
 // json method
 func (p *ProductList) Products(letter string) []*model.Product {
-	fmt.Println("\n ----- , ", letter)
-
 	var parser = service.Order.EntityManager().NewQueryParser()
 	p.Capital = strings.ToLower(p.Capital)
 	if p.Capital == "" || p.Capital == "all" {
@@ -43,6 +40,11 @@ func (p *ProductList) Products(letter string) []*model.Product {
 		panic(err.Error())
 	}
 	return products
+}
+
+// data
+func (p *ProductList) Ongetproducts(letter string) *exit.Exit {
+	return exit.MarshalJson(p.Products(letter))
 }
 
 // NOTE: event name is case sensitive. Kill this when add cache.
