@@ -36,7 +36,7 @@
               <th align="left">操作</th>
             </tr>
 
-            <tr ng-if="Products & len(Products)==0">
+            <tr ng-if="!Products">
               <td colspan="8">
                 <div class="tips_content"><i class="icon_warning"></i> No Records</div>
               </td>
@@ -93,15 +93,15 @@
 
 <script type="text/javascript">
 
-//
-p_ProductList({
-  ProductsLink: "/product/list:getproducts/{{.Capital}}",
-  ShowAll: {{.ShowAll}},
-});
+             //
+             p_ProductList({
+               ProductsLink: "/product/list:getproducts/{{.Capital}}",
+               ShowAll: {{.ShowAll}},
+             });
 
-// Products: {{.Products .Capital}}, 
-//  Factories : { {.Factories}}, // factories option
-// $(document).ready(function(){
+             // Products: {{.Products .Capital}}, 
+             //  Factories : { {.Factories}}, // factories option
+             // $(document).ready(function(){
 //   angular.element('._temp_query_box').focus(); 
 // })
 </script>
