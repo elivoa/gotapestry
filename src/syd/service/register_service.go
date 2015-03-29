@@ -31,6 +31,7 @@ var (
 	InventoryGroup = new(InventoryGroupService) // 入库组
 	InventoryTrack = new(InventoryTrackService) // Inventory Track
 	Stock          = new(StockService)          // 库存数量
+	Stat           = new(StatService)           //
 
 	User = &UserService{logs: logs.Get("SERVICE:USER:LoginCheck")}
 )

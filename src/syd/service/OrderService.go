@@ -415,7 +415,6 @@ func (s *OrderService) ListOrders(parser *db.QueryParser, withs Withs) ([]*model
 		return nil, err
 	} else {
 		// TODO: Print warrning information when has unused withs.
-
 		if withs&WITH_PERSON > 0 {
 			if err := s.FillOrderSlicesWithPerson(orders); err != nil {
 				return nil, err

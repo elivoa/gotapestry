@@ -1,10 +1,10 @@
 package inventory
 
 import (
-	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
 	"syd/model"
+	"syd/service"
 )
 
 type InventoryGroupList struct {
@@ -13,15 +13,25 @@ type InventoryGroupList struct {
 	InventoryGroups []*model.InventoryGroup
 	TotalPrice      float64 // all order's price
 	Referer         string  // return to this place
+
+	TotalGroups   int
+	TotalQuantity int
 }
 
 func (p *InventoryGroupList) SetupRender() {
-	// verify user role.
-	// service.User.RequireRole(p.W, p.R, "admin") // TODO remove w, r. use service injection.
+	service.User.RequireRole(p.W, p.R, "admin")
 	// p.TimeZone = service.TimeZone.UserTimeZoneSafe(p.R)
 
 	if p.InventoryGroups == nil {
 		return
+	}
+
+	// calculate total.
+	p.TotalGroups = len(p.InventoryGroups)
+	for _, inv := range p.InventoryGroups {
+		if nil != inv {
+			p.TotalQuantity += inv.TotalQuantity
+		}
 	}
 }
 
@@ -29,7 +39,6 @@ func (p *InventoryGroupList) SetupRender() {
 // Events
 //
 func (p *InventoryGroupList) OnDelete(id int64) *exit.Exit {
-	fmt.Printf("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk\n TODO: delete id , %d\n", id)
 	// TODO delete inventories
 	// TODO delete inventory groups.
 	// if _, err := service.Inventory.DeleteInventory(id); err != nil {

@@ -1,9 +1,8 @@
-// latest-tag: [user_dao.go] Time-stamp: <[user_dao.go] Elivoa @ Friday, 2014-10-31 13:01:49>
+// latest-tag: [user_dao.go] Time-stamp: <[user_dao.go] Elivoa @ Friday, 2015-03-27 13:19:26>
 package userdao
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
@@ -108,7 +107,6 @@ func GetUser(field string, value interface{}) (*model.User, error) {
 
 // TODO: password should be encripted.
 func GetUserWithCredential(username string, password string) (*model.User, error) {
-	fmt.Println("LoginService :> Get user with username/password pair : ", username, password)
 	return _one(em.Select().Where("username", username).And("password", password))
 }
 

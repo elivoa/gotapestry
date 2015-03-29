@@ -17,6 +17,7 @@ import (
 )
 
 var USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN_SESSION_KEY"
+var DEEP_TRACE = true
 
 // TODO change session into longtime session.
 
@@ -76,39 +77,69 @@ func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.Us
 	}
 
 	session := sessions.LongCookieSession(r)
-	// { // debug print.
-	// 	fmt.Printf("\t >>>>>>>>>>>>>>>>>>>>>>>>>>> Session.Values: %v\n", session.Values)
-	// 	for k, v := range session.Values {
-	// 		fmt.Printf("key %v --> value: %v\n", k, v)
-	// 	}
-	// }
+
+	// deep trace.
+	if DEEP_TRACE && s.logs.Trace() {
+		s.logs.Printf("  DEEP TRACE: everything in long-session: %s", "s")
+		for k, v := range session.Values {
+			s.logs.Printf("  DEEP TRACE: %v : %v", k, v)
+		}
+	}
+
 	if userTokenRaw, ok := session.Values[config.USER_TOKEN_SESSION_KEY]; ok && userTokenRaw != nil {
+		if s.logs.Trace() {
+			s.logs.Printf("Got userToken : %v.", userTokenRaw)
+		}
+
 		if userToken := userTokenRaw.(*model.UserToken); userToken != nil {
+			if s.logs.Trace() {
+				s.logs.Printf("Got userToken.outdated = %v.", "TODO: check if userToken is outdated.")
+			}
+
 			// TODO: check if userToken is outdated.
 			if outdated := false; !outdated {
 				// TODO: update userToken.Tiemout
+				if s.logs.Trace() {
+					s.logs.Printf("GetLogin success, return cached user.")
+				}
 				return userToken
 			}
 		}
 	}
+
 	// if not in session, try cookie
 	if userToken, err := s.LoginFromCookie(r); err != nil {
-		// TODO: change to log.blablabla
-		fmt.Printf("Login from cookie failed, reason: %s\n", err.Error())
+		if s.logs.Error() {
+			s.logs.Printf("Login from cookie failed, reason: %s\n", err.Error())
+		}
 		return nil
 	} else {
-		fmt.Printf("Login from cookie succee, username: %s, password(hash): %s\n",
-			userToken.Username, userToken.Password)
+		if s.logs.Info() {
+			s.logs.Printf("Login from cookie succeed, username: %s, password(hash): %s\n",
+				userToken.Username, userToken.Password)
+		}
 
 		// if success, update it to session.
 		s.setToSession(w, r, userToken)
+		if s.logs.Trace() {
+			s.logs.Printf("GetLogin success, return user.")
+		}
 		return userToken
 	}
 }
 
 func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error) {
+	if s.logs.Trace() {
+		s.logs.Printf("enter function: LoginFromCookie")
+	}
+
 	if credential := s.loadUserTokenFromCookie(r); credential != nil {
 		user, err := userdao.GetUserWithCredential(credential[0], credential[1])
+		if s.logs.Trace() {
+			s.logs.Printf("Credential in cookie is : %v", credential)
+			s.logs.Printf("Get user with Credenial, user is : %v", user)
+		}
+
 		if nil != user && err == nil {
 			// if pass := userdao.VerifyLogin(userToken.Username, userToken.Password); pass {
 			// fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")

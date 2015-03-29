@@ -10,7 +10,6 @@ import (
 	"syd/dal/orderdao"
 	"syd/model"
 	"syd/service"
-	"time"
 )
 
 // --------------------------------------------------------------------------------
@@ -154,9 +153,9 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 	return &r
 }
 
-func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
-	return orderdao.ListOrderByTime(start, end)
-}
+// func ListOrderByTime(start, end time.Time) ([]*model.Order, error) {
+// 	return orderdao.ListOrderByTime(start, end)
+// }
 
 // CombineOrderDetails combines OrderDetails into one order, others are ignored.
 func CombineOrderDetials(orders ...*model.Order) *model.Order {

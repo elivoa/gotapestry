@@ -7,7 +7,7 @@
     </tr>
     <range source=".HotSales.HSProduct">
       <tr>
-        <td>{{$.ProductName .ProductId}}</td>
+        <td>{{.ProductName}}</td>
         <td>{{.Sales}}</td>
         <td style="color:#666">
           {{range $cskey, $q := .Specs}}
