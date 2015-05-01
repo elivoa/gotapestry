@@ -171,6 +171,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 				i.OperatorId = ig.OperatorId
 				i.SendTime = ig.SendTime
 				i.ReceiveTime = ig.ReceiveTime
+				i.Type = ig.Type
 			}
 		}
 	}

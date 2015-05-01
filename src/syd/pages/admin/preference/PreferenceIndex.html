@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <t:layout.header title=".Title" css="2" />
+  </head>
+  <body>
+    <t:layout.headernav />
+    <div class="container">
+      <t:layout.leftnav curpage="/admin/preference" />
+
+      <div class="main_content">
+    	<h1>Configuration</h1>
+
+	    <div class="tab_main">
+          <div class="bg">
+            <!--
+                <div class="tab_btn">
+                  <a  class="btn_b_s" href="/inventory/purchase?referer={{refer $}}">
+                    <i class="ico_add"></i>Create Inventory
+                  </a>
+                </div>
+                -->
+	        <ul>
+	          <li class="{{$.TabStyle `test`}}"><a href="/admin/preference/test">test</a></li>
+	          <li class="{{$.TabStyle `car_made`}}"><a href="/admin/preference/car_made">Car Made</a></li>
+	          <li class="{{$.TabStyle `window_tint`}}">
+                <a href="/admin/preference/window_tint">Window Tint</a>
+              </li>
+	          <li class="{{$.TabStyle `window_tint_optional`}}">
+                <a href="/admin/preference/window_tint_optional">Window Tint Optional</a>
+              </li>
+	          <li class="{{$.TabStyle `clear_bra`}}">
+                <a href="/admin/preference/clear_bra">Clear Bra</a>
+              </li>
+	          <li class="{{$.TabStyle `clear_bra_optional`}}">
+                <a href="/admin/preference/clear_bra_optional">Clear Bra Optional</a>
+              </li>
+	        </ul>
+	      </div>
+        </div>
+        
+        <form method="POST" id="CreateConstForm" t:id="CreateConstForm" action="">
+          <input type="hidden" name="t:id" value="CreateConstForm" />
+          <input type="hidden" name="Const.Name" value="{{.Tab}}" />
+          <input type="hidden" name="Const.Id" value="{{.Const.Id}}" />
+          
+          <div class="unit">
+            <div class="tit"><strong></strong></div>
+            <div class="form_main form_config">
+              <dl>
+                <dt>Key: </dt>
+                <dd><input type="text" name="Const.Key" value="{{.Const.Key}}" size="12" /></dd>
+              </dl>
+              <dl>
+                <dt>Value: </dt>
+                <dd><input type="text" name="Const.Value" value="{{.Const.Value}}" size="12"
+                           requiredxx /></dd>
+              </dl>
+              <dl>
+                <dt>Second Value: </dt>
+                <dd><input type="text" name="Const.FloatValue"
+                           value="{{.Const.FloatValue}}" size="12" number min="-999999999" /></dd>
+              </dl>
+              <dl>
+                <dt></dt>
+                <dd><input type="submit" class="btn_a_s" value="Add"></dd>
+              </dl>
+              <dl class="clearfix"></dl>
+            </div>
+          </div>            
+        </form>
+
+        <div class="total txt_c">
+          <if t="eq .Tab `test`">
+            Car Made: Key is car made, Value and FloatValue has no meanings.
+          </if>
+          <if t="eq .Tab `window_tint`">
+            Window Tint: Key is WindowTint's name, FloatValue is it's price, Value has no meanings.
+          </if>
+          <if t="eq .Tab `window_tint_optional`">
+            Window Tint Optional: Key is WindowTintOptional's name, FloatValue is it's price, Value has no meanings.
+          </if>
+          <if t="eq .Tab `clear_bra`">
+            Clear Bra Item: Key is the Name of Clear Bra, FloatValue is it's price, Value has no meanings.
+          </if>
+        </div>
+
+        <t:admin.constlist Name=".Tab" HideName="true" Referer=".Referer"/>
+        
+      </div>
+      
+    </div>
+
+    <script type="text/javascript">
+
+      $('#CreateConstForm').validate()
+      $(function() {
+      $('#CreateConstForm input[name="Const.Value"]').focus();
+      });
+
+    </script>
+
+  </body>
+</html>

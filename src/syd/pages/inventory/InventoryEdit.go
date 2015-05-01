@@ -6,13 +6,18 @@ import (
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/gxl"
+	"syd/base/inventory"
 	"syd/base/person"
 	"syd/model"
 	"syd/service"
+	"time"
 )
 
 /* ________________________________________________________________________________
-   Product Craete Page
+   Inventory Create Page （入库）
+   Place Order Page （下单）
+   下单和入库的区别：
+
 */
 type InventoryEdit struct {
 	core.Page
@@ -25,11 +30,15 @@ type InventoryEdit struct {
 	GroupId        *gxl.Int              `path-param:"1"`
 	InventoryGroup *model.InventoryGroup ``
 
+	IsPlaceOrder bool   `query:"placeorder"` // inventory or placeorder, default false.
+	Referer      string `query:"referer"`    // referer page, view or list
+
 	// ** special ** for angularjs form submit. this is json.
 	InventoriesJson string
 
-	Referer string `query:"referer"` // referer page, view or list
-
+	// domain specific variables.
+	CurrentPage string
+	PageTitle   string
 }
 
 func (p *InventoryEdit) New() *InventoryEdit {
@@ -37,6 +46,15 @@ func (p *InventoryEdit) New() *InventoryEdit {
 }
 
 func (p *InventoryEdit) Setup() {
+	if !p.IsPlaceOrder { // normal
+		p.CurrentPage = "/inventory"
+		p.PageTitle = "新增入库"
+		p.SubTitle = "入库"
+	} else { // placeorder mode
+		p.CurrentPage = "/placeorder"
+		p.PageTitle = "下订单"
+		p.SubTitle = "订单"
+	}
 
 	// page values
 	p.Title = "create input post"
@@ -58,10 +76,10 @@ func (p *InventoryEdit) Setup() {
 
 		// construct group;
 		// p.InventoryGroup = model.NewInventoryGroup(list)
-		p.SubTitle = "编辑"
+		p.SubTitle = "编辑" + p.SubTitle
 	} else {
 		p.InventoryGroup = model.NewInventoryGroup(nil)
-		p.SubTitle = "新建"
+		p.SubTitle = "新建" + p.SubTitle
 	}
 }
 
@@ -104,6 +122,14 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 	} else { // if edit
 		// TODO...
 	}
+
+	if !p.IsPlaceOrder {
+		p.InventoryGroup.Type = inventory.TypeReceive
+	} else {
+		// place order
+		p.InventoryGroup.Type = inventory.TypePlaceOrder
+	}
+	p.InventoryGroup.CreateTime = time.Now() // update create time
 
 	nig, err := service.InventoryGroup.SaveInventoryGroupByNGLIST(p.InventoryGroup)
 	if err != nil {

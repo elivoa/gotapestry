@@ -29,8 +29,9 @@ var SYDModule = &core.Module{
 		c := config.Config
 
 		// config static resources
+		c.AddStaticResource("/static/", "../static/") // static files.
+		c.AddStaticResource("/ng/", "../ng/")         // angularjs modules.
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
-		c.AddStaticResource("/static/", "../static/") // TODO: test this, is this works now?
 
 		c.Port = 8080 //13062 for server
 		c.DBPort = 3306
@@ -38,26 +39,35 @@ var SYDModule = &core.Module{
 		c.DBUser = "root"
 		c.DBPassword = "eserver409$)("
 
-		// builtin functions
+		// Register new template functions this app usages.
 		templates.RegisterFunc("HasAnyRole", HasAnyRole)
 
-		// errorhandlers
+		// Register error handlers.
 		errorhandler.AddHandler("LoginError",
 			reflect.TypeOf(base.LoginError{}),
 			errorhandler.RedirectHandler("/account/login"),
 		)
+
 		errorhandler.AddHandler("TimeZoneNotFoundError",
 			reflect.TypeOf(exception.TimeZoneNotFoundError{}),
 			errorhandler.RedirectHandler("/account/login"),
 		)
 
 		// --------------------------------------------------------------------------------
+		// Modify some default parmeters.
 		config.LIST_PAGE_SIZE = 50
 		config.ReloadTemplate = true // disable reload template?
 
+		// Config gxl toolset.
 		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.
+
+		// TODO: Register Coercers.
+
 	},
 }
+
+// --------------------------------------------------------------------------------
+// Additional functions.
 
 func HasAnyRole(w http.ResponseWriter, r *http.Request, roles ...string) bool {
 	session := sessions.LongCookieSession(r)

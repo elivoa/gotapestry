@@ -15,6 +15,9 @@ type Header struct {
 	Public bool
 
 	Ng string // enable angularjs libraries.
+
+	// 是使用第一套css还是第二套
+	CSS int // css version now support 1 and 2
 }
 
 func (c *Header) Setup() {

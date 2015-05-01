@@ -1,0 +1,34 @@
+@charset "utf-8";
+.layer_box{background:#fff;border:3px solid rgba(0,0,0,.3);border-radius:6px;}
+.layer_top{height:30px;background:#f1f1f1;border-radius:6px 6px 0 0;border-bottom:1px solid #ccc;}
+.layer_top span{line-height:30px;font-size:1.2em;display:inline-block;padding-left:10px;}
+.layer_close{background:#d43838 url(../../images/icons/prd_attr_close.png) no-repeat center center;width:18px;height:18px;display:block;float:right;border-radius:3px;margin:5px 5px 0 0;border:1px solid #9a1a1a;}
+.layer_close:hover{box-shadow:0 0 6px #c02121;background-color:#c02121;}
+.layer_content{margin:10px;}
+.layer_btn_content{text-align:center;padding:10px 0 0;}
+
+/*发货*/
+.L_express .form_main{margin-right:60px;padding:5px 0;}
+.L_express .L_method{margin-top:5px;}
+/*快速结款*/
+.L_fast_cash .form_main{margin-right:60px;padding:5px 0;}
+.L_fast_cash .L_account_info{margin-bottom:15px;}
+.L_fast_cash .L_order_price{padding-top:0;}
+
+.L_account_info{background:#f1f1f1;border-radius:3px;padding:8px 10px;}
+.L_account_info strong{margin-right:20px;float:left;}
+.L_account_info .L_overage{float:right;}
+
+/*批量结款*/
+.L_bat_cash .form_main{margin-right:60px;padding:20px 0 5px;}
+.L_bat_cash .form_main label{margin-left:10px;}
+.L_bat_cash .tbl_s{width:100%}
+.L_bat_cash .layer_btn_content{border-top:1px dashed #999;}
+.L_cash_wait td{background:#ffc0c0;}
+.L_cash_done td{background:#c2fbc7;}
+.L_pager_content{text-align:right;margin:10px 0;}
+
+/*入库*/
+.L_warehousing{}
+.L_warehousing .form_main{margin-right:60px;padding:20px 0 5px;}
+.L_warehousing .tbl_s{width:100%}

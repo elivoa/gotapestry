@@ -5,6 +5,7 @@ import (
 	"github.com/elivoa/got/db"
 	"syd/dal/inventorydao"
 	"syd/model"
+	"time"
 )
 
 type InventoryService struct{}
@@ -17,6 +18,7 @@ func (s *InventoryService) CreateInventory(m *model.Inventory) (*model.Inventory
 	if m == nil {
 		panic("Inventory can't be null!")
 	}
+	m.CreateTime = time.Now()
 	// m.PrepareToSave() // prepare to save, create time...
 	return inventorydao.Create(m)
 }

@@ -6,6 +6,7 @@ import (
 
 type Withs int
 
+// try service API design.
 var (
 	WITH_ALL  Withs = 999999999
 	WITH_NONE Withs = 0
@@ -23,6 +24,8 @@ var (
 
 // 临时这样初始化service, 以后要用Inject的方式初始化这些东西；
 var (
+
+	// basic services
 	Order          = new(OrderService)
 	Account        = new(AccountService)
 	Person         = new(PersonService)
@@ -32,6 +35,8 @@ var (
 	InventoryTrack = new(InventoryTrackService) // Inventory Track
 	Stock          = new(StockService)          // 库存数量
 	Stat           = new(StatService)           //
+
+	FactorySettleAccount = new(FactorySettleAccountService) //
 
 	User = &UserService{logs: logs.Get("SERVICE:USER:LoginCheck")}
 )

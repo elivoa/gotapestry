@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+  <head></head>
+  <body ng-controller="InventoryGroupListCtrl" >
+    <!-- 注意：此文件共享了入库功能和下单功能 -->
+    <div id="{{.ClientId}}">
+      
+      <if t="len .InventoryGroups | not">
+        <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+
+        <else/>
+
+        <table class="tbl_main" width="100%">
+          <tr>
+            <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
+            <th align="left">ID</th>
+            <th align="left">下单日期</th>
+            <th align="left">厂家</th>
+            <th align="left">明细</th>
+            <th align="left">下单件数</th>
+            <!-- <th align="left">状态</th> -->
+            <th align="left">备注</th>
+            <th align="left">执行者</th>
+            <th align="left" style="width:80px;">操作</th>
+          </tr>
+
+          <range source=".InventoryGroups">
+            <tr>
+              <td><t:a page="inventory/edit" context="{{print .Id}}" label="print .Id"></t:a></td>
+              <td nowrap title="下单时间: {{.SendTime|prettytime}} &#10;创建时间: {{.CreateTime|prettytime}} &#10;更新时间: {{.CreateTime|prettytime}}">
+                {{.SendTime | date}}
+              </td>
+              <td nowrap>
+                <if t=".Provider">
+                  <t:a page="inventory" context="{{print .Id}}" label=".Provider.Name" 
+                       parameters="(print `provider=` .ProviderId)" />
+                  <else>
+                    <t:a page="inventory" context="{{print .Id}}" label="(print `未知ID ` .ProviderId)" 
+                         parameters="(print `provider=` .ProviderId)"
+                         style="color:gray" />
+                  </else>
+                </if>
+              </td>
+              
+              <!-- <td>{{.Status}}</td> -->
+              <!-- <td>{{.Type}}</td> -->
+              <td>{{.Summary}}</td>
+              <td>{{.TotalQuantity}}</td>
+              <td title="{{.Note}}">{{.Note | truncate 40 "..."}}</td>
+
+              <!--
+                  <td nowrap title="发: {{.SendTime | prettytime}} &#10;到: {{.ReceiveTime|prettytime}}">
+                    <if t=".SendTime|validtime">{{.SendTime | date}}<else>-</if>
+                    <br />
+                    <if t=".ReceiveTime|validtime">{{.ReceiveTime | date}}<else>-</if>
+                  </td>
+                  -->
+
+              <td>Bo Gao</td>
+              <td>
+                <t:a page="inventory/edit" context="{{print .Id}}"
+                     parameters="(print `referer=` ($|refer) `&placeorder=true` )"
+                     label="编辑" /> |
+                <t:a event="Delete" context="{{print .Id}}" 
+                     parameters="(print `referer=` ($|refer))"
+                     onclick="return confirm('确认删除?')" style="color: brown"
+                     label="删除[X]" />
+              </td>
+              
+            </tr>
+          </range>
+        </table>
+        
+        <div class="summary" style="margin:8px;">
+          共{{.TotalGroups}}条记录，总件数：{{.TotalQuantity}}。
+        </div>
+      </if>
+
+    </div>
+
+    <!-- <script src="/static/js/angular.min.js" ></script> -->
+    <!-- <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script> -->
+
+    <!--
+        <script type="text/javascript"> 
+  // var a = { {.InventoriesJson} }
+  p_InventoryGroupList({ 
+    // Product: { {.InventoryGroup} },
+  });
+          </script>
+        -->
+
+  </body>
+</html>
+

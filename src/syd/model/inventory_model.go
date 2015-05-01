@@ -68,8 +68,8 @@ type InventoryGroup struct {
 func NewInventoryGroup(invs []*Inventory) *InventoryGroup {
 	if nil == invs || len(invs) == 0 {
 		return &InventoryGroup{
-			SendTime:    time.Now().AddDate(0, 0, -1),
-			ReceiveTime: time.Now().AddDate(0, 0, 1),
+			SendTime:    time.Now().AddDate(0, 0, -2),
+			ReceiveTime: time.Now().AddDate(0, 0, 0),
 		}
 	}
 	first := invs[0]

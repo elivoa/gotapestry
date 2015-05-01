@@ -27,7 +27,7 @@
           <range source=".InventoryGroups">
             <tr>
               <td><t:a page="inventory/edit" context="{{print .Id}}" label="print .Id"></t:a></td>
-              <td nowrap title="发货: {{.SendTime|prettytime}} &#10;到货: {{.ReceiveTime|prettytime}} &#10;创建: {{.CreateTime|prettytime}} &#10;更新: {{.CreateTime|prettytime}}">
+              <td nowrap title="发货: {{.SendTime|prettytime}} &#10;到货: {{.ReceiveTime|prettytime}} &#10;创建: {{.CreateTime|prettytime}} &#10;更新: {{.UpdateTime|prettytime}}">
                 {{.SendTime | date}}
               </td>
               <td nowrap>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+  <body>
+    <div id="{{.ClientId}}">
+      
+      <if t="len .Consts | not">
+        <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+
+        <else/>
+
+        <table class="tbl_main" width="100%">
+          <tr>
+            <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
+            <!-- <th align="left">ID</th> -->
+            <if t="not .HideName"> <th align="left">Name</th> </if>
+            <th align="left">Key</th>
+            <th align="left">Value</th>
+            <th align="left">FloatValue</th>
+            <th align="left">Time</th>
+            <th align="left" style="width:80px;">Operation</th>
+          </tr>
+
+          <range source=".Consts">
+            <tr>
+              <if t="not $.HideName"><td nowrap>{{.Name}}</td></if>
+              <td nowrap>{{.Key}}</td>
+              <td nowrap>{{.Value}}</td>
+              <td nowrap>{{.FloatValue}}</td>
+              <td nowrap title="{{.Time | prettytime}} ">
+                {{.Time | prettytime}} <!-- formattime "2006-01-02" TODO: prettyday-->
+              </td>
+
+              <td desc="operation">
+                <a href="/admin/preference/{{$.Name}}?edit={{.Id}}">Edit</a> |
+                <t:a event="delete" context="{{print .Id}}" label="Delete"
+                     parameters="(print `referer=` ($|refer))" 
+                     onclick="return confirm('Confirm Deletion?')"/>
+              </td>
+
+            </tr>
+          </range>
+        </table>
+      </if>
+
+      <script type="text/javascript">
+
+      </script>
+
+    </div>
+  </body>
+</html>
+

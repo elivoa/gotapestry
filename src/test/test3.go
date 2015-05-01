@@ -2,13 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/elivoa/got/builtin/services"
 	"time"
 )
 
 func main() {
 	fmt.Println("------------------------------------------------------------------------------------------")
-	fmt.Println(time.Now())
-	fmt.Println(time.Now().Truncate(time.Hour * 24))
+	var parameters = map[string]interface{}{
+		"provider": 33,
+		"from":     time.Now(),
+	}
+
+	fmt.Println(services.Link.GeneratePageUrlWithContextAndQueryParameters("inventory", parameters))
 	fmt.Println("------------------------------------------------------------------------------------------")
 
 }

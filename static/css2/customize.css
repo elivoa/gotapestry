@@ -1,0 +1,150 @@
+@charset "utf-8";
+
+
+/*--------------------------------------NORMAL------------------------------------------*/
+.autocomplete-suggestions{width:auto !important}
+
+.newcar_zone:hover {background-color:#d9f9de}
+
+.letter_box{height:24px;margin:8px;}
+.letter_box a{border:solid 1px #ddd;padding:4px 8px;}
+.letter_box a.cur{background-color:#ffba00;}
+
+/* override */
+.customer_info dt{width:6em}
+
+.form_main {}
+.form_main dl {}
+.form_main dl dt{width:168px;}
+.form_main dd{line-height:22px;}
+
+/* for configuration's form only*/
+.form_config dl dt{width:auto;margin-left:20px;}
+
+.customer_info dt{width:6em !important}
+
+/* fix order edit form */
+.order_info .window_tint label,
+.order_info .clear_bra label {display:block;}
+.order_info .window_tint label span.price,
+.order_info .clear_bra label span.price {font-size:14px;margin-left:20px;}
+
+/* ==================================== order print ============================== */
+
+body.order_print .container
+    {Background:white !important; border: none; box-shadow: none;margin:60px 20px 40px 20px;}
+
+body.order_print .container .main_content
+    {}
+
+
+
+.toolbox {margin:1.2em 1em;clear:both;}
+
+
+.print_area {
+    width:21.59cm;min-height:20.94cm;
+    border:solid 1px #ddd;box-shadow: 0 0 6px rgba(0,0,0,.5);
+    margin-bottom:40px !important;
+    font-size:12px;
+}
+.content_area{
+    border:solid 0px green;
+    margin:12mm 11.5mm;
+    width:178.9mm;/*192.9mm;*/
+}
+
+.hide {display: none;}
+
+.toolbox {margin: 8px 24px; float: right;}
+
+table.order_print_table {border-collapse:collapse;width:100%;}
+table.order_print_table tr td {padding:8px;}
+table.order_print_table p{margin-bottom:8px;}
+table.order_print_table .customer_zone .item{font-weight:bold;margin:4px;color:black;font-size:12px;}
+table.order_print_table .value{margin:4px;font-size:12px;}
+table.order_print_table .order_number{font-size:14px;}
+table.order_print_table .name{font-size:12px;}
+
+table.op_table{margin-left:20px;margin-right:20px;border: solid 1px #999}
+table.op_table tr td{padding:4px;}
+table.op_table td.name{width:580px;border-right:noned;}
+table.op_table td.value{width:120px;text-align:right;border-left:none;}
+
+table.op_price_table tr td{padding:4px;}
+
+table.op_item_table {margin-left:20px;}
+table.op_item_table tr td{padding:2px;}
+.op_item_table td.name{min-width:100px;}
+.op_item_table td.value{}
+
+table.op_total_table {margin-left:320px;}
+table.op_total_table tr td.name {width:250px;}
+table.op_total_table tr td.value {width:120px;}
+
+table.op_sum_table {width:98%}
+table.op_sum_table tr td.name{width:100px;}
+table.op_sum_table tr td.value,
+table.op_sum_table tr td.price{width:200px;text-align:right}
+
+
+span.value {min-width:200px;}
+
+.text-logo {font-size:48px;}
+table.order_print_table .text-logo .letter-works {margin-left:4px;}
+table.order_print_table .text-logo .homepage {font-size:22px;font-weight:bold;margin-left:20px; vertical-align:middle;}
+table.order_print_table .date_area{float:right;width:190px;}
+table.order_print_table .date_area .item{font-weight:bold}
+table.order_print_table .op_address{margin-top:10px;}
+table.order_print_table .op_address span{float:left;line-height:1.6em;margin-right:12px;}
+tr.spliter{margin-bottom:8px;}
+tr.spliter td{border-bottom:solid 1px #ddd;height:1px;margin:0;padding:2px !important;font-size:2px;}
+.note {margin: 6px; border: solid 0px #eee; padding: 8px;}
+
+tr.sesion-header td{padding-top: 12px !important;}
+.price{font-size:18px;}
+.price.small{font-size:14px;}
+/** ==========old things --------------------*/
+
+.PG_order_edit .summary{float:right;margin:10px;clear: both;}
+.btn_main {text-align:center;clear: both;}
+
+
+
+/* order edit*/
+table.oe_table {}
+table.oe_table tr:hover{background-color:#d9f9de}
+table.oe_table tr{border:solid 1px #ddd}
+table.oe_table tr td{padding:2px;}
+table.oe_table td.name{width:400px;}
+table.oe_table tr td.value {padding-left:20px; padding-right:20px;text-align:right;}
+table.oe_table td .price{font-size:14px;width:20px;}
+
+.item_info .value {text-align:right;color:red;}
+
+.order_total{margin-right:20px;}
+
+.order_create{margin-top:20px;}
+div.order_header {border:solid 0px red;margin:4px;}
+div.order_header .order_id{font-size:1.4em;}
+div.order_header .time{float:right;line-height:2em;}
+.order_edit_form {margin-top:6px !important;}
+
+.tax_dl {float:right;width:320px;padding-right:0.8em;}
+.tax_dl dt {float:left;clear:left;text-align:right}
+.tax_dl dd {clear:right;text-align:right;margin-top:0.2em}
+.tax_dl dd input {width:48px;text-align:right;}
+.tax_dl .spliter {margin:6px 0 6px 0;border:0;border-top:solid 1px #ddd }
+
+.tax_dl span.term{display:block;width:16px;border:solid 0px red;float:left;text-align:center;}
+.tax_dl span.term.free{width:auto;}
+
+/* special */
+.header .loginbar {color:white}
+.header .loginbar a{color:white}
+
+
+/* Order List: Store Seelect Filter */
+.store_selector{border:solid 0px red}
+.store_selector label{color:black;font-size:16px;}
+.store_selector input{font-size:16px;line-height:24px;}

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<!--
+    Time-stamp: <[InventoryStat.html] Elivoa @ Sunday, 2015-04-05 13:38:29>
+    NG-enabled;
+  -->
+<html ng-app="syd">
+  <head>
+    <link href="/static/css/pages/pg_inventory_edit.css" rel="stylesheet" type="text/css">
+    <t:layout.header title="入库统计" ng="true"/>
+    <script src="/static/js/p/inventory/inventory_stat_ng.js" ></script>
+  </head>
+
+  <body ng-controller="InventoryStatCtrl" class="PG_edit_inventory">
+    <t:layout.headernav />
+    
+    <div class="container ">
+      <t:layout.leftnav curPage="/inventory" />
+
+      <div class="main_content">
+
+        <div style="border:solid 1px red;margin:4px;padding:4px;">DEVELOPING THIS PAGE</div>
+
+        {{with .InventoryGroup}}
+
+        <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
+              t:id="InventoryForm" novalidate>
+          <input type="hidden" name="t:id" value="InventoryForm" />
+          <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
+          <input type="hidden" name="InventoriesJson" value="[[Inventories]]" />
+
+          <div class="unit">
+            <div class="tit"><strong>搜索条件：</strong></div>
+            <div class="form_main" style="margin:2px;">
+              
+              <div style="padding:4px;margin:0px;" class="">              
+
+                <div style="margin:8px 8px 16px 8px;">
+                  <label>
+                    厂家： <!-- select 的表单提交模式，使用input提交内容。select作为同步 -->
+                    <input type="text" ng-model="Factory" class="ghost"/>
+                    <select ng-model="Factory" style="width:80px" required
+                            ng-o ptions="factory.Id as factory.Name for factory in Factories"></select>
+                  </label>
+                  <label>
+                    时间（票日期）：
+                    <input type="date" ng-model="InventoryGroup.SendTime" />
+                    <span> - </span>
+                    <input type="date" ng-model="InventoryGroup.ReceiveTime" />
+                  </label>
+
+                  <input type="button" class="btn_a_s" value="搜索" ng-click="submit(InventoryForm)"
+                         xxonclick="$('#InventoryForm').submit()" />
+                </div>
+              </div>
+              
+            </div>
+          </div>
+
+          <div class="btn_content">
+            <!-- <input type="button" class="btn_b_l" value="返回列表" -->
+            <!--        onclick="window.location.href='/inventory'"/> -->
+            
+          </div>
+
+        </form>
+        {{end}}
+        
+      </div>
+    </div>
+  </body>
+</html>
+
+<script type="text/javascript">
+
+//
+p_InventoryStat({
+  Factory:{{.Factory}},
+  Factories : {{.Factories}}, // factories option
+  TimeFrom:{{.TimeFrom}},
+  TimeTo:{{.TimeTo}},
+});
+// InventoryGroup: {{.InventoryGroup}},
+
+
+$(document).ready(function(){
+  angular.element('._temp_query_box').focus(); 
+})
+                                                            </script>
+
+

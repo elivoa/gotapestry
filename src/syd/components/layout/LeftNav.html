@@ -18,6 +18,7 @@
     <dd class="{{.Style `/product/create` }}"><a href="/product/create">新增商品</a></dd>
     <dd class="{{.Style `/product/list` }}"><a href="/product/list">商品列表</a></dd>
     <dd class="{{.Style `/inventory` }}"><a href="/inventory">库存管理</a></dd>
+    <dd class="{{.Style `/placeorder` }}"><a href="/placeorder">下单管理</a></dd>
     <dd class="{{.Style `/product/change` }}"><a href="/product/change">退换货管理</a></dd>
   </dl>
   <div class="hrline"></div>
@@ -37,6 +38,12 @@
     <dd class="{{.Style `/stat/more` }}"><a href="/stat/more">MORE</a></dd>
   </dl>
 
+  <dl>
+    <dt>系统管理</dt>
+    <dd class="{{.Style `/admin/preference` }}"><a href="/admin/preference/test">参数设置</a></dd>
+    <dd class="{{.Style `/admin/staff` }}"><a href="/admin/staff">Staff Management</a></dd>
+    <dd class="{{.Style `/product/list` }}"><a href="/product/list">Products</a></dd>
+  </dl>
   
   <t:delegate name="changelog" />
   <div class="hrline"></div>

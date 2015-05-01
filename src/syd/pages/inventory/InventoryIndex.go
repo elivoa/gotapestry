@@ -1,15 +1,19 @@
-// Time-stamp: <[InventoryIndex.go] Elivoa @ Monday, 2015-03-23 14:49:17>
+// Time-stamp: <[InventoryIndex.go] Elivoa @ Wednesday, 2015-04-22 16:38:38>
 package inventory
 
 import (
 	"fmt"
+	"github.com/elivoa/got/builtin/services"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/route/exit"
+	"github.com/elivoa/got/utils"
 	"strings"
 	"syd/base/inventory"
 	"syd/model"
 	"syd/service"
+	"time"
 )
 
 type InventoryIndex struct {
@@ -17,9 +21,13 @@ type InventoryIndex struct {
 
 	InventoryGroups []*model.InventoryGroup
 	Tab             string `path-param:"1"`
-	Current         int    `path-param:"2"`   // pager: the current item. in pager.
-	PageItems       int    `path-param:"3"`   // pager: page size.
-	Provider        int64  `query:"provider"` // filter by provider Id.
+	Current         int    `path-param:"2"` // pager: the current item. in pager.
+	PageItems       int    `path-param:"3"` // pager: page size.
+
+	// searc form or filter
+	Provider int64     `query:"provider"` // filter by provider Id.
+	TimeFrom time.Time `query:"from"`
+	TimeTo   time.Time `query:"to"`
 
 	// properties
 	Total int // pager: total items available
@@ -31,10 +39,11 @@ type InventoryIndex struct {
 func (p *InventoryIndex) Activate() {
 	// service.User.RequireRole(p.W, p.R, syd.RoleSet_Orders...)
 
-	// not injected with parameters.
+	// process parameters
 	if p.Tab == "" {
 		p.Tab = "all" // default go in toprint
 	}
+
 }
 
 func (p *InventoryIndex) SetupRender() {
@@ -44,6 +53,14 @@ func (p *InventoryIndex) SetupRender() {
 	// fix the pagers
 	if p.PageItems <= 0 {
 		p.PageItems = config.LIST_PAGE_SIZE // TODO default pager number. Config this.
+	}
+
+	// parameter time
+	if !utils.IsValidTime(p.TimeFrom) {
+		p.TimeFrom = time.Date(2015, time.January, 1, 0, 0, 0, 0, time.Local)
+	}
+	if !utils.IsValidTime(p.TimeTo) {
+		p.TimeTo = time.Now()
 	}
 
 	// load inventory group
@@ -61,6 +78,12 @@ func (p *InventoryIndex) SetupRender() {
 		fmt.Println("And filter by provider_id ", p.Provider)
 		parser.And(inventory.F_ProviderId, p.Provider)
 	}
+	// time
+	if utils.IsValidTime(p.TimeFrom) && utils.IsValidTime(p.TimeTo) {
+		parser.Range(inventory.FSendTime, p.TimeFrom, p.TimeTo)
+	}
+
+	parser.And(inventory.F_Type, inventory.TypeReceive)
 
 	// parser.Or("type", model.Wholesale, model.ShippingInstead) // restrict type
 	parser.OrderBy(inventory.FSendTime, db.DESC)
@@ -77,6 +100,30 @@ func (p *InventoryIndex) SetupRender() {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func (p *InventoryIndex) OnSuccessFromSearchForm() *exit.Exit {
+	// time is injected and then return linkpage.
+	return exit.Redirect(p.ThisPageLink())
+}
+
+func (p *InventoryIndex) OnClearForm() *exit.Exit {
+	p.TimeFrom = time.Date(0, 0, 0, 0, 0, 0, 0, time.Local)
+	p.TimeTo = p.TimeFrom
+	return exit.Redirect(p.ThisPageLink())
+}
+
+func (p *InventoryIndex) ThisPageLink() string {
+	// 一个普通的SearchBox实现。所有东西都放到url里面。直接redirect到本页面。
+	var parameters = map[string]interface{}{
+		"provider": p.Provider,
+		"from":     p.TimeFrom,
+		"to":       p.TimeTo,
+	}
+
+	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("inventory", parameters)
+	return url
+
 }
 
 // func (p *InventoryIndex) ShowProduct(r *model.Inventory) string {

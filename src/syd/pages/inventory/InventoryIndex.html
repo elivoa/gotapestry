@@ -2,7 +2,7 @@
 <html>
   <head>
     
-    <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/pages/pg_list_inventory.css" rel="stylesheet" type="text/css">
     <t:layout.header title="入库" />
     
   </head>
@@ -13,8 +13,42 @@
       <t:layout.leftnav curPage="/inventory" />
 
       <div class="main_content">
-    	<h1>所有入库记录</h1>
+    	<h1>入库记录</h1>
 
+        <!-- Search Form -->
+        <form method="POST" id="SearchForm" t:id="SearchForm" name="SearchForm"
+              class="search_form ng-cloak" novalidate>
+          <input type="hidden" name="t:id" value="SearchForm" />
+
+		  <h2>查询</h2>
+		  <div class="search_filter">
+            <div class="flt_line">
+              发货时间:
+              从 <input class="inp_calendar" type="date"
+                        name="TimeFrom" value="{{.TimeFrom | smartvaliddate}}" />  
+              到 <input class="inp_calendar" type="date"
+                        name="TimeTo" value="{{.TimeTo | smartvaliddate}}" />
+              
+              <input type="submit" value="搜索" class="btn_a_s" />
+              <input t:type="a" event="ClearForm" label="清除" class="btn_b_s" />
+              
+              <span style="margin-left:20px;">
+                <a href="###">今天</a> ,
+                <a href="###">一周</a> ,
+                <a href="###">一月</a> ,
+                <a href="###">一年</a> Todo
+              </span>
+            </div>
+
+            <div class="flt_line">
+              <span class="txt_c">日期格式： <strong>'2012-09-30'</strong>.</span>
+            </div>
+            <div class="flt_line">
+            </div>
+          </div>
+        </form>
+        <!-- End Search Form -->
+        
         <div class="bg" style="margin:8px;">
           <div class="tab_btn">
             <a class="btn_b_s" href="/inventory/edit?referer={{referer $}}">
@@ -26,6 +60,12 @@
                 显示全部
               </a>
             </if>
+
+            <div style="float:right">
+              <a class="btn_b_s" href="/inventory/stat">
+                统计
+              </a>
+            </div>
           </div>
         </div>
 

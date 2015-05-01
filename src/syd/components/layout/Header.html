@@ -9,11 +9,21 @@
 </t:block>
 
 <link href="/static/bootstrap/css/bootstrap-modal.min.css" rel="stylesheet" type="text/css" />
-
 <link href="/static/bootstrap/css/bootstrap-selected.css" rel="stylesheet" type="text/css" />
-<link href="/static/skins/skin_001/skin.css" rel="stylesheet" type="text/css" />
 
-<link href="/static/css/global/fix.css" rel="stylesheet" type="text/css" />
+<!-- CSS suite version 1 or 2, [1] is from syd project [2] is from carfilm project. -->
+<if t="eq .CSS 2">
+  <link href="/static/css2/base.css" rel="stylesheet" type="text/css" />
+  <link href="/static/css2/layer.css" rel="stylesheet" type="text/css" />
+  <link href="/static/css2/frame.css" rel="stylesheet" type="text/css" />
+  <link href="/static/css2/customize.css" rel="stylesheet" type="text/css" />
+
+  <else />
+
+  <link href="/static/skins/skin_001/skin.css" rel="stylesheet" type="text/css" />
+  <link href="/static/css/global/fix.css" rel="stylesheet" type="text/css" />
+</if>
+
 
 <!-- 3rd library-->
 <script type="text/javascript" src="/static/js/jquery.js"></script>
