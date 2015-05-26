@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "Starting syd project for lyn!"
+
+# Server mode to start syd project for LYN!
+# export GOPATH=/Users/bogao/develop/gitme/gotapestry/:$GOPATH
+export GOPATH=/root/gotapestry-lyn/:$GOPATH
+
+./start
+
+
