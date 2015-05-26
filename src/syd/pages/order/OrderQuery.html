@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html ng-app>
+  <head>
+    <!-- <link href="/static/css/pages/pg_list_order.css" rel="stylesheet" type="text/css"> -->
+    <t:layout.header title="订单查询" nggg="true" css="2"/>
+  </head>
+  <body>
+    
+    <t:layout.headernav />
+    
+    <div class="container">
+      <t:layout.leftnav CurPage="/order/query" />
+
+      <div class="main_content">
+        <!-- Search Form -->
+        <form method="POST" id="SearchForm" t:id="SearchForm" name="SearchForm"
+              class="search_form ng-cloak" novalidate>
+          <input type="hidden" name="t:id" value="SearchForm" />
+          <input type="hidden" name="Tab" value="{{.Tab}}" />
+
+		  <h2>订单查询</h2>
+		  <div class="search_filter">
+            <div class="flt_line">
+              下单时间:
+              从 <input class="inp_calendar" type="date"
+                        name="TimeFrom" value="{{.TimeFrom | smartvaliddate}}" />  
+              到 <input class="inp_calendar" type="date"
+                        name="TimeTo" value="{{.TimeTo | smartvaliddate}}" />
+              
+              <input type="submit" value="搜索" class="btn_a_s" />
+              <input t:type="a" event="ClearForm" label="清除" class="btn_b_s" />
+              
+              <span style="margin-left:20px;">
+                <a href="###">今天</a> ,
+                <a href="###">一周</a> ,
+                <a href="###">一月</a> ,
+                <a href="###">一年</a> Todo 
+              </span>
+            </div>
+
+            <div class="flt_line">
+              <span class="txt_c">日期格式： <strong>'2012-09-30'</strong>.</span>
+            </div>
+            <div class="flt_line"> 
+            </div>
+          </div>
+
+          <div>&nbsp;</div>
+          
+          <div class="tab_main">
+            <div class="bg">
+	          <ul class="clearfix">
+	            <li class="{{$.TabStyle `all`}}">
+                  <a href="javascript:void(0)" onclick="ontab('all')">全部订单</a>
+                </li>
+	            <li class="{{$.TabStyle `toprint`}}">
+                  <a href="javascript:void(0)" onclick="ontab('toprint')">待打印订单</a>
+                </li>
+                <li class="{{$.TabStyle `todeliver`}}">
+                  <a href="javascript:void(0)" onclick="ontab('todeliver')">待发货订单</a>
+                </li>
+	            <li class="{{$.TabStyle `delivering`}}">
+                  <a href="javascript:void(0)" onclick="ontab('delivering')">已发货订单</a>
+                </li>
+	            <li class="{{$.TabStyle `done`}}">
+                  <a href="javascript:void(0)" onclick="ontab('done')">已完成订单</a>
+                </li>
+	            <li class="{{$.TabStyle `canceled`}}">
+                  <a href="javascript:void(0)" onclick="ontab('canceled')">已取消订单</a>
+                </li>
+	          </ul>
+	        </div>
+          </div>
+
+        </form>
+        <!-- End Search Form -->
+      </div>
+      
+      <div class="main_content">
+
+        <div class="list_order">
+          <t:order.list tid="orderlist" orders=".Orders" tab=".Tab" Referer="refer ."/>
+
+          <div style="border:solid 0px red">
+            <div t:type="ui.pager" total=".Total" current=".Current" pageitems=".PageItems"
+                 urlTemplate=".UrlTemplate" />
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+
+    <script language="javascript">
+  function ontab(tab){
+    var formobj = $('#SearchForm');
+    if (formobj){
+      var inputobj = formobj.find('input[name="Tab"]')
+      if(inputobj){
+        inputobj.val(tab);
+        formobj.submit();
+      }
+    }
+  }  
+    </script>
+    
+  </body>
+</html>

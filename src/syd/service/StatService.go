@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/utils"
 	"sort"
 	"syd/model"
-	"time"
 )
 
 type StatService struct{}
@@ -61,7 +61,7 @@ type StatService struct{}
 
 // DAO service
 func (s *StatService) CalculateHotSaleProducts(years, months, days int) (*model.HotSales, error) {
-	start, end := natureTimeRange(years, months, days)
+	start, end := utils.NatureTimeRange(years, months, days)
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -123,7 +123,7 @@ func (s *StatService) CalculateHotSaleProducts(years, months, days int) (*model.
 }
 
 func (s *StatService) CalculateHotSaleProducts_with_specs(years, months, days int) (*model.HotSales, error) {
-	start, end := natureTimeRange(years, months, days)
+	start, end := utils.NatureTimeRange(years, months, days)
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -204,17 +204,4 @@ func (s *StatService) CalculateHotSaleProducts_with_specs(years, months, days in
 	}
 	sort.Sort(hs.HSProduct)
 	return hs, nil
-}
-
-// bad
-func timeRangeWeek(years, months, days int) (start, end time.Time) {
-	end = time.Now().Truncate(time.Hour * 24)
-	start = end.AddDate(years, months, days)
-	return
-}
-
-func natureTimeRange(years, months, days int) (start, end time.Time) {
-	natureEnd := time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24)
-	natureStart := natureEnd.AddDate(years, months, days-1)
-	return natureStart, natureEnd
 }

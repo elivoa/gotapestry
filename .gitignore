@@ -3,6 +3,7 @@ pkg/*
 .dropbox
 
 .DS_Store
-src/generated/*.go
-src/generated/main.go
+src/generated/*
+src/syd/generated/*
 static/from_lili/*
+
