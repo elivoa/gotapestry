@@ -15,9 +15,9 @@ import (
 
 /* ________________________________________________________________________________
 The Order List page
-*/ 
+*/
 type OrderQuery struct {
-	core.Page 
+	core.Page
 
 	// parameters
 	Orders    []*model.Order

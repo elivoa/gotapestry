@@ -1,29 +1,29 @@
 #!/bin/sh
 
-echo "go build..."
-echo "remove some folder first:"
+echo "Building Project..."
+echo "-[BUILD:1/6]- remove some folder first:"
 rm -rf ~/develop/go/pkg/darwin_amd64/github.com/elivoa/got
 
-echo "-200- go install github.com/elivoa/gxl..."
+echo "-[BUILD:2/6]- go install github.com/elivoa/gxl..."
 go install github.com/elivoa/gxl
 
-echo "-210- go install github.com/elivoa/got..."
+echo "-[BUILD:3/6]- go install github.com/elivoa/got..."
 go install github.com/elivoa/got
 
 # echo "-250- go install got..."
 # go install got
 
-echo "-260- go install syd... ?? need to remove and build again?"
+echo "-[BUILD:4/6]- go install syd... ?? need to remove and build again?"
 go install syd
 go install syd/service
 go install syd/model
 go install syd/dal/userdao
 
 # How to generate all components and pages package to build.
-echo "-300- go install generated; to build all pages."
-go install generated
+echo "-[BUILD:5/6]- go install generated; to build all pages."
+go install syd/generated
 
-echo "-270- go run main.go..."
+echo "-[BUILD:6/6]- go run main.go..."
 
 echo "---------------------------------------------------------------------------------------------------"
 go run main.go

@@ -1,10 +1,13 @@
 <!DOCTYPE HTML>
-<html ng-app>
+<html ng-app="app">
   <head>
     <!-- <link href="/static/css/pages/pg_list_order.css" rel="stylesheet" type="text/css"> -->
-    <t:layout.header title="订单查询" nggg="true" css="2"/>
+    <t:layout.header title="订单查询" ng="true" css="2"/>
+
+    <!-- import ngc js -->
+    <script type="text/javascript" src="/static/ngc/order-close-button.js"></script>
   </head>
-  <body>
+  <body ng-controller="ctrl">
     
     <t:layout.headernav />
     
@@ -14,7 +17,7 @@
       <div class="main_content">
         <!-- Search Form -->
         <form method="POST" id="SearchForm" t:id="SearchForm" name="SearchForm"
-              class="search_form ng-cloak" novalidate>
+              class="search_form ng-cloak" ng-submit="submit()" novalidate>
           <input type="hidden" name="t:id" value="SearchForm" />
           <input type="hidden" name="Tab" value="{{.Tab}}" />
 
@@ -90,6 +93,55 @@
       </div>
     </div>
 
+    <!-- 这是order-close-button 这个ngc所诉要用到的模板，暂时放到这里，因为不知道怎么加载最好！ -->
+    <script type="text/template" id="order-close-button-template">
+  <a href="#order-close-button-modal" data-toggle-x="modal"
+ng-click="closeclick($event)">结款</a>
+    </script>
+
+    <div id="order-close-button-modal" class="layer_box modal hide fade">
+      <div class="layer_top modal-header">
+        <a class="layer_close" title="关闭" href="#" data-dismiss="modal" aria-hidden="true"></a>
+        <span>快速结款</span>
+      </div>
+      <div class="layer_content L_fast_cash modal-body">
+        <form action="/order/ButtonSubmitHere" method="POST"
+              ___onsubmit="return validateCloseForm('');">
+          <input type="hidden" name="t:id" value="CloseForm" />
+          <input type="hidden" name="TrackNumber" value="" class="tracking-number" />
+          <input type="hidden" name="Referer" value="" class="referer"/>
+          
+          <div class="L_account_info clearfix">
+            <strong class="customer-name"></strong>
+            <span class="L_overage">
+              账户余额：
+              <span class="price account-ballance"></span> 元
+            </span>
+          </div>
+          <div class="form_main">
+            <dl class="clearfix">
+              <dt class="L_order_price">订单金额：</dt>
+              <dd>
+                <strong class="price sum-order-price"></strong> 元
+              </dd>
+            </dl>
+            <dl class="clearfix">
+              <dt>结账：</dt>
+              <dd>
+                <input type="text" size="16" class="money" name="Money" value=""> 
+                <label><input type="checkbox" class="money-clear"> 已结清</label>
+              </dd>
+            </dl>
+            <dl class="clearfix">
+              <dd>
+                <input type="submit" class="btn_a_s confirm" value="确认" />
+              </dd>
+            </dl>
+          </div>
+        </form>
+      </div>
+    </div>
+    
 
     <script language="javascript">
   function ontab(tab){
@@ -101,8 +153,24 @@
         formobj.submit();
       }
     }
-  }  
+  }
+
+// 这里可能并不需要一个controller，directive可以独立工作的；
+angular.module('app')
+// test control and test data;
+  .controller("ctrl", function ($scope) {
+    $scope.products = [
+      { name: "Apples", category: "Fruit", price: 1.20, expiry: 10 },
+      { name: "Bananas", category: "Fruit", price: 2.42, expiry: 7 },
+      { name: "Pears", category: "Fruit", price: 2.02, expiry: 6 }
+    ];
+    $scope.submit = function(form) {
+      fillFormNameWithNGModel(SearchForm);
+      SearchForm.submit();
+    };
+  })
+
     </script>
-    
+
   </body>
 </html>

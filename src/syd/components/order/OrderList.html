@@ -107,11 +107,24 @@
                     <span class="vline">|</span>
                   </if>
                   
-                  {{/* TODO order/CloseButton */}}
+
+                  {{/* TODO order/CloseButton
                   <a t:type="order.CloseButton" Tid="CloseButton" id="close{{.TrackNumber}}_"
                      order="."
                      _no_use_TrackNumber=".TrackNumber"
                      Referer="referer $" />
+                  */}}
+                  
+                  <span order-close-button
+                        track-number="{{.TrackNumber}}"
+                        customer-name="{{.Customer.Name}}"
+                        account-ballance="{{.Customer.AccountBallance | prettycurrency}}"
+                        sum-order-price="{{.SumOrderPrice | prettycurrency}}"
+                        referer="{{referer $}}"
+                        >
+                    结款CLOSE
+                  </span>
+                  
                 </if>
 
                 <!--
@@ -123,12 +136,7 @@
                 <!-- <span style="color:red">{{.Accumulated}}</span> -->
               </td>
               
-              <td style="display:none">
-                <a href="/order/list.orderlist.delete/{{.TrackNumber}}/{{$.Tab}}"
-                   onclick="return confirm('******************************\n注意：真的要删除 {{if .Customer}}{{.Customer.Name}}{{else}}{{.CustomerId}}{{end}} 的订单么？已经发货的订单不能删除！会影响累计欠款！\n******************************');">
-                  【删除订单】
-                </a>
-              </td>
+              
             </tr>
           </range>
         </table>
@@ -136,23 +144,16 @@
       </if>
 
       <script type="text/javascript">
-                   $(function(){
-                     orderlist = new OrderList({
-                       ClientId: {{.ClientId}}
-                     })
-                   });
+  // sldfkjalk
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+
+
       </script>
 
     </div>
   </body>
 </html>
-
-
-
-{{define "--------------" }}
-<a href="{{$.EditLink .}}">修改订单</a><span class="vline">|</span>
-<a href="{{$.PrintOrderLink .}}" target="_blank">打印订单</a><span class="vline">|</span>
-<a href="/order/list.CancelOrder/{{.TrackNumber}}/{{$.Tab}}"
-   onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');">取消订单</a>
-{{end}}
-
