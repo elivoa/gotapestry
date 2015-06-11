@@ -106,7 +106,7 @@ ng-click="closeclick($event)">结款</a>
       </div>
       <div class="layer_content L_fast_cash modal-body">
         <form action="/order/ButtonSubmitHere" method="POST"
-              ___onsubmit="return validateCloseForm('');">
+              onsubmit="return validateCloseForm('');">
           <input type="hidden" name="t:id" value="CloseForm" />
           <input type="hidden" name="TrackNumber" value="" class="tracking-number" />
           <input type="hidden" name="Referer" value="" class="referer"/>
@@ -128,8 +128,8 @@ ng-click="closeclick($event)">结款</a>
             <dl class="clearfix">
               <dt>结账：</dt>
               <dd>
-                <input type="text" size="16" class="money" name="Money" value=""> 
-                <label><input type="checkbox" class="money-clear"> 已结清</label>
+                <input type="text" size="16" class="money sum-order-price" name="Money" value=""> 
+                <label><input type="checkbox" class="money-clear" checked="true"> 已结清</label>
               </dd>
             </dl>
             <dl class="clearfix">
@@ -144,16 +144,33 @@ ng-click="closeclick($event)">结款</a>
     
 
     <script language="javascript">
-  function ontab(tab){
-    var formobj = $('#SearchForm');
-    if (formobj){
-      var inputobj = formobj.find('input[name="Tab"]')
-      if(inputobj){
-        inputobj.val(tab);
-        formobj.submit();
-      }
+  // in page scripts
+  
+function ontab(tab){
+  var formobj = $('#SearchForm');
+  if (formobj){
+    var inputobj = formobj.find('input[name="Tab"]')
+    if(inputobj){
+      inputobj.val(tab);
+      formobj.submit();
     }
   }
+}
+
+function validateCloseForm(){
+  if (confirm("确认结款么？")){
+    var m = angular.element("#order-close-button-modal");
+    o = m.find("input.money");
+    if (o.val() == "") {
+      alert('必须填写结账金额！')
+      o.focus()
+      return false
+    }
+    return true
+  } else{
+    return false
+  }
+}
 
 // 这里可能并不需要一个controller，directive可以独立工作的；
 angular.module('app')

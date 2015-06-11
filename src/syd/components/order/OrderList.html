@@ -107,7 +107,6 @@
                     <span class="vline">|</span>
                   </if>
                   
-
                   {{/* TODO order/CloseButton
                   <a t:type="order.CloseButton" Tid="CloseButton" id="close{{.TrackNumber}}_"
                      order="."
@@ -119,10 +118,9 @@
                         track-number="{{.TrackNumber}}"
                         customer-name="{{.Customer.Name}}"
                         account-ballance="{{.Customer.AccountBallance | prettycurrency}}"
-                        sum-order-price="{{.SumOrderPrice | prettycurrency}}"
+                        sum-order-price="{{.SumOrderPrice}}"
                         referer="{{referer $}}"
-                        >
-                    结款CLOSE
+                        >结款CLOSE
                   </span>
                   
                 </if>

@@ -1,5 +1,5 @@
 // Order/CloseButton
-// Time-stamp: <[order-close-button.js] Elivoa @ Wednesday, 2015-06-10 23:58:19>
+// Time-stamp: <[order-close-button.js] Elivoa @ Thursday, 2015-06-11 23:07:18>
 
 // Development Notes:
 // 临时使用侧重调用方式，外部框架有待改进；
@@ -24,6 +24,7 @@ angular.module('app').directive("orderCloseButton", function ($http) {
       referer         : "@referer"
     },
     link: function (scope, element, attrs) {
+
       // 结款按钮点击方法：如果上层是ngc，那么这里应该用ngc的参数传递；现在使用原始的传递方法；
       scope.closeclick = function(){
         var $scope = scope;
@@ -40,7 +41,8 @@ angular.module('app').directive("orderCloseButton", function ($http) {
           m.find('.referer').val($scope.referer);
           m.find('.customer-name').html($scope.customerName);
           m.find('.account-ballance').html($scope.accountBallance);
-          m.find('.sum-order-price').html($scope.sumOrderPrice);
+          m.find('strong.sum-order-price').html($scope.sumOrderPrice);
+          m.find('input.sum-order-price').val($scope.sumOrderPrice);
 
           m.on('shown', function(){
             m.find("input.money").focus();
