@@ -107,33 +107,11 @@
                     <span class="vline">|</span>
                   </if>
                   
-                  {{/* TODO order/CloseButton
-                  <a t:type="order.CloseButton" Tid="CloseButton" id="close{{.TrackNumber}}_"
-                     order="."
-                     _no_use_TrackNumber=".TrackNumber"
-                     Referer="referer $" />
-                  */}}
-                  
-                  <span order-close-button
-                        track-number="{{.TrackNumber}}"
-                        customer-name="{{.Customer.Name}}"
-                        account-ballance="{{.Customer.AccountBallance | prettycurrency}}"
-                        sum-order-price="{{.SumOrderPrice}}"
-                        referer="{{referer $}}"
-                        >结款CLOSE
-                  </span>
+                  <span t:type="order.CloseButton" order="." />
                   
                 </if>
 
-                <!--
-                    点击订单号查看吧，不显示查看订单了。
-                    <if t='.IsStatus "cancelled" "done"'>
-                      <a href="{{$.ViewLink .}}">查看订单</a>
-                    </if>
-                    -->
-                <!-- <span style="color:red">{{.Accumulated}}</span> -->
               </td>
-              
               
             </tr>
           </range>
@@ -142,7 +120,6 @@
       </if>
 
       <script type="text/javascript">
-  // sldfkjalk
   $(function(){
     orderlist = new OrderList({
       ClientId: {{.ClientId}}
