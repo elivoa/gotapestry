@@ -1,18 +1,14 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[ProductEdit.html] Elivoa @ Sunday, 2015-01-25 22:33:26>
+    Time-stamp: <[ProductEdit.html] Elivoa @ Friday, 2015-07-03 14:49:05>
     NG-enabled;
   -->
-
-<html ng-app="syd">
+<html ng-app="app">
   <head>
     <link href="/static/css/pages/pg_create_product.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="新增订单" />
-    <!-- <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script> -->
-    <!-- <script type="text/javascript" src="/static/js/p/product/product_edit.js"></script> -->
+    <t:layout.header title="新增订单" ng="true" />
   </head>
-
-  <body ng-controller="ProductCtrl" class="PG_create_product" >
+  <body ng-controller="ctrl" class="PG_create_product" >
     <t:layout.headernav />
 
     <div class="container">
@@ -193,6 +189,6 @@ p_ProductEdit({
   Colors: {{.Colors}},
   Sizes: {{.Sizes}}
 });
-</script>
+      </script>
 
 

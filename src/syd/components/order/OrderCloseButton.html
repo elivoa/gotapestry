@@ -3,7 +3,7 @@
   -->
 
 <t:import>
-  <!-- import ngc js -->
+  <!-- import ngc js TODO：改成自动引入这个名字的js。-->
   <script type="text/javascript" src="/static/ngc/order-close-button.js"></script>
 </t:import>
 
@@ -17,8 +17,10 @@
       />
 {{end}}
 
+<!-- 将block插入到html的最后面； -->
 <t:delegate to="support" global="true"/>
 
+<!-- 声明一个block，里面存放的是ngc用到的html模板内容，和一些js； -->
 <t:block id="support">
   <!-- 这是order-close-button 这个ngc所诉要用到的模板，暂时放到这里，因为不知道怎么加载最好！ -->
   <script type="text/template" id="order-close-button-template">
@@ -103,7 +105,6 @@ angular.module('app')
   })
 
   </script>
-
   
 </t:block>
 

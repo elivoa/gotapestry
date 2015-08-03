@@ -1,5 +1,5 @@
 // ProductEdit
-// Time-stamp: <[product_edit_ng.js] Elivoa @ Monday, 2015-01-26 00:28:39>
+// Time-stamp: <[product_edit_ng.js] Elivoa @ Friday, 2015-07-03 16:07:01>
 
 //
 // $master.Product -- product json.
@@ -8,12 +8,7 @@
 //
 function p_ProductEdit($master){
 
-  var sydapp = angular.module('syd', [], function($interpolateProvider){
-    $interpolateProvider.startSymbol('[[');
-    $interpolateProvider.endSymbol(']]');
-  });
-
-  sydapp.controller('ProductCtrl', function($scope){
+  angular.module('app').controller('ctrl', function($scope){
     $scope.init = function() {
       // init values
       $scope.Product = angular.copy($master.Product);
