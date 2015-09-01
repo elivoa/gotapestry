@@ -12,6 +12,8 @@ import (
 	"syd/service/personservice"
 )
 
+var debug_always_update_order_accumulated = true
+
 type OrderService struct{}
 
 func (s *OrderService) EntityManager() *db.Entity {
@@ -64,6 +66,8 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 		_processOrderCustomerPrice(order)    // update order custumize price when confirm order.
 		_calculateOrder(order)               // calculate order statistic fields.
 		_processingUpdateOrderDetails(order) // update order detail into db;
+
+		_update_order_accumulated(order) // debug option
 		// update order
 		if _, err := orderdao.UpdateOrder(order); err != nil {
 			return nil, err
@@ -89,6 +93,24 @@ func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
 
 	}
 	return order, nil
+}
+
+func _update_order_accumulated(order *model.Order) error {
+	if debug_always_update_order_accumulated {
+
+		// always update order.accumulated
+		// 4. get person, check if customer exists.
+		customer, err := Person.GetPersonById(order.CustomerId)
+		if err != nil {
+			return err
+		} else if customer == nil {
+			return errors.New(fmt.Sprintf("Customer not found for order! id %v", order.CustomerId))
+		}
+
+		// 5. 设置累计欠款；
+		order.Accumulated = -customer.AccountBallance
+	}
+	return nil
 }
 
 func _processingUpdateOrderDetails(order *model.Order) error {
@@ -223,7 +245,8 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 		detail.OrderTrackNumber = order.TrackNumber
 	}
 
-	var needUpdateBallance = false
+	var needUpdateBallance = false // 需要写入Person的累计欠款
+
 	// If order delivery method is `takeaway`, chagne order status to `delivering` and
 	// update account ballance; In other situation change status to `toprint`.
 	if order.DeliveryMethod == "TakeAway" {
@@ -249,6 +272,8 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 		return nil, err
 	}
 
+	_update_order_accumulated(order) // debug option
+
 	// update account ballance
 	if needUpdateBallance {
 		Account.UpdateAccountBalance(order.CustomerId, -order.SumOrderPrice(),
@@ -256,7 +281,6 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 
 		// last step: update stocks. 修改累计欠款的时候就修改库存；
 		_reduceProductStocks(order.Details)
-
 	}
 
 	return order, nil
@@ -348,8 +372,8 @@ func _calculateOrder(order *model.Order) {
 	case model.ShippingInstead:
 		// this type of order's total price is calculated by sub
 		// orders, which is difficult to calculate, so I calclate sum
-		// in page, and then submit to the parent order. So, here do
-		// nothing.
+		// in page, and then submit to the parent order.
+		// So, here does nothing.
 	}
 }
 

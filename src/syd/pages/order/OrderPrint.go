@@ -34,6 +34,7 @@ func (p *OrderPrint) Setup() {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	p.Order = order
 	if p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId); err != nil {
 		panic(err)
@@ -42,22 +43,6 @@ func (p *OrderPrint) Setup() {
 	}
 
 	p.Sumprice = p.sumprice()
-
-	// logic: update order's accumulated
-	// ** 打印订单不需要修改累计欠款吧。
-
-	// fmt.Println("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-	// fmt.Println(" p.Order.Accumulated != -p.Customer.AccountBallance :: ",
-	// 	p.Order.Accumulated, "!=", -p.Customer.AccountBallance)
-
-	// if p.Order.Accumulated != -p.Customer.AccountBallance {
-	// 	p.Order.Accumulated = -p.Customer.AccountBallance
-	// 	_, err := service.Order.UpdateOrder(p.Order)
-	// 	if err != nil {
-	// 		panic(err.Error())
-	// 	}
-	// }
-
 }
 
 func (p *OrderPrint) sumprice() float64 {

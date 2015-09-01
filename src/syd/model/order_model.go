@@ -199,7 +199,7 @@ func (order *Order) TypeIs(t uint) bool {
 }
 
 func (order *Order) HasAccumulated() bool {
-	return order.Accumulated > 0
+	return order.Accumulated != 0
 }
 
 // Total price + express fee
