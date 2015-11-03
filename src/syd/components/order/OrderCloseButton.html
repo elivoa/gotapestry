@@ -7,6 +7,9 @@
   <script type="text/javascript" src="/static/ngc/order-close-button.js"></script>
 </t:import>
 
+
+[D:>
+
 {{with .Order}}
 <span order-close-button
       track-number="{{.TrackNumber}}"
@@ -20,12 +23,13 @@
 <!-- 将block插入到html的最后面； -->
 <t:delegate to="support" global="true"/>
 
-<!-- 声明一个block，里面存放的是ngc用到的html模板内容，和一些js； -->
+<!-- ******************************************************************************** < block
+     声明一个block，里面存放的是ngc用到的html模板内容，和一些js；
+  -->
 <t:block id="support">
   <!-- 这是order-close-button 这个ngc所诉要用到的模板，暂时放到这里，因为不知道怎么加载最好！ -->
   <script type="text/template" id="order-close-button-template">
-  <a href="#order-close-button-modal" data-toggle-x="modal"
-ng-click="closeclick($event)">结款</a>
+  <a href="#order-close-button-modal" data-toggle-x="modal" ng-click="closeclick($event)">结款</a>
   </script>
 
   <div id="order-close-button-modal" class="layer_box modal hide fade">
@@ -88,21 +92,6 @@ function validateCloseForm(){
     return false
   }
 }
-
-// 这里可能并不需要一个controller，directive可以独立工作的；
-angular.module('app')
-// test control and test data;
-  .controller("ctrl", function ($scope) {
-    $scope.products = [
-      { name: "Apples", category: "Fruit", price: 1.20, expiry: 10 },
-      { name: "Bananas", category: "Fruit", price: 2.42, expiry: 7 },
-      { name: "Pears", category: "Fruit", price: 2.02, expiry: 6 }
-    ];
-    $scope.submit = function(form) {
-      fillFormNameWithNGModel(SearchForm);
-      SearchForm.submit();
-    };
-  })
 
   </script>
   
