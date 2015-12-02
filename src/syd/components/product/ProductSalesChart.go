@@ -2,7 +2,6 @@ package product
 
 // Deprecated, TODO chagne this into angularjs module.
 import (
-	"fmt"
 	"github.com/elivoa/got/builtin/services"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
@@ -39,7 +38,7 @@ func (p *ProductSalesChart) OnPeriod(days int) *exit.Exit {
 		map[string]interface{}{"period": days}, p.ProductId,
 	)
 
-	fmt.Println("\n-================= go to days ", days, p.ProductId)
+	// fmt.Println("\n-================= go to days ", days, p.ProductId)
 	return exit.Redirect(url)
 }
 

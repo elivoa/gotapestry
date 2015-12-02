@@ -253,7 +253,6 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 			// performance issue?
 			found := false
 			for _, v := range salesdata {
-				fmt.Println(v.Key, " == ", key)
 				if v.Key == key {
 					found = true
 					newps = append(newps, v)
