@@ -11,6 +11,7 @@ import (
 	"syd/model"
 	"syd/service/suggest"
 	"syd/utils"
+	"time"
 )
 
 type ProductService struct{}
@@ -228,4 +229,66 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
 		pkeys[i] = filepath.Join("/pictures", pkeys[i])
 	}
 	return pkeys
+}
+
+//
+// Stat: StatDailySalesData - 统计产品每日销售数量
+//
+func (s *ProductService) StatDailySalesData(productId int, period int) (model.ProductSales, error) {
+
+	dprint := false
+	remove_year := true
+	default_period := 30
+
+	if salesdata, err := productdao.DailySalesData(productId); err != nil {
+		panic(err)
+	} else {
+		showdays := period
+		if showdays <= 0 {
+			showdays = default_period
+		}
+		keys := datekeys(showdays)
+		newps := model.ProductSales{}
+		for _, key := range keys {
+			// performance issue?
+			found := false
+			for _, v := range salesdata {
+				fmt.Println(v.Key, " == ", key)
+				if v.Key == key {
+					found = true
+					newps = append(newps, v)
+					break
+				}
+			}
+			if !found {
+				newps = append(newps, &model.SalesNode{Key: key, Value: 0})
+			}
+		}
+
+		if remove_year { // remove year-
+			for _, node := range newps {
+				if node != nil && len(node.Key) > 5 {
+					node.Key = node.Key[5:]
+				}
+			}
+		}
+
+		if dprint {
+			fmt.Println("\nDEVELOPING.................................................")
+			for _, node := range salesdata {
+				fmt.Println("\t", node.Key, " is ", node.Value)
+			}
+		}
+		return newps, nil
+	}
+}
+
+func datekeys(lastNDays int) []string {
+	t := time.Now().AddDate(0, 0, -lastNDays+1)
+	result := []string{}
+	for i := 0; i < lastNDays; i++ {
+		result = append(result, t.AddDate(0, 0, i).Format("2006-01-02"))
+	}
+
+	return result
 }

@@ -188,3 +188,56 @@ func ListProductsByIdSet(ids ...int64) (map[int64]*model.Product, error) {
 	}
 	return modelmap, nil
 }
+
+//
+// 统计产品日销量
+//
+func DailySalesData(n int) (model.ProductSales, error) {
+
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	_sql := `
+select
+  DATE_FORMAT(o.create_time, '%Y-%m-%d'), sum(od.quantity)
+from
+  order_detail od 
+  left join ` + "`" + `order` + "`" + ` o on od.order_track_number = o.track_number
+where 
+  od.product_id=? 
+  and o.status!="canceled" and o.type!=1
+  and o.create_time >= "2015-10-23"
+group by
+  DATE_FORMAT(o.create_time, '%Y-%m-%d')
+order by
+  DATE_FORMAT(o.create_time, '%Y-%m-%d') asc
+`
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		n,
+	)
+	if db.Err(err) {
+		return nil, err
+	}
+	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+
+	// the final result
+	// ps := []*model.SalesNode{}
+	ps := model.ProductSales{}
+
+	for rows.Next() {
+		p := new(model.SalesNode)
+		rows.Scan(&p.Key, &p.Value)
+		ps = append(ps, p)
+	}
+	return ps, nil
+}

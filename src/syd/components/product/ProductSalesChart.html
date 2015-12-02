@@ -1,0 +1,69 @@
+
+<div style="float:right;margin:8px;">
+  时间:
+  <!-- TODO: 自动填入页面URL -->
+  <t:a event="Period" context="7" label="一周" parameters="productid={{.ProductId}}"
+       class="(.PeriodLinkClass 7)" /> <span>|</span>
+  <t:a event="Period" context="30" label="30天" parameters="productid={{.ProductId}}"
+       class="(.PeriodLinkClass 30)" /> <span>|</span>
+  <t:a event="Period" context="90" label="90天" parameters="productid={{.ProductId}}"
+       class="(.PeriodLinkClass 90)" /> <span>|</span>
+  <t:a event="Period" context="365" label="一年" parameters="productid={{.ProductId}}"
+       class="(.PeriodLinkClass 365)" />
+
+</div>
+
+<h1>销售图表 (X日期，Y:件数)</h1>
+
+<script src="/static/js/lib/Chart.min.js"></script>
+<canvas id="canvas" height="180" width="800"></canvas>
+
+<div style="border:solid 1px red;display:none;">
+  {{.DailySalesData.Labels}}
+</div>
+
+<script language="javascript">
+  //
+
+// var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+
+var lineChartData = {
+  // labels : ["13","14","15","16","17","18","19"],
+  labels :  {{.DailySalesData.Labels}},
+  datasets : [
+    // {
+    //   label: "捣乱",
+    //   fillColor : "rgba(220,220,220,0.2)",
+    //   strokeColor : "rgba(220,220,220,1)",
+    //   pointColor : "rgba(220,220,220,1)",
+    //   pointStrokeColor : "#fff",
+    //   pointHighlightFill : "#fff",
+    //   pointHighlightStroke : "rgba(220,220,220,1)",
+    //   data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+    // },
+    {
+      label: "日销量",
+      fillColor : "rgba(151,187,205,0.2)",
+      strokeColor : "rgba(151,187,205,1)",
+      pointColor : "rgba(151,187,205,1)",
+      pointStrokeColor : "#fff",
+      pointHighlightFill : "#fff",
+      pointHighlightStroke : "rgba(151,187,205,1)",
+      data :  {{.DailySalesData.Datas}}
+    }
+  ]
+
+}
+
+window.onload = function(){
+  var ctx = document.getElementById("canvas").getContext("2d");
+  window.myLine = new Chart(ctx).Line(lineChartData, {
+    responsive: true
+  });
+}
+
+//';
+
+                </script>
+
+

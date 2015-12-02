@@ -16,10 +16,12 @@ import (
 	"syd/model"
 )
 
+var appversion = "3.5"
+
 // todo: think out a better way to register this.
 var SYDModule = &core.Module{
 	Name:            "syd",       // Don't use this. It's only used to display.
-	Version:         "3.5",       // TODO: used to add to assets path to disable cache.
+	Version:         appversion,  // TODO: used to add to assets path to disable cache.
 	VarName:         "SYDModule", // Variable name.
 	BasePath:        utils.CurrentBasePath(),
 	PackagePath:     "syd", // package name used anywhere to locate important things.
@@ -41,6 +43,7 @@ var SYDModule = &core.Module{
 
 		// Register new template functions this app usages.
 		templates.RegisterFunc("HasAnyRole", HasAnyRole)
+		templates.RegisterFunc("version", AppVersion)
 
 		// Register error handlers.
 		errorhandler.AddHandler("LoginError",
@@ -92,4 +95,8 @@ func HasAnyRole(w http.ResponseWriter, r *http.Request, roles ...string) bool {
 		}
 	}
 	return false
+}
+
+func AppVersion() string {
+	return appversion
 }

@@ -14,6 +14,8 @@ type ProductDetail struct {
 	core.Page
 	Id      *gxl.Int `path-param:"1"`
 	Product *model.Product
+
+	Period int `query:"period"` // Chart Time Period
 }
 
 func (p *ProductDetail) Setup() {
