@@ -1,18 +1,18 @@
 <div>
-  <table class="table">
+  <table class="table" style="border-color: #ddd;border:solid 1px #ddd" border="1">
     <tr>
+      <th>货号</th>
       <th>产品</th>
       <th>售出(件)</th>
       <th>详情</th>
     </tr>
     <range source=".HotSales.HSProduct">
       <tr>
-        <td>{{.ProductName}}</td>
+        <td>0000</td>
+        <td><a href="/product/detail/{{.ProductId}}">{{.ProductName}}</a></td>
         <td>{{.Sales}}</td>
         <td style="color:#666">
-          {{range $cskey, $q := .Specs}}
-          {{$cskey}}:{{$q}} | 
-          {{end}}
+          {{range $cskey, $q := .Specs}} {{$cskey}}:{{$q}} | {{end}}
         </td>
       </tr>
     </range>

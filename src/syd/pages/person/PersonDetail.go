@@ -129,12 +129,12 @@ func (p *PersonDetail) DisplayType(t int) string {
 	case 1:
 		return "手工修改"
 	case 2:
-		return "订单发货"
+		return "发货"
 	case 3:
 		return "批量结款"
 	case 4:
 		return "取消已发货订单，减去累计欠款"
 	default:
-		return "不可知类型"
+		return "未知"
 	}
 }

@@ -192,7 +192,7 @@ func ListProductsByIdSet(ids ...int64) (map[int64]*model.Product, error) {
 //
 // 统计产品日销量
 //
-func DailySalesData(n int) (model.ProductSales, error) {
+func DailySalesData(n int, startTime string) (model.ProductSales, error) {
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -211,7 +211,7 @@ from
 where 
   od.product_id=? 
   and o.status!="canceled" and o.type!=1
-  and o.create_time >= "2015-10-23"
+  and o.create_time >= ?
 group by
   DATE_FORMAT(o.create_time, '%Y-%m-%d')
 order by
@@ -223,12 +223,14 @@ order by
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		n,
+		n, startTime,
 	)
 	if db.Err(err) {
 		return nil, err
 	}
 	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+
+	fmt.Println("lskdjflasdjflaksjdf:::::, ", startTime)
 
 	// the final result
 	// ps := []*model.SalesNode{}

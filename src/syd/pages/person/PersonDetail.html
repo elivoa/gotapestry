@@ -78,29 +78,54 @@
 
         <div class="not defined">
           <h2>累计欠款变化记录:</h2>
-          <table border="1" cellpadding="10">
+          <table border="1" cellpadding="10" class="account_change_table">
             <tr>
               <td>时间</td>
+              <td>操作</td>
+              <td>增量</td>
               <td>累计欠款</td>
-              <td>Delta</td>
-              <td>类型</td>
-              <td>理由</td>
               <td>相关订单号</td>
+              <td>备注</td>
             </tr>
             
             {{range .ChangeLogs}}
             <tr>
-              <td>{{.Time | prettytime}}</td>
-              <td>{{.Account}}</td>
-              <td>{{.Delta}}</td>
-              <td>{{$.DisplayType .Type}}</td>
-              <td>{{.Reason}}</td>
-              <td>{{.RelatedOrderTN}}</td>
+              <td class="time">{{.Time | prettytime}}</td>
+              <td class="reason">{{$.DisplayType .Type}}</td>
+              <td class="delta" style="{{if .Delta}}color:green{{end}}">{{.Delta}}</td>
+              <td class="accu">{{.Account}}</td>
+              <td class="orderno">{{if .RelatedOrderTN}} {{.RelatedOrderTN}} {{else}} - {{end}}</td>
+              <td class="memo">{{.Reason}}</td>
             </tr>
             {{end}}
           </table>
+
+          <!-- 
+               <table border="1" cellpadding="10" class="account_change_table">
+                 <tr>
+                   <td>时间</td>
+                   <td>累计欠款</td>
+                   <td>Delta</td>
+                   <td>类型</td>
+                   <td>理由</td>
+                   <td>相关订单号</td>
+                 </tr>
+                 
+                 {{range .ChangeLogs}}
+                 <tr>
+                   <td>{{.Time | prettytime}}</td>
+                   <td>{{.Account}}</td>
+                   <td>{{.Delta}}</td>
+                   <td>{{$.DisplayType .Type}}</td>
+                   <td>{{.Reason}}</td>
+                   <td>{{.RelatedOrderTN}}</td>
+                 </tr>
+                 {{end}}
+               </table>
+               -->
         </div>
 
+        <div style="height:100px;"> </div>
       </div>
     </div>
     <div class="footer">

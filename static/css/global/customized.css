@@ -1,2 +1,11 @@
 @charset "utf-8";
 a.current {text-decoration:underline;font-weight:bold;color:green}
+
+table.account_change_table {border-color: #ddd;border:solid 1px #ddd;margin:4px;
+                           }
+table.account_change_table tr td{padding:2px;text-align:left;padding:2px 8px;font-size:14px;}
+table.account_change_table tr td.time{color:#666;font-size:12px;padding:2px 8px;}
+table.account_change_table tr td.orderno{color:#666;font-size:12px;padding:2px 8px;}
+table.account_change_table tr td.delta{color:#a00;text-align:right;}
+table.account_change_table tr td.accu{color:#a00;text-align:right;}
+table.account_change_table tr td.memo{color:#666;font-size:12px;}

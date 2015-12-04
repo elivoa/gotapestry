@@ -239,15 +239,20 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 	dprint := false
 	remove_year := true
 	default_period := 30
+	combine_days := 7
 
-	if salesdata, err := productdao.DailySalesData(productId); err != nil {
+	showdays := period
+	if showdays <= 0 {
+		showdays = default_period
+	}
+	keys := datekeys(showdays)
+	if keys == nil || len(keys) <= 0 {
+		return nil, nil
+	}
+
+	if salesdata, err := productdao.DailySalesData(productId, keys[0]); err != nil {
 		panic(err)
 	} else {
-		showdays := period
-		if showdays <= 0 {
-			showdays = default_period
-		}
-		keys := datekeys(showdays)
 		newps := model.ProductSales{}
 		for _, key := range keys {
 			// performance issue?
@@ -273,11 +278,56 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 		}
 
 		if dprint {
-			fmt.Println("\nDEVELOPING.................................................")
-			for _, node := range salesdata {
+			fmt.Println("\nDEVELOP .................................................")
+			for _, node := range newps {
 				fmt.Println("\t", node.Key, " is ", node.Value)
 			}
 		}
+
+		if combine_days > 0 {
+
+			var (
+				idx          int = 0
+				first_key    string
+				last_key     string
+				current      *model.SalesNode
+				combinedNode *model.SalesNode
+				combinedps   = model.ProductSales{}
+			)
+			for i := len(newps) - 1; i >= 0; i-- {
+				current = newps[i]
+
+				switch idx % combine_days {
+				case 0: // every first one
+					// fmt.Println(" - start", i)
+					last_key = current.Key
+					combinedNode = &model.SalesNode{}
+
+				case combine_days - 1: // end
+					first_key = current.Key
+					combinedNode.Key = fmt.Sprintf("%s - %s", first_key, last_key)
+					// combinedNode.Value = combinedNode.Value / combine_days
+					combinedps = append(combinedps, combinedNode)
+					// fmt.Println(" - end", i, ": combined is : ", combinedNode.Value)
+
+				default: // in middle
+					combinedNode.Value += current.Value // combine values.
+				}
+
+				// fmt.Printf("idx: %d mod %d = %d\n", idx, combine_days, (idx % combine_days))
+				idx += 1
+
+			} // TODO to be continued...
+
+			if dprint {
+				fmt.Println("\nDEVELOP:: Combined ProductSales ....................................")
+				for _, node := range combinedps {
+					fmt.Println("\t", node.Key, " is ", node.Value)
+				}
+			}
+			return combinedps, nil
+		}
+
 		return newps, nil
 	}
 }
