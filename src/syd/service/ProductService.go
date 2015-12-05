@@ -327,8 +327,8 @@ func (s *ProductService) StatDailySalesData(productId int, period, combine_days 
 					start = false
 
 				default: // in middle
-					combinedNode.Value += current.Value // combine values.
 				}
+				combinedNode.Value += current.Value // combine values.
 				// fmt.Printf("idx: %d mod %d = %d\n", idx, combine_days, (idx % combine_days))
 				idx += 1
 			}
