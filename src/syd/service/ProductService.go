@@ -234,12 +234,26 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
 //
 // Stat: StatDailySalesData - 统计产品每日销售数量
 //
-func (s *ProductService) StatDailySalesData(productId int, period int) (model.ProductSales, error) {
+func (s *ProductService) StatDailySalesData(productId int, period, combine_days int) (
+	model.ProductSales, error) {
 
-	dprint := false
+	dprint := true
 	remove_year := true
 	default_period := 30
-	combine_days := 7
+	if combine_days == 0 { // 默认点合并策略
+		switch period {
+		case 7:
+			combine_days = 1
+		case 30:
+			combine_days = 5
+		case 90:
+			combine_days = 7
+		case 365:
+			combine_days = 7
+		default:
+			combine_days = 1
+		}
+	}
 
 	showdays := period
 	if showdays <= 0 {
@@ -284,8 +298,7 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 			}
 		}
 
-		if combine_days > 0 {
-
+		if combine_days > 1 {
 			var (
 				idx          int = 0
 				first_key    string
@@ -293,6 +306,7 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 				current      *model.SalesNode
 				combinedNode *model.SalesNode
 				combinedps   = model.ProductSales{}
+				start        = false
 			)
 			for i := len(newps) - 1; i >= 0; i-- {
 				current = newps[i]
@@ -300,24 +314,30 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 				switch idx % combine_days {
 				case 0: // every first one
 					// fmt.Println(" - start", i)
+					start = true
 					last_key = current.Key
 					combinedNode = &model.SalesNode{}
 
 				case combine_days - 1: // end
 					first_key = current.Key
-					combinedNode.Key = fmt.Sprintf("%s - %s", first_key, last_key)
+					combinedNode.Key = fmt.Sprintf("%s,%s", first_key, last_key)
 					// combinedNode.Value = combinedNode.Value / combine_days
 					combinedps = append(combinedps, combinedNode)
 					// fmt.Println(" - end", i, ": combined is : ", combinedNode.Value)
+					start = false
 
 				default: // in middle
 					combinedNode.Value += current.Value // combine values.
 				}
-
 				// fmt.Printf("idx: %d mod %d = %d\n", idx, combine_days, (idx % combine_days))
 				idx += 1
+			}
 
-			} // TODO to be continued...
+			if start { // the last one
+				first_key = current.Key
+				combinedNode.Key = fmt.Sprintf("%s - %s", first_key, last_key)
+				combinedps = append(combinedps, combinedNode)
+			}
 
 			if dprint {
 				fmt.Println("\nDEVELOP:: Combined ProductSales ....................................")
@@ -325,7 +345,13 @@ func (s *ProductService) StatDailySalesData(productId int, period int) (model.Pr
 					fmt.Println("\t", node.Key, " is ", node.Value)
 				}
 			}
-			return combinedps, nil
+
+			// 需要翻转数组
+			ncps := model.ProductSales{}
+			for i := len(combinedps) - 1; i >= 0; i-- {
+				ncps = append(ncps, combinedps[i])
+			}
+			return ncps, nil
 		}
 
 		return newps, nil

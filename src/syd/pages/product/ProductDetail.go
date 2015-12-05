@@ -15,7 +15,8 @@ type ProductDetail struct {
 	Id      *gxl.Int `path-param:"1"`
 	Product *model.Product
 
-	Period int `query:"period"` // Chart Time Period
+	Period     int `query:"period"` // Chart Time Period
+	CombineDay int `query:"combineday"`
 }
 
 func (p *ProductDetail) Setup() {
