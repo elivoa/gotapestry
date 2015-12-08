@@ -37,9 +37,19 @@ func (p *ProductSalesChart) Setup() {
 		p.Period = 30
 	}
 	if p.CombineDay == 0 {
-		p.CombineDay = 1
+		switch p.Period {
+		case 7:
+			p.CombineDay = 1
+		case 30:
+			p.CombineDay = 5
+		case 90:
+			p.CombineDay = 7
+		case 365:
+			p.CombineDay = 7
+		default:
+			p.CombineDay = 1
+		}
 	}
-
 	return
 }
 
