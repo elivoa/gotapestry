@@ -19,10 +19,47 @@
     {{range .Stats}}
     <tr>
       <td>{{$.ShowDate .Id | prettyday}}</td>
-      <td>{{.NOrder}}</td>
-      <td>{{.NSold}}</td>
-      <td>{{.AvgPrice | prettycurrency}}</td>
-      <td>{{.TotalPrice | prettycurrency}}</td>
+      <td>
+        {{.NOrder}}
+        <span class="yestoday">
+          <if t="$.Yestoday .Id">
+            /<span class="">{{($.Yestoday .Id).NOrder}}</span>
+          </if>
+        </span>
+      </td>
+      <td>
+        {{.NSold}}
+        <span class="yestoday">
+          <if t="$.Yestoday .Id">
+            /<span class="">{{($.Yestoday .Id).NSold}}</span>
+          </if>
+        </span>
+        <!--
+            <span class="yestoday">/{ {(index $.LastYearStats .Id).NSold}}</span>
+            -->
+      </td>
+      <td>
+        {{.AvgPrice | prettycurrency}}
+        <span class="yestoday">
+          <if t="$.Yestoday .Id">
+            /<span class="">{{($.Yestoday .Id).AvgPrice |prettycurrency}}</span>
+          </if>
+        </span>
+        <!--
+            <span class="yestoday">/{ {(index $.LastYearStats .Id).AvgPrice |prettycurrency}}</span>
+            -->
+      </td>
+      <td>
+        {{.TotalPrice | prettycurrency}}
+        <span class="yestoday">
+          <if t="$.Yestoday .Id">
+            /<span class="">{{($.Yestoday .Id).TotalPrice |prettycurrency}}</span>
+          </if>
+        </span>
+        <!--
+            <span class="yestoday">/{ {(index $.LastYearStats .Id).TotalPrice |prettycurrency}}</span>
+            -->
+      </td>
     </tr>
     {{end}}
   </table>
@@ -50,7 +87,7 @@ function drawChart() {
   var chart = new google.visualization.LineChart(document.getElementById({{.ClientId}}));
   chart.draw(data, options);
 }
-</script>
+                                      </script>
   <script type="text/javascript">
   google.setOnLoadCallback(drawChart2);
 function drawChart2() {
@@ -68,5 +105,5 @@ function drawChart2() {
   var chart = new google.visualization.ColumnChart(document.getElementById("{{.ClientId}}_2"));
   chart.draw(data, options);
 }
-</script>
+                                      </script>
 </if>

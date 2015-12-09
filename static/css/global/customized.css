@@ -9,3 +9,5 @@ table.account_change_table tr td.orderno{color:#666;font-size:12px;padding:2px 8
 table.account_change_table tr td.delta{color:#a00;text-align:right;}
 table.account_change_table tr td.accu{color:#a00;text-align:right;}
 table.account_change_table tr td.memo{color:#666;font-size:12px;}
+
+span.yestoday{color:gray}

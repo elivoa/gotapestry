@@ -116,7 +116,10 @@
             </tr>
           </range>
         </table>
-        <div>** 订单总价格: <span class="price">{{$.TotalPrice | prettycurrency}}</span></div>
+        <div>
+          ** 共{{len .Orders}}个订单，
+          订单总价格: <span class="price">{{$.TotalPrice | prettycurrency}}</span>
+        </div>
       </if>
 
       <script type="text/javascript">

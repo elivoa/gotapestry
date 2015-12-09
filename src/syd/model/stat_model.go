@@ -12,6 +12,8 @@ type SumStat struct {
 	TotalPrice float64
 }
 
+var EmptySumStat = &SumStat{}
+
 //
 // hot sales model
 //
