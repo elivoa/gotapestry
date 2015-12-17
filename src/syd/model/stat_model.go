@@ -1,11 +1,16 @@
 package model
 
+import (
+	"time"
+)
+
 //
 // stat by day.
 //
 
 type SumStat struct {
-	Id         int
+	Id         string
+	CreateTime time.Time
 	NOrder     int
 	NSold      int
 	AvgPrice   float64

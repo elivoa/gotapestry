@@ -7,58 +7,42 @@
     <div id="{{.ClientId}}_2" style="width: 800px; height: 200px;"></div>
   </if>
   
-  <table border="1" style="text-align:right" class="table">
-    <tr>
-      <td>日期</td>
-      <td>订单数</td>
-      <td>销售数量</td>
-      <td>平均货单价</td>
-      <td>总价</td>
-    </tr>
-    
+  <table border="1" class="table">
+    <thead>
+      <tr>
+        <th>日期</th>
+        <th colspan="2">订单数</th>
+        <th colspan="2">销售数量</th>
+        <th colspan="2">平均货单价</th>
+        <th colspan="2">总价</th>
+      </tr>
+    </thead>
     {{range .Stats}}
-    <tr>
-      <td>{{$.ShowDate .Id | prettyday}}</td>
-      <td>
-        {{.NOrder}}
-        <span class="yestoday">
-          <if t="$.Yestoday .Id">
-            /<span class="">{{($.Yestoday .Id).NOrder}}</span>
-          </if>
-        </span>
+    <tr class="{{$.LineClass .Id}}">
+      <td> <!--{ {$.ShowDate .Id | prettyday}}--> {{.Id}} </td>
+      <td class="_t"> {{.NOrder}} </td>
+      <td class="_l">
+        <if t="$.Yestoday .Id">
+          / <span class="">{{($.Yestoday .Id).NOrder}}</span>
+        </if>
       </td>
-      <td>
-        {{.NSold}}
-        <span class="yestoday">
-          <if t="$.Yestoday .Id">
-            /<span class="">{{($.Yestoday .Id).NSold}}</span>
-          </if>
-        </span>
-        <!--
-            <span class="yestoday">/{ {(index $.LastYearStats .Id).NSold}}</span>
-            -->
+      <td class="_t"> {{.NSold}} </td>
+      <td class="_l">
+        <if t="$.Yestoday .Id">
+          / <span class="">{{($.Yestoday .Id).NSold}}</span>
+        </if>
       </td>
-      <td>
-        {{.AvgPrice | prettycurrency}}
-        <span class="yestoday">
-          <if t="$.Yestoday .Id">
-            /<span class="">{{($.Yestoday .Id).AvgPrice |prettycurrency}}</span>
-          </if>
-        </span>
-        <!--
-            <span class="yestoday">/{ {(index $.LastYearStats .Id).AvgPrice |prettycurrency}}</span>
-            -->
+      <td class="_t"> {{.AvgPrice | prettycurrency}} </td>
+      <td class="_l">
+        <if t="$.Yestoday .Id">
+          / <span class="">{{($.Yestoday .Id).AvgPrice |prettycurrency}}</span>
+        </if>
       </td>
-      <td>
-        {{.TotalPrice | prettycurrency}}
-        <span class="yestoday">
-          <if t="$.Yestoday .Id">
-            /<span class="">{{($.Yestoday .Id).TotalPrice |prettycurrency}}</span>
-          </if>
-        </span>
-        <!--
-            <span class="yestoday">/{ {(index $.LastYearStats .Id).TotalPrice |prettycurrency}}</span>
-            -->
+      <td class="_t"> {{.TotalPrice | prettycurrency}} </td>
+      <td class="_l">
+        <if t="$.Yestoday .Id">
+          / <span class="">{{($.Yestoday .Id).TotalPrice |prettycurrency}}</span>
+        </if>
       </td>
     </tr>
     {{end}}
@@ -87,7 +71,7 @@ function drawChart() {
   var chart = new google.visualization.LineChart(document.getElementById({{.ClientId}}));
   chart.draw(data, options);
 }
-                                      </script>
+  </script>
   <script type="text/javascript">
   google.setOnLoadCallback(drawChart2);
 function drawChart2() {
@@ -105,5 +89,5 @@ function drawChart2() {
   var chart = new google.visualization.ColumnChart(document.getElementById("{{.ClientId}}_2"));
   chart.draw(data, options);
 }
-                                      </script>
+  </script>
 </if>

@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+
+	fmt.Println("--", time.Now().AddDate(0, 0, 1).Format("2006-01-02"))
 	ss := datekeys(7)
 	for _, k := range ss {
 		fmt.Println("LL ", k)

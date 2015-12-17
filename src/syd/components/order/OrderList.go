@@ -14,7 +14,8 @@ type OrderList struct {
 	core.Component
 
 	Orders     []*model.Order
-	Tab        string  // receive status tabs. TODO A Better way to do this?
+	Tab        string // receive status tabs. TODO A Better way to do this?
+	TotalItems int
 	TotalPrice float64 // all order's price
 	Referer    string  // return here.
 
@@ -32,9 +33,12 @@ func (p *OrderList) SetupRender() {
 
 	// Prepare customerNames to display.
 	length := len(p.Orders)
+	p.TotalItems = 0
+	p.TotalPrice = 0
 	if length > 0 {
 		for _, o := range p.Orders {
 			p.TotalPrice += o.TotalPrice
+			p.TotalItems += o.TotalCount
 		}
 	}
 }

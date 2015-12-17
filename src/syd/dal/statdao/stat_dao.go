@@ -7,6 +7,7 @@ package statdao
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
@@ -16,6 +17,8 @@ import (
 // TodayStat returns statistics of latest n days.
 // TODO: return the second parameter as error
 func TodayStat(startTime time.Time, n int) ([]*model.SumStat, error) {
+	var debug_print_time = true
+
 	var conn *sql.DB
 	var stmt *sql.Stmt
 	var err error
@@ -24,13 +27,14 @@ func TodayStat(startTime time.Time, n int) ([]*model.SumStat, error) {
 	}
 	defer conn.Close()
 
-	// fmt.Println("98989898980 start time is : --------", startTime)
 	startTime = startTime.UTC().Truncate(time.Hour*24).AddDate(0, 0, 1)
 	endTime := startTime.AddDate(0, 0, -n).Truncate(time.Hour * 24)
-	// fmt.Println("98989898980 truncate : --------", startTime, endTime)
-
+	if debug_print_time {
+		fmt.Println("((((())))) ----  start time:", startTime)
+		fmt.Println("((((())))) ----  end   time:", endTime)
+	}
 	_sql := `
-select DATEDIFF(create_time,?) as 'date', 
+select DATE_FORMAT(create_time, '%Y-%m-%d') as 'date', 
   sum(1) as 'norder',
   sum(total_count) as 'nsold',
   sum(total_price) as '总价' ` +
@@ -52,12 +56,10 @@ order by DATEDIFF(create_time,?) asc
 	// now := time.Now()
 	rows, err := stmt.Query(
 		startTime,
-		startTime,
 		endTime,
 		startTime, -n,
 		model.Wholesale, model.ShippingInstead,
 		"toprint", "todeliver", "delivering", "done",
-		// "canceled",// model.ToPrint, model.ToDeliver, model.Delivering, model.Done,
 		startTime,
 		startTime,
 	)
