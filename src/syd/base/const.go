@@ -78,3 +78,8 @@ var Basic = &BasicConfig{
 	// []string{Role_Sales, "Sales"},
 	},
 }
+
+// -- Application Configurations.
+var (
+	TODAY_STAT_EXCLUDED_PRODUCT int = 69 // 去掉叫[样衣]的商品
+)

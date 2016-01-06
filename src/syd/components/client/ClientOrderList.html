@@ -15,7 +15,7 @@
             <!-- <th width="10" align="left"> <input type="checkbox" class="check-all"> </th>  -->
             <th align="left">ID</th>
             <th align="left">下单日期</th>
-            <th align="left">厂家</th>
+            <th align="left">下单的客户</th>
             <th align="left">明细</th>
             <th align="left">下单件数</th>
             <!-- <th align="left">状态</th> -->
@@ -59,7 +59,7 @@
               <td>Bo Gao</td>
               <td>
                 <t:a page="inventory/edit" context="{{print .Id}}"
-                     parameters="(print `referer=` ($|refer) `&create=receive` )"
+                     parameters="(print `referer=` ($|refer) `&create=client` )"
                      label="编辑" /> |
                 <t:a event="Delete" context="{{print .Id}}" 
                      parameters="(print `referer=` ($|refer))"

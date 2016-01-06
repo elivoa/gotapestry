@@ -30,8 +30,8 @@ type InventoryEdit struct {
 	GroupId        *gxl.Int              `path-param:"1"`
 	InventoryGroup *model.InventoryGroup ``
 
-	IsPlaceOrder bool   `query:"placeorder"` // inventory or placeorder, default false.
-	Referer      string `query:"referer"`    // referer page, view or list
+	CreateType string `query:"create"`  // [client|produce|-] 客户订单/工厂下单/收货入库
+	Referer    string `query:"referer"` // referer page, view or list
 
 	// ** special ** for angularjs form submit. this is json.
 	InventoriesJson string
@@ -46,14 +46,23 @@ func (p *InventoryEdit) New() *InventoryEdit {
 }
 
 func (p *InventoryEdit) Setup() {
-	if !p.IsPlaceOrder { // normal
+
+	switch p.CreateType {
+	case "produce": // placeorder mode
+		p.CurrentPage = "/placeorder"
+		p.PageTitle = "创建生产订单"
+		p.SubTitle = "下单管理"
+
+	case "client": // client order mode
+		p.CurrentPage = "/client/orderindex"
+		p.PageTitle = "客户下单"
+		p.SubTitle = "客户订单"
+
+	default: // normal
 		p.CurrentPage = "/inventory"
 		p.PageTitle = "新增入库"
-		p.SubTitle = "入库"
-	} else { // placeorder mode
-		p.CurrentPage = "/placeorder"
-		p.PageTitle = "下订单"
-		p.SubTitle = "订单"
+		p.SubTitle = "库存管理"
+
 	}
 
 	// page values
@@ -76,10 +85,10 @@ func (p *InventoryEdit) Setup() {
 
 		// construct group;
 		// p.InventoryGroup = model.NewInventoryGroup(list)
-		p.SubTitle = "编辑" + p.SubTitle
+		p.SubTitle = p.SubTitle + "：编辑"
 	} else {
 		p.InventoryGroup = model.NewInventoryGroup(nil)
-		p.SubTitle = "新建" + p.SubTitle
+		p.SubTitle = p.SubTitle + "：新建"
 	}
 }
 
@@ -123,12 +132,7 @@ func (p *InventoryEdit) OnSuccessFromInventoryForm() *exit.Exit {
 		// TODO...
 	}
 
-	if !p.IsPlaceOrder {
-		p.InventoryGroup.Type = inventory.TypeReceive
-	} else {
-		// place order
-		p.InventoryGroup.Type = inventory.TypePlaceOrder
-	}
+	p.InventoryGroup.Type = guessTypeByCreateType(p.CreateType)
 	p.InventoryGroup.CreateTime = time.Now() // update create time
 
 	nig, err := service.InventoryGroup.SaveInventoryGroupByNGLIST(p.InventoryGroup)
@@ -162,4 +166,27 @@ func (p *InventoryEdit) unmarshalInventories(invsJson string) ([]*model.Inventor
 		return nil, err
 	}
 	return invs, nil
+}
+
+func guessTypeByCreateType(createType string) inventory.Type {
+	switch createType {
+	case "produce":
+		return inventory.TypePlaceOrder
+	case "client":
+		return inventory.TypeClientOrder
+	default:
+		return inventory.TypeReceive
+	}
+}
+
+func (p *InventoryEdit) IsProduce() bool {
+	return p.CreateType == "produce"
+}
+
+func (p *InventoryEdit) IsClientOrder() bool {
+	return p.CreateType == "client"
+}
+
+func (p *InventoryEdit) IsReceive() bool {
+	return p.CreateType == ""
 }

@@ -1,0 +1,24 @@
+
+
+<div style="border:solid 1px red">
+
+  <h2>TODO 显示所有当前正在执行的订单：</h2><br/>
+  {{with .ClientOrder}}
+  <p> {{.SendTime | prettyday}} [{{.Id}}] </p>
+  {{end}}
+
+  ::--- products:
+  
+  {{range .ClientOrder.Inventories}}
+  <div>PRODUCT: {{.Product.Id}}, {{.Product.Name}} {{.Color}} {{.Size}}</div>
+  {{end}}
+
+  ::---
+
+
+  
+  <hr>
+  <div>{{.ClientOrder}}</div>
+  
+  
+</div>

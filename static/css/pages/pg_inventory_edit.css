@@ -13,8 +13,8 @@
 /* copied from pg_order_create_detail.css */
 
 .PG_edit_inventory .B_order_step1,.PG_create_order .B_order_step2,.PG_create_order .B_order_step3{margin:30px auto 0;}
-.PG_edit_inventory .unit{margin:40px 0 20px;}
-.PG_edit_inventory .form_main{margin:30px 0 40px;}
+.PG_edit_inventory .unit{margin:20px 0 20px;}
+.PG_edit_inventory .form_main{margin:15px 0 40px;}
 .PG_edit_inventory .form_main label{margin-right:20px;}
 .PG_edit_inventory .btn_content{margin-bottom:100px;}
 .PG_edit_inventory .btn_content a{margin:0 10px;}

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[InventoryEdit.html] Elivoa @ Friday, 2015-04-24 15:56:38>
+    Time-stamp: <[InventoryEdit.html] Elivoa @ Sunday, 2015-12-20 16:45:36>
     NG-enabled;
   -->
 <html ng-app="syd">
@@ -13,30 +13,27 @@
   <body ng-controller="InventoryEditCtrl" class="PG_edit_inventory">
     <t:layout.headernav />
 
-    <div class="container ">
+    <div class="container">
       <t:layout.leftnav curPage=".CurrentPage" />
 
       <div class="main_content">
 
         {{with .InventoryGroup}}
+        <h1 class="page-title"><strong>{{$.SubTitle}}</strong> [<span>组ID : {{.Id}}</span>]</h1>
 
         <form method="POST" name="InventoryForm" ng-submit="submit()" action=""
               t:id="InventoryForm" novalidate ng-cloak>
           <input type="hidden" name="t:id" value="InventoryForm" />
           <input type="hidden" name="InventoryGroup.Id" value="{{.Id}}" />
           <input type="hidden" name="InventoriesJson" value="[[Inventories]]" />
-          <input type="hidden" name="IsPlaceOrder" value="{{$.IsPlaceOrder}}" />
-
+          <input type="hidden" name="CreateType" value="{{$.CreateType}}" />
+          
           <div class="unit">
-            <div class="tit"><strong>{{$.SubTitle}} [<span>组ID : {{.Id}}</span>]</strong></div>
             <div class="form_main">
               
-              <div style="padding:8px;margin:4px;" class="">              
-
+              <div style="padding:8px;margin:4px;">              
                 <div style="margin:8px 8px 8px 8px;">
-                  <if t="$.IsPlaceOrder">
-                    <span style="font-size:20px;color:#9d2932;font-weight:bold">下单管理：</span> <br />
-                  </if>
+
                   <label>
                     厂家： <input type="text" ng-model="InventoryGroup.ProviderId" class="ghost"/>
                     <select ng-model="InventoryGroup.ProviderId"
@@ -44,14 +41,15 @@
                             style="width:80px" required></select>
                   </label>
                   <label>
-                    <if t="not $.IsPlaceOrder">
-                      发货时间：<else />下单时间：
+                    <if t="$.IsReceive">
+                      发货时间： <input type="date" ng-model="InventoryGroup.SendTime" />（票日期）
+                      <else />
+                      下单时间： <input type="date" ng-model="InventoryGroup.SendTime" />
                     </if>
-                    <input type="date" ng-model="InventoryGroup.SendTime" /> （票日期）
                   </label>
 
-                  <if t="not $.IsPlaceOrder">
-                    <span style="font-size:20px">新订单：</span> <br />
+                  <if t="$.IsReceive">
+                    <!-- <span style="font-size:20px">新订单：</span> <br /> -->
                     <label>
                       到货时间：
                       <input type="date" ng-model="InventoryGroup.ReceiveTime" />
@@ -104,6 +102,6 @@ p_InventoryEdit({
 $(document).ready(function(){
   angular.element('._temp_query_box').focus(); 
 })
-</script>
+                            </script>
 
 

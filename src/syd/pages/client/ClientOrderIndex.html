@@ -2,45 +2,41 @@
 <html>
   <head>
     <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="下单" />
+    <t:layout.header title="客户下单" />
   </head>
   <body class="PG_list_inventory">
     <t:layout.headernav />
 
     <div class="container">
-      <t:layout.leftnav curPage="/placeorder" />
+      <t:layout.leftnav curPage="/client/orderindex" />
 
       <div class="main_content">
-    	<h1>当前下单状态：</h1>
-        <div sytle="border:solid 1px red">
-          <div style="margin:16px 8px;">当前没有正在做的货。</div>
-        </div>
         
-    	<h1>下单记录</h1>
-
+        <h1 class="page-title">客户订单：</h1>
+        <!-- TODO range all not-finished client order. -->
+        <t:client.orderdetail orderId="280" />
+        
+    	<h1>所有客户订单</h1>
+        <p>客户订单PN</p>
         <div class="bg" style="margin:8px;">
           <div class="tab_btn">
             <a class="btn_b_s"
-               href="/inventory/edit?create=produce&referer={{referer $}}">
-              <i class="ico_add"></i>+ 生产下单
+               href="/inventory/edit?create=client&referer={{referer $}}">
+              <i class="ico_add"></i>+ 客户下单
             </a>
             
             <if t=".Provider">
-              <a class="btn_b_s" href="/inventory">
-                显示全部
-              </a>
+              <a class="btn_b_s" href="/inventory"> 显示全部 </a>
             </if>
 
             <div style="float:right">
-              <a class="btn_b_s" href="/inventory/stat">
-                统计
-              </a>
+              <a class="btn_b_s" href="/inventory/stat"> 统计 </a>
             </div>
           </div>
         </div>
 
         <div class="list_product">
-          <t:placeorder.list InventoryGroups=".InventoryGroups" />
+          <t:client.orderlist InventoryGroups=".InventoryGroups" />
           
           <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><a href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
 

@@ -59,7 +59,7 @@ function drawChart() {
   var data = google.visualization.arrayToDataTable([
     ['日期', '总金额'],
     {{range .Stats}}
-    [{{$.ShowDate .Id | prettyday}}, {{.TotalPrice}}],
+    [{{.Id}}, {{.TotalPrice}}],
     {{end}}
   ]);
 
@@ -78,7 +78,7 @@ function drawChart2() {
   var data = google.visualization.arrayToDataTable([
     ['日期', '订单数', '销售数量' ],
     {{range .Stats}}
-    [{{$.ShowDate .Id | prettyday}}, {{.NOrder}}, {{.NSold}}],
+    [{{.Id}}, {{.NOrder}}, {{.NSold}}],
     {{end}}
   ]);
 

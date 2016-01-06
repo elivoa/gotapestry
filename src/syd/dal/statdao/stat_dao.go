@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
+	"syd/base"
 	"syd/model"
 	"time"
 )
@@ -34,19 +35,21 @@ func TodayStat(startTime time.Time, n int) ([]*model.SumStat, error) {
 		fmt.Println("((((())))) ----  end   time:", endTime)
 	}
 	_sql := `
-select DATE_FORMAT(create_time, '%Y-%m-%d') as 'date', 
-  sum(1) as 'norder',
-  sum(total_count) as 'nsold',
-  sum(total_price) as '总价' ` +
-		"from `order` " + `
+select DATE_FORMAT(o.create_time, '%Y-%m-%d') as 'date', 
+  count(distinct o.track_number) as 'norder',
+  sum(od.quantity) as 'nsold',
+  sum(od.quantity * od.selling_price) as '总价' ` +
+		"from `order` o " + `
+  right join order_detail od on o.track_number = od.order_track_number
 where
-  create_time<?
-  and create_time >= ?
-  and DATEDIFF(create_time,?) > ?
-  and type in (?,?)
-  and status in (?,?,?,?)
-group by DATEDIFF(create_time,?)
-order by DATEDIFF(create_time,?) asc
+  o.create_time<?
+  and o.create_time >= ?
+  and DATEDIFF(o.create_time,?) > ?
+  and o.type in (?,?)
+  and o.status in (?,?,?,?)
+  and od.product_id<>?
+group by DATEDIFF(o.create_time,?)
+order by DATEDIFF(o.create_time,?) asc
 `
 	if stmt, err = conn.Prepare(_sql); err != nil {
 		return nil, err
@@ -60,6 +63,7 @@ order by DATEDIFF(create_time,?) asc
 		startTime, -n,
 		model.Wholesale, model.ShippingInstead,
 		"toprint", "todeliver", "delivering", "done",
+		base.TODAY_STAT_EXCLUDED_PRODUCT,
 		startTime,
 		startTime,
 	)
