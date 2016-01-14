@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" type="text/css" media="screen" />
+    <link href="/static/css/pages/pg_list_person.css" rel="stylesheet" type="text/css" />
+    <t:layout.header title="趋势" />
+  </head>
+  <body class="PG_list_person">
+    <t:layout.headernav />
+    <div class="container">
+      <t:layout.leftnav curpage="/stat/trend" />
+      <div class="main_content">
+        <div class="">
+          <t:stat.TodayStat ShowChart="false"/>
+        </div>
+
+        <t:stat.Trend period="$.Period" combineday="$.CombineDay" />
+
+      </div>
+    </div>
+  </body>
+</html>

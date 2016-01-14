@@ -19,7 +19,7 @@
     </thead>
     {{range .Stats}}
     <tr class="{{$.LineClass .Id}}">
-      <td> <!--{ {$.ShowDate .Id | prettyday}}--> {{.Id}} </td>
+      <td> <!--{ {$.ShowDate .Id | prettyday}}--> {{$.DateLabel .Id}} </td>
       <td class="_t"> {{.NOrder}} </td>
       <td class="_l">
         <if t="$.Yestoday .Id">

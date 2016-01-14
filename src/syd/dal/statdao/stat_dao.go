@@ -61,9 +61,9 @@ order by DATEDIFF(o.create_time,?) asc
 		startTime,
 		endTime,
 		startTime, -n,
-		model.Wholesale, model.ShippingInstead,
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
 		"toprint", "todeliver", "delivering", "done",
-		base.TODAY_STAT_EXCLUDED_PRODUCT,
+		base.STAT_EXCLUDED_PRODUCT,
 		startTime,
 		startTime,
 	)

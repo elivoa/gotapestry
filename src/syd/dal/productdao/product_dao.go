@@ -8,6 +8,7 @@ import (
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"syd/base"
 	"syd/base/product"
 	"syd/model"
 )
@@ -192,7 +193,11 @@ func ListProductsByIdSet(ids ...int64) (map[int64]*model.Product, error) {
 //
 // 统计产品日销量
 //
-func DailySalesData(n int, startTime string) (model.ProductSales, error) {
+func DailySalesData(productId int, startTime string, excludeYangYi bool) (model.ProductSales, error) {
+	// skip to all data
+	if 0 == productId {
+		return DailySalesData_alldata(startTime, true)
+	}
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -209,9 +214,11 @@ from
   order_detail od 
   left join ` + "`" + `order` + "`" + ` o on od.order_track_number = o.track_number
 where 
-  od.product_id=? 
-  and o.status!="canceled" and o.type!=1
+  od.product_id=?
+  and o.type in (?,?)
+  and o.status in (?,?,?,?)
   and o.create_time >= ?
+  and od.product_id <> ?
 group by
   DATE_FORMAT(o.create_time, '%Y-%m-%d')
 order by
@@ -222,18 +229,82 @@ order by
 	}
 	defer stmt.Close()
 
+	// query
+	var excluded_product_id = 0
+	if excludeYangYi {
+		excluded_product_id = base.STAT_EXCLUDED_PRODUCT
+	}
+
 	rows, err := stmt.Query(
-		n, startTime,
+		productId,
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
+		"toprint", "todeliver", "delivering", "done",
+		startTime, excluded_product_id,
 	)
 	if db.Err(err) {
 		return nil, err
 	}
 	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
 
-	fmt.Println("lskdjflasdjflaksjdf:::::, ", startTime)
-
 	// the final result
 	// ps := []*model.SalesNode{}
+	ps := model.ProductSales{}
+
+	for rows.Next() {
+		p := new(model.SalesNode)
+		rows.Scan(&p.Key, &p.Value)
+		ps = append(ps, p)
+	}
+	return ps, nil
+}
+
+func DailySalesData_alldata(startTime string, excludeYangYi bool) (model.ProductSales, error) {
+
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	_sql := `
+select
+  DATE_FORMAT(o.create_time, '%Y-%m-%d'), sum(od.quantity)
+from
+  order_detail od 
+  left join ` + "`" + `order` + "`" + ` o on od.order_track_number = o.track_number
+where 
+  o.type in (?,?)
+  and o.status in (?,?,?,?)
+  and o.create_time >= ?
+  and od.product_id <> ?
+group by
+  DATE_FORMAT(o.create_time, '%Y-%m-%d')
+order by
+  DATE_FORMAT(o.create_time, '%Y-%m-%d') asc
+`
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var excluded_product_id = 0
+	if excludeYangYi {
+		excluded_product_id = base.STAT_EXCLUDED_PRODUCT
+	}
+
+	rows, err := stmt.Query(
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
+		"toprint", "todeliver", "delivering", "done",
+		startTime, excluded_product_id,
+	)
+
+	if db.Err(err) {
+		return nil, err
+	}
+	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+
 	ps := model.ProductSales{}
 
 	for rows.Next() {

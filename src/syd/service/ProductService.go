@@ -231,9 +231,10 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
 	return pkeys
 }
 
-//
-// Stat: StatDailySalesData - 统计产品每日销售数量
-//
+/*
+ * Stat: StatDailySalesData - 统计产品每日销售数量
+ * productId == 0 -- Read all day sales.
+ */
 func (s *ProductService) StatDailySalesData(productId int, period, combine_days int) (
 	model.ProductSales, error) {
 
@@ -250,6 +251,8 @@ func (s *ProductService) StatDailySalesData(productId int, period, combine_days 
 			combine_days = 7
 		case 365:
 			combine_days = 7
+		case 1095:
+			combine_days = 30
 		default:
 			combine_days = 1
 		}
@@ -258,13 +261,14 @@ func (s *ProductService) StatDailySalesData(productId int, period, combine_days 
 	showdays := period
 	if showdays <= 0 {
 		showdays = default_period
+		combine_days = 1
 	}
 	keys := datekeys(showdays)
 	if keys == nil || len(keys) <= 0 {
 		return nil, nil
 	}
 
-	if salesdata, err := productdao.DailySalesData(productId, keys[0]); err != nil {
+	if salesdata, err := productdao.DailySalesData(productId, keys[0], true); err != nil {
 		panic(err)
 	} else {
 		newps := model.ProductSales{}

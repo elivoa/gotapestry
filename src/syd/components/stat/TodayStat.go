@@ -104,6 +104,13 @@ func (p *TodayStat) LineClass(key string) string {
 	return ""
 }
 
+func (p *TodayStat) DateLabel(key string) string {
+	if key == p.Today_Key {
+		return "今天"
+	}
+	return key
+}
+
 func (p *TodayStat) ShowDate(diff int) time.Time {
 	t := time.Now()
 	t = t.AddDate(0, 0, diff+1)
