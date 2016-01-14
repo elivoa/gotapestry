@@ -1,5 +1,5 @@
 ##
-## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Friday, 2014-10-31 14:06:13>
+## Elivoa @ Time-stamp: <[batch_close_order.coffee] Elivoa @ Thursday, 2016-01-14 23:48:47>
 ##
 window.BatchCloseOrder =
 class BatchCloseOrder
@@ -134,6 +134,10 @@ class BatchCloseOrder
         @orders_can_clear = 0
         @money.val("")
         @m.find("a.btn_a_s").html("结款完毕！必须刷新！")
+        # TODO 延时1秒钟刷新窗口
+        # setTimeout(function(){
+        #    window.location.reload();
+        #  }, 1000);
       ,@
       error: ()->
         alert 'error occured'

@@ -146,7 +146,11 @@
           this.applyJson(data);
           this.orders_can_clear = 0;
           this.money.val("");
-          return this.m.find("a.btn_a_s").html("结款完毕！必须刷新！");
+          this.m.find("a.btn_a_s").html("结款完毕！必须刷新！(1秒后刷新)");
+          setTimeout(function(){
+            window.location.reload();
+          }, 1000);
+          return "";
         }, this),
         error: function() {
           return alert('error occured');
