@@ -7,6 +7,7 @@ import (
 	"github.com/elivoa/got/route/exit"
 	"syd/model"
 	"syd/service"
+	"time"
 )
 
 type ProductSalesChart struct {
@@ -26,8 +27,9 @@ type ProductSalesChart struct {
 // display: total stocks
 func (p *ProductSalesChart) Setup() {
 
+	endtime := time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24)
 	if salesdata, err :=
-		service.Product.StatDailySalesData(p.ProductId, p.Period, p.CombineDay); err != nil {
+		service.Product.StatDailySalesData(p.ProductId, p.Period, p.CombineDay, endtime); err != nil {
 		return
 	} else {
 		p.DailySalesData = salesdata

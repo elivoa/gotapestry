@@ -136,19 +136,24 @@ func (s *StatService) CalculateHotSaleProducts_with_specs(years, months, days in
 	_sql := "select product_id,p.name,color,size,sum(quantity) from `order_detail` od " +
 		"left join product p on od.product_id = p.Id " +
 		"where od.order_track_number in (" +
-		"  SELECT o.track_number FROM `order` o WHERE (`type`=0 or `type`=2) " +
-		"  and (`create_time`>=? and `create_time`<?) " +
+		"  SELECT o.track_number FROM `order` o WHERE (`create_time`>=? and `create_time`<?)" +
+		`    and o.type in (?,?)
+             and o.status in (?,?,?,?)
+        ` +
+		// and od.product_id<>? // 需要显示样衣卖掉了多少件。不用去掉。
 		") group by product_id,color,size order by sum(quantity) desc"
 
-	// fmt.Println(_sql)
-	// fmt.Println("start: ", start)
-	// fmt.Println("end  : ", end)
 	if stmt, err = conn.Prepare(_sql); err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(start, end)
+	rows, err := stmt.Query(
+		start, end,
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
+		"toprint", "todeliver", "delivering", "done",
+		// base.STAT_EXCLUDED_PRODUCT,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -235,7 +235,7 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
  * Stat: StatDailySalesData - 统计产品每日销售数量
  * productId == 0 -- Read all day sales.
  */
-func (s *ProductService) StatDailySalesData(productId int, period, combine_days int) (
+func (s *ProductService) StatDailySalesData(productId int, period, combine_days int, endday time.Time) (
 	model.ProductSales, error) {
 
 	dprint := true
@@ -263,12 +263,12 @@ func (s *ProductService) StatDailySalesData(productId int, period, combine_days 
 		showdays = default_period
 		combine_days = 1
 	}
-	keys := datekeys(showdays)
+	keys := datekeys(showdays, endday)
 	if keys == nil || len(keys) <= 0 {
 		return nil, nil
 	}
 
-	if salesdata, err := productdao.DailySalesData(productId, keys[0], true); err != nil {
+	if salesdata, err := productdao.DailySalesData(productId, keys[0], true, endday); err != nil {
 		panic(err)
 	} else {
 		newps := model.ProductSales{}
@@ -362,8 +362,11 @@ func (s *ProductService) StatDailySalesData(productId int, period, combine_days 
 	}
 }
 
-func datekeys(lastNDays int) []string {
-	t := time.Now().AddDate(0, 0, -lastNDays+1)
+// endday - 最后日期
+// lastNDays - 从endday往前数N天。
+func datekeys(lastNDays int, endday time.Time) []string {
+	t := endday.AddDate(0, 0, -lastNDays+1)
+	// t := time.Now().AddDate(0, 0, -lastNDays+1)
 	result := []string{}
 	for i := 0; i < lastNDays; i++ {
 		result = append(result, t.AddDate(0, 0, i).Format("2006-01-02"))

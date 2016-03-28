@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var va = 1 << 0
@@ -88,7 +89,7 @@ func main2() {
 
 func testLoad() {
 	fmt.Println("---- start loading...")
-	stats, err := statdao.TodayStat(20)
+	stats, err := statdao.TodayStat(time.Now(), 20)
 	if err != nil {
 		panic(err.Error())
 	}

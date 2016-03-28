@@ -11,6 +11,7 @@ import (
 	"syd/base"
 	"syd/base/product"
 	"syd/model"
+	"time"
 )
 
 var logdebug = true
@@ -193,7 +194,10 @@ func ListProductsByIdSet(ids ...int64) (map[int64]*model.Product, error) {
 //
 // 统计产品日销量
 //
-func DailySalesData(productId int, startTime string, excludeYangYi bool) (model.ProductSales, error) {
+func DailySalesData(
+	productId int, startTime string, excludeYangYi bool, endday time.Time) (
+	model.ProductSales, error) {
+
 	// skip to all data
 	if 0 == productId {
 		return DailySalesData_alldata(startTime, true)
@@ -218,6 +222,7 @@ where
   and o.type in (?,?)
   and o.status in (?,?,?,?)
   and o.create_time >= ?
+  and o.create_time <= ?
   and od.product_id <> ?
 group by
   DATE_FORMAT(o.create_time, '%Y-%m-%d')
@@ -239,7 +244,7 @@ order by
 		productId,
 		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
 		"toprint", "todeliver", "delivering", "done",
-		startTime, excluded_product_id,
+		startTime, endday, excluded_product_id,
 	)
 	if db.Err(err) {
 		return nil, err

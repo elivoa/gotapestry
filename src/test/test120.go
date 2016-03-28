@@ -6,6 +6,14 @@ import (
 )
 
 func main() {
+	now := time.Now().UTC()
+	start := now.Truncate(time.Hour * 24)
+	end := now.AddDate(0, 0, 1).Truncate(time.Hour * 24)
+	fmt.Println(start)
+	fmt.Println(end)
+
+	fmt.Println(time.Now().Format("2006-01-02"))
+	fmt.Println(time.Now().Truncate(time.Hour * 24))
 
 	fmt.Println("--", time.Now().AddDate(0, 0, 1).Format("2006-01-02"))
 	ss := datekeys(7)

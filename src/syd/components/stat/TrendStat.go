@@ -7,6 +7,7 @@ import (
 	"github.com/elivoa/got/route/exit"
 	"syd/model"
 	"syd/service"
+	"time"
 )
 
 type TrendStat struct {
@@ -14,8 +15,10 @@ type TrendStat struct {
 
 	Period     int `query:"period"`
 	CombineDay int `query:"combineday"`
+	Yearonyear int `query:"yearonyear"`
 
-	DailySalesData model.ProductSales
+	DailySalesData  model.ProductSales
+	DailySalesData2 model.ProductSales
 
 	// old things p
 	Products []*model.Product
@@ -24,14 +27,27 @@ type TrendStat struct {
 
 // display: total stocks
 func (p *TrendStat) Setup() {
-
+	// fmt.Println("===================================== ", p.Yearonyear)
+	endtime := time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24)
 	if salesdata, err :=
-		service.Product.StatDailySalesData(0, p.Period, p.CombineDay); err != nil {
+		service.Product.StatDailySalesData(0, p.Period, p.CombineDay, endtime); err != nil {
 		return
 	} else {
 		p.DailySalesData = salesdata
 	}
 
+	// Year on year
+	if p.Yearonyear > 0 {
+		endtime = endtime.AddDate(-1, 0, 0)
+		if salesdata, err :=
+			service.Product.StatDailySalesData(0, p.Period, p.CombineDay, endtime); err != nil {
+			return
+		} else {
+			p.DailySalesData2 = salesdata
+		}
+	}
+
+	// 修改显示标签
 	var no_argu = false
 	if p.Period == 0 {
 		no_argu = true
@@ -64,7 +80,7 @@ func (p *TrendStat) OnPeriod(days int) *exit.Exit {
 	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("stat/trend",
 		map[string]interface{}{
 			"period":     days,
-			"combineday": 0, // 目的是点击period时间间隔的时候清除合并点策略
+			"combineday": 0, // 0的目的是点击period时间间隔的时候清除合并点。
 		}, 0,
 	)
 	return exit.Redirect(url)
@@ -80,6 +96,17 @@ func (p *TrendStat) OnCombineNode(combine_day int) *exit.Exit {
 	return exit.Redirect(url)
 }
 
+func (p *TrendStat) OnYearonyear(yoy int) *exit.Exit {
+	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("stat/trend",
+		map[string]interface{}{
+			"period":     p.Period,
+			"combineday": p.CombineDay,
+			"yearonyear": yoy,
+		}, 0,
+	)
+	return exit.Redirect(url)
+}
+
 func (p TrendStat) PeriodLinkClass(period int) string {
 	if period == p.Period {
 		return "current"
@@ -89,6 +116,13 @@ func (p TrendStat) PeriodLinkClass(period int) string {
 
 func (p TrendStat) CombineNodeClass(combine_day int) string {
 	if combine_day == p.CombineDay {
+		return "current"
+	}
+	return "-"
+}
+
+func (p TrendStat) YearonyearClass(yoy int) string {
+	if yoy == p.Yearonyear {
 		return "current"
 	}
 	return "-"
