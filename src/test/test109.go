@@ -2,36 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"html/template"
 	"os"
-	"strings"
-	"text/template"
 )
-
-func main2() {
-	const (
-		master  = `Names:{{block "list" .}}{{"\n"}}{{range .}}{{println "-" .}}{{end}}{{end}}`
-		overlay = `{{define "list"}} {{join . ", "}}{{end}} `
-	)
-	var (
-		funcs     = template.FuncMap{"join": strings.Join}
-		guardians = []string{"Gamora", "Groot", "Nebula", "Rocket", "Star-Lord"}
-	)
-	masterTmpl, err := template.New("master").Funcs(funcs).Parse(master)
-	if err != nil {
-		log.Fatal(err)
-	}
-	overlayTmpl, err := template.Must(masterTmpl.Clone()).Parse(overlay)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := masterTmpl.Execute(os.Stdout, guardians); err != nil {
-		log.Fatal(err)
-	}
-	if err := overlayTmpl.Execute(os.Stdout, guardians); err != nil {
-		log.Fatal(err)
-	}
-}
 
 // Engine instance. Unique.
 var Engine = NewTemplateEngine()
@@ -42,8 +15,6 @@ type TemplateEngine struct {
 
 func NewTemplateEngine() *TemplateEngine {
 	e := &TemplateEngine{
-		// init template TODO remove this, change another init method.
-		// TODO: use better way to init.
 		template: template.New("-"),
 	}
 	return e
@@ -58,69 +29,90 @@ func parseTemplate(key string, content string) error {
 	// t, so t, err := New(name).Funcs(xxx).ParseFiles(name)
 	// works. Otherwise we create a new template associated with t.
 
-	fmt.Printf("[parse tempalte] parseTempalte(%s,<<\n%s\n>>);\n", key, "--") //content) // REMOVE
+	fmt.Println("\n\n--------------------------------------------------------------------------------")
+	fmt.Printf("[parse tempalte] parseTempalte(%s,<<%s>>);\n", key, content) //content) // REMOVE
+
+	engine := Engine
+
+	if engine.template == nil {
+		engine.template = template.New(key)
+	}
 
 	var tmpl *template.Template
-	if Engine.template == nil {
-		Engine.template = template.New(key)
-	}
-
-	if key == Engine.template.Name() {
-		fmt.Println("[-vvvvvvvvvvvvvvvvvvvvvv") // REMOVE
-		tmpl = Engine.template
+	// fmt.Println("0000000000000 > ", key, engine.template.Name())
+	if key == engine.template.Name() {
+		// fmt.Println(".... User old name, ", engine.template.Name())
+		tmpl = engine.template
 	} else {
-		fmt.Println("[-xxxxxxxxxxxxxxxxxxxx") // REMOVE
-		tmpl = Engine.template.New(key)
-		Engine.template = tmpl
+		// fmt.Println(".... New name, ", key)
+		tmpl = engine.template.New(key)
 	}
-	fmt.Println("\tKEY    is", key)
-	fmt.Println("\tt.name is", Engine.template.Name())
-	fmt.Println("[-equals] template is: ", key == Engine.template.Name()) // REMOVE
 
+	if true { // -------------------------- debug print templates.
+		fmt.Println("\ndebug info { // templates loop ; tmpl.name is : ", tmpl.Name())
+		for _, t := range engine.template.Templates() {
+			fmt.Println("  ", t.Name())
+		}
+		fmt.Println("}")
+	}
+
+	// newt, e := tmpl.Clone()
+	// if e != nil {
+	// 	panic(e)
+	// }
+	// _, err := newt.Parse(content)
 	_, err := tmpl.Parse(content)
-	fmt.Printf("[parse tempalte] End parseTempalte(%s, << ignored >>);\n", key) // REMOVE
+
+	// fmt.Printf("[parse tempalte] End parseTempalte(%s, << ignored >>);\n", key) // REMOVE
 	if err != nil {
-		fmt.Println("[ERROR] \n", err) // REMOVE
+		// fmt.Println("[ERROR] : \t", err) // REMOVE
 		return err
 	}
+	engine.template = tmpl
 	return nil
 }
 
-func main() {
-	fmt.Println("start test it")
+const (
+	master = `<head><title>Title</title>` + "{{t_PageHeadBootstrap $ `span`}}</head>" + `<body></html>`
 
-	const (
-		master  = `Names:{{block "list" .}}{{"\n"}}{{range .}}{{println "-" .}}{{end}}{{end}}`
-		overlay = `{{define "list"}} {{join . ", "}}{{end}} `
-	)
-	var (
-		funcs     = template.FuncMap{"join": strings.Join}
-		guardians = []string{"Gamora", "Groot", "Nebula", "Rocket", "Star-Lord"}
-	)
-	fmt.Println("===========================")
-	parseTemplate("ddd", master)
-	fmt.Println("===========================")
+	overlay = `(____PageHeadBootstrap_replace_to_html____) `
+)
 
-	if err := Engine.template.Execute(os.Stdout, guardians); err != nil {
-		log.Fatal(err)
+func nestedFunc(i interface{}, c string) string {
+	if err := parseTemplate("a1", overlay); err != nil {
+		panic(err)
 	}
-	parseTemplate("ddd", master)
-
-
-	
-	masterTmpl, err := template.New("master").Funcs(funcs).Parse(master)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	overlayTmpl, err := template.Must(masterTmpl.Clone()).Parse(overlay)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := masterTmpl.Execute(os.Stdout, guardians); err != nil {
-		log.Fatal(err)
-	}
-	if err := overlayTmpl.Execute(os.Stdout, guardians); err != nil {
-		log.Fatal(err)
-	}
+	Engine.template.ExecuteTemplate(os.Stderr, "a2", []string{"a", "b"})
+	return "********" + c + "<<"
 }
+
+func main() {
+
+	t := Engine.template
+	t.Funcs(template.FuncMap{"t_PageHeadBootstrap": nestedFunc})
+
+	if err := parseTemplate("p/test.Test", master); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("============ start ===============")
+	if err := t.ExecuteTemplate(os.Stderr, "p/test.Test", []string{"a", "b"}); err != nil {
+		panic(err)
+	}
+	fmt.Println("\n========== DONE")
+}
+
+// func main2() {
+
+// 	t := templates2.Engine
+// 	t.Template().Funcs(template.FuncMap{"t_PageHeadBootstrap": nestedFunc})
+// 	if err := templates2.ParseTemplate("p/test.Test", master); err != nil {
+// 		panic(err)
+// 	}
+
+// 	fmt.Println("============ Execute ===============")
+// 	if err := t.Template().ExecuteTemplate(os.Stderr, "p/test.Test", []string{"a", "b"}); err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("\n========== DONE")
+// }

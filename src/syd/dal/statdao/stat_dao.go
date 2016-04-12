@@ -18,7 +18,7 @@ import (
 // TodayStat returns statistics of latest n days.
 // TODO: return the second parameter as error
 func TodayStat(startTime time.Time, n int) ([]*model.SumStat, error) {
-	var debug_print_time = true
+	var debug_print_time = false
 
 	var conn *sql.DB
 	var stmt *sql.Stmt

@@ -319,3 +319,56 @@ order by
 	}
 	return ps, nil
 }
+
+// Product's top buyer list. In product/detail page.
+func ProductBestBuyerList(productId int) (model.BestBuyerList, error) {
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	_sql := `
+select -- d.product_id, p.Name, 
+	o.customer_id, pp.Name, sum(d.quantity), d.selling_price ` +
+		"from `order` o " +
+		` right join order_detail d on d.order_track_number = o.track_number 
+	left join product p on d.product_id = p.Id
+	left join person pp on o.customer_id=pp.Id
+where 
+	-- and o.customer_id = 305
+	d.product_id = ?
+  and o.type in (?,?)
+  and o.status in (?,?,?,?)
+	-- and o.create_time >= "2015-08-14" -- and o.create_time < "2015-03-23 23:55:55"
+	-- and o.track_number=1501161519337773 -- debug
+group BY d.product_id, o.customer_id
+order by sum(d.quantity) desc
+`
+
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		productId,
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
+		"toprint", "todeliver", "delivering", "done",
+	)
+
+	if db.Err(err) {
+		return nil, err
+	}
+	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+
+	ps := model.BestBuyerList{}
+	for rows.Next() {
+		p := new(model.BestBuyerListItem)
+		rows.Scan(&p.CustomerId, &p.CustomerName, &p.Quantity, &p.SalePrice)
+		ps = append(ps, p)
+	}
+	return ps, nil
+}

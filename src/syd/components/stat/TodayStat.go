@@ -33,7 +33,7 @@ var (
 )
 
 func (p *TodayStat) Setup() {
-	var debug_print_time = true
+	var debug_print_time = false
 
 	var see_future_days = 1
 	var show_days = 7

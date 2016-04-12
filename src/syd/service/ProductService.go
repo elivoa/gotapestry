@@ -238,7 +238,7 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
 func (s *ProductService) StatDailySalesData(productId int, period, combine_days int, endday time.Time) (
 	model.ProductSales, error) {
 
-	dprint := true
+	dprint := false
 	remove_year := true
 	default_period := 30
 	if combine_days == 0 { // 默认点合并策略

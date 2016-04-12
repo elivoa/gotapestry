@@ -19,6 +19,7 @@ func (s *InventoryGroupService) EntityManager() *db.Entity {
 
 // Get InventoryGroup
 func (s *InventoryGroupService) GetInventoryGroup(id int64, withs Withs) (*model.InventoryGroup, error) {
+	// TODO-001 有bug， ig可能是nil。
 	ig, err := inventorygroupdao.GetInventoryGroupById(id)
 	if err != nil {
 		return nil, err

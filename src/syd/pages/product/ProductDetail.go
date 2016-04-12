@@ -3,6 +3,7 @@ package product
 import (
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/gxl"
+	"syd/dal/productdao"
 	"syd/model"
 	"syd/service"
 )
@@ -45,4 +46,12 @@ func (p *ProductDetail) SupplierName(id int) string {
 		return person.Name
 	}
 	return "供货商_" + string(id)
+}
+
+func (p *ProductDetail) TopCustomers() model.BestBuyerList {
+	list, err := productdao.ProductBestBuyerList(p.Id.Int)
+	if err != nil {
+		panic(err)
+	}
+	return list
 }

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[ProductDetail.html] Elivoa @ Saturday, 2015-12-05 22:30:15>
+    Time-stamp: <[ProductDetail.html] Elivoa @ Tuesday, 2016-04-12 23:22:29>
     NG-enabled;
   -->
 
@@ -78,9 +78,9 @@
             <dl class="clearfix">
               <dt>供货价格：TODO</dt>
               <dd>
-                批次1<strong class="price">68</strong>元<br />
-                批次2<strong class="price">66</strong>元<br />
-                批次3<strong class="price">62</strong>元<br />
+                批次1<strong class="price">1000</strong>元<br />
+                批次2<strong class="price">800</strong>元<br />
+                批次3<strong class="price">90</strong>元<br />
               </dd>
               <dd class=""></dd>
             </dl>
@@ -90,18 +90,20 @@
 		<div class="B_prd_sale">
 		  <div class="B_tit"><strong>购买列表 TODO</strong></div>
 		  <table class="tbl_main">
-			<tr>
+            <tr>
 			  <th align="left">客户姓名</th>
-			  <th align="left">订单号</th>
-			  <th align="left">日期</th>
-			  <th align="center">购买件数</th>
+			  <th align="left">购买件数</th>
+			  <th align="left">购买价格</th>
+			  <th align="center">总金额</th>
 			</tr>
+            {{range $.TopCustomers}}
 			<tr>
-			  <td>吴凤仙</td>
-			  <td>203319293022</td>
-			  <td>2013-08-10</td>
-			  <td align="center">8</td>
+			  <td><a href="/person/detail/{{.CustomerId}}">{{.CustomerName}}</a></td>
+			  <td>{{.Quantity}}</td>
+			  <td>{{.SalePrice}}</td>
+			  <td align="center">{{.Quantity}}</td>
 			</tr>
+            {{end}}
 		  </table>
 		</div>
       </div>
