@@ -320,6 +320,7 @@ order by
 	return ps, nil
 }
 
+// --------------------------------------------------------------------------------
 // Product's top buyer list. In product/detail page.
 func ProductBestBuyerList(productId int) (model.BestBuyerList, error) {
 	var conn *sql.DB

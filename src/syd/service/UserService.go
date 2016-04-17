@@ -16,8 +16,11 @@ import (
 	"time"
 )
 
-var USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN_SESSION_KEY"
-var DEEP_TRACE = true
+var (
+	USER_TOKEN_SESSION_KEY string = config.USER_TOKEN_SESSION_KEY // "USER_TOKEN_SESSION_KEY"
+	USER_TOKEN_COOKIE_KEY  string = config.USER_TOKEN_COOKIE_KEY  // "USER_TOKEN_COOKIE_KEY"
+)
+var DEEP_TRACE = false
 
 // TODO change session into longtime session.
 
@@ -44,8 +47,9 @@ func (s *UserService) EntityManager() *db.Entity {
 // used in methods.
 func (s *UserService) RequireLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
 	if s.logs.Trace() {
-		s.logs.Printf("enter function: RequireLogin")
+		s.logs.Printf("Enter function: RequireLogin")
 	}
+
 	if userToken := s.GetLogin(w, r); userToken == nil {
 		panic(&base.LoginError{Message: "User not login.", Reason: "some reason"})
 	} else {
@@ -73,17 +77,27 @@ func (s *UserService) RequireRole(w http.ResponseWriter, r *http.Request, roles 
 // return false if
 func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.UserToken {
 	if s.logs.Trace() {
-		s.logs.Printf("enter function: GetLogin")
+		s.logs.Printf("Enter function: GetLogin [session]")
 	}
 
 	session := sessions.LongCookieSession(r)
 
+	// session.Values["55667788"] = &model.UserToken{Name: "84983"}
+	// session.Values["55667788--"] = "&model.UserToken{Name: 84983}"
+	// session.Save(r, w)
+	// for k, v := range session.Values {
+	// 	fmt.Println("\t)))->:", k, " -> ", v)
+	// }
+
+	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
 	// deep trace.
 	if DEEP_TRACE && s.logs.Trace() {
-		s.logs.Printf("  DEEP TRACE: everything in long-session: %s", "s")
+		s.logs.Printf("  DEEP TRACE: everything in long-session: %s {", session.ID)
 		for k, v := range session.Values {
 			s.logs.Printf("  DEEP TRACE: %v : %v", k, v)
 		}
+		s.logs.Printf("  }")
 	}
 
 	if userTokenRaw, ok := session.Values[config.USER_TOKEN_SESSION_KEY]; ok && userTokenRaw != nil {
@@ -115,7 +129,7 @@ func (s *UserService) GetLogin(w http.ResponseWriter, r *http.Request) *model.Us
 		return nil
 	} else {
 		if s.logs.Info() {
-			s.logs.Printf("Login from cookie succeed, username: %s, password(hash): %s\n",
+			s.logs.Printf("[Cookie] Login from cookie succeed, username: %s, password(hash): %s\n",
 				userToken.Username, userToken.Password)
 		}
 
@@ -134,10 +148,12 @@ func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error)
 	}
 
 	if credential := s.loadUserTokenFromCookie(r); credential != nil {
-		user, err := userdao.GetUserWithCredential(credential[0], credential[1])
 		if s.logs.Trace() {
 			s.logs.Printf("Credential in cookie is : %v", credential)
-			s.logs.Printf("Get user with Credenial, user is : %v", user)
+		}
+		user, err := userdao.GetUserWithCredential(credential[0], credential[1])
+		if s.logs.Trace() {
+			s.logs.Printf("[DB] Get user with Credenial, user is : %v", user)
 		}
 
 		if nil != user && err == nil {
@@ -158,7 +174,7 @@ func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error)
 
 // return username & password pair
 func (s *UserService) loadUserTokenFromCookie(r *http.Request) []string {
-	if c, err := r.Cookie(USER_TOKEN_SESSION_KEY); err == nil {
+	if c, err := r.Cookie(USER_TOKEN_COOKIE_KEY); err == nil {
 		if nil == c {
 			return nil
 		}
@@ -198,14 +214,16 @@ func (s *UserService) Login(username string, password string,
 func (s *UserService) setToSession(w http.ResponseWriter, r *http.Request, userToken *model.UserToken) {
 	session := sessions.LongCookieSession(r)
 	session.Values[USER_TOKEN_SESSION_KEY] = userToken
-	fmt.Printf("\n\nSave to Session \n")
-	session.Save(r, w)
+	if err := session.Save(r, w); err != nil {
+		fmt.Println("======= ERROR TO HANDLE ========================")
+		fmt.Println(err)
+	}
 }
 
 // set UserToken to Cookie.
 func (s *UserService) setToCookie(w http.ResponseWriter, userToken *model.UserToken) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    USER_TOKEN_SESSION_KEY,
+		Name:    USER_TOKEN_COOKIE_KEY,
 		Value:   fmt.Sprintf("%s|%s", userToken.Username, userToken.Password),
 		Expires: time.Now().AddDate(0, 0, 7),
 		Path:    "/",
@@ -214,7 +232,7 @@ func (s *UserService) setToCookie(w http.ResponseWriter, userToken *model.UserTo
 
 func (s *UserService) removeUserCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
-		Name:   USER_TOKEN_SESSION_KEY,
+		Name:   USER_TOKEN_COOKIE_KEY,
 		Path:   "/",
 		MaxAge: -1,
 	})
@@ -225,9 +243,6 @@ func (s *UserService) removeUserTokenSession(w http.ResponseWriter, r *http.Requ
 	session.Values[USER_TOKEN_SESSION_KEY] = nil
 	delete(session.Values, USER_TOKEN_SESSION_KEY)
 	session.Save(r, w)
-
-	// context.Set(r, USER_TOKEN_SESSION_KEY, nil)
-	// context.Delete(r, USER_TOKEN_SESSION_KEY)
 }
 
 func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {

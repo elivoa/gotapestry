@@ -1,6 +1,7 @@
 package syd
 
 import (
+	"encoding/gob"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/core/exception"
@@ -65,6 +66,9 @@ var SYDModule = &core.Module{
 		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.
 
 		// TODO: Register Coercers.
+
+		// Register gob
+		gob.Register(&model.UserToken{})
 
 	},
 }
