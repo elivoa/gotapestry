@@ -27,7 +27,7 @@
       <t:layout.LeftNav curPage="/order/list" />
 
       <div class="main_content">
-    	<h1>打印订单 Developing.....</h1>
+    	<h1>打印订单</h1>
         <div class="B_order_step3"></div>
 		<div class="B_print_content">
 		  <div class="B_btn_print">
@@ -42,24 +42,23 @@
 			  </div>
 			</div>
 			<div id="orderTable">
-              
 			  <table class="prt_tbl order-form-container" border="0" cellpadding="0" cellspacing="0">
 				<thead>
 				  <tr>
-					<th align="center">序号</th>
-					<th align="center">商品名称</th>
-					<th align="center">单价</th>
-					<th align="center">颜色</th>
-					<th align="center">尺码</th>
-					<th align="center">数量</th>
-					<th align="center">合计数量</th>
-					<th align="center">金额</th>
-					<th align="center">备注</th>
+					<th align="center" class="th">序号</th>
+					<th align="center" class="th">商品名称</th>
+					<th align="center" class="th">单价</th>
+					<th align="center" class="th">颜色</th>
+					<th align="center" class="th">尺码</th>
+					<th align="center" class="th">数量</th>
+					<th align="center" class="th">合计数量</th>
+					<th align="center" class="th">金额</th>
+					<th align="center" class="th">备注</th>
 				  </tr>
 				</thead>
 
 				<tr class="total">
-				  <td valign="top" align="right"><strong>总计</strong></td>
+				  <td valign="top" align="right" style="white-space:nowrap;"><strong>总计</strong></td>
 				  <td valign="top">&nbsp;</td>
 				  <td valign="top">&nbsp;</td>
 				  <td valign="top">&nbsp;</td>
@@ -139,5 +138,5 @@
     op  = new OrderPrint()
     op.setData({{.ProductDetailJson}})
   });
-</script>
+    </script>
 

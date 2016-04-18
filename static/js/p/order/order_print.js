@@ -73,7 +73,7 @@
       htmls = [];
       htmls.push("<tr>");
       htmls.push("  <td>" + idx + "</td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='top' class='title' rowspan='" + nquantity + "'>");
       htmls.push("    <strong>" + json.name + "</strong>");
       htmls.push("  </td>");
       htmls.push("  <td valign='top' rowspan='" + nquantity + "' class='money'>");
