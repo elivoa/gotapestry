@@ -366,6 +366,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 			}
 		}
 	}
+
 	if deleteGroup != nil {
 		for _, inv := range deleteGroup {
 			// delete inventory
@@ -401,6 +402,11 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 		}
 	}
 
+	// Add by gb @ 2016-04-29: set all sub-inventory item's send_time, update_time, and factory_id.
+	if err := inventorydao.UpdateAllInventoryItems(ig); err != nil {
+		panic(err)
+	}
+
 	return ig, nil
 }
 
@@ -408,6 +414,10 @@ func _makeSummary(inventories []*model.Inventory) (summary string, totalQuantity
 	var buff bytes.Buffer
 	if nil != inventories {
 		for idx, inv := range inventories {
+			if nil == inv { // bogao@2016-04-29: fix nil pointer bug.
+				continue
+			}
+
 			if idx > 0 {
 				buff.WriteString(", ")
 			}

@@ -1,4 +1,4 @@
-// Time-stamp: <[InventoryIndex.go] Elivoa @ Wednesday, 2015-04-22 16:38:38>
+// Time-stamp: <[InventoryIndex.go] Elivoa @ Wednesday, 2016-04-27 15:28:03>
 package inventory
 
 import (
@@ -43,7 +43,6 @@ func (p *InventoryIndex) Activate() {
 	if p.Tab == "" {
 		p.Tab = "all" // default go in toprint
 	}
-
 }
 
 func (p *InventoryIndex) SetupRender() {

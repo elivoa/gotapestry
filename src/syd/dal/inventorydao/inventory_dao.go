@@ -128,6 +128,48 @@ func Delete(id int64) (int64, error) {
 	return em.DeleteByPK(id)
 }
 
+// 这是一个落后的原始的sql
+
+func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
+	if nil == ig {
+		panic("InventoryId is nil!")
+	}
+
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	_sql := `update inventory set provider_id=?, operator_id=?, send_time=?, receive_time=? where group_id=?`
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(ig.ProviderId, ig.OperatorId, ig.SendTime, ig.ReceiveTime, ig.Id)
+	if db.Err(err) {
+		return err
+	}
+	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+
+	// // the final result
+	// ps := []*model.SumStat{}
+	// for rows.Next() {
+	// 	p := new(model.SumStat)
+	// 	rows.Scan(&p.Id, &p.NOrder, &p.NSold, &p.TotalPrice)
+
+	// 	// update average.
+	// 	p.AvgPrice = p.TotalPrice / float64(p.NSold)
+
+	// 	ps = append(ps, p)
+	// }
+	// return ps, nil
+	return nil
+}
+
 // old things.
 // func SearchInventoryInUseByPattern(pattern string) ([]*model.Inventory, error) {
 // 	var conn *sql.DB

@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type Test struct {
+type Hidden struct {
 	core.Page
 	Data *model.ProductSalesTable
 }
 
-func (p *Test) SetupRender() *exit.Exit {
+func (p *Hidden) SetupRender() *exit.Exit {
 	fmt.Println("=============================================")
-	starttime, err := time.Parse("2006-01-02", "2016-02-25")
+	starttime, err := time.Parse("2006-01-02", "2016-03-25")
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func (p *Test) SetupRender() *exit.Exit {
 	return nil
 }
 
-func (p *Test) GetData(date string, productId int64) string {
+func (p *Hidden) GetData(date string, productId int64) string {
 	value := p.Data.Get(date, productId)
 	if value == 0 {
 		return ""

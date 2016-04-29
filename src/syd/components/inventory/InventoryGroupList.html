@@ -26,7 +26,10 @@
 
           <range source=".InventoryGroups">
             <tr>
-              <td><t:a page="inventory/edit" context="{{print .Id}}" label="print .Id"></t:a></td>
+              <td>
+                <t:a page="inventory/edit" context="{{print .Id}}" label="print .Id"
+                     parameters="(print `referer=` ($|refer))"></t:a>
+              </td>
               <td nowrap title="发货: {{.SendTime|prettytime}} &#10;到货: {{.ReceiveTime|prettytime}} &#10;创建: {{.CreateTime|prettytime}} &#10;更新: {{.UpdateTime|prettytime}}">
                 {{.SendTime | date}}
               </td>
@@ -82,10 +85,10 @@
     <!-- <script src="/static/js/c/inventory/invnetory_group_list_ng.js" ></script> -->
     
     <!-- <script type="text/javascript"> -->
-  <!--              // var a = { {.InventoriesJson} } -->
-  <!--              p_InventoryGroupList({ -->
-                                           <!--                // Product: { {.InventoryGroup} }, -->
-                                           <!--              }); -->
+                 <!--              // var a = { {.InventoriesJson} } -->
+                 <!--              p_InventoryGroupList({ -->
+                                                          <!--                // Product: { {.InventoryGroup} }, -->
+                                                          <!--              }); -->
   <!-- </script> -->
 
 
