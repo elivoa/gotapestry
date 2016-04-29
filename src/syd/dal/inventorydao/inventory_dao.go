@@ -135,56 +135,10 @@ func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
 	if nil == ig && ig.Id >= 0 {
 		panic("InventoryId is nil!")
 	}
-
-	fmt.Println("UpdateAllInventoryItems 1")
-	var conn *sql.DB
-	var stmt *sql.Stmt
-	var err error
-	if conn, err = db.Connect(); err != nil {
-		return err
-	}
-	defer func() {
-		fmt.Println("conn.Close()")
-		conn.Close()
-		fmt.Println("conn.CLose() done!")
-	}()
-
-	fmt.Println("UpdateAllInventoryItems 2")
 	_sql := `update inventory set provider_id=?, operator_id=?, send_time=?, receive_time=? where group_id=?`
-	if stmt, err = conn.Prepare(_sql); err != nil {
-		return err
-	}
-	defer func() {
-		fmt.Println("conn.Close()")
-		stmt.Close()
-		fmt.Println("conn.CLose() done!")
-	}()
-	fmt.Println("UpdateAllInventoryItems 3")
-
-	rows, err := stmt.Query(ig.ProviderId, ig.OperatorId, ig.SendTime, ig.ReceiveTime, ig.Id)
-	if db.Err(err) {
-		return err
-	}
-	defer func() {
-		fmt.Println("conn.Close()")
-		rows.Close()
-		fmt.Println("conn.CLose() done!")
-	}()
-	fmt.Println("UpdateAllInventoryItems 4")
-
-	// // the final result
-	// ps := []*model.SumStat{}
-	// for rows.Next() {
-	// 	p := new(model.SumStat)
-	// 	rows.Scan(&p.Id, &p.NOrder, &p.NSold, &p.TotalPrice)
-
-	// 	// update average.
-	// 	p.AvgPrice = p.TotalPrice / float64(p.NSold)
-
-	// 	ps = append(ps, p)
-	// }
-	// return ps, nil
-	return nil
+	parser := em.RawQuery(_sql)
+	_, err := parser.Exec(ig.ProviderId, ig.OperatorId, ig.SendTime, ig.ReceiveTime, ig.Id)
+	return err
 }
 
 // old things.
