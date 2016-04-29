@@ -131,7 +131,7 @@ func Delete(id int64) (int64, error) {
 // 这是一个落后的原始的sql
 
 func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
-	if nil == ig {
+	if nil == ig && ig.Id >= 0 {
 		panic("InventoryId is nil!")
 	}
 
