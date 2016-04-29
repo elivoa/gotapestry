@@ -2,7 +2,6 @@ package inventorydao
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
