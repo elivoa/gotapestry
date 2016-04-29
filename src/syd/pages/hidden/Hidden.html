@@ -4,39 +4,8 @@
   </head>
   <body>
     <h1>开发中的功能:</h1>
-    <h3>测试结账表格：</h3><a href="/Accounting/FactorySettleAccount">结账</a>
-
-    <table border="1" style="border:solid 1px black;border-collapse: collapse;cell-padding:8px;margin:16px;"
-           cellpadding="4">
-
-      <th>
-        {{range $p := .Data.ProductLabel -}}
-        <td>{{$p}}</td>
-        {{end}}
-        <td>合计</td>
-      </th>
-      
-      {{range $d := .Data.DateLabel -}}
-      <tr>
-        <td>{{$d}}</td>
-        {{range $p := $.Data.ProductLabel -}}
-        <td>{{$.GetData $d $p}}</td>
-        {{end}}
-        <td>{{$.Data.SumDate $d}}</td>
-      </tr>
-      {{end}}
-      
-      <tr>
-        <td>合计:</td>
-        {{range $p := $.Data.ProductLabel -}}
-        <td>{{$.Data.SumProduct $p}}</td>
-        {{end}}
-        <td> - </td>
-      </tr>
-      
-    </table>
-    
-
+    <h3>测试结账表格：</h3>
+    <a href="/Accounting/FactorySettleAccount">结账</a>
   </body>
 </html>
 
