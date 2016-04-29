@@ -135,6 +135,7 @@ func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
 	if nil == ig && ig.Id >= 0 {
 		panic("InventoryId is nil!")
 	}
+
 	fmt.Println("UpdateAllInventoryItems 1")
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -142,21 +143,33 @@ func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
 	if conn, err = db.Connect(); err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() {
+		fmt.Println("conn.Close()")
+		conn.Close()
+		fmt.Println("conn.CLose() done!")
+	}()
 
 	fmt.Println("UpdateAllInventoryItems 2")
 	_sql := `update inventory set provider_id=?, operator_id=?, send_time=?, receive_time=? where group_id=?`
 	if stmt, err = conn.Prepare(_sql); err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func() {
+		fmt.Println("conn.Close()")
+		stmt.Close()
+		fmt.Println("conn.CLose() done!")
+	}()
 	fmt.Println("UpdateAllInventoryItems 3")
 
 	rows, err := stmt.Query(ig.ProviderId, ig.OperatorId, ig.SendTime, ig.ReceiveTime, ig.Id)
 	if db.Err(err) {
 		return err
 	}
-	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+	defer func() {
+		fmt.Println("conn.Close()")
+		rows.Close()
+		fmt.Println("conn.CLose() done!")
+	}()
 	fmt.Println("UpdateAllInventoryItems 4")
 
 	// // the final result
