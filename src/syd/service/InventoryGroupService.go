@@ -400,7 +400,6 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 					return nil, err
 				}
 			}
-
 		}
 	}
 
@@ -408,6 +407,7 @@ func (s *InventoryGroupService) SaveInventoryGroupByNGLIST(ig *model.InventoryGr
 
 	// Add by gb @ 2016-04-29: set all sub-inventory item's send_time, update_time, and factory_id.
 	if err := inventorydao.UpdateAllInventoryItems(ig); err != nil {
+		fmt.Println("err: ", err)
 		panic(err)
 	}
 	fmt.Println(">>>> ig.Inventories> All Done; ") // print debug info.

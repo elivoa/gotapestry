@@ -2,6 +2,7 @@ package inventorydao
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
@@ -134,7 +135,7 @@ func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
 	if nil == ig && ig.Id >= 0 {
 		panic("InventoryId is nil!")
 	}
-
+	fmt.Println("UpdateAllInventoryItems 1")
 	var conn *sql.DB
 	var stmt *sql.Stmt
 	var err error
@@ -143,17 +144,20 @@ func UpdateAllInventoryItems(ig *model.InventoryGroup) error {
 	}
 	defer conn.Close()
 
+	fmt.Println("UpdateAllInventoryItems 2")
 	_sql := `update inventory set provider_id=?, operator_id=?, send_time=?, receive_time=? where group_id=?`
 	if stmt, err = conn.Prepare(_sql); err != nil {
 		return err
 	}
 	defer stmt.Close()
+	fmt.Println("UpdateAllInventoryItems 3")
 
 	rows, err := stmt.Query(ig.ProviderId, ig.OperatorId, ig.SendTime, ig.ReceiveTime, ig.Id)
 	if db.Err(err) {
 		return err
 	}
 	defer rows.Close() // db.CloseRows(rows) // use db.CloseRows or rows.Close()? Is rows always nun-nil?
+	fmt.Println("UpdateAllInventoryItems 4")
 
 	// // the final result
 	// ps := []*model.SumStat{}
