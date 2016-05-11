@@ -8,7 +8,6 @@ import (
 	"github.com/elivoa/got/utils"
 	"syd/dal/settleaccountdao"
 	"syd/model"
-	"syd/service"
 	"time"
 )
 
@@ -22,7 +21,7 @@ type FactorySettleAccount struct {
 	TimeFrom time.Time `query:"from"`
 	TimeTo   time.Time `query:"to"`
 
-	products map[int64]*model.Product
+	// products map[int64]*model.Product
 
 	Referer string // return to this place
 }
@@ -47,38 +46,11 @@ func (p *FactorySettleAccount) SetupRender() *exit.Exit {
 	}
 	p.Data = pst
 
-	// get product
-	productmap, err := service.Product.BatchFetchProductByIdMap(pst.ProductMap())
-	if err != nil {
-		return exit.Error(err)
-	}
-	p.products = productmap
-
 	return nil
 }
 
-func (p *FactorySettleAccount) GetData(date string, productId int64) string {
-	value := p.Data.Get(date, productId)
-	if value == 0 {
-		return ""
-	} else {
-		return fmt.Sprint(value)
-	}
-}
-
-var emptyproduct = model.NewProduct()
-
-func (p *FactorySettleAccount) GetProduct(productId int64) *model.Product {
-	if nil != p.products {
-		if product, ok := p.products[productId]; ok && nil != product {
-			return product
-		}
-	}
-	return emptyproduct
-}
-
 // --------------------------------------------------------------------------------
-// Form
+// Search Form
 
 func (p *FactorySettleAccount) OnSuccessFromSearchForm() *exit.Exit {
 	// time is injected and then return linkpage.

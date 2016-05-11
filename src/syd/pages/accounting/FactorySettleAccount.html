@@ -20,7 +20,7 @@
 		<h2>查询</h2>
 		<div class="search_filter">
           <input class="" type="text" name="Provider" value="{{.Provider}}" />
-          17-罗清元；16-黄楚辉；18-林琦雁；283-张志新；287-小震；288-老段；
+          17-罗清元；16-黄楚辉；18-林琦雁；283-张志新；287-小震；288-老段；464-王维业;
           <div class="flt_line">
             发货时间:
             从 <input class="inp_calendar" type="date"
@@ -47,33 +47,10 @@
         </div>
       </form>
       <!-- End Search Form -->
+
+      <!-- Detail Product Calculate Table -->
+      <t:product.CalcTable data=".Data"/>
       
-      <table border="1" style="border:solid 1px black;border-collapse: collapse;cell-padding:8px;margin:16px;"
-             cellpadding="4">
-        <th>
-          {{range $p := .Data.ProductLabel }}
-          {{with $product := $.GetProduct $p}}
-          <td>{{$product.ProductId}} - {{$product.Name}}</td>
-          {{end}}
-          {{end}}
-          <td>合计</td>
-        </th>
-        
-        {{range $d := .Data.SortedDateLabel }}
-        <tr>
-          <td style="width:78px;">{{$d}}</td>
-          {{range $p := $.Data.ProductLabel }}<td>{{$.GetData $d $p}}</td>{{end}}
-          <td>{{$.Data.SumDate $d}}</td>
-        </tr>
-        {{end}}
-        
-        <tr>
-          <td>合计:</td>
-          {{range $p := $.Data.ProductLabel }} <td>{{$.Data.SumProduct $p}}</td> {{end}}
-          <td> - </td>
-        </tr>
-        
-      </table>
     </div>
 
   </body>
