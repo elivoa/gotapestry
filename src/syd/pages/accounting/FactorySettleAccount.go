@@ -14,6 +14,7 @@ import (
 type FactorySettleAccount struct {
 	core.Page
 
+	// table data
 	Data *model.ProductSalesTable
 
 	// searc form or filter

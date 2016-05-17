@@ -33,7 +33,7 @@ type PreferenceIndex struct {
 func (p *PreferenceIndex) Activate() {
 	// service.User.RequireRole(p.W, p.R, carfilm.RoleSet_Management...)
 	if p.Tab == "" {
-		p.Tab = "today" // default go in toprint
+		p.Tab = "system" // default go in toprint
 	}
 }
 
@@ -68,7 +68,6 @@ func (p *PreferenceIndex) OnSuccessFromCreateConstForm() /* *exit.Exit  */ {
 			panic(err)
 		}
 	} else {
-
 		if err := service.Const.Set(p.Const.Name, p.Const.Key, p.Const.Value, p.Const.FloatValue); err != nil {
 			panic(err)
 		}

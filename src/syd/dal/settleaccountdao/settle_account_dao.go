@@ -222,7 +222,6 @@ func DeleteById(id int64) (int64, error) {
 
 // ----------------------------------------------------------------------------------------------------
 
-// TODO: return the second parameter as error
 func SettleAccount(startTime, endTime time.Time, factoryId int64) (*model.ProductSalesTable, error) {
 	var conn *sql.DB
 	var stmt *sql.Stmt

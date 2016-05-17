@@ -13,3 +13,4 @@ type Const struct {
 	Order      int // TODO: implement order to manage order.
 	Time       time.Time
 }
+

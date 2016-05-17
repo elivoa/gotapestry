@@ -28,6 +28,10 @@
                 Your role is:
                 <span style="color:red;font-size:20px;">{{.UserToken.Role}}</span>
               </li>
+              <li>
+                Store is:
+                <span style="color:red;font-size:20px;">{{.StoreName .UserToken.Store}}</span>
+              </li>
             </ul>
             <br><br>
             <a href="/account/changepassword">Change Your Password</a> |

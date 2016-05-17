@@ -7,7 +7,7 @@
   <div class="loginbar">
 
     <if t=".IsLogin">
-      <a href="/account">{{.UserToken.Username}}</a>,
+      <a href="/account">{{.UserToken.Username}} 来自 {{.StoreName .UserToken.Store}}</a>,
       <a href="/account/logout">退出</a>
       <else>
         <a href="/account/login">登陆</a>,

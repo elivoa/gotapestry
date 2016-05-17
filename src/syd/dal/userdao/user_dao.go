@@ -1,4 +1,4 @@
-// latest-tag: [user_dao.go] Time-stamp: <[user_dao.go] Elivoa @ Friday, 2015-03-27 13:19:26>
+// latest-tag: [user_dao.go] Time-stamp: <[user_dao.go] Elivoa @ Tuesday, 2016-05-17 16:31:46>
 package userdao
 
 import (
@@ -10,7 +10,7 @@ import (
 )
 
 var core_fields = []string{
-	"username", "password", "gender", "qq", "mobile", "city", "role", "create_time",
+	"username", "password", "gender", "qq", "mobile", "city", "role", "store", "create_time",
 }
 
 var em = &db.Entity{
@@ -35,7 +35,7 @@ func _one(query *db.QueryParser) (*model.User, error) {
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&p.Id, &p.Username, &p.Password, &p.Gender, &p.QQ, &p.Mobile, &p.City, &p.Role,
-				&p.CreateTime, &p.UpdateTime,
+				&p.Store, &p.CreateTime, &p.UpdateTime,
 			)
 		},
 	)
@@ -55,7 +55,7 @@ func _list(query *db.QueryParser) ([]*model.User, error) {
 			p := &model.User{}
 			err := rows.Scan(
 				&p.Id, &p.Username, &p.Password, &p.Gender, &p.QQ, &p.Mobile, &p.City, &p.Role,
-				&p.CreateTime, &p.UpdateTime,
+				&p.Store, &p.CreateTime, &p.UpdateTime,
 			)
 			models = append(models, p)
 			return true, err
@@ -69,7 +69,8 @@ func _list(query *db.QueryParser) ([]*model.User, error) {
 func CreateUser(user *model.User) (*model.User, error) {
 	// password???
 	res, err := em.Insert().Exec(
-		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role, time.Now(),
+		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role,
+		user.Store, time.Now(),
 		// TODO: change time.Now() to user.CreateTime, need to assign all create time outside.
 	)
 	if err != nil {
@@ -83,7 +84,7 @@ func CreateUser(user *model.User) (*model.User, error) {
 func UpdateUser(user *model.User) (int64, error) {
 	// update order
 	res, err := em.Update().Exec(
-		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role,
+		user.Username, user.Password, user.Gender, user.QQ, user.Mobile, user.City, user.Role, user.Store,
 		user.UpdateTime,
 		user.Id, // condition
 	)
@@ -163,30 +164,3 @@ func ListUserByIdSet(ids ...int64) (map[int64]*model.User, error) {
 	}
 	return usermap, nil
 }
-
-// old things
-
-// list all accounts by id.
-// func ListAccountChangeLogsByCustomerId(customerId int) ([]*model.AccountChangeLog, error) {
-// 	return list_account_changelog(aclEm.Select().Where("customer_id", customerId).OrderBy("id desc").Limit(20))
-// }
-
-// list_incoming is an common function that accept a query and query a list of result, and error.
-// func list_account_changelog(query *db.QueryParser) ([]*model.AccountChangeLog, error) {
-// 	changeLogs := make([]*model.AccountChangeLog, 0)
-// 	err := query.Query(
-// 		func(rows *sql.Rows) (bool, error) {
-// 			p := new(model.AccountChangeLog)
-// 			err := rows.Scan(
-// 				&p.Id, &p.CustomerId, &p.Delta, &p.Account, &p.Type,
-// 				&p.RelatedOrderTN, &p.Reason, &p.Time,
-// 			)
-// 			changeLogs = append(changeLogs, p)
-// 			return true, err
-// 		},
-// 	)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return changeLogs, nil
-// }

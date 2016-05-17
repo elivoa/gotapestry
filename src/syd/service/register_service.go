@@ -25,7 +25,11 @@ var (
 // 临时这样初始化service, 以后要用Inject的方式初始化这些东西；
 var (
 
-	// basic services
+	// Fundamental Serivces
+	Const = NewCosntService()
+	User  = &UserService{logs: logs.Get("SERVICE:USER:LoginCheck")}
+
+	// basic logic services
 	Order          = new(OrderService)
 	Account        = new(AccountService)
 	Person         = new(PersonService)
@@ -36,7 +40,7 @@ var (
 	Stock          = new(StockService)          // 库存数量
 	Stat           = new(StatService)           //
 
+	// Extend Services
 	FactorySettleAccount = new(FactorySettleAccountService) //
-
-	User = &UserService{logs: logs.Get("SERVICE:USER:LoginCheck")}
+	SendNewProduct       = new(SendNewProductService)
 )

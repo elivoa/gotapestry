@@ -9,7 +9,7 @@
       <t:layout.leftnav curpage="/admin/preference" />
 
       <div class="main_content">
-    	<h1>Configuration</h1>
+    	<h1>系统参数设置</h1>
 
 	    <div class="tab_main">
           <div class="bg">
@@ -21,19 +21,10 @@
                 </div>
                 -->
 	        <ul>
-	          <li class="{{$.TabStyle `test`}}"><a href="/admin/preference/test">test</a></li>
-	          <li class="{{$.TabStyle `car_made`}}"><a href="/admin/preference/car_made">Car Made</a></li>
-	          <li class="{{$.TabStyle `window_tint`}}">
-                <a href="/admin/preference/window_tint">Window Tint</a>
-              </li>
-	          <li class="{{$.TabStyle `window_tint_optional`}}">
-                <a href="/admin/preference/window_tint_optional">Window Tint Optional</a>
-              </li>
-	          <li class="{{$.TabStyle `clear_bra`}}">
-                <a href="/admin/preference/clear_bra">Clear Bra</a>
-              </li>
-	          <li class="{{$.TabStyle `clear_bra_optional`}}">
-                <a href="/admin/preference/clear_bra_optional">Clear Bra Optional</a>
+	          <li class="{{$.TabStyle `system`}}"><a href="/admin/preference/system">系统参数</a></li>
+	          <li class="{{$.TabStyle `store`}}"><a href="/admin/preference/store">店铺</a></li>
+	          <li class="{{$.TabStyle `SendNewProduct`}}">
+                <a href="/admin/preference/SendNewProduct">需要发样衣</a>
               </li>
 	        </ul>
 	      </div>
@@ -67,12 +58,16 @@
               </dl>
               <dl class="clearfix"></dl>
             </div>
-          </div>            
+          </div>
         </form>
 
         <div class="total txt_c">
-          <if t="eq .Tab `test`">
-            Car Made: Key is car made, Value and FloatValue has no meanings.
+          <if t="eq .Tab `SendNewProduct`">
+            Key：客户ID；Value:客户名称； SecondValue: 0 生效，1 无效;<br />
+            Key: RecentProductItems - 最近N条产品被认为是新品。
+          </if>
+          <if t="eq .Tab `store`">
+            Key: 仓库ID，必须是int；Value: 说明；FloatValue：1-显示在商品列表中。
           </if>
           <if t="eq .Tab `window_tint`">
             Window Tint: Key is WindowTint's name, FloatValue is it's price, Value has no meanings.

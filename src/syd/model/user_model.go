@@ -1,4 +1,4 @@
-// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Friday, 2014-10-31 13:36:59>
+// latest-tag: Time-stamp: <[user_model.go] Elivoa @ Tuesday, 2016-05-17 16:33:00>
 package model
 
 import (
@@ -23,6 +23,7 @@ type User struct {
 	Address    string // 车模项目添加。可作为公用项。
 	Role       string
 	Note       string
+	Store      int       // store
 	CreateTime time.Time // 试试看，是否可作为入职时间。
 	UpdateTime time.Time
 }
@@ -34,7 +35,7 @@ type UserToken struct {
 	Username string
 	Password string
 	Roles    []string // roles, do not support multi roles now.
-	Store    string   // no use in syd
+	Store    int      // no use in syd
 	// TODO: timeout?
 }
 
@@ -65,7 +66,7 @@ func (u *User) ToUserToken() *UserToken {
 		Name:     u.Name,
 		Username: u.Username,
 		Password: u.Password,
-		// Store:    u.Store,
+		Store:    u.Store,
 	}
 	// roles
 	rawRoles := strings.Split(u.Role, ",")

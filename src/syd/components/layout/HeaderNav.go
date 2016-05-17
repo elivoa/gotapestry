@@ -2,6 +2,7 @@ package layout
 
 import (
 	"github.com/elivoa/got/core"
+	"strconv"
 	"syd/base"
 	"syd/model"
 	"syd/service"
@@ -27,4 +28,12 @@ func (c *HeaderNav) IsLogin() bool {
 
 func (c *HeaderNav) IsAdmin() bool {
 	return c.UserToken.HasRole(base.Role_Admin)
+}
+
+func (p *HeaderNav) StoreName(store int) string {
+	if value, err := service.Const.GetStringValue("store", strconv.Itoa(store)); err != nil {
+		panic(err)
+	} else {
+		return value
+	}
 }

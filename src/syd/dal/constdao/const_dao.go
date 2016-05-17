@@ -2,6 +2,7 @@ package constdao
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
 	"strconv"
@@ -31,16 +32,38 @@ func EntityManager() *db.Entity {
 // ________________________________________________________________________________
 // Get product
 //
-func GetIntValue(name string) (int64, error) {
-	if ccc, err := Get("name", name); err != nil {
+//
+
+// do not use any more
+func GetIntValue(name, key string) (int64, error) {
+	if ccc, err := GetOne(name, key); err != nil {
 		return 0, err
 	} else {
 		return strconv.ParseInt(ccc.Value, 10, 64)
 	}
 }
 
-func GetStringValue(name string) (string, error) {
-	if ccc, err := Get("name", name); err != nil {
+// do not use any more
+func Get2ndIntValue(name, key string) (int64, error) {
+	if ccc, err := GetOne(name, key); err != nil {
+		return 0, err
+	} else {
+		return int64(ccc.FloatValue), nil //  strconv.ParseInt(ccc.Value, 10, 64)
+	}
+}
+
+// do not use any more
+func Get2ndStringValue(name, key string) (string, error) {
+	if ccc, err := GetOne(name, key); err != nil {
+		return "", err
+	} else {
+		return fmt.Sprint(ccc.FloatValue), nil
+	}
+}
+
+// do not use any more
+func GetStringValue(name, key string) (string, error) {
+	if ccc, err := Get(name, key); err != nil {
 		return "", err
 	} else {
 		return ccc.Value, nil
@@ -49,6 +72,21 @@ func GetStringValue(name string) (string, error) {
 
 func GetById(id int64) (*model.Const, error) {
 	return Get(em.PK, id)
+}
+
+func GetOne(name, key string) (*model.Const, error) {
+	var query = em.Select().Where("name", name).And("key", key)
+	if models, err := _list(query); err != nil {
+		panic(err)
+	} else {
+		if nil != models && len(models) > 0 {
+			if models[0] == nil {
+				// return nil, errors.New("Const Not founc.")
+				return nil, nil
+			}
+		}
+		return models[0], nil
+	}
 }
 
 // 搞什么鬼
