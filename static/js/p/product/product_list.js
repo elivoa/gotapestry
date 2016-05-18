@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2015-03-25 15:21:23>
+// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2016-05-18 15:28:33>
 
 function p_ProductList($master){
 
@@ -32,9 +32,46 @@ function p_ProductList($master){
 
     // init products.
     // $scope.Products = $master.Products; // TODO change to load something.
+    // AjaxLevel 1
     $http.get($master.ProductsLink)
       .success(function (data) {
         $scope.Products = data;
+
+        // AjaxLevel 2: Get Stocks
+        $http.get($master.StocksLink)
+          .success(function (data) {
+            if(data == undefined || data.length != $scope.Products.length){
+              console.log("Error!!! with data: ", data);
+              return;
+            }
+            for(var i=0;i <= data.length;i++){
+              var p = $scope.Products[i];
+              if (p && data[i]){
+                p.Stock = data[i].Stock;
+                p.Stocks = data[i].Stocks;
+              }
+            }
+          });
+
+
+        // AjaxLevel 2 in parallel: Get Details.
+        $http.get($master.DetailLink)
+          .success(function (data) {
+            if(data == undefined || data.length != $scope.Products.length){
+              console.log("Error!!! with data: ", data);
+              return;
+            }
+            for(var i=0;i <= data.length;i++){
+              var p = $scope.Products[i];
+              if (p && data[i]){
+                p.Colors = data[i].Colors;
+                p.Sizes = data[i].Sizes;
+                p.Properties = data[i].Properties;
+              }
+            }
+          });
+
+        
       });
     $scope.showall = $master.ShowAll;
 

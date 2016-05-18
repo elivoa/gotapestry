@@ -13,29 +13,29 @@ type Product struct {
 	Name         string         // product name
 	ProductId    string         // 传说中的货号
 	Status       product.Status //
-	Brand        string
-	Price        float64
-	Supplier     int
-	FactoryPrice float64
-	Stock        int    // 库存量 || not used again?
-	ShelfNo      string // 货架号
-	Capital      string // captical letter to quick access.
-	Note         string
-	CreateTime   time.Time
-	UpdateTime   time.Time
+	Brand        string         `json:",omitempty"`
+	Price        float64        `json:",omitempty"`
+	Supplier     int            `json:"-"`
+	FactoryPrice float64        `json:"-"`
+	Stock        int            // 库存量 || not used again?
+	ShelfNo      string         `json:"-"`          // 货架号
+	Capital      string         `json:",omitempty"` // captical letter to quick access.
+	Note         string         `json:",omitempty"`
+	CreateTime   time.Time      `json:"-"`
+	UpdateTime   time.Time      `json:"-"`
 
-	Pictures string // picture keys splited by ';' filenamne can't contain ';'
+	Pictures string `json:"-"` // picture keys splited by ';' filenamne can't contain ';'
 
 	// additional information, not in persistence
-	Colors     []string // these two information stores in product_properties table.
-	Sizes      []string
-	Properties map[string][]string // other properties // TODO
+	Colors     []string            `json:",omitempty"` // stores in product_properties table.
+	Sizes      []string            `json:",omitempty"`
+	Properties map[string][]string `json:",omitempty"` // other properties // TODO
 
 	// stock information. format: map[color__size]nstock
 	// special values in stock table
 	//   stock = -1 means this pair of combination doesn't exist.
 	//   stock = -2 means the pair is deleted.(may be price is available)
-	Stocks Stocks // map[string]int
+	Stocks Stocks `json:",omitempty"` // map[string]int
 }
 
 // TODO make a new structure of stocks;

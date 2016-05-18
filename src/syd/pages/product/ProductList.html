@@ -81,8 +81,10 @@
             </tr>
             
           </table>
-          
-          <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><A href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+
+          <!-- 
+               <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><A href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
+               -->
 
         </div>
         
@@ -93,17 +95,19 @@
 
 <script type="text/javascript">
 
-             //
-             p_ProductList({
-               ProductsLink: "/product/list:getproducts/{{.Capital}}",
-               ShowAll: {{.ShowAll}},
-             });
+  // start ng.
+  p_ProductList({
+    ProductsLink: "/product/list:getproducts/{{.Capital}}",
+    StocksLink: "/product/list:getproductstocks/{{.Capital}}",
+    DetailLink: "/product/list:getproductdetails/{{.Capital}}",
+    ShowAll: {{.ShowAll}},
+  });
 
-             // Products: {{.Products .Capital}}, 
-             //  Factories : { {.Factories}}, // factories option
-             // $(document).ready(function(){
-//   angular.element('._temp_query_box').focus(); 
-// })
+  // Products: {{.Products .Capital}}, 
+  //  Factories : { {.Factories}}, // factories option
+  // $(document).ready(function(){
+  //   angular.element('._temp_query_box').focus(); 
+  // })
 </script>
 
 

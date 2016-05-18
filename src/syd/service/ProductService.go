@@ -146,6 +146,44 @@ func (s *ProductService) List(parser *db.QueryParser, withs Withs) ([]*model.Pro
 	}
 }
 
+func (s *ProductService) ListStocks(parser *db.QueryParser) ([]*model.Product, error) {
+
+// func FillProductStocksByIdSet(models []*model.Product) error {
+// 	if nil == models || len(models) == 0 {
+// 		return nil
+// 	}
+
+// 	var idset = map[int64]bool{}
+// 	for _, m := range models {
+// 		idset[int64(m.Id)] = true
+// 	}
+// 	if allstocks, err := GetAllStocksByIdSet(idset); err != nil {
+// 		return err
+// 	} else {
+// 		if nil != allstocks {
+// 			for _, m := range models {
+// 				if stock, ok := allstocks[int64(m.Id)]; ok {
+// 					m.Stocks = stock
+// 					m.Stock = stock.Total()
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return nil
+// }
+
+
+	
+	if models, err := productdao.List(parser); err != nil {
+		return nil, err
+	} else {
+		if err := inventorydao.FillProductStocksByIdSet(models); err != nil {
+			return nil, err
+		}
+		return models, nil
+	}
+}
+
 //
 // Get Product, with product's size and color properties.
 //
