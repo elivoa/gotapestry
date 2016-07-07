@@ -152,5 +152,12 @@ func (p *Product) ClearSizes() {
 }
 
 func (p *Product) PictureKeys() []string {
-	return strings.Split(p.Pictures, ";")
+	res := strings.Split(p.Pictures, ";")
+	pks := []string{}
+	for _, pk := range res {
+		if strings.TrimSpace(pk) != "" {
+			pks = append(pks, strings.TrimSpace(pk))
+		}
+	}
+	return pks
 }

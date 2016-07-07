@@ -21,10 +21,12 @@ func SetProductStock(productId int, color string, size string, stock int) {
 	setProductCSValue(productId, color, size, "stock", stock, 0)
 }
 
-func SetProductPrice(productId int, color string, size string, price float64) {
-	setProductCSValue(productId, color, size, "price", 0, price)
-}
+// TODO 没有引用。这个标的price字段是不是没有用啊。 所以注释掉。
+// func SetProductPrice(productId int, color string, size string, price float64) {
+// 	setProductCSValue(productId, color, size, "price", 0, price)
+// }
 
+// private 
 func setProductCSValue(productId int, color string, size string,
 	field string, stock int, price float64) {
 

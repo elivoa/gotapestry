@@ -33,7 +33,11 @@ func (p *ProductDetail) Pictures() []string {
 }
 
 func (p *ProductDetail) Picture(index int) string {
-	return service.Product.ProductPictrues(p.Product)[index]
+	pictures := service.Product.ProductPictrues(p.Product)
+	if nil != pictures && len(pictures) > index {
+		return pictures[index]
+	}
+	return ""
 }
 
 func (p *ProductDetail) SupplierName(id int) string {

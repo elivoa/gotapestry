@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2016-05-18 15:28:33>
+// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2016-05-18 16:30:29>
 
 function p_ProductList($master){
 
@@ -32,6 +32,7 @@ function p_ProductList($master){
 
     // init products.
     // $scope.Products = $master.Products; // TODO change to load something.
+    
     // AjaxLevel 1
     $http.get($master.ProductsLink)
       .success(function (data) {
@@ -53,7 +54,6 @@ function p_ProductList($master){
             }
           });
 
-
         // AjaxLevel 2 in parallel: Get Details.
         $http.get($master.DetailLink)
           .success(function (data) {
@@ -71,7 +71,6 @@ function p_ProductList($master){
             }
           });
 
-        
       });
     $scope.showall = $master.ShowAll;
 

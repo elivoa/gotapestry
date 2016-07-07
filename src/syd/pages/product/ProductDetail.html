@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-    Time-stamp: <[ProductDetail.html] Elivoa @ Tuesday, 2016-04-12 23:22:29>
+    Time-stamp: <[ProductDetail.html] Elivoa @ 星期五, 2016-07-08 01:36:10>
     NG-enabled;
   -->
 
@@ -21,8 +21,16 @@
 
 		<div class="B_prd clearfix">
 		  <div class="B_prd_img">
-			<img src="{{$.Picture 0}}"><!-- TODO how to template slice -->
+			<img src="{{$.Picture 0}}"> <!-- TODO how to template slice -->
+
 		  </div>
+          <!-- debug area -->
+          <div style="float:right;border:solid 1px #ddd">
+            {{range $.Pictures}}
+            <img src="{{.}}" height="90" style="border:solic 1px gray">
+            {{end}}
+          </div>
+
 		  <div class="B_prd_info">
 			<h2>{{.Name}}</h2>
 			<p>单价：<strong class="price">{{.Price}}</strong>元</p>
