@@ -16,10 +16,16 @@
 
       <div class="main_content ng-cloak">
     	<h1>商品列表</h1>
+
+        <div style="margin:8px;">
+          <t:a event="ChangeMode" context=".Capital" label="显示模式"
+               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)"/>
+        </div>
+        
         <div class="tab_s clearfix">
           <a ng-repeat="tab in tabs track by $index"
              class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
-             href="/product/list/[[tab]]?showall=[[showall]]">
+             href="/product/list/[[tab]]?showall=[[showall]]&detailmode=[[detailmode]]">
             [[tab]]
           </a>
         </div>
@@ -29,6 +35,9 @@
           <table class="tbl_main">
             <tr>
               <th align="left" style="width:10px;">货号</th>
+              
+              <th ng-if="detailmode" width="62">图片</th>
+              
               <th align="left" style="width:150px;">商品名称</th>
               <th align="right">销售单价</th>
               <th align="right">库存</th>
@@ -46,6 +55,11 @@
               <td nowrap>
                 <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
               </td>
+              
+              <td ng-if="detailmode" width="62" >
+                <img src="[[p.pic]]" height="90" width="60" style="border:solic 1px gray">
+              </td>
+              
               <td nowrap>
                 <a href="/product/detail/[[p.Id]]">[[p.Name]]</a>
                 <!-- TODO: chagne this into string name; -->
@@ -95,19 +109,18 @@
 
 <script type="text/javascript">
 
-  // start ng.
-  p_ProductList({
-    ProductsLink: "/product/list:getproducts/{{.Capital}}",
-    StocksLink: "/product/list:getproductstocks/{{.Capital}}",
-    DetailLink: "/product/list:getproductdetails/{{.Capital}}",
-    ShowAll: {{.ShowAll}},
-  });
+           // start ng.
+p_ProductList({
+  ProductsLink: "/product/list:getproducts/{{.Capital}}",
+  StocksLink: "/product/list:getproductstocks/{{.Capital}}",
+  DetailLink: "/product/list:getproductdetails/{{.Capital}}",
+  ShowAll: {{.ShowAll}},
+  DetailMode: {{.DetailMode}},
+});
 
-  // Products: {{.Products .Capital}}, 
-  //  Factories : { {.Factories}}, // factories option
-  // $(document).ready(function(){
-  //   angular.element('._temp_query_box').focus(); 
-  // })
-</script>
-
-
+// Products: {{.Products .Capital}}, 
+//  Factories : { {.Factories}}, // factories option
+// $(document).ready(function(){
+//   angular.element('._temp_query_box').focus(); 
+// })
+                  </script>

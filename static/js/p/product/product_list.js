@@ -1,5 +1,5 @@
 // ProductList
-// Time-stamp: <[product_list.js] Elivoa @ Wednesday, 2016-05-18 16:30:29>
+// Time-stamp: <[product_list.js] Elivoa @ 星期五, 2016-07-08 23:32:18>
 
 function p_ProductList($master){
 
@@ -13,6 +13,8 @@ function p_ProductList($master){
 
   sydapp.controller('ProductListCtrl', function($scope, $http){
 
+    $scope.detailmode = $master.DetailMode; // display picture?
+    
     $scope.tabs = ["ALL", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
                    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"];
 
@@ -38,6 +40,8 @@ function p_ProductList($master){
       .success(function (data) {
         $scope.Products = data;
 
+        // TODO performance: load picture in parallel.
+        
         // AjaxLevel 2: Get Stocks
         $http.get($master.StocksLink)
           .success(function (data) {

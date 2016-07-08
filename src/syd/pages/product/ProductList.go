@@ -1,6 +1,7 @@
 package product
 
 import (
+	"github.com/elivoa/got/builtin/services"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/db"
 	"github.com/elivoa/got/route"
@@ -18,10 +19,11 @@ import (
 */
 type ProductList struct {
 	core.Page
-	products []*model.Product
-	Capital  string `path-param:"1"`
-	ShowAll  bool   `query:"showall"`
-	Referer  string `query:"referer"` // return here if non-empty
+	products   []*model.Product
+	Capital    string `path-param:"1"`
+	ShowAll    bool   `query:"showall"`    // show hidden products.
+	DetailMode bool   `query:"detailmode"` // show pictures
+	Referer    string `query:"referer"`    // return here if non-empty
 }
 
 func (p *ProductList) Setup() {
@@ -97,6 +99,7 @@ type ProductListJsonObject struct {
 	ProductId    string         // 传说中的货号
 	Status       product.Status //
 	Brand        string         `json:",omitempty"`
+	Picture      string         `json:"pic,omitempty"`
 	Price        float64        `json:",omitempty"`
 	Supplier     int            `json:"-"`
 	FactoryPrice float64        `json:"-"`
@@ -131,6 +134,7 @@ func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 				ProductId:    p.ProductId,
 				Status:       p.Status,
 				Brand:        p.Brand,
+				Picture:      getpicture(p),
 				Price:        p.Price,
 				Supplier:     p.Supplier,
 				FactoryPrice: p.FactoryPrice,
@@ -145,6 +149,14 @@ func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 		}
 	}
 	return basicps
+}
+
+func getpicture(p *model.Product) string {
+	pictures := service.Product.ProductPictrues(p)
+	if nil != pictures && len(pictures) > 0 {
+		return pictures[0]
+	}
+	return ""
 }
 
 func copyToProductStocks(products []*model.Product) []*ProductStocksJsonObject {
@@ -176,4 +188,15 @@ func copyToProductDetails(products []*model.Product) []*ProductDetailsJsonObject
 		}
 	}
 	return basicps
+}
+
+// 模式切换
+func (p *ProductList) OnChangeMode() *exit.Exit {
+	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("product/list",
+		map[string]interface{}{
+			"showall":    p.ShowAll,
+			"detailmode": !p.DetailMode, // 目的是点击period时间间隔的时候清除合并点策略
+		}, p.Capital,
+	)
+	return exit.Redirect(url)
 }
