@@ -89,6 +89,7 @@ func person_need_price(customerId int) bool {
 			return true
 		} else {
 			fmt.Println(">>>>>> 16")
+			fmt.Println("err is : ", err)
 			panic(err)
 		}
 	}
