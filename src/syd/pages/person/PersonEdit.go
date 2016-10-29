@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/gxl"
-	"strconv"
 	"syd/model"
 	"syd/service"
 	"syd/service/personservice"
@@ -45,16 +44,16 @@ func (p *PersonEdit) Setup() {
 
 		// Extend, load bool options
 		{
-			value, err := service.Const.GetIntValue("SendNewProduct", strconv.Itoa(person.Id))
-			if err != nil {
-				panic(err)
-			}
-			if value >= 0 {
-				p.IsSendNewProduct = true
-			}
+			// value, err := service.Const.GetIntValue("SendNewProduct", strconv.Itoa(person.Id))
+			// if err != nil {
+			// 	panic(err)
+			// }
+			// if value >= 0 {
+			// 	p.IsSendNewProduct = true
+			// }
 
-			// test
-			p.IsPrintHidePrice = true
+			// // test
+			// p.IsPrintHidePrice = true
 		}
 
 	} else {
