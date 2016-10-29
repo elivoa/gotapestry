@@ -31,7 +31,7 @@
         <div class="B_order_step3"></div>
 		<div class="B_print_content">
 		  <div class="B_btn_print">
-            <a class="" href="/order/printnoprice/{{.TrackNumber}}?first=true">切换至“打印配货单”</a>
+            <a class="" href="/order/printnoprice/{{.TrackNumber}}?first=true">不含价格</a>
             <a class="btn_b_s print-order" href="javascript:printOrder();">打印订单</a>
           </div>
 		  <div class="order_print">
@@ -139,5 +139,5 @@
     op  = new OrderPrint()
     op.setData({{.ProductDetailJson}})
   });
-  </script>
+</script>
 

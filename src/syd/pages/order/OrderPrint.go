@@ -41,19 +41,30 @@ func (p *OrderPrint) Setup() *exit.Exit {
 		panic(err.Error())
 	}
 
+	fmt.Println(">>>>>> 1")
 	p.Order = order
 	if p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId); err != nil {
+		fmt.Println(">>>>>> 2")
 		panic(err)
 	} else if p.Customer == nil {
+		fmt.Println(">>>>>> 3")
 		panic("Customer does not exist!")
 	}
+	fmt.Println(">>>>>> 4")
+
 	if p.First == false {
+		fmt.Println(">>>>>> 5")
+
 		needprice := person_need_price(p.Customer.Id)
 		if !needprice {
+			fmt.Println(">>>>>> 6")
+
 			// Redirect to print no pirce page.
 			return exit.Redirect(fmt.Sprintf("/order/printnoprice/%d", p.TrackNumber))
 		}
 	}
+	fmt.Println(">>>>>> 7")
+
 	p.Sumprice = p.sumprice()
 	return nil
 }
