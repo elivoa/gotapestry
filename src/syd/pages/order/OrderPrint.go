@@ -72,15 +72,23 @@ func (p *OrderPrint) Setup() *exit.Exit {
 // Return true if the specified person need print price defaultly.
 func person_need_price(customerId int) bool {
 	// 如果不是跳转过来的，就要检查默认状态。如果用户在不打印价格列表中，就要跳转到不打印文件中。
+	fmt.Println("DEBUG: ", base.SYS_PREF_KEY_PRINT_HIDE_PRICE, strconv.Itoa(customerId))
+	fmt.Println(">>>>>> 11")
 	result, err := service.Const.Get(base.SYS_PREF_KEY_PRINT_HIDE_PRICE, strconv.Itoa(customerId))
+	fmt.Println(">>>>>> 12")
 	if err != nil {
+		fmt.Println(">>>>>> 13")
 		panic(err)
 	}
 	if nil != result {
+		fmt.Println(">>>>>> 14")
+
 		if intvalue, err := result.Get2ndIntValue(); err == nil && intvalue == 0 {
+			fmt.Println(">>>>>> 15")
 			// need redirect.
 			return true
 		} else {
+			fmt.Println(">>>>>> 16")
 			panic(err)
 		}
 	}
