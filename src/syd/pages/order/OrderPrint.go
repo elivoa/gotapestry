@@ -41,56 +41,42 @@ func (p *OrderPrint) Setup() *exit.Exit {
 		panic(err.Error())
 	}
 
-	fmt.Println(">>>>>> 1")
 	p.Order = order
 	if p.Customer, err = service.Person.GetPersonById(p.Order.CustomerId); err != nil {
-		fmt.Println(">>>>>> 2")
 		panic(err)
 	} else if p.Customer == nil {
-		fmt.Println(">>>>>> 3")
 		panic("Customer does not exist!")
 	}
-	fmt.Println(">>>>>> 4")
 
 	if p.First == false {
-		fmt.Println(">>>>>> 5")
-
 		needprice := person_need_price(p.Customer.Id)
-		if !needprice {
-			fmt.Println(">>>>>> 6")
-
+		if needprice {
 			// Redirect to print no pirce page.
 			return exit.Redirect(fmt.Sprintf("/order/printnoprice/%d", p.TrackNumber))
 		}
 	}
-	fmt.Println(">>>>>> 7")
-
 	p.Sumprice = p.sumprice()
 	return nil
 }
 
 // Return true if the specified person need print price defaultly.
+// true  - 值为0， 没有值
+// false - 值为1
 func person_need_price(customerId int) bool {
 	// 如果不是跳转过来的，就要检查默认状态。如果用户在不打印价格列表中，就要跳转到不打印文件中。
-	fmt.Println("DEBUG: ", base.SYS_PREF_KEY_PRINT_HIDE_PRICE, strconv.Itoa(customerId))
-	fmt.Println(">>>>>> 11")
 	result, err := service.Const.Get(base.SYS_PREF_KEY_PRINT_HIDE_PRICE, strconv.Itoa(customerId))
-	fmt.Println(">>>>>> 12")
 	if err != nil {
-		fmt.Println(">>>>>> 13")
 		panic(err)
 	}
 	if nil != result {
-		fmt.Println(">>>>>> 14")
-
-		if intvalue, err := result.Get2ndIntValue(); err == nil && intvalue == 0 {
-			fmt.Println(">>>>>> 15")
-			// need redirect.
-			return true
-		} else {
-			fmt.Println(">>>>>> 16")
-			fmt.Println("err is : ", err)
+		if intvalue, err := result.Get2ndIntValue(); err != nil {
 			panic(err)
+		} else {
+			if intvalue == 0 {
+				return true
+			} else {
+				return false
+			}
 		}
 	}
 	return false
