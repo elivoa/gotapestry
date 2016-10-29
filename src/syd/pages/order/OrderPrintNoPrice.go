@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/elivoa/got/core"
-	"github.com/elivoa/got/route/exit"
 	"html/template"
-	"strconv"
-	"syd/base"
 	"syd/model"
 	"syd/service"
 	"syd/service/orderservice"
@@ -16,26 +13,23 @@ import (
 // ________________________________________________________________________________
 // OrderPrint
 
-type OrderPrint struct {
+type OrderPrintNoPrice struct {
 	core.Page
 	TrackNumber int64 `path-param:"1"`
 
 	Order    *model.Order
 	Customer *model.Person
 	Sumprice float64 // order sum price, no expressfee, no accumulated, no 代发
-
-	//
-	First bool `query:"first"`
 }
 
-func (p *OrderPrint) Activate() {
+func (p *OrderPrintNoPrice) Activate() {
 	if p.TrackNumber == 0 {
 		panic("Need Tracking Number!")
 	}
 	fmt.Println("Order Print is here")
 }
 
-func (p *OrderPrint) Setup() *exit.Exit {
+func (p *OrderPrintNoPrice) Setup() {
 	order, err := orderservice.GetOrderByTrackingNumber(p.TrackNumber)
 	if err != nil {
 		panic(err.Error())
@@ -47,36 +41,11 @@ func (p *OrderPrint) Setup() *exit.Exit {
 	} else if p.Customer == nil {
 		panic("Customer does not exist!")
 	}
-	if p.First == false {
-		needprice := person_need_price(p.Customer.Id)
-		if !needprice {
-			// Redirect to print no pirce page.
-			return exit.Redirect(fmt.Sprintf("/order/printnoprice/%d", p.TrackNumber))
-		}
-	}
+
 	p.Sumprice = p.sumprice()
-	return nil
 }
 
-// Return true if the specified person need print price defaultly.
-func person_need_price(customerId int) bool {
-	// 如果不是跳转过来的，就要检查默认状态。如果用户在不打印价格列表中，就要跳转到不打印文件中。
-	result, err := service.Const.Get(base.SYS_PREF_KEY_PRINT_HIDE_PRICE, strconv.Itoa(customerId))
-	if err != nil {
-		panic(err)
-	}
-	if nil != result {
-		if intvalue, err := result.Get2ndIntValue(); err == nil && intvalue == 0 {
-			// need redirect.
-			return true
-		} else {
-			panic(err)
-		}
-	}
-	return false
-}
-
-func (p *OrderPrint) sumprice() float64 {
+func (p *OrderPrintNoPrice) sumprice() float64 {
 	var sum float64
 	if p.Order.Details != nil {
 		for _, detail := range p.Order.Details {
@@ -86,14 +55,14 @@ func (p *OrderPrint) sumprice() float64 {
 	return sum
 }
 
-func (p *OrderPrint) ProductDetailJson() interface{} {
+func (p *OrderPrintNoPrice) ProductDetailJson() interface{} {
 	return orderservice.OrderDetailsJson(p.Order)
 }
 
 // ________________________________________________________________________________
 // Display Summarize
 //
-func (p *OrderPrint) DeliveryMethodDisplay() string {
+func (p *OrderPrintNoPrice) DeliveryMethodDisplay() string {
 	dis, ok := deliveryMethodDisplayMap[p.Order.DeliveryMethod]
 	if ok {
 		return dis
@@ -102,11 +71,11 @@ func (p *OrderPrint) DeliveryMethodDisplay() string {
 	}
 }
 
-func (p *OrderPrint) DeliveryMethodIs(dm string) bool {
+func (p *OrderPrintNoPrice) DeliveryMethodIs(dm string) bool {
 	return p.Order.DeliveryMethod == dm
 }
 
-func (p *OrderPrint) HasExpressFee() bool {
+func (p *OrderPrintNoPrice) HasExpressFee() bool {
 	// not 自提 & not 到付， 剩下的就是没填。
 	if p.Order.DeliveryMethod != "TakeAway" && p.Order.ExpressFee != -1 {
 		return true
@@ -114,7 +83,7 @@ func (p *OrderPrint) HasExpressFee() bool {
 	return false
 }
 
-func (p *OrderPrint) ExpressFeeHtml() interface{} {
+func (p *OrderPrintNoPrice) ExpressFeeHtml() interface{} {
 	if p.Order.ExpressFee == 0 {
 		return template.HTML("<span class=\"underline\"></span>")
 	} else {
@@ -122,7 +91,7 @@ func (p *OrderPrint) ExpressFeeHtml() interface{} {
 	}
 }
 
-func (p *OrderPrint) TotalPriceHtml() interface{} {
+func (p *OrderPrintNoPrice) TotalPriceHtml() interface{} {
 	// 自提 到付， 显示总订单额就好
 	if p.Order.DeliveryMethod != "TakeAway" && p.Order.ExpressFee != -1 {
 		return p.Sumprice
@@ -134,12 +103,12 @@ func (p *OrderPrint) TotalPriceHtml() interface{} {
 	}
 }
 
-func (p *OrderPrint) IsDaofu() bool {
+func (p *OrderPrintNoPrice) IsDaofu() bool {
 	return p.Order.ExpressFee == -1
 }
 
 // not used
-func (p *OrderPrint) DeliveryMethodHtml() interface{} {
+func (p *OrderPrintNoPrice) DeliveryMethodHtml() interface{} {
 	var html bytes.Buffer
 	html.WriteString(p.DeliveryMethodDisplay())
 	html.WriteString("        ")
@@ -155,15 +124,4 @@ func (p *OrderPrint) DeliveryMethodHtml() interface{} {
 		}
 	}
 	return template.HTML(html.String())
-}
-
-// ________________________________________________________________________________
-// helper
-//
-var deliveryMethodDisplayMap = map[string]string{
-	"YTO":      "圆通速递",
-	"SF":       "顺风快递",
-	"Depoon":   "德邦",
-	"Freight":  "货运",
-	"TakeAway": "自提",
 }

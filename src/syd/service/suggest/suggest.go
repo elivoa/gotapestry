@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Monday, 2015-01-26 00:52:54>
+  Time-stamp: <[suggest.go] Elivoa @ 星期三, 2016-08-10 01:26:31>
 */
 package suggest
 
@@ -41,6 +41,7 @@ func EnsureLoaded() {
 	if loaded {
 		return
 	}
+
 
 	l.Lock()
 	if !loaded {

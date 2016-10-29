@@ -11,7 +11,7 @@
         <link rel="stylesheet" type="text/css" media="screen" href="/static/css/pages/order-print.css" />
         <link rel="stylesheet" type="text/css" media="print" href="/static/css/pages/order-print.css" />
         -->
-    <script language="javascript" src="/static/js/p/order/order_print.js"></script>
+    <script language="javascript" src="/static/js/p/order/order_print_noprice.js"></script>
     <script language="javascript" src="/static/js/native/LodopFuncs.js"></script>
     <script language="javascript" src="/static/js/native/normal-print.js"></script>
     
@@ -27,12 +27,14 @@
       <t:layout.LeftNav curPage="/order/list" />
 
       <div class="main_content">
-    	<h1>打印订单</h1>
+    	<h1>打印配货单</h1>
         <div class="B_order_step3"></div>
 		<div class="B_print_content">
 		  <div class="B_btn_print">
-            <a class="" href="/order/printnoprice/{{.TrackNumber}}?first=true">切换至“打印配货单”</a>
-            <a class="btn_b_s print-order" href="javascript:printOrder();">打印订单</a>
+            <a class="" href="/order/print/{{.TrackNumber}}?first=true">切换至“打印订单”</a>
+            <a class="btn_b_s print-order" href="javascript:printOrder();">
+              打印配货单
+            </a>
           </div>
 		  <div class="order_print">
 			<div id="orderTop">
@@ -48,12 +50,12 @@
 				  <tr>
 					<th align="center" class="th">序号</th>
 					<th align="center" class="th">商品名称</th>
-					<th align="center" class="th">单价</th>
+					<!-- <th align="center" class="th">单价</th> -->
 					<th align="center" class="th">颜色</th>
 					<th align="center" class="th">尺码</th>
 					<th align="center" class="th">数量</th>
 					<th align="center" class="th">合计数量</th>
-					<th align="center" class="th">金额</th>
+					<!-- <th align="center" class="th">金额</th> -->
 					<th align="center" class="th">备注</th>
 				  </tr>
 				</thead>
@@ -135,9 +137,9 @@
   </body>
 </html>
 <script type="text/javascript">
-  $(function(){
-    op  = new OrderPrint()
-    op.setData({{.ProductDetailJson}})
-  });
-  </script>
+             $(function(){
+               op  = new OrderPrint()
+               op.setData({{.ProductDetailJson}})
+             });
+    </script>
 

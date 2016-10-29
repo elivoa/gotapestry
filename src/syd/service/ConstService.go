@@ -21,6 +21,22 @@ type ConstCacheItem struct {
 	timeout    int64 // time
 }
 
+func (s *ConstCacheItem) GetIntValue() (int64, error) {
+	return strconv.ParseInt(s.Value, 10, 64)
+}
+
+func (s *ConstCacheItem) GetStringValue() (string, error) {
+	return s.Value, nil
+}
+
+func (s *ConstCacheItem) Get2ndIntValue() (int64, error) {
+	return int64(s.FloatValue), nil
+}
+
+func (s *ConstCacheItem) Get2ndStringValue() (string, error) {
+	return fmt.Sprint(s.FloatValue), nil
+}
+
 // services
 
 func NewCosntService() *ConstService {
@@ -58,6 +74,11 @@ func (s *ConstService) Get2ndStringValue(name, key string) (string, error) {
 	return fmt.Sprint(ccitem.FloatValue), nil
 }
 
+func (s *ConstService) Get(name, key string) (*ConstCacheItem, error) {
+	ccitem := s.get(name, key)
+	return ccitem, nil
+}
+
 // basic get system.
 
 // get Item from cache first, if not found get from db and update cache.
@@ -87,6 +108,9 @@ func (s *ConstService) get(name, key string) *ConstCacheItem {
 		if constmodel, err := constdao.GetOne(name, key); err != nil {
 			panic(err)
 		} else {
+			if nil == constmodel {
+				return nil
+			}
 			ccitem = &ConstCacheItem{
 				Value:      constmodel.Value,
 				FloatValue: constmodel.FloatValue,

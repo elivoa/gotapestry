@@ -22,7 +22,7 @@
             <dl class="clearfix">
               <dt><i>*</i>姓名：</dt>
               <dd>
-                <input type="text" size="12" class="inp_error"
+                <input type="text" size="36" class="inp_error"
                        name="Person.Name" value="{{.Person.Name}}" />
               </dd>
               <dd class="tips" style="display:block">
@@ -33,15 +33,36 @@
             <dl class="clearfix">
               <dt>类型：</dt>
               <dd>
-                <t:select data=".TypeData" name="Person.Type" value=".Person.Type" Header="请选择" />
+                <t:select data=".TypeData" name="Person.Type" value=".Person.Type" Header="请选择"
+                          size="3" style="width:233px;"/>
               </dd>
               <dd></dd>
             </dl>
 
             <dl class="clearfix">
+              <dt>是否发样衣：</dt>
+              <dd>
+                {{if .IsSendNewProduct}}是 {{else}} 否 {{end}}
+              </dd>
+              <dd></dd>
+            </dl>
+
+            <dl class="clearfi">
+              <dt>是否默认打印价格：</dt>
+              <dd>
+                {{if .IsPrintHidePrice}}是 {{else}} 否 {{end}}
+              </dd>
+              <dd></dd>
+            </dl>
+
+            <dl class="clearfix">
+              <hr style="width:600px;"/>
+            </dl>
+            
+            <dl class="clearfix">
               <dt>电话：</dt>
               <dd>
-                <input type="text" size="12"
+                <input type="text" size="36"
                        name="Person.Phone" value="{{.Person.Phone}}" />
               </dd>
               <dd></dd>
@@ -51,18 +72,10 @@
               <dt>所在地：</dt>
               <dd>
                 <t:provinceSelect name="Person.City" value=".Person.City" />
-
-                <hide>
-                  <!--
-                      <select name="Person.City" value="{{.Person.City}}">
-                        <option value="">省</option>
-                        <option value="上海">上海</option>
-                        <option value="嘉兴">嘉兴</option>
-                        <option value="濮院">濮院</option>
-                      </select>
-                      -->
-                </hide>
-                <input type="text" size="12"
+                <br><br>
+              </dd>
+              <dd>
+                <input type="text" size="36"
                        name="Person.Address" value="{{.Person.Address}}" />
               </dd>
               <dd class="tips"></dd>
@@ -79,7 +92,7 @@
             <dl class="clearfix">
               <dt>QQ：</dt>
               <dd>
-                <input type="text" site="12"
+                <input type="text" size="36"
                        name="Person.QQ" value="{{.Person.QQ}}" />
               </dd>
               <dd></dd>
@@ -87,14 +100,14 @@
             <dl class="clearfix">
               <dt>网店：</dt>
               <dd>
-                <input type="text" site="12"
+                <input type="text" size="36"
                        name="Person.Website" value="{{.Person.Website}}" />
               </dd>
               <dd></dd>
             </dl>
             <dl class="clearfix">
               <dt>备注：</dt>
-              <dd><textarea name="Person.Note">{{.Person.Note}}</textarea></dd>
+              <dd><textarea name="Person.Note" cols="35" rows="6">{{.Person.Note}}</textarea></dd>
               <dd></dd>
             </dl>
 
@@ -104,6 +117,9 @@
               <dd></dd>
             </dl>
 
+            <dl class="clearfix">
+              <hr style="width:600px;"/>
+            </dl>
             
             <dl class="clearfix">
               <dt></dt>

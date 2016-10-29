@@ -79,11 +79,11 @@ func GetOne(name, key string) (*model.Const, error) {
 	if models, err := _list(query); err != nil {
 		panic(err)
 	} else {
-		if nil != models && len(models) > 0 {
-			if models[0] == nil {
-				// return nil, errors.New("Const Not founc.")
-				return nil, nil
-			}
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>  models is")
+		fmt.Println(models)
+		if nil == models || len(models) <= 0 {
+			// return nil, errors.New("Const Not founc.")
+			return nil, nil
 		}
 		return models[0], nil
 	}

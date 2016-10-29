@@ -35,6 +35,7 @@ var SYDModule = &core.Module{
 		c.AddStaticResource("/static/", "../static/") // static files.
 		c.AddStaticResource("/ng/", "../ng/")         // angularjs modules.
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
+		c.ResourcePath = "/var/site/data/syd/pictures/"
 
 		c.Port = 8080 //13062 for server
 		c.DBPort = 3306

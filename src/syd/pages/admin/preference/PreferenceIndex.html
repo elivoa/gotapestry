@@ -24,7 +24,10 @@
 	          <li class="{{$.TabStyle `system`}}"><a href="/admin/preference/system">系统参数</a></li>
 	          <li class="{{$.TabStyle `store`}}"><a href="/admin/preference/store">店铺</a></li>
 	          <li class="{{$.TabStyle `SendNewProduct`}}">
-                <a href="/admin/preference/SendNewProduct">需要发样衣</a>
+                <a href="/admin/preference/SendNewProduct">发样衣客户列表</a>
+              </li>
+	          <li class="{{$.TabStyle `PrintHidePrice`}}">
+                <a href="/admin/preference/PrintHidePrice">隐藏价格客户列表</a>
               </li>
 	        </ul>
 	      </div>
@@ -63,20 +66,17 @@
 
         <div class="total txt_c">
           <if t="eq .Tab `SendNewProduct`">
-            Key：客户ID；Value:客户名称； SecondValue: 0 生效，1 无效;<br />
-            Key: RecentProductItems - 最近N条产品被认为是新品。
+            >> 需要默认发新款样衣的客户列表：<br />
+            Key: 客户ID；Value:客户名称； SecondValue: 0 生效，1 无效;<br />
+            Key: RecentProductItems - 最近N条产品被认为是新品。<br /><br />
           </if>
           <if t="eq .Tab `store`">
             Key: 仓库ID，必须是int；Value: 说明；FloatValue：1-显示在商品列表中。
           </if>
-          <if t="eq .Tab `window_tint`">
-            Window Tint: Key is WindowTint's name, FloatValue is it's price, Value has no meanings.
-          </if>
-          <if t="eq .Tab `window_tint_optional`">
-            Window Tint Optional: Key is WindowTintOptional's name, FloatValue is it's price, Value has no meanings.
-          </if>
-          <if t="eq .Tab `clear_bra`">
-            Clear Bra Item: Key is the Name of Clear Bra, FloatValue is it's price, Value has no meanings.
+          <if t="eq .Tab `PrintHidePrice`">
+            >> 打印订单时，默认隐藏价格的客户列表: <br />
+            Key: 客户ID；Value:客户名称； SecondValue: 0 生效，1 无效;<br />
+            <br />
           </if>
         </div>
 
@@ -88,10 +88,10 @@
 
     <script type="text/javascript">
 
-      $('#CreateConstForm').validate()
-      $(function() {
-      $('#CreateConstForm input[name="Const.Value"]').focus();
-      });
+                 $('#CreateConstForm').validate()
+                 $(function() {
+                   $('#CreateConstForm input[name="Const.Value"]').focus();
+                 });
 
     </script>
 
