@@ -53,24 +53,38 @@ type ConstService struct {
 
 // Cache系统，如果没有值，则每次都要读取数据库。
 // 如果有值，则只读取一次，TODO 加上一个超时时间。重新读取数据。
+var DEFAULT_INT_VALUE_IF_NIL int64 = -1
+var DEFAULT_STRING_VALUE_IF_NIL string = ""
 
 func (s *ConstService) GetIntValue(name, key string) (int64, error) {
 	ccitem := s.get(name, key)
+	if nil == ccitem {
+		return DEFAULT_INT_VALUE_IF_NIL, nil
+	}
 	return strconv.ParseInt(ccitem.Value, 10, 64)
 }
 
 func (s *ConstService) GetStringValue(name, key string) (string, error) {
 	ccitem := s.get(name, key)
+	if nil == ccitem {
+		return DEFAULT_STRING_VALUE_IF_NIL, nil
+	}
 	return ccitem.Value, nil
 }
 
 func (s *ConstService) Get2ndIntValue(name, key string) (int64, error) {
 	ccitem := s.get(name, key)
+	if nil == ccitem {
+		return DEFAULT_INT_VALUE_IF_NIL, nil
+	}
 	return int64(ccitem.FloatValue), nil
 }
 
 func (s *ConstService) Get2ndStringValue(name, key string) (string, error) {
 	ccitem := s.get(name, key)
+	if nil == ccitem {
+		return DEFAULT_STRING_VALUE_IF_NIL, nil
+	}
 	return fmt.Sprint(ccitem.FloatValue), nil
 }
 
@@ -103,13 +117,13 @@ func (s *ConstService) get(name, key string) *ConstCacheItem {
 
 	// level two
 	ccitem, ok := keymap[key]
-	if !ok || ccitem == nil {
+	if !ok || ccitem == nil { // if not found
 		// get value from database;
 		if constmodel, err := constdao.GetOne(name, key); err != nil {
 			panic(err)
 		} else {
 			if nil == constmodel {
-				return nil
+				return nil // here return nil?
 			}
 			ccitem = &ConstCacheItem{
 				Value:      constmodel.Value,

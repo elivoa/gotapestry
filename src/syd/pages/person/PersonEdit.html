@@ -34,7 +34,7 @@
               <dt>类型：</dt>
               <dd>
                 <t:select data=".TypeData" name="Person.Type" value=".Person.Type" Header="请选择"
-                          size="3" style="width:233px;"/>
+                          style="width:233px;"/>
               </dd>
               <dd></dd>
             </dl>
@@ -43,6 +43,8 @@
               <dt>是否发样衣：</dt>
               <dd>
                 {{if .IsSendNewProduct}}是 {{else}} 否 {{end}}
+
+                <a href="javascript:void(0)" style="margin-left:40px;">>改为相反</a>
               </dd>
               <dd></dd>
             </dl>
@@ -51,6 +53,9 @@
               <dt>是否默认打印价格：</dt>
               <dd>
                 {{if .IsPrintHidePrice}}是 {{else}} 否 {{end}}
+                
+                <a href="javascript:void(0)" style="margin-left:40px;">>改为相反</a>
+                
               </dd>
               <dd></dd>
             </dl>
@@ -75,8 +80,8 @@
                 <br><br>
               </dd>
               <dd>
-                <input type="text" size="36"
-                       name="Person.Address" value="{{.Person.Address}}" />
+                <textarea type="text" size="36" cols="38" rows="3"
+                       name="Person.Address" value="{{.Person.Address}}" >{{.Person.Address}}</textarea>
               </dd>
               <dd class="tips"></dd>
             </dl>
