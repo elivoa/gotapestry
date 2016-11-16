@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Saturday, 2016-11-12 23:10:24>
+  Time-stamp: <[suggest.go] Elivoa @ Wednesday, 2016-11-16 19:04:37>
 */
 package suggest
 
@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/elivoa/got/debug"
+	"sort"
 	"strings"
 	"syd/dal/persondao"
 	"syd/dal/productdao"
@@ -21,7 +22,7 @@ const (
 )
 
 var l sync.RWMutex
-var cache map[string][]*Item //
+var cache map[string]Items // inner suggest cache.
 var loaded bool
 
 // var suggestCache
@@ -33,8 +34,22 @@ type Item struct {
 	Type        string // 1-customer,2-factory,3-product
 }
 
+type Items []*Item
+
+func NewItems(len int) Items { return Items(make([]*Item, len)) }
+func (p Items) Len() int     { return len(p) }
+func (p Items) Less(i, j int) bool {
+	if p[i] == nil || p[j] == nil {
+		return false
+	}
+	return p[i].SN > p[j].SN // reverse order
+}
+func (p Items) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
 func init() {
-	cache = make(map[string][]*Item, 10)
+	cache = make(map[string]Items, 10)
 }
 
 func EnsureLoaded() {
@@ -57,7 +72,7 @@ func IsLoaded() bool {
 }
 
 func load() {
-	cache = make(map[string][]*Item, 100)
+	cache = make(map[string]Items, 100)
 
 	persons, err := persondao.ListAll("customer")
 	// persons, err := personservice.ListCustomer()
@@ -65,8 +80,7 @@ func load() {
 		panic(err.Error())
 	} else {
 		debug.Log("[suggest] load %v customers.", len(persons))
-		personItems := make([]*Item, len(persons))
-		cache[Customer] = personItems
+		personItems := NewItems(len(persons))
 		for i, person := range persons {
 			personItems[i] = &Item{
 				Id:          person.Id,
@@ -75,6 +89,8 @@ func load() {
 				Type:        "1",
 			}
 		}
+		sort.Sort(personItems)
+		cache[Customer] = personItems
 	}
 
 	factories, err := persondao.ListAll("factory")
@@ -83,8 +99,7 @@ func load() {
 		panic(err.Error())
 	} else {
 		debug.Log("[suggest] load %v factories.", len(factories))
-		factoryItems := make([]*Item, len(factories))
-		cache[Factory] = factoryItems
+		factoryItems := NewItems(len(factories))
 		for i, factory := range factories {
 			factoryItems[i] = &Item{
 				Id:          factory.Id,
@@ -93,6 +108,8 @@ func load() {
 				Type:        "2",
 			}
 		}
+		sort.Sort(factoryItems)
+		cache[Factory] = factoryItems
 	}
 
 	// TODO: chagne to step load.
@@ -103,8 +120,7 @@ func load() {
 	}
 	// products := dal.ListProduct()
 	debug.Log("[suggest] load %v products.", len(products))
-	productItems := make([]*Item, len(products))
-	cache[Product] = productItems
+	productItems := NewItems(len(products))
 	for i, product := range products {
 		productItems[i] = &Item{
 			Id:          product.Id,
@@ -114,6 +130,8 @@ func load() {
 			Type:        "3",
 		}
 	}
+	sort.Sort(productItems)
+	cache[Product] = productItems
 
 	debug.Log("Loading suggest done. Use 0.00 ms.")
 }
@@ -137,9 +155,10 @@ func Add(category string, text string, id int, sn string) {
 	l.Lock()
 	items, ok := cache[category]
 	if !ok {
-		cache[category] = []*Item{item}
+		cache[category] = Items([]*Item{item}) // newitems
 	} else {
-		items = append(items, item)
+		items := append(items, item)
+		sort.Sort(items)
 		cache[category] = items
 	}
 	l.Unlock()
@@ -147,11 +166,10 @@ func Add(category string, text string, id int, sn string) {
 
 func Delete(category string, id int) {
 	EnsureLoaded()
-	//
 	l.Lock()
 	items, ok := cache[category]
 	if !ok {
-		items = []*Item{}
+		items = NewItems(0)
 		cache[category] = items
 	}
 	for i := 0; i < len(items); i++ {
@@ -160,7 +178,6 @@ func Delete(category string, id int) {
 			break
 		}
 	}
-	//
 	l.Unlock()
 }
 
