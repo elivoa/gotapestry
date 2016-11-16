@@ -2,11 +2,23 @@ package main
 
 import (
 	"fmt"
+	"github.com/elivoa/gxl"
 	"time"
 )
 
 func main() {
 	now := time.Now().UTC()
+
+	fmt.Println("now is : ", now)
+	s, e := gxl.NatureTimeRangeUTC(0, 0, 0)
+	fmt.Println("debug:::: ", s, " ////  ", e)
+	fmt.Println("----------------------------")
+	t, err := time.ParseInLocation("2006-01-02 15:04:05", "2015-01-01 01:33:22", time.Local)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("+8now is:", t)
+
 	start := now.Truncate(time.Hour * 24)
 	end := now.AddDate(0, 0, 1).Truncate(time.Hour * 24)
 	fmt.Println(start)

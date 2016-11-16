@@ -46,10 +46,10 @@
 
           <!-- times -->
           <ul style="margin:4px;padding:8px;border:solid 1px #ddd">
-            <li>订单创建时间：{{.Order.CreateTime | prettytime}}</li>
-            <li>订单修改时间：{{.Order.UpdateTime | prettytime}}</li>
+            <li>订单创建时间：{{.Order.CreateTime |local|prettytime}}</li>
+            <li>订单修改时间：{{.Order.UpdateTime |local|prettytime}}</li>
             <if t='.Order.StatusIs "Closed"'>
-              <li>订单关闭时间：{{.Order.CloseTime | prettytime}}</li>
+              <li>订单关闭时间：{{.Order.CloseTime |local|prettytime}}</li>
             </if>
           </ul>
         </div>
@@ -103,4 +103,4 @@
     odf = new OrderDetailsForm(false)
     odf.setData({{.ProductDetailJson}})
   });
-</script>
+  </script>

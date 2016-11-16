@@ -30,9 +30,12 @@ func (p *Suggest) Setup() *exit.Exit {
 	sj := &SuggestJson{Query: p.Query}
 	sj.Suggestions = make([]SuggestionJsonItem, len(items))
 	for idx, item := range items {
+		// fmt.Println("item.SN:", item.Id, item.SN)
 		sj.Suggestions[idx] = SuggestionJsonItem{
 			Value: item.QuickString + "||" + item.Text,
 			Data:  fmt.Sprint(item.Id),
+			Id:    item.SN,
+			Type:  item.Type,
 		}
 	}
 
@@ -52,6 +55,7 @@ func (p *Suggest) Onproduct() *exit.Exit {
 	if err != nil {
 		return exit.Error(err)
 	}
+
 	// translate
 	sj := &ProductSuggestions{Query: query}
 	sj.Suggestions = make([]ProductSuggestionItem, len(items))
@@ -84,60 +88,6 @@ type ProductSuggestionItem struct {
 	// Data        string `json:"data"`
 }
 
-// 	// search
-// 	items, err := suggest.Lookup(p.Query, p.Type)
-// 	if err != nil {
-// 		return err, nil
-// 	}
-// 	// translate
-// 	sj := &SuggestJson{Query: p.Query}
-// 	sj.Suggestions = make([]SuggestionJsonItem, len(items))
-// 	for idx, item := range items {
-// 		sj.Suggestions[idx] = SuggestionJsonItem{
-// 			Value: item.QuickString + "||" + item.Text,
-// 			Data:  fmt.Sprint(item.Id),
-// 		}
-// 	}
-
-// 	// marshal
-// 	jsonbytes, err := json.Marshal(sj)
-// 	if err != nil {
-// 		debug.Error(err)
-// 		return err, nil
-// 	}
-// 	jsonstr := string(jsonbytes)
-// 	return "json", jsonstr
-// }
-
-// // On query
-// func (p *Suggest) OnQuery() (interface{}, interface{}) {
-// 	suggest.EnsureLoaded()
-
-// 	// search
-// 	items, err := suggest.Lookup(p.Query, p.Type)
-// 	if err != nil {
-// 		return err, nil
-// 	}
-// 	// translate
-// 	sj := &SuggestJson{Query: p.Query}
-// 	sj.Suggestions = make([]SuggestionJsonItem, len(items))
-// 	for idx, item := range items {
-// 		sj.Suggestions[idx] = SuggestionJsonItem{
-// 			Value: item.QuickString + "||" + item.Text,
-// 			Data:  fmt.Sprint(item.Id),
-// 		}
-// 	}
-
-// 	// marshal
-// 	jsonbytes, err := json.Marshal(sj)
-// 	if err != nil {
-// 		debug.Error(err)
-// 		return err, nil
-// 	}
-// 	jsonstr := string(jsonbytes)
-// 	return "json", jsonstr
-// }
-
 /* struct to json */
 type SuggestJson struct {
 	Query       string               `json:"query"`
@@ -146,5 +96,7 @@ type SuggestJson struct {
 
 type SuggestionJsonItem struct {
 	Value string `json:"value"`
+	Id    string `json:"id"`
 	Data  string `json:"data"`
+	Type  string `json:"t"`
 }

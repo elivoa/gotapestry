@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/utils"
+	"github.com/elivoa/gxl"
 	"sort"
 	"syd/model"
 )
@@ -61,7 +61,7 @@ type StatService struct{}
 
 // DAO service
 func (s *StatService) CalculateHotSaleProducts(years, months, days int) (*model.HotSales, error) {
-	start, end := utils.NatureTimeRange(years, months, days)
+	start, end := gxl.NatureTimeRangeUTC(years, months, days)
 
 	var conn *sql.DB
 	var stmt *sql.Stmt
@@ -123,7 +123,11 @@ func (s *StatService) CalculateHotSaleProducts(years, months, days int) (*model.
 }
 
 func (s *StatService) CalculateHotSaleProducts_with_specs(years, months, days int) (*model.HotSales, error) {
-	start, end := utils.NatureTimeRange(years, months, days)
+	start, end := gxl.NatureTimeRangeUTC(years, months, days)
+	// fmt.Println("=======================")
+	// fmt.Println("start:", start)
+	// fmt.Println("start:", end)
+	// fmt.Println("=======================")
 
 	var conn *sql.DB
 	var stmt *sql.Stmt

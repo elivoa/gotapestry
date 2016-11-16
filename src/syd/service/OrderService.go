@@ -268,6 +268,9 @@ func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
 	}
 
 	// create order into db
+	// fmt.Println("======================================")
+	// fmt.Println("order.CreateTimeis ", order.CreateTime)
+	// fmt.Println("======================================")
 	if err := orderdao.CreateOrder(order); err != nil {
 		return nil, err
 	}

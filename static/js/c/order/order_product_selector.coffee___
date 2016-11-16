@@ -5,7 +5,7 @@
 #   data:{...}
 ##################################################
 
-window.OrderProductSelector =
+window.OrderProductSelector = dsd
 class OrderProductSelector
   constructor:(customerId) ->
     # fields

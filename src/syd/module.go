@@ -65,6 +65,7 @@ var SYDModule = &core.Module{
 
 		// Config gxl toolset.
 		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.
+		gxl.Timezone = +0   // set gxl toolset timezone to 8 Beijing.
 
 		// TODO: Register Coercers.
 

@@ -67,8 +67,8 @@
                 </if>
               </td>
               <td>{{.DisplayStatus }}</td>
-              <td nowrap title="{{.CreateTime | prettytime}} ">
-                {{.CreateTime | prettyday}} <!-- formattime "2006-01-02"-->
+              <td nowrap title="{{.CreateTime |local|prettytime}} ">
+                {{.CreateTime |local| prettytime}} <!-- formattime "2006-01-02"-->
               </td>
               
               <hide t="~~~~ operation ~~~~" ></hide>

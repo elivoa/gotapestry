@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ 星期三, 2016-08-10 01:26:31>
+  Time-stamp: <[suggest.go] Elivoa @ Saturday, 2016-11-12 23:10:24>
 */
 package suggest
 
@@ -21,7 +21,7 @@ const (
 )
 
 var l sync.RWMutex
-var cache map[string][]*Item
+var cache map[string][]*Item //
 var loaded bool
 
 // var suggestCache
@@ -30,7 +30,7 @@ type Item struct {
 	SN          string // Product Id
 	Text        string // Product Name
 	QuickString string // capital of pinyin
-	Type        string
+	Type        string // 1-customer,2-factory,3-product
 }
 
 func init() {
@@ -41,7 +41,6 @@ func EnsureLoaded() {
 	if loaded {
 		return
 	}
-
 
 	l.Lock()
 	if !loaded {
@@ -73,6 +72,7 @@ func load() {
 				Id:          person.Id,
 				Text:        person.Name,
 				QuickString: parseQuickText(person.Name),
+				Type:        "1",
 			}
 		}
 	}
@@ -90,6 +90,7 @@ func load() {
 				Id:          factory.Id,
 				Text:        factory.Name,
 				QuickString: parseQuickText(factory.Name), // TODO
+				Type:        "2",
 			}
 		}
 	}
@@ -110,6 +111,7 @@ func load() {
 			SN:          product.ProductId,
 			Text:        product.Name,
 			QuickString: parseQuickText(product.Name), // TODO
+			Type:        "3",
 		}
 	}
 
@@ -121,12 +123,15 @@ func parseQuickText(text string) string {
 	return utils.ParsePinyin(text)
 }
 
-func Add(category string, text string, id int) {
+func Add(category string, text string, id int, sn string) {
 	EnsureLoaded()
+
 	item := &Item{
 		Id:          id,
 		Text:        text,
+		SN:          sn,
 		QuickString: parseQuickText(text),
+		Type:        _categoryToType(category),
 	}
 
 	l.Lock()
@@ -137,7 +142,6 @@ func Add(category string, text string, id int) {
 		items = append(items, item)
 		cache[category] = items
 	}
-
 	l.Unlock()
 }
 
@@ -160,9 +164,9 @@ func Delete(category string, id int) {
 	l.Unlock()
 }
 
-func Update(category string, text string, id int) {
+func Update(category string, text string, id int, sn string) {
 	Delete(category, id)
-	Add(category, text, id)
+	Add(category, text, id, sn)
 }
 
 func PrintAll() {
@@ -183,6 +187,7 @@ func PrintAll() {
 	l.RUnlock()
 }
 
+// 遍历法查找匹配项。
 func Lookup(q string, category string) ([]*Item, error) {
 	l.RLock()
 	items, ok := cache[category]
@@ -204,7 +209,18 @@ func Lookup(q string, category string) ([]*Item, error) {
 		if item == nil {
 			continue
 		}
+		// fmt.Println("LOOKUP:>", item.Text, item.Id, item.SN)
+
+		var matched bool = false
+
 		if strings.HasPrefix(item.QuickString, q) {
+			matched = true
+		}
+		if strings.HasPrefix(item.SN, q) {
+			matched = true
+		}
+
+		if matched {
 			filtered[idx] = item
 			found++
 			if idx >= N-1 {
@@ -217,4 +233,19 @@ func Lookup(q string, category string) ([]*Item, error) {
 	l.RUnlock()
 	result := filtered[:found]
 	return result, nil
+}
+
+// ---------- small functions --------------
+
+func _categoryToType(category string) string {
+	var Type string
+	switch category {
+	case Customer:
+		Type = "1"
+	case Factory:
+		Type = "2"
+	case Product:
+		Type = "3"
+	}
+	return Type
 }

@@ -98,9 +98,9 @@ func Create(person *model.Person) error {
 	}
 	// update suggest
 	if person.Type == "customer" {
-		suggest.Add(suggest.Customer, person.Name, person.Id)
+		suggest.Add(suggest.Customer, person.Name, person.Id, "")
 	} else if person.Type == "factory" {
-		suggest.Add(suggest.Factory, person.Name, person.Id)
+		suggest.Add(suggest.Factory, person.Name, person.Id, "")
 	}
 	return nil
 }
@@ -112,9 +112,9 @@ func Update(person *model.Person) (affacted int64, err error) {
 	}
 	// update person
 	if person.Type == "customer" {
-		suggest.Update(suggest.Customer, person.Name, person.Id)
+		suggest.Update(suggest.Customer, person.Name, person.Id, "")
 	} else if person.Type == "factory" {
-		suggest.Update(suggest.Factory, person.Name, person.Id)
+		suggest.Update(suggest.Factory, person.Name, person.Id, "")
 	}
 	return
 }

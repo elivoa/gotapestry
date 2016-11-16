@@ -1,13 +1,26 @@
 <!DOCTYPE HTML>
-<html>
+<!--
+    Time-stamp: <[OrderCreateDetail.html] Elivoa @ Saturday, 2016-11-12 23:18:49>
+    NG-enabled;
+  -->
+
+<!-- Enable Angularjs -->
+<!-- 只启用新的ProductSelector， 其余的保持原来的功能。 -->
+
+<html ng-app="syd">
   <head>
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="print .SubTitle `订单`" />
+    <t:layout.header title="print .SubTitle `订单`" n-g="true"/>
     <script type="text/javascript" src="/static/js/c/product_cst_generator.js"></script>
     <script type="text/javascript" src="/static/js/p/order/order_create_detail.js"></script>
+    <script src="/static/js/p/order/order_create_detail_ng.js" ></script>
+
+    <script src="/static/js/c/inventory/inventory_product_selector.js" ></script>
   </head>
-  <body class="PG_create_order">
+  
+  <body ng-controller="OrderCreateDetailCtrl" class="PG_create_order">
     <t:layout.headernav />
+    
     <div class="container">
       <t:layout.leftnav curpage="/order/create" />
       
@@ -15,6 +28,12 @@
     	<h1>{{.SubTitle}}订单</h1>
         <div class="B_order_step2"></div>
 
+        <!--
+            0000000<br>
+            < t:inventory.productselector GroupId="" inventories="" />
+            0000000<br>
+            -->
+        
         <form method="POST" id="OrderDetailForm" onkeydown="return(event.keyCode!=13)">
           <input type="hidden" name="Order.TrackNumber" value="{{.Order.TrackNumber}}" />
           <input type="hidden" name="Order.Status" value="{{.Order.Status}}" />
@@ -104,16 +123,21 @@
 </html>
 
 <script type="text/javascript">
-  $(function(){
-    ocd = new OrderCreateDetail({{.CustomerId}})
-    
-    {{if .IsEdit}}
-    // Restore information
-    ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
-    ocd.odf.setData({{.ProductDetailJson}})
-    {{end}}
-    
-  });
+
+//p_OrderCreateDetail({
+//});
+
+
+$(function(){
+  ocd = new OrderCreateDetail({{.CustomerId}})
+  
+  {{if .IsEdit}}
+  // Restore information
+  ocd.setExpress("{{.Order.DeliveryMethod}}", {{.Order.ExpressFee}})
+  ocd.odf.setData({{.ProductDetailJson}})
+  {{end}}
+  
+});
 
 // submit to return this page;
 function tempsave(){
@@ -125,4 +149,4 @@ function tempsave(){
   // console.log(btn.val())
   form.submit()
 }
-</script>
+        </script>

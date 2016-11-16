@@ -7,6 +7,7 @@ import (
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/route/exit"
 	"github.com/elivoa/got/utils"
+	"github.com/elivoa/gxl"
 	"strings"
 	"syd/model"
 	"syd/service"
@@ -42,9 +43,9 @@ func (p *OrderQuery) Activate() {
 
 	// time
 	if !utils.ValidTime(p.TimeTo) && !utils.ValidTime(p.TimeFrom) {
-		p.TimeFrom, p.TimeTo = utils.NatureTimeRange(0, 0, -3)
+		p.TimeFrom, p.TimeTo = gxl.NatureTimeRange(0, 0, -3) // TODO NOT-UTC
 	} else if !utils.ValidTime(p.TimeTo) {
-		p.TimeTo = utils.NatureTimeTodayEnd()
+		p.TimeTo = gxl.NatureTimeTodayEnd()
 	} else if !utils.ValidTime(p.TimeFrom) {
 		// TODO what to do?
 	}

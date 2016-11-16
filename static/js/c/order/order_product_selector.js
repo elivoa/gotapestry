@@ -78,6 +78,7 @@
               productPrice: data.Price,
               colors: data.Colors,
               sizes: data.Sizes
+              // notes: data.Note
             };
           }
           urlprice = "/api/customer_price/" + _.customerId + "/" + productId;
@@ -116,6 +117,8 @@
         $("#cs-container").html("ERROR Loading Color&Size information. Product Information Has Errors!");
       }
       this.updatePriceDisplay();
+      // fixed by gb @ 2016-11-09: bug,no notes.
+      $(".notes").val(this.product.note);
       return this.fillQuantities();
     };
 

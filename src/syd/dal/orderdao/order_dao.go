@@ -2,6 +2,7 @@ package orderdao
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
@@ -61,6 +62,10 @@ func CreateOrder(order *model.Order) error {
 		order.TotalPrice, order.TotalCount, order.PriceCut, order.Accumulated,
 		order.Note, order.ParentTrackNumber, time.Now(), time.Now(), time.Now(),
 	)
+	fmt.Println("======================================")
+	fmt.Println("order.CreateTimeis ", time.Now())
+	fmt.Println("======================================")
+
 	if err != nil {
 		return err
 	}

@@ -8,6 +8,7 @@
     <th align="right">库存</th>
     <th align="left">产品规格</th>
     <th align="left">操作</th>
+    <!-- <th align="left">创建时间</th> -->
   </tr>
 
   {{range .Products}}
@@ -34,6 +35,9 @@
       <a href="/product/list.ProductList.delete/{{.Id}}?source={{$.Source}}"
          onclick="return confirm('确认删除?')">删除</a>
     </td>
+
+    <!-- <td>{{.CreateTime}}</td> -->
+    
   </tr>
   {{end}}
 

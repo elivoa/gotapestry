@@ -34,6 +34,8 @@ func TodayStat(startTime time.Time, n int) ([]*model.SumStat, error) {
 		fmt.Println("((((())))) ----  start time:", startTime)
 		fmt.Println("((((())))) ----  end   time:", endTime)
 	}
+
+	// 这个sql会自动将时间转换为utc时间进行搜索。因此传入的时间无需转换时区。
 	_sql := `
 select DATE_FORMAT(o.create_time, '%Y-%m-%d') as 'date', 
   count(distinct o.track_number) as 'norder',
