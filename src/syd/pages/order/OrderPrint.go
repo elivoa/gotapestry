@@ -20,11 +20,11 @@ type OrderPrint struct {
 	core.Page
 	TrackNumber int64 `path-param:"1"`
 
-	Order    *model.Order
-	Customer *model.Person
-	Sumprice float64 // order sum price, no expressfee, no accumulated, no 代发
+	Order       *model.Order
+	Customer    *model.Person
+	Sumprice    float64 // order sum price, no expressfee, no accumulated, no 代发
+	ShowPicture bool    // show picture in print result?
 
-	//
 	First bool `query:"first"`
 }
 
@@ -55,8 +55,20 @@ func (p *OrderPrint) Setup() *exit.Exit {
 			return exit.Redirect(fmt.Sprintf("/order/printnoprice/%d", p.TrackNumber))
 		}
 	}
+
+	p.ShowPicture = showPicture()
+
 	p.Sumprice = p.sumprice()
 	return nil
+}
+
+func showPicture() bool {
+	result, err := service.Const.Get(base.SYS_PREF_SYSTEM, base.SYS_PREF_KEY_PRINT_PICTURE)
+	if err != nil {
+		panic(err)
+	}
+	b, err := result.BooleanValue()
+	return b
 }
 
 // Return true if the specified person need print price defaultly.
@@ -69,7 +81,7 @@ func person_need_price(customerId int) bool {
 		panic(err)
 	}
 	if nil != result {
-		if intvalue, err := result.Get2ndIntValue(); err != nil {
+		if intvalue, err := result.SecondIntValue(); err != nil {
 			panic(err)
 		} else {
 			if intvalue == 0 {
@@ -93,7 +105,7 @@ func (p *OrderPrint) sumprice() float64 {
 }
 
 func (p *OrderPrint) ProductDetailJson() interface{} {
-	return orderservice.OrderDetailsJson(p.Order)
+	return orderservice.OrderDetailsJson(p.Order, p.ShowPicture)
 }
 
 // ________________________________________________________________________________

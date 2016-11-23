@@ -15,8 +15,9 @@ import (
 // --------------------------------------------------------------------------------
 
 type OrderDetailJson struct {
-	Orders   []int                              `json:"order"`
-	Products map[string]*ProductDetalJsonStruct `json:"products"`
+	Orders      []int                              `json:"order"`
+	Products    map[string]*ProductDetalJsonStruct `json:"products"`
+	ShowPicture bool                               `json:"showpic"`
 }
 
 // todo rename
@@ -24,6 +25,7 @@ type ProductDetalJsonStruct struct {
 	Id           int             `json:"id"` // product id
 	ProductId    string          `json:"pid"`
 	Name         string          `json:"name"`
+	Picture      string          `json:"pic"`
 	SellingPrice float64         `json:"price"`
 	ProductPrice float64         `json:"productPrice"`
 	Colors       []string        `json:"colors"`
@@ -101,7 +103,7 @@ func LoadSubOrders(order *model.Order) ([]*model.Order, error) {
 
 // ________________________________________________________________________________
 // ProductJson generator
-func OrderDetailsJson(order *model.Order) *OrderDetailJson {
+func OrderDetailsJson(order *model.Order, showPicture bool) *OrderDetailJson {
 	orders := []int{}
 	products := map[string]*ProductDetalJsonStruct{}
 
@@ -124,9 +126,16 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 					panic("can not find product")
 				}
 
+				// with picture?
+				var showpic = ""
+				if showPicture {
+					showpic = service.Product.ProductPicture(product, 0)
+				}
+
 				jsonStruct = &ProductDetalJsonStruct{
 					Id:           product.Id,
 					ProductId:    product.ProductId,
+					Picture:      showpic,
 					Name:         product.Name,
 					SellingPrice: detail.SellingPrice,
 					ProductPrice: product.Price,
@@ -144,7 +153,8 @@ func OrderDetailsJson(order *model.Order) *OrderDetailJson {
 				[]interface{}{detail.Color, detail.Size, detail.Quantity})
 		}
 	}
-	r := OrderDetailJson{Orders: orders, Products: products}
+	r := OrderDetailJson{Orders: orders, Products: products, ShowPicture: showPicture}
+
 	// bytes, err := json.Marshal(r)
 	// if err != nil {
 	// 	panic(err.Error())
@@ -276,7 +286,7 @@ func LoadDetails(orders []*model.Order) error {
 
 func LeavingMessage(bigOrder *model.Order) string {
 	var msg bytes.Buffer
-	jo := OrderDetailsJson(bigOrder)
+	jo := OrderDetailsJson(bigOrder, false)
 	var sumTotal float64
 	var sumQuantity int
 	for _, id := range jo.Orders {

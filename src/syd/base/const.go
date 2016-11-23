@@ -40,7 +40,9 @@ var (
 	// Application specific settings.
 	Order_create_tax_enable = false
 
+	SYS_PREF_SYSTEM               = "system"
 	SYS_PREF_KEY_PRINT_HIDE_PRICE = "PrintHidePrice"
+	SYS_PREF_KEY_PRINT_PICTURE    = "PrintPicture"
 )
 
 // const key, as a list.

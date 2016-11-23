@@ -269,6 +269,14 @@ func (s *ProductService) ProductPictrues(product *model.Product) []string {
 	return pkeys
 }
 
+func (p *ProductService) ProductPicture(product *model.Product, index int) string {
+	pictures := p.ProductPictrues(product)
+	if nil != pictures && len(pictures) > index {
+		return pictures[index]
+	}
+	return ""
+}
+
 /*
  * Stat: StatDailySalesData - 统计产品每日销售数量
  * productId == 0 -- Read all day sales.

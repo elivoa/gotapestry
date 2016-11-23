@@ -111,7 +111,7 @@ func (p *ShippingInsteadPrint) sumprice() float64 {
 }
 
 func (p *ShippingInsteadPrint) ProductDetailJson() interface{} {
-	return orderservice.OrderDetailsJson(p.Order)
+	return orderservice.OrderDetailsJson(p.Order, false)
 }
 
 // ________________________________________________________________________________

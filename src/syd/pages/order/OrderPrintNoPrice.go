@@ -56,7 +56,7 @@ func (p *OrderPrintNoPrice) sumprice() float64 {
 }
 
 func (p *OrderPrintNoPrice) ProductDetailJson() interface{} {
-	return orderservice.OrderDetailsJson(p.Order)
+	return orderservice.OrderDetailsJson(p.Order, false)
 }
 
 // ________________________________________________________________________________

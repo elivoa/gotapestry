@@ -3,12 +3,15 @@ package service
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"syd/dal/constdao"
 	"sync"
 	"time"
 )
 
-// support models
+/*
+ * support models
+ */
 type ConstCache struct {
 	// name -> key -> ConstItem
 	data map[string]map[string]*ConstCacheItem
@@ -21,23 +24,37 @@ type ConstCacheItem struct {
 	timeout    int64 // time
 }
 
-func (s *ConstCacheItem) GetIntValue() (int64, error) {
+func (s *ConstCacheItem) IntValue() (int64, error) {
 	return strconv.ParseInt(s.Value, 10, 64)
 }
 
-func (s *ConstCacheItem) GetStringValue() (string, error) {
+func (s *ConstCacheItem) StringValue() (string, error) {
 	return s.Value, nil
 }
 
-func (s *ConstCacheItem) Get2ndIntValue() (int64, error) {
+func (s *ConstCacheItem) SecondIntValue() (int64, error) {
 	return int64(s.FloatValue), nil
 }
 
-func (s *ConstCacheItem) Get2ndStringValue() (string, error) {
+func (s *ConstCacheItem) SecondStringValue() (string, error) {
 	return fmt.Sprint(s.FloatValue), nil
 }
 
-// services
+func (s *ConstCacheItem) BooleanValue() (bool, error) {
+	if nil != s && strings.ToLower(strings.TrimSpace(s.Value)) == "true" {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (s *ConstCacheItem) SecondBooleanValue() (bool, error) {
+	panic("TODO Implement this!")
+}
+
+/*
+ * services
+
+ */
 
 func NewCosntService() *ConstService {
 	return &ConstService{
@@ -114,7 +131,6 @@ func (s *ConstService) get(name, key string) *ConstCacheItem {
 	if !ok || keymap == nil {
 		keymap = map[string]*ConstCacheItem{}
 	}
-
 	// level two
 	ccitem, ok := keymap[key]
 	if !ok || ccitem == nil { // if not found
@@ -143,7 +159,9 @@ func (s *ConstService) Set(name string, key string, value interface{}, floatValu
 	return s.updatecache(name, key, value, floatValue)
 }
 
-func (s *ConstService) Update(name string, key string, value interface{}, floatValue float64, id int64) error {
+func (s *ConstService) Update(name string, key string,
+	value interface{}, floatValue float64, id int64) error {
+
 	if err := constdao.Update(name, key, value, floatValue, id); err != nil {
 		return err
 	}

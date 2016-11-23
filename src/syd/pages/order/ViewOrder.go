@@ -34,5 +34,5 @@ func (p *ViewOrder) Setup() {
 }
 
 func (p *ViewOrder) ProductDetailJson() interface{} {
-	return orderservice.OrderDetailsJson(p.Order)
+	return orderservice.OrderDetailsJson(p.Order, false)
 }

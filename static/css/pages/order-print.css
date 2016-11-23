@@ -13,3 +13,7 @@
 .prt_tbl td.title{white-space:normal}
 .other_info{margin:8mm 0 0;line-height:1.8em;}
 .underline{display:inline-block;border-bottom:1px solid #000;width:20mm;}
+
+.prt_tbl td.pic img{width:86px;height:98px;}
+
+

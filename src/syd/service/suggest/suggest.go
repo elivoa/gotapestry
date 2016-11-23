@@ -1,5 +1,5 @@
 /**
-  Time-stamp: <[suggest.go] Elivoa @ Wednesday, 2016-11-16 19:04:37>
+  Time-stamp: <[suggest.go] Elivoa @ 星期三, 2016-11-23 11:34:16>
 */
 package suggest
 
@@ -226,7 +226,8 @@ func Lookup(q string, category string) ([]*Item, error) {
 		if item == nil {
 			continue
 		}
-		// fmt.Println("LOOKUP:>", item.Text, item.Id, item.SN)
+		fmt.Println("LOOKUP:>", item.Text, item.Id, item.SN)
+		fmt.Println("LOOKUP query:>", q, item.Text)
 
 		var matched bool = false
 
@@ -236,7 +237,10 @@ func Lookup(q string, category string) ([]*Item, error) {
 		if strings.HasPrefix(item.SN, q) {
 			matched = true
 		}
-
+		// 支持模糊搜索 
+		if strings.Contains(item.Text, q) {
+			matched = true
+		}
 		if matched {
 			filtered[idx] = item
 			found++
