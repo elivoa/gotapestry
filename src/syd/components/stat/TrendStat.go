@@ -2,12 +2,15 @@ package stat
 
 // Deprecated, TODO chagne this into angularjs module.
 import (
-	"github.com/elivoa/got/builtin/services"
-	"github.com/elivoa/got/core"
-	"github.com/elivoa/got/route/exit"
+	"fmt"
 	"syd/model"
 	"syd/service"
 	"time"
+
+	"github.com/elivoa/got/builtin/services"
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route/exit"
+	"github.com/elivoa/gxl"
 )
 
 type TrendStat struct {
@@ -19,6 +22,10 @@ type TrendStat struct {
 
 	DailySalesData  model.ProductSales
 	DailySalesData2 model.ProductSales
+
+	Paylogs []*model.PayLog
+
+	Days int `query:"days"` // paylog days
 
 	// old things p
 	Products []*model.Product
@@ -72,6 +79,23 @@ func (p *TrendStat) Setup() {
 	if no_argu {
 		p.CombineDay = 1
 	}
+
+	// get Paylogs
+
+	// get time
+	// TimeFrom, TimeTo := gxl.NatureTimeRange(0, 0, -1) // TODO NOT-UTC
+	fmt.Println(">>>>>>>>>>>>>>>>>> Day is :", p.Days)
+	if p.Days <= 0 {
+		p.Days = 1
+	}
+	start, end := gxl.UntilStartOfTomorrowRangeUTC(p.Days)
+	fmt.Println(">>>>>>>>>>>>>>>>>> ", start, end, p.Days)
+	if data, err := service.Account.ListPaysByTime(start, end); err != nil {
+		panic(err)
+	} else {
+		p.Paylogs = data
+	}
+
 	return
 }
 
@@ -126,4 +150,15 @@ func (p TrendStat) YearonyearClass(yoy int) string {
 		return "current"
 	}
 	return "-"
+}
+
+func (p *TrendStat) SumPays() float64 {
+	if p.Paylogs == nil {
+		return 0
+	}
+	var sum float64
+	for _, paylog := range p.Paylogs {
+		sum += paylog.Delta
+	}
+	return sum
 }

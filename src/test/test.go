@@ -16,7 +16,54 @@ var vb = 1 << 1
 var vc = 1 << 2
 var vd = 1 << 3
 
+// 例如 0 0 -1, 返回最近两天的时间点。
+func NatureTimeRangeUTC(years, months, days int) (start, end time.Time) {
+	Timezone := 0
+	natureEnd := time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24).
+		Add(time.Hour * time.Duration(-Timezone))
+	natureStart := natureEnd.AddDate(years, months, days-1)
+	return natureStart, natureEnd
+}
+
+func EndOfTodayUTC() (t time.Time) {
+	year, month, day := time.Now().Date()
+	return time.Date(year, month, day, 23, 59, 59, 999999999, time.UTC)
+}
+func StartOfTomorrowUTC() (t time.Time) {
+	year, month, day := time.Now().AddDate(0, 0, 1).Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+}
+
+func UntilEndOfTodayRangeUTC(days int) (start, end time.Time) {
+	year, month, day := time.Now().AddDate(0, 0, -(days - 1)).Date()
+	startTime := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	return startTime, EndOfTodayUTC()
+}
+
+func UntilStartOfTomorrowRangeUTC(days int) (start, end time.Time) {
+	year, month, day := time.Now().AddDate(0, 0, -(days - 1)).Date()
+	startTime := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	return startTime, StartOfTomorrowUTC()
+}
+
 func main() {
+	Timezone := 0
+
+	// start, end := NatureTimeRangeUTC(0, 0, 0)
+	// fmt.Println(start, end)
+	fmt.Println("Now is : ", time.Now())
+	fmt.Println(UntilStartOfTomorrowRangeUTC(1))
+	fmt.Println(UntilStartOfTomorrowRangeUTC(2))
+	fmt.Println(UntilStartOfTomorrowRangeUTC(3))
+	fmt.Println(UntilStartOfTomorrowRangeUTC(4))
+	fmt.Println(UntilStartOfTomorrowRangeUTC(5))
+	fmt.Println(UntilStartOfTomorrowRangeUTC(6))
+	fmt.Println(time.Now().AddDate(0, 0, 1))
+	fmt.Println(time.Now().AddDate(0, 0, 1).UTC())
+	fmt.Println(time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24))
+	fmt.Println(time.Now().AddDate(0, 0, 1).UTC().Truncate(time.Hour * 24).Add(time.Hour * time.Duration(-Timezone)))
+	fmt.Println("========================================")
+
 	fmt.Println(00011 &^ 0110)
 	var buf bytes.Buffer
 	var PLACEHOLDER string = "(____PageHeadBootstrap_replace_to_html____)"

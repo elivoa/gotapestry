@@ -5,6 +5,7 @@ import (
 	"syd/dal/accountdao"
 	"syd/model"
 	"syd/service/personservice"
+	"time"
 )
 
 type AccountService struct{}
@@ -40,4 +41,8 @@ func (s *AccountService) UpdateAccountBalance(personId int, delta float64,
 func (s *AccountService) CreateAccountChangeLog(acl *model.AccountChangeLog) (
 	*model.AccountChangeLog, error) {
 	return accountdao.CreateAccountChangeLog(acl)
+}
+
+func (s *AccountService) ListPaysByTime(start, end time.Time) ([]*model.PayLog, error) {
+	return accountdao.ListPaysByTime(start, end)
 }

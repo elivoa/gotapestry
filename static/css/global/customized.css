@@ -28,3 +28,7 @@ span.yestoday{color:gray}
 .page-title {font-size:20px;color:#9d2932;font-weight:bold;}
 
 .container {width:93%;}
+
+/* Paylogs */
+.paylogs {line-height: 22px}
+.paylogs span {display:inline-block;background-color: #ddd;text-align: right;padding:0 4px;margin:0 4px;}

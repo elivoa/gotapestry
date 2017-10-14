@@ -29,3 +29,22 @@ type AccountChangeLog struct {
 	Reason         string
 	Time           time.Time
 }
+
+// PayLog is Used to List pay log in page.
+type PayLog struct {
+	ID           int64
+	CustomerID   int64
+	CustomerName string
+	Type         int
+	Delta        float64
+	Account      float64
+	Reason       string
+	Time         time.Time
+}
+
+func (p *PayLog) MinusAccount() float64 {
+	if p.Account == 0 {
+		return p.Account
+	}
+	return -p.Account
+}

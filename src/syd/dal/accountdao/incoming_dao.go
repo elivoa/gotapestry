@@ -2,10 +2,12 @@ package accountdao
 
 import (
 	"database/sql"
-	"github.com/elivoa/got/db"
-	_ "github.com/go-sql-driver/mysql"
+	"fmt"
 	"syd/model"
 	"time"
+
+	"github.com/elivoa/got/db"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // create a new entity.
@@ -71,4 +73,56 @@ func DeleteIncoming(id int) (int64, error) {
 		return 0, err
 	}
 	return res.RowsAffected()
+}
+
+/*_______________________________________________________________________________
+  Fill order Lists.
+*/
+func ListPaysByTime(start, end time.Time) ([]*model.PayLog, error) {
+	var err error
+	conn := db.Connectp()
+	defer db.CloseConn(conn)
+
+	// 1. query
+	var queryString = `
+select 
+  c.time,p.Id,p.Name,c.type,c.delta,c.account,c.reason 
+from 
+  account_changelog c
+  left join person p on c.customer_id=p.id
+where 
+  time >= ? 
+  and time < ?
+  and delta>0 
+limit 2000
+`
+	// 2. prepare
+	stmt, err := conn.Prepare(queryString)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	// 3. query
+	rows, err := stmt.Query(start, end)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// 4. process results.
+	models := make([]*model.PayLog, 0)
+	for rows.Next() {
+
+		m := &model.PayLog{}
+		err := rows.Scan(
+			&m.Time, &m.CustomerID, &m.CustomerName, &m.Type, &m.Delta, &m.Account, &m.Reason,
+		)
+		if err != nil {
+			return nil, err
+		}
+		models = append(models, m)
+	}
+	fmt.Println("sldkjfaljds=================,m", models)
+	return models, nil
 }

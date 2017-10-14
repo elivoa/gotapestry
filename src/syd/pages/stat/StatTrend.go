@@ -12,4 +12,7 @@ type StatTrend struct {
 	Period     int `query:"period"` // Chart Time Period
 	CombineDay int `query:"combineday"`
 	Yearonyear int `query:"yearonyear"`
+
+	Days int `query:"days"` // paylog days
+
 }

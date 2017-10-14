@@ -2,9 +2,10 @@ package accountdao
 
 import (
 	"database/sql"
+	"syd/model"
+
 	"github.com/elivoa/got/db"
 	_ "github.com/go-sql-driver/mysql"
-	"syd/model"
 )
 
 // create a new entity.
@@ -48,7 +49,7 @@ func AllAccountChangeLogs() ([]*model.AccountChangeLog, error) {
 
 // list all accounts by id.
 func ListAccountChangeLogsByCustomerId(customerId int) ([]*model.AccountChangeLog, error) {
-	return list_account_changelog(aclEm.Select().Where("customer_id", customerId).OrderBy("id", db.DESC).Limit(20))
+	return list_account_changelog(aclEm.Select().Where("customer_id", customerId).OrderBy("id", db.DESC).Limit(100))
 }
 
 // list_incoming is an common function that accept a query and query a list of result, and error.
