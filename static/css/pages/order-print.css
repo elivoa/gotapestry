@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*frame*/
-.order_print{font-size:11pt;line-height:1.4em;}
+.order_print{font-size:10pt;line-height:1.4em;}
 .prt_tit{height:10mm;text-align:center;font-size:9pt;}
 .prt_tit span{display:inline-block;width:30%;}
 .prt_tbl{width:100%;}

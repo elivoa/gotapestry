@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -88,3 +89,64 @@ func (m BestBuyerListItem) TotalPrice() float64 {
 }
 
 type BestBuyerList []*BestBuyerListItem
+
+//********************************************************************************
+// Profit
+//********************************************************************************
+
+type Profits struct {
+	Profit ProfitM
+}
+
+type ProfitModel struct {
+	ProductId    int64
+	ProductName  string
+	Sales        int // 销量
+	Specs        map[string]int
+	CustomerId   int64
+	CustomerName string
+	SellingPrice float64
+	FactoryPrice float64
+}
+
+var juntan_yunfei float64 = 1
+
+// 这条记录的利润，这条记录的利润率。
+func (p ProfitModel) Profit() float64 {
+	if p.FactoryPrice == 0 {
+		return 0
+	} else {
+		return (p.SellingPrice - p.FactoryPrice) * float64(p.Sales)
+	}
+}
+
+func (p ProfitModel) ProfitRate() float64 {
+	if p.FactoryPrice > 0 {
+		return (p.SellingPrice - p.FactoryPrice - juntan_yunfei) / p.FactoryPrice
+	}
+	return 0
+}
+
+func (p ProfitModel) ProfitRateString() string {
+	return fmt.Sprintf("%.1f %%", (p.SellingPrice-p.FactoryPrice-juntan_yunfei)/p.FactoryPrice*100)
+}
+
+type ProfitM []*ProfitModel
+
+func (p ProfitM) Len() int           { return len(p) }
+func (p ProfitM) Less(i, j int) bool { return p[i].Sales > p[j].Sales }
+func (p ProfitM) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// person profit
+type PersonProfit struct {
+	CustomerId   int64
+	CustomerName string
+	Profit       float64
+	ProfitRate   float64
+}
+
+type PersonProfits []*PersonProfit
+
+func (p PersonProfits) Len() int           { return len(p) }
+func (p PersonProfits) Less(i, j int) bool { return p[i].ProfitRate > p[j].ProfitRate }
+func (p PersonProfits) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }

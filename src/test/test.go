@@ -17,6 +17,7 @@ var vc = 1 << 2
 var vd = 1 << 3
 
 func main() {
+	fmt.Println(00011 &^ 0110)
 	var buf bytes.Buffer
 	var PLACEHOLDER string = "(____PageHeadBootstrap_replace_to_html____)"
 	buf.WriteString("something  b((((((((()efore ((____PageHeadBootstrap_replace_to_html____) end")

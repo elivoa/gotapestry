@@ -15,39 +15,56 @@
       <t:layout.leftnav curPage="/product/list" />
 
       <div class="main_content ng-cloak--">
-    	<h1>发样衣</h1>
+    	<h1>发样衣:: 改为计算每天净利润</h1>
 
 
         RecentProductItems/最近N条新品/{{.RecentProductItems}}
 
-        
-        <div class="list_product">
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
-          dddddddddd
+        <div class="list_product" style="margin:20px;border:solid 1px #ddd;padding:10px;">
+          日期:{{$.TimeFrom | prettytime}} <br><br>
+          总件数:{{$.TotalCount}} <br><br>
+          总利润  :{{$.TotalProfit}}<br><br>
+          总利润率 :{{$.TotalProfitRiteString}}   (无价格数据的不统计)<br><br>
+        </div>
+        <div>无价格产品ID列表：{{$.NoPriceProductIdList}}</div>
+        <div class="list_product" style="margin:20px;border:solid 1px #ddd;padding:10px;">
+          计算日期：{{.Date}}
+          <br />
+          <br />
+          <hr />
+          <br />
+          <br />
+          <div>
+            <table class="table" style="border-color: #ddd;border:solid 1px #ddd" border="1">
+              <tr>
+                <th width="58">客户</th>
+                <th width="28">货号</th>
+                <th>产品</th>
+                <th>售出(件)</th>
+                <th>单价</th>
+                <th>出厂价</th>
+                <th>详情</th>
+                <th>利润</th>
+                <th>利润率</th>
+              </tr>
+              <range source=".HotSales.Profit">
+                <tr style="{{$.ValidRow .}}">
+                  <td>{{.CustomerName}}</td>
+                  <td>{{.ProductId}}</td>
+                  <td><a href="/product/detail/{{.ProductId}}">{{.ProductName}}</a></td>
+                  <td>{{.Sales}}</td>
+                  <td>{{.SellingPrice}}</td>
+                  <td>{{.FactoryPrice}}</td>
+                  <td style="color:#666;display:none">
+                    {{range $cskey, $q := .Specs}} {{$cskey}}:{{$q}} | {{end}}
+                  </td>
+                  <td>-</td>
+                  <td>{{.Profit}}</td>
+                  <td>{{.ProfitRateString}}</td>
+                </tr>
+              </range>
+          </div>
+
         </div>
         
       </div>
@@ -56,7 +73,6 @@
 </html>
 
 <script type="text/javascript">
-
 </script>
 
 

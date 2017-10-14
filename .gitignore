@@ -4,10 +4,7 @@ pkg/*
 
 .DS_Store
 src/generated/*
+src/syd/generated
 src/syd/generated/*
 static/from_lili/*
 
-
-src/syd/generated/main
-
-src/syd/generated/main.go

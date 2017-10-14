@@ -101,6 +101,11 @@
             </div>
             --------------------------------------------------------------------------- */}}
             
+            <!-- 这里是备注信息 -->
+            <div id="orderMemo" class="other_info">
+              订单备注：<span style="font-size:16px;font-weight:bold">{{.Order.Note}}</span>
+            </div>
+
             <!-- 先用这个版本，隐藏代发，运费始终显示下划线; 订单状态为todeliver，使用实时累计欠款；-->
             <div id="orderTotal" class="other_info">
               <div>运输方式：{{.DeliveryMethodDisplay }}

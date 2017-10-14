@@ -7,6 +7,7 @@ import (
 	"github.com/elivoa/gxl"
 	"sort"
 	"syd/model"
+	"time"
 )
 
 type StatService struct{}
@@ -212,5 +213,122 @@ func (s *StatService) CalculateHotSaleProducts_with_specs(years, months, days in
 		hs.HSProduct = append(hs.HSProduct, hsp)
 	}
 	sort.Sort(hs.HSProduct)
+	return hs, nil
+}
+
+// 用来计算利润率的东西
+
+func (s *StatService) CalculateHotSaleProducts_with_specs_specday(
+	start, end time.Time) (*model.Profits, error) {
+
+	// start, end := gxl.NatureTimeRangeUTC(years, months, days)
+	// fmt.Println("=======================")
+	// fmt.Println("start:", start)
+	// fmt.Println("start:", end)
+	// fmt.Println("=======================")
+
+	var conn *sql.DB
+	var stmt *sql.Stmt
+	var err error
+	if conn, err = db.Connect(); err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	//-- sum(quantity),product_id,p.name,color,size,sum(quantity)
+	// -- group by product_id,color,size order by sum(quantity) desc
+	_sql := "select product_id,p.name,color,size,od.quantity,o.customer_id,c.name,od.selling_price,p.FactoryPrice from `order_detail` od " +
+		"left join product p on od.product_id = p.Id " +
+		"left join `order` o on od.order_track_number = o.track_number " +
+		"left join `person` c on o.customer_id = c.id " +
+		"where od.order_track_number in (" +
+		"  SELECT o.track_number FROM `order` o WHERE (`create_time`>=? and `create_time`<?)" +
+		`    and o.type in (?,?)
+             and o.status in (?,?,?,?)
+        ` +
+		")"
+
+	if stmt, err = conn.Prepare(_sql); err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	//临时搞一搞
+	// start = "2017-01-10"
+	// end = "2017-01-11"
+	fmt.Println(">>>>>>>>>>>>((((((((((((((((()))))))))))))))))", start, end)
+	rows, err := stmt.Query(
+		start, end,
+		model.Wholesale, model.SubOrder, // model.ShippingInstead, // 查子订单
+		"toprint", "todeliver", "delivering", "done",
+		// base.STAT_EXCLUDED_PRODUCT,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// collect results.
+	pmap := map[string]*model.ProfitModel{}
+	for rows.Next() {
+		var (
+			quantity     = new(sql.NullInt64)
+			color        = new(sql.NullString)
+			size         = new(sql.NullString)
+			productId    = new(sql.NullInt64)
+			productName  = new(sql.NullString)
+			customerId   = new(sql.NullInt64)
+			customerName = new(sql.NullString)
+			sellingPrice = new(sql.NullFloat64)
+			factoryPrice = new(sql.NullFloat64)
+		)
+		if err := rows.Scan(productId, productName, color, size, quantity, customerId, customerName, sellingPrice, factoryPrice); err != nil {
+			return nil, err
+		}
+		m := new(model.ProfitModel)
+		if productId.Valid {
+			m.ProductId = productId.Int64
+		}
+		if productName.Valid {
+			m.ProductName = productName.String
+		}
+		if quantity.Valid {
+			m.Sales = (int)(quantity.Int64)
+		}
+		if customerId.Valid {
+			m.CustomerId = customerId.Int64
+		}
+		if customerName.Valid {
+			m.CustomerName = customerName.String
+		}
+		if sellingPrice.Valid {
+			m.SellingPrice = sellingPrice.Float64
+		}
+		if factoryPrice.Valid {
+			m.FactoryPrice = factoryPrice.Float64
+		}
+
+		// combine specs.
+
+		// if color.Valid && size.Valid {
+		uniqueKey := fmt.Sprintf("%v_%v_%v", m.ProductId, m.CustomerId, m.SellingPrice)
+		fmt.Println("---------- ", uniqueKey, m.Sales)
+		// cskey := fmt.Sprintf("%v_%v", color.String, size.String)
+		hsp, ok := pmap[uniqueKey]
+		if !ok {
+			hsp = m
+			hsp.Specs = make(map[string]int)
+			// hsp.Sales = 0
+			pmap[uniqueKey] = hsp
+		} else {
+			hsp.Sales += m.Sales
+		}
+		// hsp.Specs[cskey] += m.Sales
+	}
+
+	hs := &model.Profits{}
+	for _, hsp := range pmap {
+		hs.Profit = append(hs.Profit, hsp)
+	}
+	sort.Sort(hs.Profit)
 	return hs, nil
 }
