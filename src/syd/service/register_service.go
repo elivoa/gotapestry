@@ -8,8 +8,9 @@ type Withs int
 
 // try service API design.
 var (
-	WITH_ALL  Withs = 999999999
-	WITH_NONE Withs = 0
+	WITH_ALL     Withs = 999999999
+	WITH_NONE    Withs = 0 // TODO replace with  WITH_NOTHING
+	WITH_NOTHING Withs = 0
 
 	WITH_USERS   Withs = 1 << 0
 	WITH_PERSON  Withs = 1 << 1 // customer or factory

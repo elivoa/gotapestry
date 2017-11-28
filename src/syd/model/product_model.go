@@ -12,7 +12,7 @@ type Product struct {
 	Id           int            // id
 	Name         string         // product name
 	ProductId    string         // 传说中的货号
-	Status       product.Status //
+	Status       product.Status // 1 hide, 0 normal.
 	Brand        string         `json:",omitempty"`
 	Price        float64        `json:",omitempty"`
 	Supplier     int            `json:"-"`

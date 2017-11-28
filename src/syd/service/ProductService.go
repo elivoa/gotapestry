@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/elivoa/got/db"
 	"path/filepath"
 	"strings"
 	"syd/base/product"
@@ -12,6 +11,8 @@ import (
 	"syd/service/suggest"
 	"syd/utils"
 	"time"
+
+	"github.com/elivoa/got/db"
 )
 
 type ProductService struct{}
@@ -42,7 +43,7 @@ func (s *ProductService) CreateProduct(product *model.Product) (*model.Product, 
 	}
 
 	// update suggest
-	suggest.Add(suggest.Product, newProduct.Name, newProduct.Id, product.ProductId)
+	suggest.Add(suggest.Product, newProduct.Name, newProduct.Id, product.ProductId, newProduct.Status)
 
 	return newProduct, nil
 }
@@ -77,7 +78,12 @@ func (s *ProductService) UpdateProduct(product *model.Product) {
 	// update suggest
 	fmt.Println("^^^^^^ update product, ", product)
 	fmt.Println("Productid is: ", product.ProductId)
-	suggest.Update(suggest.Product, product.Name, product.Id, product.ProductId)
+	suggest.Update(suggest.Product, &suggest.Item{
+		Text:   product.Name,
+		Id:     product.Id,
+		SN:     product.ProductId,
+		Status: product.Status,
+	})
 
 }
 
@@ -96,6 +102,17 @@ func (s *ProductService) ChangeStatus(id int, status product.Status) (affacted i
 	} else {
 		// TODO affact suggest ???? should change status's status.
 		// suggest.Delete(suggest.Product, id)
+		product, err2 := s.GetProduct(id, WITH_NONE)
+		if err2 != nil {
+			fmt.Printf("error when reload product %d, %s\n", id, err2)
+		} else {
+			suggest.Update(suggest.Product, &suggest.Item{
+				Text:   product.Name,
+				Id:     product.Id,
+				SN:     product.ProductId,
+				Status: product.Status,
+			})
+		}
 		return
 	}
 }

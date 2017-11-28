@@ -6,13 +6,15 @@ package suggest
 import (
 	"errors"
 	"fmt"
-	"github.com/elivoa/got/debug"
 	"sort"
 	"strings"
+	"syd/base/product"
 	"syd/dal/persondao"
 	"syd/dal/productdao"
 	"syd/utils"
 	"sync"
+
+	"github.com/elivoa/got/debug"
 )
 
 const (
@@ -27,11 +29,12 @@ var loaded bool
 
 // var suggestCache
 type Item struct {
-	Id          int    // for Product
-	SN          string // Product Id
-	Text        string // Product Name
-	QuickString string // capital of pinyin
-	Type        string // 1-customer,2-factory,3-product
+	Id          int            // for Product
+	SN          string         // Product Id
+	Text        string         // Product Name
+	QuickString string         // capital of pinyin
+	Type        string         // 1-customer,2-factory,3-product | category
+	Status      product.Status // 0-normal, 1-hide. for product. TODO 暂时用了product的隐藏和显示.
 }
 
 type Items []*Item
@@ -121,13 +124,14 @@ func load() {
 	// products := dal.ListProduct()
 	debug.Log("[suggest] load %v products.", len(products))
 	productItems := NewItems(len(products))
-	for i, product := range products {
+	for i, p := range products {
 		productItems[i] = &Item{
-			Id:          product.Id,
-			SN:          product.ProductId,
-			Text:        product.Name,
-			QuickString: parseQuickText(product.Name), // TODO
+			Id:          p.Id,
+			SN:          p.ProductId,
+			Text:        p.Name,
+			QuickString: parseQuickText(p.Name), // TODO
 			Type:        "3",
+			Status:      p.Status,
 		}
 	}
 	sort.Sort(productItems)
@@ -141,7 +145,8 @@ func parseQuickText(text string) string {
 	return utils.ParsePinyin(text)
 }
 
-func Add(category string, text string, id int, sn string) {
+// Add add a suggest item into suggest-cache.
+func Add(category string, text string, id int, sn string, status product.Status) {
 	EnsureLoaded()
 
 	item := &Item{
@@ -150,6 +155,7 @@ func Add(category string, text string, id int, sn string) {
 		SN:          sn,
 		QuickString: parseQuickText(text),
 		Type:        _categoryToType(category),
+		Status:      status,
 	}
 
 	l.Lock()
@@ -164,6 +170,7 @@ func Add(category string, text string, id int, sn string) {
 	l.Unlock()
 }
 
+// Delete deletes item from suggest cache.
 func Delete(category string, id int) {
 	EnsureLoaded()
 	l.Lock()
@@ -181,9 +188,11 @@ func Delete(category string, id int) {
 	l.Unlock()
 }
 
-func Update(category string, text string, id int, sn string) {
-	Delete(category, id)
-	Add(category, text, id, sn)
+// Update use item{Id,Text,SN,Type} to update an suggest item.
+func Update(category string, item *Item /* text string, id int, sn string*/) {
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>> Update category", item, item.Status)
+	Delete(category, item.Id)
+	Add(category, item.Text, item.Id, item.SN, item.Status)
 }
 
 func PrintAll() {
@@ -226,10 +235,10 @@ func Lookup(q string, category string) ([]*Item, error) {
 		if item == nil {
 			continue
 		}
-		fmt.Println("LOOKUP:>", item.Text, item.Id, item.SN)
+		fmt.Println("LOOKUP:>", item.Text, item.Id, item.SN, item.Status)
 		fmt.Println("LOOKUP query:>", q, item.Text)
 
-		var matched bool = false
+		var matched = false
 
 		if strings.HasPrefix(item.QuickString, q) {
 			matched = true
@@ -237,11 +246,11 @@ func Lookup(q string, category string) ([]*Item, error) {
 		if strings.HasPrefix(item.SN, q) {
 			matched = true
 		}
-		// 支持模糊搜索 
+		// 支持模糊搜索
 		if strings.Contains(item.Text, q) {
 			matched = true
 		}
-		if matched {
+		if matched && item.Status == product.StatusNormal {
 			filtered[idx] = item
 			found++
 			if idx >= N-1 {

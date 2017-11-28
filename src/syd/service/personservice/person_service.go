@@ -2,6 +2,7 @@ package personservice
 
 import (
 	"sort"
+	"syd/base/product"
 	"syd/dal/persondao"
 	"syd/model"
 	"syd/service/suggest"
@@ -98,9 +99,9 @@ func Create(person *model.Person) error {
 	}
 	// update suggest
 	if person.Type == "customer" {
-		suggest.Add(suggest.Customer, person.Name, person.Id, "")
+		suggest.Add(suggest.Customer, person.Name, person.Id, "", product.StatusNormal)
 	} else if person.Type == "factory" {
-		suggest.Add(suggest.Factory, person.Name, person.Id, "")
+		suggest.Add(suggest.Factory, person.Name, person.Id, "", product.StatusNormal)
 	}
 	return nil
 }
@@ -111,11 +112,20 @@ func Update(person *model.Person) (affacted int64, err error) {
 		return
 	}
 	// update person
+	var suggestType string
 	if person.Type == "customer" {
-		suggest.Update(suggest.Customer, person.Name, person.Id, "")
+		suggestType = suggest.Customer
+		// suggest.Update(suggest.Customer, person.Name, person.Id, "")
 	} else if person.Type == "factory" {
-		suggest.Update(suggest.Factory, person.Name, person.Id, "")
+		suggestType = suggest.Factory
+		// suggest.Update(suggest.Factory, person.Name, person.Id, "")
 	}
+
+	suggest.Update(suggestType, &suggest.Item{
+		Text: person.Name,
+		Id:   person.Id,
+		SN:   "",
+	})
 	return
 }
 
