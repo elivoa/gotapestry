@@ -1,9 +1,9 @@
 // ProductList
 // Time-stamp: <[product_list.js] Elivoa @ 星期五, 2016-07-08 23:32:18>
 
-function p_ProductList($master){
+function p_ProductList($master) {
 
-  var sydapp = angular.module('syd', [], function($interpolateProvider){
+  var sydapp = angular.module('syd', [], function ($interpolateProvider) {
     $interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');
   });
@@ -11,22 +11,23 @@ function p_ProductList($master){
   // if has components, init it first; then init this page;
   ngLoadComponent(sydapp);
 
-  sydapp.controller('ProductListCtrl', function($scope, $http){
+  sydapp.controller('ProductListCtrl', function ($scope, $http) {
 
     $scope.detailmode = $master.DetailMode; // display picture?
-    
-    $scope.tabs = ["ALL", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-                   "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"];
 
-    $scope.firstTabClass = function(index){
-      if(index==0){
+    $scope.tabs = ["ALL", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+      "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"
+    ];
+
+    $scope.firstTabClass = function (index) {
+      if (index == 0) {
         return "first";
       }
       return "";
     };
 
-    $scope.tabClass = function(tab, pageTab){
-      if(tab.toLowerCase() === pageTab.toLowerCase()){
+    $scope.tabClass = function (tab, pageTab) {
+      if (tab.toLowerCase() === pageTab.toLowerCase()) {
         return "cur";
       }
       return "";
@@ -34,24 +35,24 @@ function p_ProductList($master){
 
     // init products.
     // $scope.Products = $master.Products; // TODO change to load something.
-    
+
     // AjaxLevel 1
     $http.get($master.ProductsLink)
       .success(function (data) {
         $scope.Products = data;
-
+        console.log('=====================', $scope);
         // TODO performance: load picture in parallel.
-        
+
         // AjaxLevel 2: Get Stocks
         $http.get($master.StocksLink)
           .success(function (data) {
-            if(data == undefined || data.length != $scope.Products.length){
+            if (data == undefined || data.length != $scope.Products.length) {
               console.log("Error!!! with data: ", data);
               return;
             }
-            for(var i=0;i <= data.length;i++){
+            for (var i = 0; i <= data.length; i++) {
               var p = $scope.Products[i];
-              if (p && data[i]){
+              if (p && data[i]) {
                 p.Stock = data[i].Stock;
                 p.Stocks = data[i].Stocks;
               }
@@ -61,13 +62,13 @@ function p_ProductList($master){
         // AjaxLevel 2 in parallel: Get Details.
         $http.get($master.DetailLink)
           .success(function (data) {
-            if(data == undefined || data.length != $scope.Products.length){
+            if (data == undefined || data.length != $scope.Products.length) {
               console.log("Error!!! with data: ", data);
               return;
             }
-            for(var i=0;i <= data.length;i++){
+            for (var i = 0; i <= data.length; i++) {
               var p = $scope.Products[i];
-              if (p && data[i]){
+              if (p && data[i]) {
                 p.Colors = data[i].Colors;
                 p.Sizes = data[i].Sizes;
                 p.Properties = data[i].Properties;
@@ -78,25 +79,25 @@ function p_ProductList($master){
       });
     $scope.showall = $master.ShowAll;
 
-    $scope.StockDescription = function(product){
+    $scope.StockDescription = function (product) {
       var str = [];
-      if(product.Colors!=undefined){
-        for(i=0;i<product.Colors.length;i++){
-          if(product.Sizes!=undefined){
-            for(j=0;j<product.Sizes.length;j++){
+      if (product.Colors != undefined) {
+        for (i = 0; i < product.Colors.length; i++) {
+          if (product.Sizes != undefined) {
+            for (j = 0; j < product.Sizes.length; j++) {
               var color = product.Colors[i];
               var size = product.Sizes[j];
               var has = false;
               // console.log(product);
-              if(product.Stocks!=undefined){
+              if (product.Stocks != undefined) {
                 var sizes = product.Stocks[color];
-                if(sizes!=undefined){
+                if (sizes != undefined) {
                   var stock = sizes[size];
                   str.push(stock);
-                  has=true;
+                  has = true;
                 }
               }
-              if(!has){
+              if (!has) {
                 str.push("n/a");
               }
               str.push(" - ");
@@ -111,21 +112,21 @@ function p_ProductList($master){
       return str.join("");
     };
 
-    $scope.SpecDescription = function(product){
+    $scope.SpecDescription = function (product) {
       var str = [];
-      if(product.Colors!=undefined){
-        for(i=0;i<product.Colors.length;i++){
+      if (product.Colors != undefined) {
+        for (i = 0; i < product.Colors.length; i++) {
           var color = product.Colors[i];
-          if(i>0){
+          if (i > 0) {
             str.push(" / ");
           }
           str.push(color);
         }
         str.push(' | ');
-        if(product.Sizes!=undefined){
-          for(j=0;j<product.Sizes.length;j++){
+        if (product.Sizes != undefined) {
+          for (j = 0; j < product.Sizes.length; j++) {
             var size = product.Sizes[j];
-            if(j>0){
+            if (j > 0) {
               str.push(" / ");
             }
             str.push(size);
@@ -210,5 +211,3 @@ function p_ProductList($master){
 
   });
 }
-
-

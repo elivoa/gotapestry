@@ -17,7 +17,7 @@ import (
 
 var logdebug = true
 var core_fields = []string{
-	"name", "productId", "status", "brand", "price", "supplier", "factoryPrice",
+	"name", "productId", "status", "brand", "price", "supplier", "factoryPrice", "discountPercent",
 	"stock", "shelfno", "capital", "note", "pictures", "createtime",
 }
 var em = &db.Entity{
@@ -45,7 +45,7 @@ func _one(query *db.QueryParser) (*model.Product, error) {
 	err := query.Query(
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
-				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
+				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice, &m.DiscountPercent,
 				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
 			)
 		},
@@ -65,7 +65,7 @@ func _list(query *db.QueryParser) ([]*model.Product, error) {
 		func(rows *sql.Rows) (bool, error) {
 			m := &model.Product{}
 			err := rows.Scan(
-				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice,
+				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice, &m.DiscountPercent,
 				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
 			)
 			models = append(models, m)
@@ -110,7 +110,7 @@ func List(parser *db.QueryParser) ([]*model.Product, error) {
 func Create(product *model.Product) (*model.Product, error) {
 	res, err := em.Insert().Exec(
 		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
-		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
+		product.FactoryPrice, product.DiscountPercent, product.Stock, product.ShelfNo, product.Capital,
 		product.Note, product.Pictures, product.CreateTime,
 	)
 	if err != nil {
@@ -128,7 +128,7 @@ func UpdateProduct(product *model.Product) (int64, error) {
 	// update order
 	res, err := em.Update().Exec(
 		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
-		product.FactoryPrice, product.Stock, product.ShelfNo, product.Capital,
+		product.FactoryPrice, product.DiscountPercent, product.Stock, product.ShelfNo, product.Capital,
 		product.Note, product.Pictures, product.CreateTime,
 		product.Id,
 	)

@@ -60,7 +60,7 @@
               <dl class="clearfix">
                 <dt>销售单价：</dt>
                 <dd>
-                  <input type="number" ng-model="Product.Price" size="12">
+                  <input type="number" ng-model="Product.Price" max="99999999" step="0.01" size="12">
                 </dd>
                 <dd></dd>
               </dl>
@@ -121,6 +121,23 @@
               </dl>
             </div>
           </div>
+          
+          <div class="unit">
+            <div class="tit"><strong>商品折扣</strong></div>
+            <div class="form_main">
+              <dl class="clearfix">
+                <dt>折扣：</dt>
+                <dd>
+                  <input type="number" step="1" max="300" min="0" 
+                  name="Product.DiscountPercent" ng-model="Product.DiscountPercent"
+                  style="width:50px;font-size:16px;text-align:right;color:green;"  /> %
+                </dd>
+                <dd></dd>
+              </dl>
+            </div>
+          </div>
+
+
           <div class="unit">
             <div class="tit"><strong>商品图片</strong></div>
             <div class="form_main">
@@ -135,6 +152,7 @@
               </dl>
             </div>
           </div>
+
           <div class="unit">
             <div class="tit"><strong>供货商信息</strong></div>
             <div class="form_main">

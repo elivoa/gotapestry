@@ -2,6 +2,12 @@ package syd
 
 import (
 	"encoding/gob"
+	"net/http"
+	"reflect"
+	"strings"
+	"syd/base"
+	"syd/model"
+
 	"github.com/elivoa/got/config"
 	"github.com/elivoa/got/core"
 	"github.com/elivoa/got/core/exception"
@@ -10,14 +16,9 @@ import (
 	"github.com/elivoa/got/templates"
 	"github.com/elivoa/got/utils"
 	"github.com/elivoa/gxl"
-	"net/http"
-	"reflect"
-	"strings"
-	"syd/base"
-	"syd/model"
 )
 
-var appversion = "3.5"
+var appversion = "4.1"
 
 // todo: think out a better way to register this.
 var SYDModule = &core.Module{

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <!-- This is an component, Contents in header and body is used. Other is discard. -->
+    <script type="text/javascript" src="/static/js/c/order/order_list.js?v={{version}}"></script>
+  </head>
+  <body>
+
+    <div id="{{.ClientId}}" class="c_order_list">
+      
+      <if t="len .Orders | not">
+        <div class="tips_content"><i class="icon_warning"></i> 无记录</div>
+
+        <else/>
+
+        <table class="tbl_main">
+          <tr>
+            <th width="10" align="left">
+              <input type="checkbox" class="check-all">
+            </th> 
+            <th align="left">客户</th>
+            <th align="left">订单号</th>
+            <th align="left">订单金额</th>
+            <th align="left">订单状态</th>
+            <th align="left">日期</th>
+            <th align="left">操作</th>
+            <!-- <th align="left">特殊操作</th> -->
+          </tr>
+
+          <range source=".Orders">
+            <tr class="order_status_{{.Status}}">
+              <td align="left">
+                <input type="checkbox" class="order-check"
+                       value="{{.TrackNumber}}" CustomerId="{{.CustomerId}}">
+              </td>
+              <td nowrap>
+                <if t=".Customer">
+                  <a href="/person/detail/{{.CustomerId}}">
+                    {{.Customer.Name}}
+                  </a>
+                  <else />
+                  <a href="/person/detail/{{.CustomerId}}">
+                    {{.CustomerId}}
+                  </a>
+                </if>
+              </td>
+              <td nowrap>
+                <a href="{{$.ViewLink .}}">
+                  <if t=".TypeIs 1"><span style="color:red;font-weight:bold;">[代发]</span></if>
+                  {{if .TypeIs 2}}<span style="color:#ddd;font-weight:bold;">SUB</span>{{end}}
+                  {{.TrackNumber}}
+                </a>
+              </td>
+              <td>
+                <if t='.IsStatus "todeliver"'>
+                  <strong class="price">{{.TotalPrice | prettycurrency}}</strong>
+                  <span class="txt_c">(不含运费)</span>
+                  <else />
+                  <strong class="price">{{.SumOrderPrice | prettycurrency}}</strong>
+                  <if t='.DeliveryMethodIs "TakeAway"'>
+                    <span class="txt_c">(自提)</span>
+                    <else />
+                    <span class="txt_c">
+                      ({{if not .IsDaoFu}}含运费{{.ExpressFee}}元{{else}}到付{{end}})
+                    </span>
+                  </if>
+                </if>
+              </td>
+              <td>{{.DisplayStatus }}</td>
+              <td nowrap title="{{.CreateTime |local|prettytime}} ">
+                {{.CreateTime |local| prettytime}} <!-- formattime "2006-01-02"-->
+              </td>
+              
+              <hide t="~~~~ operation ~~~~" ></hide>
+              <td nowrap>
+
+                <if t='.IsStatus "toprint"'>
+                  <!-- TODO solve this -->
+                  <a href="{{$.EditLink .}}?referer={{referer $}}">修改订单</a><span class="vline">|</span>
+                  <a href="{{$.PrintOrderLink .}}?referer={{referer $}}"
+                     style="font-weight:bolder;color:green"
+                     onclick="return confirm('打印订单将修改订单状态为代发货，确定打印么？');">
+                    打印订单
+                  </a>
+                  <span class="vline">|</span>
+
+                  <t:a event="CancelOrder" context="{{print .TrackNumber}}" label="取消订单"
+                       parameters="(print `referer=` ($|refer))"
+                       onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');"></t:a>
+                </if>
+
+                <if t='.IsStatus "todeliver"'>
+                  <a href="{{$.FixPrintOrderLink .}}?referer={{referer $}}">打印订单</a>
+                  <span class="vline">|</span>
+                  <a t:type="order/DeliverButton" tid="deliverBtn" trackNumber=".TrackNumber"
+                     deliveryMethod=".DeliveryMethod" deliveryTrackingNumber=".DeliveryTrackingNumber"
+                     ExpressFee=".ExpressFee" Source="/order/list/{{$.Tab}}" />
+                  <span class="vline">|</span>
+                  <t:a event="CancelOrder" context="{{print .TrackNumber}}" label="取消订单"
+                       parameters="(print `referer=` ($|refer))"
+                       onclick="return confirm('确定要取消订单么？取消的订单不可撤销！');"></t:a>
+                </if>
+
+                <if t='.StatusIs "delivering"'>
+                  <if t='.DeliveryMethodIs "TakeAway"'>
+                    <a href="{{$.FixPrintOrderLink .}}?referer={{referer $}}">自提打印订单</a>
+                    <span class="vline">|</span>
+                  </if>
+                  
+                  <span t:type="order.CloseButton" order="." />
+                  
+                </if>
+
+              </td>
+              
+            </tr>
+          </range>
+        </table>
+        <div>
+          ** 共{{len .Orders}}个订单，{{$.TotalItems}}件商品，
+          订单总价格: <span class="price">{{$.TotalPrice | prettycurrency}}</span>
+        </div>
+      </if>
+
+      <script type="text/javascript">
+  $(function(){
+    orderlist = new OrderList({
+      ClientId: {{.ClientId}}
+    })
+  });
+
+
+      </script>
+
+    </div>
+  </body>
+</html>

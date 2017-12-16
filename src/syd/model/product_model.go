@@ -9,20 +9,21 @@ import (
 
 // TODO Design:model, how to split model data and fields.
 type Product struct {
-	Id           int            // id
-	Name         string         // product name
-	ProductId    string         // 传说中的货号
-	Status       product.Status // 1 hide, 0 normal.
-	Brand        string         `json:",omitempty"`
-	Price        float64        `json:",omitempty"`
-	Supplier     int            `json:"-"`
-	FactoryPrice float64        `json:"-"`
-	Stock        int            // 库存量 || not used again?
-	ShelfNo      string         `json:"-"`          // 货架号
-	Capital      string         `json:",omitempty"` // captical letter to quick access.
-	Note         string         `json:",omitempty"`
-	CreateTime   time.Time      `json:"-"`
-	UpdateTime   time.Time      `json:"-"`
+	Id              int            // id
+	Name            string         // product name
+	ProductId       string         // 传说中的货号
+	Status          product.Status // 1 hide, 0 normal.
+	Brand           string         `json:",omitempty"`
+	Price           float64        `json:",omitempty"`
+	Supplier        int            `json:"-"`
+	FactoryPrice    float64        `json:"-"`
+	DiscountPercent int            `json:",omitempty"` // 打折的百分比，0-100
+	Stock           int            // 库存量 || not used again?
+	ShelfNo         string         `json:"-"`          // 货架号
+	Capital         string         `json:",omitempty"` // captical letter to quick access.
+	Note            string         `json:",omitempty"`
+	CreateTime      time.Time      `json:"-"`
+	UpdateTime      time.Time      `json:"-"`
 
 	Pictures string `json:"-"` // picture keys splited by ';' filenamne can't contain ';'
 

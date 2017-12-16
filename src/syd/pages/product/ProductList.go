@@ -1,16 +1,17 @@
 package product
 
 import (
-	"github.com/elivoa/got/builtin/services"
-	"github.com/elivoa/got/core"
-	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/route"
-	"github.com/elivoa/got/route/exit"
 	"strings"
 	"syd/base/product"
 	"syd/model"
 	"syd/service"
 	"time"
+
+	"github.com/elivoa/got/builtin/services"
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/route"
+	"github.com/elivoa/got/route/exit"
 )
 
 /*
@@ -94,21 +95,22 @@ func (p *ProductList) Onhide(productId int) *exit.Exit {
 // for output json
 
 type ProductListJsonObject struct {
-	Id           int            // id
-	Name         string         // product name
-	ProductId    string         // 传说中的货号
-	Status       product.Status //
-	Brand        string         `json:",omitempty"`
-	Picture      string         `json:"pic,omitempty"`
-	Price        float64        `json:",omitempty"`
-	Supplier     int            `json:"-"`
-	FactoryPrice float64        `json:"-"`
-	Stock        int            `json:"-"`          // 库存量 || not used again?
-	ShelfNo      string         `json:"-"`          // 货架号
-	Capital      string         `json:",omitempty"` // captical letter to quick access.
-	Note         string         `json:",omitempty"`
-	CreateTime   time.Time      `json:"-"`
-	UpdateTime   time.Time      `json:"-"`
+	Id              int            // id
+	Name            string         // product name
+	ProductId       string         // 传说中的货号
+	Status          product.Status //
+	Brand           string         `json:",omitempty"`
+	Picture         string         `json:"pic,omitempty"`
+	Price           float64        `json:",omitempty"`
+	Supplier        int            `json:"-"`
+	FactoryPrice    float64        `json:"-"`
+	DiscountPercent int            `json:",omitempty"` // 打折的百分比，0-100
+	Stock           int            `json:"-"`          // 库存量 || not used again?
+	ShelfNo         string         `json:"-"`          // 货架号
+	Capital         string         `json:",omitempty"` // captical letter to quick access.
+	Note            string         `json:",omitempty"`
+	CreateTime      time.Time      `json:"-"`
+	UpdateTime      time.Time      `json:"-"`
 }
 
 type ProductStocksJsonObject struct {
@@ -129,21 +131,22 @@ func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 	if nil != products {
 		for _, p := range products {
 			basicp := &ProductListJsonObject{
-				Id:           p.Id,
-				Name:         p.Name,
-				ProductId:    p.ProductId,
-				Status:       p.Status,
-				Brand:        p.Brand,
-				Picture:      getpicture(p),
-				Price:        p.Price,
-				Supplier:     p.Supplier,
-				FactoryPrice: p.FactoryPrice,
-				Stock:        p.Stock,
-				ShelfNo:      p.ShelfNo,
-				Capital:      p.Capital,
-				Note:         p.Note,
-				CreateTime:   p.CreateTime,
-				UpdateTime:   p.UpdateTime,
+				Id:              p.Id,
+				Name:            p.Name,
+				ProductId:       p.ProductId,
+				Status:          p.Status,
+				Brand:           p.Brand,
+				Picture:         getpicture(p),
+				Price:           p.Price,
+				Supplier:        p.Supplier,
+				FactoryPrice:    p.FactoryPrice,
+				DiscountPercent: p.DiscountPercent,
+				Stock:           p.Stock,
+				ShelfNo:         p.ShelfNo,
+				Capital:         p.Capital,
+				Note:            p.Note,
+				CreateTime:      p.CreateTime,
+				UpdateTime:      p.UpdateTime,
 			}
 			basicps = append(basicps, basicp)
 		}

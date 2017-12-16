@@ -32,6 +32,7 @@ var (
 
 	// basic logic services
 	Order          = new(OrderService)
+	OrderReturns   = new(OrderReturnsService)
 	Account        = new(AccountService)
 	Person         = new(PersonService)
 	Product        = new(ProductService)
