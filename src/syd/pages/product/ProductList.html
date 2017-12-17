@@ -20,12 +20,18 @@
         <div style="margin:8px;">
           <t:a event="ChangeMode" context=".Capital" label="显示模式"
                parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)"/>
+               |
+          <t:a event="ChangeShowHideMode" context=".Capital" label="隐藏/全部"
+               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)"/>
+               |
+          <t:a event="ChangeSalesOnlyMode" context=".Capital" label="只显示打折商品"
+               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode `&salesonly=` .SalesOnlyMode)"/>
         </div>
         
         <div class="tab_s clearfix">
           <a ng-repeat="tab in tabs track by $index"
              class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
-             href="/product/list/[[tab]]?showall=[[showall]]&detailmode=[[detailmode]]">
+             href="/product/list/[[tab]]?showall=[[showall]]&detailmode=[[detailmode]]&salesonly=[[salesonly]]">
             [[tab]]
           </a>
         </div>
@@ -52,7 +58,7 @@
               </td>
             </tr>
             
-            <tr ng-repeat="p in Products" ng-if="p.Status!=1 || showall">
+            <tr ng-repeat="p in Products" ng-if="(p.Status!=1 || showall) && ((salesonly && p.DiscountPercent > 0) || !salesonly)">
               <td nowrap>
                 <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
               </td>
@@ -120,6 +126,7 @@ p_ProductList({
   StocksLink: "/product/list:getproductstocks/{{.Capital}}",
   DetailLink: "/product/list:getproductdetails/{{.Capital}}",
   ShowAll: {{.ShowAll}},
+  SalesOnly: {{.SalesOnlyMode}},
   DetailMode: {{.DetailMode}},
 });
 

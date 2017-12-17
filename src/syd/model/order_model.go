@@ -61,10 +61,11 @@ type Order struct {
 	ShippingAddress        string `` // this only used in ShippingInstead
 
 	// price summarization.
-	TotalPrice  float64 // not include expressfee
-	TotalCount  int
-	PriceCut    float64 // currently not used.
-	Accumulated float64 // 上期累计欠款快照（不包含本期订单价格以及代发费用）
+	TotalPrice         float64 // not include expressfee
+	TotalCount         int
+	OriginalTotalPrice float64 // order's original total price, before discount.
+	PriceCut           float64 // currently not used.
+	Accumulated        float64 // 上期累计欠款快照（不包含本期订单价格以及代发费用）
 
 	Note              string
 	ParentTrackNumber int64 `` // if has value it's a suborder
@@ -89,11 +90,15 @@ type OrderDetail struct {
 	Color            string
 	Size             string
 	Quantity         int
-	SellingPrice     float64 //售价
+	SellingPrice     float64 // 售价，实际售价。
+	ProductPrice     float64 // 商品原价.
+	DiscountPercent  int     // 当时的折扣百分比.
 
 	Unit string // always 件, Not Used Yet.
-
 	Note string
+
+	// additional containers
+	Product *Product
 }
 
 func NewOrder() *Order {
@@ -143,19 +148,21 @@ func GenerateOrderId() int64 {
 }
 
 func (order *Order) DisplayStatus() string {
-	display, ok := OrderStatusDisplayMap[order.Status]
-	if ok {
+	if display, ok := OrderStatusDisplayMap[order.Status]; ok {
 		return display
-	} else {
-		return order.Status
 	}
+	return order.Status
 }
 
+var enableSales = true
+
+// CalculateOrder calucate order's price. including discount.
 func (order *Order) CalculateOrder() {
 	// loop to assign values more
 	var (
-		sum   float64 = 0
-		count int     = 0
+		count       int     // total count
+		sum         float64 // total price
+		originalSum float64 // totoal price without discount.
 	)
 	for idx, d := range order.Details {
 		if !d.IsValid() {
@@ -163,15 +170,30 @@ func (order *Order) CalculateOrder() {
 			continue
 		}
 
-		// sum values
-		sum += d.SellingPrice * float64(d.Quantity)
 		count += d.Quantity
+
+		// 高级部分，计算价格。
+		var price = d.SellingPrice * float64(d.Quantity)
+		var originalPrice = price
+		if enableSales && d.DiscountPercent > 0 {
+			var discountPrice = float64(d.Quantity) * d.ProductPrice * (float64(d.DiscountPercent) / 100)
+			if discountPrice < price {
+				originalPrice = price
+				price = discountPrice
+			}
+		}
+
+		sum += price
+		originalSum += originalPrice
 
 		// assign tracking number
 		d.OrderTrackNumber = order.TrackNumber
 	}
 	order.TotalPrice = sum
 	order.TotalCount = count
+	if enableSales {
+		order.OriginalTotalPrice = originalSum
+	}
 }
 
 // ----  Show Helper  ----------------------------------------------------------------------------
@@ -220,11 +242,11 @@ func (order *Order) SumOrderPrice() float64 {
 func (d *OrderDetail) IsValid() bool {
 	if d.ProductId == 0 && d.Quantity == 0 && d.SellingPrice == 0 && d.Note == "" {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
+// TODO discount
 func (d *OrderDetail) TotalPrice() float64 {
 	return float64(d.Quantity) * d.SellingPrice
 }

@@ -20,11 +20,12 @@ import (
 */
 type ProductList struct {
 	core.Page
-	products   []*model.Product
-	Capital    string `path-param:"1"`
-	ShowAll    bool   `query:"showall"`    // show hidden products.
-	DetailMode bool   `query:"detailmode"` // show pictures
-	Referer    string `query:"referer"`    // return here if non-empty
+	products      []*model.Product
+	Capital       string `path-param:"1"`
+	ShowAll       bool   `query:"showall"`    // show hidden products.
+	DetailMode    bool   `query:"detailmode"` // show pictures
+	SalesOnlyMode bool   `query:"salesonly"`  // sales only mode.
+	Referer       string `query:"referer"`    // return here if non-empty
 }
 
 func (p *ProductList) Setup() {
@@ -199,6 +200,29 @@ func (p *ProductList) OnChangeMode() *exit.Exit {
 		map[string]interface{}{
 			"showall":    p.ShowAll,
 			"detailmode": !p.DetailMode, // 目的是点击period时间间隔的时候清除合并点策略
+		}, p.Capital,
+	)
+	return exit.Redirect(url)
+}
+
+//
+func (p *ProductList) OnChangeShowHideMode() *exit.Exit {
+	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("product/list",
+		map[string]interface{}{
+			"showall":    !p.ShowAll,
+			"detailmode": p.DetailMode, // 目的是点击period时间间隔的时候清除合并点策略
+		}, p.Capital,
+	)
+	return exit.Redirect(url)
+}
+
+//
+func (p *ProductList) OnChangeSalesOnlyMode() *exit.Exit {
+	url := services.Link.GeneratePageUrlWithContextAndQueryParameters("product/list",
+		map[string]interface{}{
+			"showall":    p.ShowAll,
+			"detailmode": p.DetailMode, // 目的是点击period时间间隔的时候清除合并点策略
+			"salesonly":  !p.SalesOnlyMode,
 		}, p.Capital,
 	)
 	return exit.Redirect(url)

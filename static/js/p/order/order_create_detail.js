@@ -17,8 +17,8 @@
       }, this);
       this.ops.onAddToOrder = $.proxy(function(product) {
         var success;
-        console.log('==== onAddToOrder === ');
-        console.log(product);
+        // console.log('==== onAddToOrder === ');
+        // console.log(product);
         success = false;
         if (this.ops.isEdit) {
           success = this.odf.editProduct(product);

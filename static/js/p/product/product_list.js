@@ -40,7 +40,6 @@ function p_ProductList($master) {
     $http.get($master.ProductsLink)
       .success(function (data) {
         $scope.Products = data;
-        console.log('=====================', $scope);
         // TODO performance: load picture in parallel.
 
         // AjaxLevel 2: Get Stocks
@@ -78,6 +77,7 @@ function p_ProductList($master) {
 
       });
     $scope.showall = $master.ShowAll;
+    $scope.salesonly = $master.SalesOnly;
 
     $scope.StockDescription = function (product) {
       var str = [];

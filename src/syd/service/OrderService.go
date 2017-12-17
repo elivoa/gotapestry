@@ -3,16 +3,18 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/debug"
 	"syd/dal"
 	"syd/dal/accountdao"
 	"syd/dal/orderdao"
 	"syd/model"
 	"syd/service/personservice"
+
+	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/debug"
 )
 
 var debug_always_update_order_accumulated = true
+var enableSales = true
 
 type OrderService struct{}
 
@@ -30,6 +32,13 @@ func (s *OrderService) GetOrderByTrackingNumber(trackNumber int64) (*model.Order
 
 // Update Order 的所有逻辑都在这里了；
 func (s *OrderService) UpdateOrder(order *model.Order) (*model.Order, error) {
+
+	fmt.Println("0000", order.Details)
+	for idx, d := range order.Details {
+		fmt.Println("\t00", idx, d, d.SellingPrice)
+		fmt.Println("\t00", idx, d.SellingPrice)
+		fmt.Println("\t00", idx, d.DiscountPercent)
+	}
 
 	// 更新 Tracking Number 到子订单的 Tracking No
 	for _, detail := range order.Details {
@@ -235,7 +244,7 @@ func _processingUpdateOrderDetails(order *model.Order) error {
 
 // 创建订单的所有逻辑都在这里
 func (s *OrderService) CreateOrder(order *model.Order) (*model.Order, error) {
-
+	fmt.Println("0000", order)
 	// 这个步骤很重要，判断是否订单已经存在了；如果存在了，需要换一个订单号再试；
 	if newtn := makeSureOrderTNUnique(order.TrackNumber); newtn > 0 {
 		order.TrackNumber = newtn

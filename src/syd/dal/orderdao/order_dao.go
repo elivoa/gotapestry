@@ -3,19 +3,20 @@ package orderdao
 import (
 	"database/sql"
 	"fmt"
-	"github.com/elivoa/got/config"
-	"github.com/elivoa/got/db"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"syd/model"
 	"time"
+
+	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/db"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var logdebug = true
 var orderFields = []string{
 	"track_number", "status", "type", "customer_id",
 	"delivery_method", "delivery_tracking_number", "express_fee", "shipping_address",
-	"total_price", "total_count", "price_cut", "Accumulated",
+	"total_price", "total_count", "original_total_price", "price_cut", "Accumulated",
 	"note", "parent_track_number",
 	"create_time", "update_time", "close_time",
 }
@@ -32,7 +33,8 @@ func EntityManager() *db.Entity {
 }
 
 var orderDetailFields = []string{
-	"order_track_number", "product_id", "color", "size", "quantity", "selling_price", "note",
+	"order_track_number", "product_id", "color", "size", "quantity", "selling_price",
+	"product_price", "DiscountPercent", "note",
 }
 
 var detailem = &db.Entity{
@@ -59,7 +61,7 @@ func CreateOrder(order *model.Order) error {
 	res, err := em.Insert().Exec(
 		order.TrackNumber, order.Status, order.Type, order.CustomerId,
 		order.DeliveryMethod, order.DeliveryTrackingNumber, order.ExpressFee, order.ShippingAddress,
-		order.TotalPrice, order.TotalCount, order.PriceCut, order.Accumulated,
+		order.TotalPrice, order.TotalCount, order.OriginalTotalPrice, order.PriceCut, order.Accumulated,
 		order.Note, order.ParentTrackNumber, time.Now(), time.Now(), time.Now(),
 	)
 	fmt.Println("======================================")
@@ -96,7 +98,7 @@ func UpdateOrder(order *model.Order) (int64, error) {
 	res, err := em.Update().Exec(
 		order.TrackNumber, order.Status, order.Type, order.CustomerId,
 		order.DeliveryMethod, order.DeliveryTrackingNumber, order.ExpressFee, order.ShippingAddress,
-		order.TotalPrice, order.TotalCount, order.PriceCut, order.Accumulated,
+		order.TotalPrice, order.TotalCount, order.OriginalTotalPrice, order.PriceCut, order.Accumulated,
 		order.Note, order.ParentTrackNumber, order.CreateTime, time.Now(), order.CloseTime,
 		order.Id,
 	)
@@ -127,8 +129,8 @@ func CreateOrderDetail(orderDetails []*model.OrderDetail) error {
 				continue
 			}
 			res, err := detailem.Insert().Exec(
-				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size,
-				detail.Quantity, detail.SellingPrice, detail.Note,
+				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size, detail.Quantity,
+				detail.SellingPrice, detail.ProductPrice, detail.DiscountPercent, detail.Note,
 			)
 			if err != nil {
 				return err
@@ -147,8 +149,8 @@ func BatchUpdateOrderDetail(orderDetails []*model.OrderDetail) error {
 				continue
 			}
 			res, err := detailem.Update().Exec(
-				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size,
-				detail.Quantity, detail.SellingPrice, detail.Note,
+				detail.OrderTrackNumber, detail.ProductId, detail.Color, detail.Size, detail.Quantity,
+				detail.SellingPrice, detail.ProductPrice, detail.DiscountPercent, detail.Note,
 				detail.Id,
 			)
 			if err != nil {
@@ -200,7 +202,7 @@ func GetOrder(field string, value interface{}) (*model.Order, error) {
 			return false, rows.Scan(
 				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
 				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
-				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
+				&p.TotalPrice, &p.TotalCount, &p.OriginalTotalPrice, &p.PriceCut, &p.Accumulated,
 				&p.Note, &p.ParentTrackNumber,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)
@@ -270,7 +272,7 @@ func GetOrderDetails(trackNumber int64) ([]*model.OrderDetail, error) {
 			p := new(model.OrderDetail)
 			err := rows.Scan(
 				&p.Id, &p.OrderTrackNumber, &p.ProductId, &p.Color, &p.Size, &p.Quantity,
-				&p.SellingPrice, &p.Note,
+				&p.SellingPrice, &p.ProductPrice, &p.DiscountPercent, &p.Note,
 			)
 			orders = append(orders, p)
 			return true, err
@@ -319,7 +321,7 @@ func _listOrder(query *db.QueryParser) ([]*model.Order, error) {
 			err := rows.Scan(
 				&p.Id, &p.TrackNumber, &p.Status, &p.Type, &p.CustomerId,
 				&p.DeliveryMethod, &p.DeliveryTrackingNumber, &p.ExpressFee, &p.ShippingAddress,
-				&p.TotalPrice, &p.TotalCount, &p.PriceCut, &p.Accumulated,
+				&p.TotalPrice, &p.TotalCount, &p.OriginalTotalPrice, &p.PriceCut, &p.Accumulated,
 				&p.Note, &p.ParentTrackNumber,
 				&p.CreateTime, &p.UpdateTime, &p.CloseTime,
 			)

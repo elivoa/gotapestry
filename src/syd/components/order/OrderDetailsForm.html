@@ -12,6 +12,7 @@
       <th align="left">尺码</th>
       <th align="left">数量</th>
       <th align="center">合计数量</th>
+      <th align="center">折扣</th>
       <th align="right">合计金额</th>
       <th align="left">备注</th>
       {{if not .HideOperation}}
@@ -80,13 +81,26 @@
       <td valign="top">&nbsp;</td>
       <td valign="top">&nbsp;</td>
       <td valign="top">&nbsp;</td>
-      <td valign="top" align="center" rowspan="1"><strong class="sumQuantity">35</strong></td>
-      <td valign="top" align="right" rowspan="1"><strong class="price sumPrice">3,920.00</strong></td>
+      <td valign="top" align="center" rowspan="1"><strong class="sumQuantity">0</strong></td>
+      <td valign="top" align="center">&nbsp;</td>
+      <td valign="top" align="right" rowspan="1"><strong class="price sumPrice">0,000.00</strong></td>
       <td valign="top">&nbsp;</td>
       {{if not .HideOperation}}
       <td valign="top">&nbsp;</td>
       {{end}}
     </tr>
+    <!--
+    <tr class="total">
+      <td valign="top" align="right" colspan="9" class="additionalSumLine"></td>
+      <td valign="top">&nbsp;</td>
+      {{if not .HideOperation}}
+      <td valign="top">&nbsp;</td>
+      {{end}}
+    </tr>
+    -->
   </tfoot>
 </table>
-
+<div class="additionalSumLine"
+ style="font-size:14px;width:70%;text-align:right;margin:4px 12px">
+  lsdkfjlsdjf
+</div>

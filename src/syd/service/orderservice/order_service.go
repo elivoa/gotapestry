@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/elivoa/gxl"
 	"math"
 	"strconv"
 	"syd/dal/orderdao"
 	"syd/model"
 	"syd/service"
+
+	"github.com/elivoa/gxl"
 )
 
 // --------------------------------------------------------------------------------
@@ -22,16 +23,17 @@ type OrderDetailJson struct {
 
 // todo rename
 type ProductDetalJsonStruct struct {
-	Id           int             `json:"id"` // product id
-	ProductId    string          `json:"pid"`
-	Name         string          `json:"name"`
-	Picture      string          `json:"pic"`
-	SellingPrice float64         `json:"price"`
-	ProductPrice float64         `json:"productPrice"`
-	Colors       []string        `json:"colors"`
-	Sizes        []string        `json:"sizes"`
-	Quantity     [][]interface{} `json:"quantity"`
-	Note         string          `json:"note"`
+	Id              int             `json:"id"` // product id
+	ProductId       string          `json:"pid"`
+	Name            string          `json:"name"`
+	Picture         string          `json:"pic"`
+	SellingPrice    float64         `json:"price"`
+	ProductPrice    float64         `json:"productPrice"`
+	DiscountPercent int             `json:"discountPercent"`
+	Colors          []string        `json:"colors"`
+	Sizes           []string        `json:"sizes"`
+	Quantity        [][]interface{} `json:"quantity"`
+	Note            string          `json:"note"`
 }
 
 // --------------------------------------------------------------------------------
@@ -133,16 +135,17 @@ func OrderDetailsJson(order *model.Order, showPicture bool) *OrderDetailJson {
 				}
 
 				jsonStruct = &ProductDetalJsonStruct{
-					Id:           product.Id,
-					ProductId:    product.ProductId,
-					Picture:      showpic,
-					Name:         product.Name,
-					SellingPrice: detail.SellingPrice,
-					ProductPrice: product.Price,
-					Colors:       product.Colors,
-					Sizes:        product.Sizes,
-					Quantity:     [][]interface{}{},
-					Note:         detail.Note,
+					Id:              product.Id,
+					ProductId:       product.ProductId,
+					Picture:         showpic,
+					Name:            product.Name,
+					SellingPrice:    detail.SellingPrice,
+					ProductPrice:    product.Price,
+					DiscountPercent: product.DiscountPercent,
+					Colors:          product.Colors,
+					Sizes:           product.Sizes,
+					Quantity:        [][]interface{}{},
+					Note:            detail.Note,
 				}
 				products[strconv.Itoa(detail.ProductId)] = jsonStruct
 				orders = append(orders, product.Id)
