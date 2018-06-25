@@ -19,6 +19,8 @@ type Person struct {
 	QQ         int
 	Website    string
 	Note       string
+	Level      string
+	Hide       string
 
 	// Customer: 存储累计欠款; Factory: TODO
 	AccountBallance float64

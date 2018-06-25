@@ -18,17 +18,22 @@
           <table class="tbl_main">
             <tr>
               <th align="left">客户姓名</th>
+              <th align="center" width="32">级别</th>
               <th align="left">地址</th>
               <th align="left">电话</th>
               <th align="left">qq</th>
               <th align="left">网店</th>
               <th align="left">备注</th>
-              <th align="left">操作</th>
+              <th align="left" width="62">操作</th>
             </tr>
 
             <range source=".Persons">
               <tr>
-                <td><a href="/person/detail/{{.Id}}" >{{.Name}}</a></td>
+                <td><a href="/person/detail/{{.Id}}" >
+                  {{.Name}}
+                  <if t="eq .Hide `1`">[隐藏]</if>
+                </a></td>
+                <td align="center">{{.Level}}</td>
                 <td>{{.Address}}</td>
                 <td>{{.Phone}}</td>
                 <td>{{.QQ}}</td>

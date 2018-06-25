@@ -10,10 +10,11 @@ package persondao
 
 import (
 	"database/sql"
-	"github.com/elivoa/got/db"
-	_ "github.com/go-sql-driver/mysql"
 	"syd/model"
 	"time"
+
+	"github.com/elivoa/got/db"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // debug option
@@ -21,7 +22,7 @@ var logdebug = true
 
 var core_fields = []string{
 	"name", "type", "phone", "city", "address", "postalcode", "qq", "website", "note",
-	"AccountBallance", "createtime",
+	"AccountBallance", "level", "hide", "createtime",
 }
 
 var em = &db.Entity{
@@ -63,7 +64,7 @@ func _list(query *db.QueryParser) ([]*model.Person, error) {
 			m := &model.Person{}
 			err := rows.Scan(
 				&m.Id, &m.Name, &m.Type, &m.Phone, &m.City, &m.Address, &m.PostalCode, &m.QQ,
-				&m.Website, &m.Note, &m.AccountBallance, &m.CreateTime, &m.UpdateTime,
+				&m.Website, &m.Note, &m.AccountBallance, &m.Level, &m.Hide, &m.CreateTime, &m.UpdateTime,
 			)
 			models = append(models, m)
 			return true, err
@@ -81,7 +82,7 @@ func _one(query *db.QueryParser) (*model.Person, error) {
 		func(rows *sql.Rows) (bool, error) {
 			err := rows.Scan(
 				&m.Id, &m.Name, &m.Type, &m.Phone, &m.City, &m.Address, &m.PostalCode, &m.QQ,
-				&m.Website, &m.Note, &m.AccountBallance, &m.CreateTime, &m.UpdateTime,
+				&m.Website, &m.Note, &m.AccountBallance, &m.Level, &m.Hide, &m.CreateTime, &m.UpdateTime,
 			)
 			return false, err // don't fetch the second line. first is enough;
 		},
@@ -100,7 +101,7 @@ func ListAll(personType string) ([]*model.Person, error) {
 			p := new(model.Person)
 			err := rows.Scan(
 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+				&p.Website, &p.Note, &p.AccountBallance, &p.Level, &p.Hide, &p.CreateTime, &p.UpdateTime,
 			)
 			persons = append(persons, p)
 			return true, err
@@ -118,7 +119,7 @@ func ListAll(personType string) ([]*model.Person, error) {
 func Create(person *model.Person) error {
 	res, err := em.Insert().Exec(
 		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode,
-		person.QQ, person.Website, person.Note, person.AccountBallance, time.Now(),
+		person.QQ, person.Website, person.Note, person.AccountBallance, person.Level, person.Hide, time.Now(),
 		// TODO: later change to create time outside.
 	)
 	if err != nil {
@@ -135,7 +136,7 @@ func Create(person *model.Person) error {
 func Update(person *model.Person) (int64, error) {
 	res, err := em.Update().Exec(
 		person.Name, person.Type, person.Phone, person.City, person.Address, person.PostalCode, person.QQ,
-		person.Website, person.Note, person.AccountBallance, time.Now(),
+		person.Website, person.Note, person.AccountBallance, person.Level, person.Hide, time.Now(),
 		person.Id)
 	if err != nil {
 		return 0, err
@@ -170,7 +171,7 @@ func ListPersonByIdSet(ids ...int64) (map[int64]*model.Person, error) {
 			p := new(model.Person)
 			err := rows.Scan(
 				&p.Id, &p.Name, &p.Type, &p.Phone, &p.City, &p.Address, &p.PostalCode, &p.QQ,
-				&p.Website, &p.Note, &p.AccountBallance, &p.CreateTime, &p.UpdateTime,
+				&p.Website, &p.Note, &p.AccountBallance, &p.Level, &p.Hide, &p.CreateTime, &p.UpdateTime,
 			)
 			models = append(models, p)
 			return true, err

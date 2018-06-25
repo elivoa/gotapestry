@@ -2,12 +2,13 @@ package person
 
 import (
 	"fmt"
-	"github.com/elivoa/got/core"
-	"github.com/elivoa/gxl"
 	"strconv"
 	"syd/model"
 	"syd/service"
 	"syd/service/personservice"
+
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/gxl"
 )
 
 type PersonEdit struct {
@@ -23,12 +24,16 @@ type PersonEdit struct {
 	IsSendNewProduct bool // 是否发样衣
 	IsPrintHidePrice bool // 是否默认不打印价格
 
-	TypeData interface{} // for type select
+	TypeData  interface{} // for type select
+	LevelData interface{} // for type select
+	HideData  interface{} // for type select
 }
 
 func (p *PersonEdit) Activate() {
 	// here is some lightweight init.
 	p.TypeData = &listTypeLabel
+	p.LevelData = &levelTypeLabel
+	p.HideData = &hideTypeLabel
 }
 
 func (p *PersonEdit) Setup() {

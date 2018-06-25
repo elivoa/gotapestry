@@ -2,13 +2,16 @@ package person
 
 import (
 	"fmt"
-	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service/personservice"
+
+	"github.com/elivoa/got/core"
 )
 
 var (
-	listTypeLabel = map[string]string{"customer": "客户", "factory": "厂商"}
+	listTypeLabel  = map[string]string{"customer": "客户", "factory": "厂商"}
+	levelTypeLabel = map[string]string{"S": "S", "A": "A", "B": "B", "C": "C", "D": "D"}
+	hideTypeLabel  = map[string]string{"0": "显示", "1": "隐藏"}
 )
 
 /*_______________________________________________________________________________
