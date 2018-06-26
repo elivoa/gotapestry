@@ -1,52 +1,10 @@
 package utils
 
 import (
-	"bytes"
-	"log"
+	"github.com/axgle/mahonia"
 	"regexp"
 	"strings"
-
-	"github.com/axgle/mahonia"
-	pinyin "github.com/mozillazg/go-pinyin"
 )
-
-var pinyinArgs = pinyin.NewArgs()
-
-// TODO 将来计划支持多音字。
-
-// ParsePinyin2 ...
-func ParsePinyin2(s string) string {
-	var buffer bytes.Buffer
-	var str string
-	for _, rune := range s {
-		str = string(rune)
-		if hzRegexp.MatchString(str) { //chinese
-			buffer.WriteString(strings.ToLower(toPinyin(str)))
-		} else {
-			if enRegexp.MatchString(str) {
-				buffer.WriteString(strings.ToLower(str))
-			}
-		}
-	}
-	log.Println("-- ", buffer.String())
-
-	return buffer.String()
-}
-
-// ParsePinyin2 ...
-func toPinyin(s string) string {
-	var buffer bytes.Buffer
-	if py := pinyin.Pinyin(s, pinyinArgs); py != nil {
-		if len(py) > 0 {
-			for _, word := range py {
-				if word != nil && len(word) > 0 && word[0] != "" {
-					buffer.WriteByte(word[0][0])
-				}
-			}
-		}
-	}
-	return buffer.String()
-}
 
 // modified version of Convert
 // return many strings: for syd-     (  )

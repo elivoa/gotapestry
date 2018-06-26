@@ -142,7 +142,7 @@ func load() {
 
 // convert to pinyin
 func parseQuickText(text string) string {
-	return utils.ParsePinyin(text)
+	return utils.ParsePinyin2(text)
 }
 
 // Add add a suggest item into suggest-cache.

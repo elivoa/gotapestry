@@ -138,7 +138,7 @@ func (s *ProductService) BatchFetchProductByIdMap(idset map[int64]bool) (map[int
 }
 
 func (s *ProductService) getCapital(text string) string {
-	str := utils.ParsePinyin(text)
+	str := utils.ParsePinyin2(text)
 	if len(str) > 0 {
 		return strings.ToLower(str[0:1])
 	}
