@@ -14,8 +14,8 @@ var pinyinArgs = pinyin.NewArgs()
 
 // TODO 将来计划支持多音字。
 
-// ParsePinyin2 ...
-func ParsePinyin2(s string) string {
+func ParsePinyin(s string) string {
+
 	var buffer bytes.Buffer
 	var str string
 	for _, rune := range s {
@@ -53,7 +53,9 @@ func toPinyin(s string) string {
 //   1. syd-TangGuoXiaoKaiShan(HuangSe)
 //   2. sydtgxkshs
 //   3. syd-tgxks(hs)
-func ParsePinyin(s string) string {
+
+// ParsePinyin2 ...
+func ParsePinyin2(s string) string {
 	var (
 		f   = ""
 		str = ""
@@ -70,6 +72,7 @@ func ParsePinyin(s string) string {
 		}
 	}
 	return f
+
 }
 
 var enRegexp = regexp.MustCompile("[a-zA-Z0-9]")
