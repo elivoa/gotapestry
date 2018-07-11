@@ -16,7 +16,7 @@ type Product struct {
 	Brand           string         `json:",omitempty"`
 	Price           float64        `json:",omitempty"`
 	Supplier        int            `json:"-"`
-	FactoryPrice    float64        `json:"-"`
+	FactoryPrice    float64        `json:",omitempty"`
 	DiscountPercent int            `json:",omitempty"` // 打折的百分比，0-100
 	Stock           int            // 库存量 || not used again?
 	ShelfNo         string         `json:"-"`          // 货架号

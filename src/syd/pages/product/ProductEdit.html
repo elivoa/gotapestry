@@ -166,7 +166,10 @@
               </dl>
               <dl class="clearfix">
                 <dt>供货价格：</dt>
-                <dd><input type="text" size="12"> <a href="">历史价格查询</a></dd>
+                <dd>
+                  <input type="number" ng-model="Product.FactoryPrice" max="99999999" step="0.01" size="12">
+                  <a href="">历史价格查询</a>
+                </dd>
                 <dd class=""></dd>
               </dl>
             </div>
@@ -207,5 +210,3 @@ p_ProductEdit({
   Sizes: {{.Sizes}}
 });
 </script>
-
-
