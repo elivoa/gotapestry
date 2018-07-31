@@ -36,9 +36,9 @@ func (p *ProductList) getMainParser(letter string) *db.QueryParser { // []*model
 	var parser = service.Order.EntityManager().NewQueryParser()
 	p.Capital = strings.ToLower(p.Capital)
 	if p.Capital == "" || p.Capital == "all" {
-		parser.Where().Limit(1000) // disable default limit
+		parser.Where().Limit(100000) // disable default limit
 	} else {
-		parser.Where("capital", p.Capital)
+		parser.Where("capital", p.Capital).Limit(100000)
 	}
 	return parser
 }
