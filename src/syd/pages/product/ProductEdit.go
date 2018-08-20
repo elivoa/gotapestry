@@ -3,12 +3,13 @@ package product
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/elivoa/got/core"
-	"github.com/elivoa/got/route/exit"
-	"github.com/elivoa/gxl"
 	"strings"
 	"syd/model"
 	"syd/service"
+
+	"github.com/elivoa/got/core"
+	"github.com/elivoa/got/route/exit"
+	"github.com/elivoa/gxl"
 )
 
 /* ________________________________________________________________________________

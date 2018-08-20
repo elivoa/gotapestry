@@ -224,7 +224,7 @@ func Lookup(q string, category string) ([]*Item, error) {
 	}
 
 	var (
-		N        = 50
+		N        = 100
 		idx      = 0
 		filtered = make([]*Item, N, N)
 		found    = 0

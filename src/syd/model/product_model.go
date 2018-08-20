@@ -19,7 +19,7 @@ type Product struct {
 	FactoryPrice    float64        `json:",omitempty"`
 	DiscountPercent int            `json:",omitempty"` // 打折的百分比，0-100
 	Stock           int            // 库存量 || not used again?
-	ShelfNo         string         `json:"-"`          // 货架号
+	ShelfNo         string         `json:",omitempty"` // 货架号
 	Capital         string         `json:",omitempty"` // captical letter to quick access.
 	Note            string         `json:",omitempty"`
 	CreateTime      time.Time      `json:"-"`

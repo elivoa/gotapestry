@@ -1,7 +1,5 @@
 package base
 
-import ()
-
 var (
 	Role_Admin = "admin"
 	// Role_Manager          = "manager"
@@ -35,7 +33,7 @@ var (
 	// RoleSet_Preference  = []string{Role_Admin, Role_Accountant}
 	// RoleSet_Staff  = []string{Role_Admin, Role_Accountant}
 
-	CONST_DB_DEFAULT_MAX_ITEMS = 50
+	CONST_DB_DEFAULT_MAX_ITEMS = 100000
 
 	// Application specific settings.
 	Order_create_tax_enable = false
@@ -77,9 +75,9 @@ var Basic = &BasicConfig{
 		// []string{Role_Engineer, "Engineer"},
 	},
 	RoleOptionsCanCreate: [][]string{
-	// []string{Role_Admin, "Admin"},
-	// []string{Role_Manager, "Manager"},
-	// []string{Role_Sales, "Sales"},
+		// []string{Role_Admin, "Admin"},
+		// []string{Role_Manager, "Manager"},
+		// []string{Role_Sales, "Sales"},
 	},
 }
 
