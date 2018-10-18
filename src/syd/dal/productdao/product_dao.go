@@ -18,7 +18,7 @@ import (
 var logdebug = true
 var core_fields = []string{
 	"name", "productId", "status", "brand", "price", "supplier", "factoryPrice", "discountPercent",
-	"stock", "shelfno", "capital", "note", "pictures", "createtime",
+	"stock", "shelfno", "capital", "note", "pictures", "ProducePeriod", "createtime",
 }
 var em = &db.Entity{
 	Table:        "product",
@@ -46,7 +46,7 @@ func _one(query *db.QueryParser) (*model.Product, error) {
 		func(rows *sql.Rows) (bool, error) {
 			return false, rows.Scan(
 				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice, &m.DiscountPercent,
-				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
+				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.ProducePeriod, &m.CreateTime, &m.UpdateTime,
 			)
 		},
 	)
@@ -66,7 +66,7 @@ func _list(query *db.QueryParser) ([]*model.Product, error) {
 			m := &model.Product{}
 			err := rows.Scan(
 				&m.Id, &m.Name, &m.ProductId, &m.Status, &m.Brand, &m.Price, &m.Supplier, &m.FactoryPrice, &m.DiscountPercent,
-				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.CreateTime, &m.UpdateTime,
+				&m.Stock, &m.ShelfNo, &m.Capital, &m.Note, &m.Pictures, &m.ProducePeriod, &m.CreateTime, &m.UpdateTime,
 			)
 			models = append(models, m)
 			return true, err
@@ -111,7 +111,7 @@ func Create(product *model.Product) (*model.Product, error) {
 	res, err := em.Insert().Exec(
 		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
 		product.FactoryPrice, product.DiscountPercent, product.Stock, product.ShelfNo, product.Capital,
-		product.Note, product.Pictures, product.CreateTime,
+		product.Note, product.ProducePeriod, product.Pictures, product.CreateTime,
 	)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func UpdateProduct(product *model.Product) (int64, error) {
 	res, err := em.Update().Exec(
 		product.Name, product.ProductId, product.Status, product.Brand, product.Price, product.Supplier,
 		product.FactoryPrice, product.DiscountPercent, product.Stock, product.ShelfNo, product.Capital,
-		product.Note, product.Pictures, product.CreateTime,
+		product.Note, product.Pictures, product.ProducePeriod, product.CreateTime,
 		product.Id,
 	)
 	if err != nil {
@@ -216,9 +216,9 @@ func DailySalesData(
 select
   DATE_FORMAT(o.create_time, '%Y-%m-%d'), sum(od.quantity)
 from
-  order_detail od 
+  order_detail od
   left join ` + "`" + `order` + "`" + ` o on od.order_track_number = o.track_number
-where 
+where
   od.product_id=?
   and o.type in (?,?)
   and o.status in (?,?,?,?)
@@ -278,9 +278,9 @@ func DailySalesData_alldata(startTime string, excludeYangYi bool) (model.Product
 select
   DATE_FORMAT(o.create_time, '%Y-%m-%d'), sum(od.quantity)
 from
-  order_detail od 
+  order_detail od
   left join ` + "`" + `order` + "`" + ` o on od.order_track_number = o.track_number
-where 
+where
   o.type in (?,?)
   and o.status in (?,?,?,?)
   and o.create_time >= ?
@@ -333,13 +333,13 @@ func ProductBestBuyerList(productId int) (model.BestBuyerList, error) {
 	defer conn.Close()
 
 	_sql := `
-select -- d.product_id, p.Name, 
+select -- d.product_id, p.Name,
 	o.customer_id, pp.Name, sum(d.quantity), d.selling_price ` +
 		"from `order` o " +
-		` right join order_detail d on d.order_track_number = o.track_number 
+		` right join order_detail d on d.order_track_number = o.track_number
 	left join product p on d.product_id = p.Id
 	left join person pp on o.customer_id=pp.Id
-where 
+where
 	-- and o.customer_id = 305
 	d.product_id = ?
   and o.type in (?,?)

@@ -22,6 +22,7 @@ type Product struct {
 	ShelfNo         string         `json:",omitempty"` // 货架号
 	Capital         string         `json:",omitempty"` // captical letter to quick access.
 	Note            string         `json:",omitempty"`
+	ProducePeriod   string         `json:",omitempty"` // 预计货期
 	CreateTime      time.Time      `json:"-"`
 	UpdateTime      time.Time      `json:"-"`
 

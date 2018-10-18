@@ -33,7 +33,7 @@ func (p *ProductList) Setup() {
 
 // get main parser for prefix letter
 func (p *ProductList) getMainParser(letter string) *db.QueryParser { // []*model.Product
-	var parser = service.Order.EntityManager().NewQueryParser()
+	var parser = service.Product.EntityManager().NewQueryParser()
 	p.Capital = strings.ToLower(p.Capital)
 	if p.Capital == "" || p.Capital == "all" {
 		parser.Where().Limit(100000) // disable default limit
@@ -51,6 +51,10 @@ func (p *ProductList) Products(letter string) []*model.Product {
 	parser := p.getMainParser(letter)
 	products, err := service.Product.List(parser, service.WITH_PRODUCT_DETAIL|service.WITH_PRODUCT_INVENTORY)
 	// products, err := service.Product.List(parser, service.WITH_NONE)
+	// for idx, p := range products {
+	// 	fmt.Println("products:", idx, p.ProducePeriod)
+	// }
+
 	if nil != err {
 		panic(err.Error())
 	}
@@ -110,6 +114,7 @@ type ProductListJsonObject struct {
 	ShelfNo         string         `json:",omitempty"` // 货架号
 	Capital         string         `json:",omitempty"` // captical letter to quick access.
 	Note            string         `json:",omitempty"`
+	ProducePeriod   string         `json:",omitempty"`
 	CreateTime      time.Time      `json:"-"`
 	UpdateTime      time.Time      `json:"-"`
 }
@@ -146,6 +151,7 @@ func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 				ShelfNo:         p.ShelfNo,
 				Capital:         p.Capital,
 				Note:            p.Note,
+				ProducePeriod:   p.ProducePeriod,
 				CreateTime:      p.CreateTime,
 				UpdateTime:      p.UpdateTime,
 			}

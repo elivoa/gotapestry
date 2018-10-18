@@ -1,144 +1,141 @@
 <!DOCTYPE HTML>
 <html ng-app="syd">
-  <head>
-    <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
 
-    <t:layout.header title="商品列表" deps="ng TODO" ng="true"/>
+<head>
+  <link href="/static/css/pages/pg_list_product.css" rel="stylesheet" type="text/css">
 
-    <script src="/static/js/p/product/product_list.js?v={{version}}" ></script>
-  </head>
-  
-  <body ng-controller="ProductListCtrl" class="PG_list_product">
-    <t:layout.headernav />
+  <t:layout.header title="商品列表" deps="ng TODO" ng="true" />
 
-    <div class="container">
-      <t:layout.leftnav curPage="/product/list" />
+  <script src="/static/js/p/product/product_list.js?v={{version}}"></script>
+</head>
 
-      <div class="main_content ng-cloak">
-    	<h1>商品列表</h1>
+<body ng-controller="ProductListCtrl" class="PG_list_product">
+  <t:layout.headernav />
 
-        <div style="margin:8px;">
-          <t:a event="ChangeMode" context=".Capital" label="显示模式"
-               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)"/>
-               |
-          <t:a event="ChangeShowHideMode" context=".Capital" label="隐藏/全部"
-               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)"/>
-               |
-          <t:a event="ChangeSalesOnlyMode" context=".Capital" label="只显示打折商品"
-               parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode `&salesonly=` .SalesOnlyMode)"/>
-        </div>
-        
-        <div class="tab_s clearfix">
-          <a ng-repeat="tab in tabs track by $index"
-             class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
-             href="/product/list/[[tab]]?showall=[[showall]]&detailmode=[[detailmode]]&salesonly=[[salesonly]]">
-            [[tab]]
-          </a>
-        </div>
+  <div class="container">
+    <t:layout.leftnav curPage="/product/list" />
 
-        <div class="list_product">
+    <div class="main_content ng-cloak">
+      <h1>商品列表</h1>
 
-          <table class="tbl_main">
-            <tr>
-              <th align="left" style="width:10px;">货号</th>
-              
-              <th ng-if="detailmode" width="62">图片</th>
-              
-              <th align="left" style="width:150px;">商品名称</th>
-              <th align="right">销售单价</th>
-              <!-- <th align="right" style="min-width:40px;">打折%</th> -->
-              <th align="right">库存</th>
-              <th align="left" style="width:150px;">产品规格</th>
-              <th align="center" style="min-width:40px;">货架</th>
-              <th align="left">操作</th>
-            </tr>
+      <div style="margin:8px;">
+        <t:a event="ChangeMode" context=".Capital" label="显示模式" parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)" />
+        |
+        <t:a event="ChangeShowHideMode" context=".Capital" label="隐藏/全部" parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode)" />
+        |
+        <t:a event="ChangeSalesOnlyMode" context=".Capital" label="只显示打折商品" parameters="(print `showall=` .ShowAll `&detailmode=` .DetailMode `&salesonly=` .SalesOnlyMode)" />
+      </div>
 
-            <tr ng-if="!Products">
-              <td colspan="8">
-                <div class="tips_content"><i class="icon_warning"></i> No Records</div>
-              </td>
-            </tr>
-            
-            <tr ng-repeat="p in Products" ng-if="(p.Status!=1 || showall) && ((salesonly && p.DiscountPercent > 0) || !salesonly)">
-              <td nowrap>
-                <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
-              </td>
-              
-              <td ng-if="detailmode" width="62" >
-                <img src="[[p.pic]]" height="90" width="60" style="border:solic 1px gray">
-              </td>
-              
-              <td nowrap>
-                <a href="/product/detail/[[p.Id]]">[[p.Name]]</a>
-                <!-- TODO: chagne this into string name; -->
-                <span style="color:#ddd" ng-if="p.Status==1">[隐藏]</span>
-              </td>
-              <td align="right">
-                <span class="price">[[p.Price]]</span> <!-- PrettyCurrency filter -->
-              </td>
-              <!--
+      <div class="tab_s clearfix">
+        <a ng-repeat="tab in tabs track by $index" class="[[firstTabClass($index)]] [[tabClass(tab, '{{.Capital}}')]]"
+          href="/product/list/[[tab]]?showall=[[showall]]&detailmode=[[detailmode]]&salesonly=[[salesonly]]">
+          [[tab]]
+        </a>
+      </div>
+
+      <div class="list_product">
+
+        <table class="tbl_main">
+          <tr>
+            <th align="left" style="width:10px;">货号</th>
+
+            <th ng-if="detailmode" width="62">图片</th>
+
+            <th align="left" style="width:150px;">商品名称</th>
+            <th align="right">销售单价</th>
+            <!-- <th align="right" style="min-width:40px;">打折%</th> -->
+            <th align="right">库存</th>
+            <th align="left" style="width:150px;">产品规格</th>
+            <th align="center" style="min-width:40px;">货架</th>
+            <th align="center" style="min-width:40px;">预计货期</th>
+            <th align="left">操作</th>
+          </tr>
+
+          <tr ng-if="!Products">
+            <td colspan="8">
+              <div class="tips_content"><i class="icon_warning"></i> No Records</div>
+            </td>
+          </tr>
+
+          <tr ng-repeat="p in Products" ng-if="(p.Status!=1 || showall) && ((salesonly && p.DiscountPercent > 0) || !salesonly)">
+            <td nowrap>
+              <a href="/product/detail/[[p.Id]]">[[p.ProductId]]</a>
+            </td>
+
+            <td ng-if="detailmode" width="62">
+              <img src="[[p.pic]]" height="90" width="60" style="border:solic 1px gray">
+            </td>
+
+            <td nowrap>
+              <a href="/product/detail/[[p.Id]]">[[p.Name]]</a>
+              <!-- TODO: chagne this into string name; -->
+              <span style="color:#ddd" ng-if="p.Status==1">[隐藏]</span>
+            </td>
+            <td align="right">
+              <span class="price">[[p.Price]]</span> <!-- PrettyCurrency filter -->
+            </td>
+            <!--
               <td align="right">
                   <span ng-if="p.DiscountPercent > 0">[[p.DiscountPercent]]%</span>
               </td>
               -->
-              <td title="[[StockDescription(p)]]" style="text-align:right">
-                <span class="inventory">[[p.Stock]]</span>
-              </td>
-              <td nowrap style="color:#a1a1a1;min-width:120px;max-width:200px;">
-                [[SpecDescription(p)]]
-              </td>
-              <td align="center">
-                <span>[[p.ShelfNo]]</span>
-              </td>
-              <td nowrap>
-                <a href="/product/edit/[[p.Id]]">修改商品</a>
-                <!-- 隐藏和显示 --> <span class="vline">|</span>
-                <a ng-if="p.Status!=1"
-                   href="/product/list:hide/[[p.Id]]?referer={{referer $}}"
-                   onclick="return confirm('确认隐藏?')">
-                  隐藏
-                </a>
-                <a ng-if="p.Status==1"
-                   href="/product/list:show/[[p.Id]]?referer={{referer $}}"
-                   onclick="return confirm('确认显示?')">
-                  显示
-                </a>
-                <!-- 删除 --> <span class="vline">|</span>
-                {{/* This will be generated */}}
-                <a href="/product/list:delete/[[p.Id]]?referer={{referer $}}"
-                   onclick="return confirm('确认删除?')">删除</a>
-              </td>
-            </tr>
-            
-          </table>
+            <td title="[[StockDescription(p)]]" style="text-align:right">
+              <span class="inventory">[[p.Stock]]</span>
+            </td>
+            <td nowrap style="color:#a1a1a1;min-width:120px;max-width:200px;">
+              [[SpecDescription(p)]]
+            </td>
+            <td align="center">
+              <span>[[p.ShelfNo]]</span>
+            </td>
+            <td align="center">
+              <span>[[p.ProducePeriod]]</span>
+            </td>
+            <td nowrap>
+              <a href="/product/edit/[[p.Id]]">修改商品</a>
+              <!-- 隐藏和显示 --> <span class="vline">|</span>
+              <a ng-if="p.Status!=1" href="/product/list:hide/[[p.Id]]?referer={{referer $}}" onclick="return confirm('确认隐藏?')">
+                隐藏
+              </a>
+              <a ng-if="p.Status==1" href="/product/list:show/[[p.Id]]?referer={{referer $}}" onclick="return confirm('确认显示?')">
+                显示
+              </a>
+              <!-- 删除 --> <span class="vline">|</span>
+              {{/* This will be generated */}}
+              <a href="/product/list:delete/[[p.Id]]?referer={{referer $}}" onclick="return confirm('确认删除?')">删除</a>
+            </td>
+          </tr>
 
-          <!-- 
+        </table>
+
+        <!--
                <div class="pager_main"><a class="btn_c_s" href="#">首页</a><span><a href="#">1</a><A href="#">2</a><a class="cur" href="#">3</a><a href="#">4</a><a href="#">5</a></span><a class="btn_c_s" href="#">末页</a></div>
                -->
 
-        </div>
-        
       </div>
+
     </div>
-  </body>
+  </div>
+</body>
+
 </html>
 
 <script type="text/javascript">
 
-// start ng.
+  // start ng.
 
-p_ProductList({
-  ProductsLink: "/product/list:getproducts/{{.Capital}}",
-  StocksLink: "/product/list:getproductstocks/{{.Capital}}",
-  DetailLink: "/product/list:getproductdetails/{{.Capital}}",
-  ShowAll: {{.ShowAll}},
-  SalesOnly: {{.SalesOnlyMode}},
-  DetailMode: {{.DetailMode}},
+  p_ProductList({
+    ProductsLink: "/product/list:getproducts/{{.Capital}}",
+    StocksLink: "/product/list:getproductstocks/{{.Capital}}",
+    DetailLink: "/product/list:getproductdetails/{{.Capital}}",
+    ShowAll: {{.ShowAll }},
+    SalesOnly: {{.SalesOnlyMode }},
+    DetailMode: {{.DetailMode }},
 });
 
-// Products: {{.Products .Capital}}, 
+// Products: {{.Products .Capital}},
 //  Factories : { {.Factories}}, // factories option
 // $(document).ready(function(){
-//   angular.element('._temp_query_box').focus(); 
+//   angular.element('._temp_query_box').focus();
 // })
-          </script>
+</script>
