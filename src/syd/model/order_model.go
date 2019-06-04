@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -232,7 +233,8 @@ func (order *Order) SumOrderPrice() float64 {
 	if order.ExpressFee > 0 {
 		sum += float64(order.ExpressFee)
 	}
-	return sum
+	// return sum
+	return math.Floor(sum + 0.5)
 }
 
 /*________________________________________________________________________________
@@ -248,7 +250,8 @@ func (d *OrderDetail) IsValid() bool {
 
 // TODO discount
 func (d *OrderDetail) TotalPrice() float64 {
-	return float64(d.Quantity) * d.SellingPrice
+	a := float64(d.Quantity) * d.SellingPrice
+	return math.Floor(a + 0.5)
 }
 
 func (d *OrderDetail) String() string {

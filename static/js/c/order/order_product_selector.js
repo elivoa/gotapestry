@@ -128,17 +128,6 @@
       return this.fillQuantities();
     };
 
-    function fix2(value) {
-      if (!value) {
-        return ""
-      }
-      if (typeof value === 'string') {
-        return value
-      }
-      return value.toFixed(2);
-    }
-
-
     OrderProductSelector.prototype.updatePriceDisplay = function () {
       console.log("===", this.product)
       $("." + this.containerClass + " .price").html(fix2(this.product.price));

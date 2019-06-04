@@ -2,10 +2,11 @@ package order
 
 import (
 	"fmt"
-	"github.com/elivoa/got/core"
 	"syd/model"
 	"syd/service"
 	"syd/service/orderservice"
+
+	"github.com/elivoa/got/core"
 )
 
 /* ________________________________________________________________________________
@@ -36,3 +37,7 @@ func (p *ViewOrder) Setup() {
 func (p *ViewOrder) ProductDetailJson() interface{} {
 	return orderservice.OrderDetailsJson(p.Order, false)
 }
+
+// func (p *ViewOrder) Fix2(value) string {
+// 	return fmt.Sprintf("%.2f", value)
+// }
