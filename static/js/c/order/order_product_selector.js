@@ -94,7 +94,7 @@
             dataType: 'json',
             success: function (data) {
               if (data) {
-                newproduct.price = data.price; // 
+                newproduct.price = data.price; //
                 newproduct.productPrice = data.productPrice; // 跟上面productPrice是一样的。
               }
               return _.refresh(newproduct);
@@ -189,7 +189,7 @@
     OrderProductSelector.prototype.extractProductJson = function () {
       var strprice;
       strprice = $("." + this.containerClass + " .price").html();
-      this.product.price = parseInt(strprice);
+      this.product.price = parseFloat(strprice);
       this.product.note = $("." + this.containerClass + " .notes").val();
       this.product.quantity = [];
       $("." + this.containerClass + " .stock").each($.proxy(function (idx, obj) {

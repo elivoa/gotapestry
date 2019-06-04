@@ -15,6 +15,7 @@
           return this.ops.clear();
         }
       }, this);
+
       this.ops.onAddToOrder = $.proxy(function(product) {
         var success;
         // console.log('==== onAddToOrder === ');
