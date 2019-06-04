@@ -189,7 +189,7 @@
     OrderProductSelector.prototype.extractProductJson = function () {
       var strprice;
       strprice = $("." + this.containerClass + " .price").html();
-      this.product.price = parseFloat(strprice);
+      this.product.price = parseFloat(strprice).toFixed(2);
       this.product.note = $("." + this.containerClass + " .notes").val();
       this.product.quantity = [];
       $("." + this.containerClass + " .stock").each($.proxy(function (idx, obj) {

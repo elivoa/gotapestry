@@ -171,7 +171,7 @@
       }
       nquantity = quantities.length;
 
-      var uniquePrice = enableSales && useDiscount ? json.productPrice : json.price;
+      var uniquePrice = enableSales && useDiscount ? json.productPrice && json.productPrice.toFixed(2) : json.price;
 
       htmls = [];
       htmls.push("<tr>");
