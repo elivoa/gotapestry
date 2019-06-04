@@ -77,7 +77,7 @@
         <div class="unit">
           <div class="tit"><strong>合计</strong></div>
           <div class="B_express">
-            <span>{{.Order.TotalPrice}}</span>
+            <span>{{.Order.TotalPriceFixed}}</span>
             <if t='not .Order.IsDaoFu'>
               + <span>{{.Order.ExpressFee}}</span> =
               <span class="price">{{.Order.SumOrderPrice}}</span>

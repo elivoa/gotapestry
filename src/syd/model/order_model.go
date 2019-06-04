@@ -234,7 +234,28 @@ func (order *Order) SumOrderPrice() float64 {
 		sum += float64(order.ExpressFee)
 	}
 	// return sum
-	return math.Floor(sum + 0.5)
+	return round(sum, 2)
+	// return math.Floor((sum+0.5)*100) / 100
+}
+
+func round(v float64, decimals int) float64 {
+	var pow float64 = 1
+	for i := 0; i < decimals; i++ {
+		pow *= 10
+	}
+	return float64(int((v*pow)+0.5)) / pow
+}
+
+// Total price + express fee
+func (order *Order) TotalPriceFixed() float64 {
+	var sum float64 = order.TotalPrice
+	if order.ExpressFee > 0 {
+		sum += float64(order.ExpressFee)
+	}
+
+	// return sum
+	fmt.Println(">>>>>>>>>>>>>>>>>>", sum, round(sum, 2))
+	return round(sum, 2)
 }
 
 /*________________________________________________________________________________
