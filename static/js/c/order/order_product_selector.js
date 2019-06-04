@@ -38,7 +38,7 @@
           return;
         }
         input = $("<input type='text' style='width:40px;'>");
-        input.val(this.product.price);
+        input.val(fix2(this.product.price));
         input.blur($.proxy(function (e) {
           this.product.price = e.target.value;
           return this.updatePriceDisplay();
@@ -128,15 +128,26 @@
       return this.fillQuantities();
     };
 
+    function fix2(value) {
+      if (!value) {
+        return ""
+      }
+      if (typeof value === 'string') {
+        return value
+      }
+      return value.toFixed(2);
+    }
+
+
     OrderProductSelector.prototype.updatePriceDisplay = function () {
       console.log("===", this.product)
-      $("." + this.containerClass + " .price").html(this.product.price);
+      $("." + this.containerClass + " .price").html(fix2(this.product.price));
       var container = $("." + this.containerClass + " .info");
       container.html("");
       if (this.product.productPrice === this.product.price) {
         // return container.html("");
       } else {
-        container.append($("<div>原价：" + this.product.productPrice + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠</div>"));
+        container.append($("<div>原价：" + fix2(this.product.productPrice) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; √ 已优惠</div>"));
       }
       // 启用折扣功能.
       if (enableSales) {
