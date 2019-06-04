@@ -40,6 +40,10 @@ type Product struct {
 	Stocks Stocks `json:",omitempty"` // map[string]int
 }
 
+func (s Product) PriceFixed() float64 {
+	return round(s.Price, 2)
+}
+
 // TODO make a new structure of stocks;
 type Stocks map[string]map[string]int
 

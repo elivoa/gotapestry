@@ -254,7 +254,6 @@ func (order *Order) TotalPriceFixed() float64 {
 	}
 
 	// return sum
-	fmt.Println(">>>>>>>>>>>>>>>>>>", sum, round(sum, 2))
 	return round(sum, 2)
 }
 

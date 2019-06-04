@@ -132,6 +132,14 @@ type ProductDetailsJsonObject struct {
 	Properties map[string][]string `json:",omitempty"` // other properties // TODO
 }
 
+func round(v float64, decimals int) float64 {
+	var pow float64 = 1
+	for i := 0; i < decimals; i++ {
+		pow *= 10
+	}
+	return float64(int((v*pow)+0.5)) / pow
+}
+
 func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 	basicps := []*ProductListJsonObject{}
 	if nil != products {
@@ -143,7 +151,7 @@ func copyToBasicProduct(products []*model.Product) []*ProductListJsonObject {
 				Status:          p.Status,
 				Brand:           p.Brand,
 				Picture:         getpicture(p),
-				Price:           p.Price,
+				Price:           round(p.Price, 2),
 				Supplier:        p.Supplier,
 				FactoryPrice:    p.FactoryPrice,
 				DiscountPercent: p.DiscountPercent,

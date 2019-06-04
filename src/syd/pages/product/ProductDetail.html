@@ -33,7 +33,7 @@
 
 		  <div class="B_prd_info">
 			<h2>{{.Name}}</h2>
-			<p>单价：<strong class="price">{{.Price}}</strong>元</p>
+			<p>单价：<strong class="price">{{.PriceFixed}}</strong>元</p>
 			<p>颜色：{{range .Colors}} {{.}}, {{end}}</p>
 			<p>尺码：{{range .Sizes}} {{.}}, {{end}}</p>
 			<div class="B_stock">
@@ -64,13 +64,13 @@
 				    </tr>
 			      </table>
                   -->
-              
+
 			</div>
             <p>创建时间：{{.CreateTime|datetime}}</p>
             <p>修改时间：{{.CreateTime|datetime}}</p>
 		  </div>
 		</div>
-        
+
 		<div class="unit">
 		  <div class="tit"><strong>销售图表</strong></div>
           <t:product.SalesChart productId=".Id" period="$.Period" combineday="$.CombineDay" />
@@ -94,7 +94,7 @@
             </dl>
           </div>
 		</div>
-        
+
 		<div class="B_prd_sale">
 		  <div class="B_tit"><strong>购买列表 TODO</strong></div>
 		  <table class="tbl_main">
@@ -116,7 +116,7 @@
 		</div>
       </div>
       {{end}}
-      
+
     </div>
   </body>
 </html>
