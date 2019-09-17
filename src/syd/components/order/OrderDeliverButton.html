@@ -21,9 +21,9 @@
 
     <form action="/order/ButtonSubmitHere" method="POST">
       <input type="hidden" name="t:id" value="DeliverForm" />
-      <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />      
+      <input type="hidden" name="TrackNumber" value="{{.TrackNumber}}" />
       <input type="hidden" name="Referer" value="{{referer .}}" />
-      
+
 	  <div class="form_main">
 	    <dl class="clearfix">
 		  <dt class="L_method">发货方式：</dt>
@@ -72,7 +72,7 @@
 	    </dl>
 	  </div>
     </form>
-    
+
   </div>
 </div>
 <script type="text/javascript">
@@ -83,7 +83,6 @@
       DeliveryTrackingNumber: {{.DeliveryTrackingNumber}},
       ExpressFee : {{.ExpressFee}},
     })
-    ol.setExpress({{.DeliveryMethod}}, {{.ExpressFee}})
+    ol.setExpressFix({{.ClientId}}, {{.DeliveryMethod}}, {{.ExpressFee}})
   });
 </script>
-

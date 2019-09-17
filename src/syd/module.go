@@ -38,9 +38,10 @@ var SYDModule = &core.Module{
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
 		c.ResourcePath = "/var/site/data/syd/pictures/"
 
-		c.Port = 8080 //13062 for server
+		// c.Port = 8080 //13062 for server
+		c.Port = 13062 //for server
 		c.DBPort = 3306
-		c.DBName = "syd"
+		c.DBName = "sydold"
 		c.DBUser = "root"
 		c.DBPassword = "eserver409$)("
 
