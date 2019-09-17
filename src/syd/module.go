@@ -39,7 +39,7 @@ var SYDModule = &core.Module{
 		c.ResourcePath = "/var/site/data/syd/pictures/"
 
 		// c.Port = 8080 //13062 for server
-		c.Port = 13062 //for server
+		c.Port = 16023 //for server
 		c.DBPort = 3306
 		c.DBName = "sydold"
 		c.DBUser = "root"

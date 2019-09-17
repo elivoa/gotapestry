@@ -115,7 +115,7 @@ type ProductListJsonObject struct {
 	Capital         string         `json:",omitempty"` // captical letter to quick access.
 	Note            string         `json:",omitempty"`
 	ProducePeriod   string         `json:",omitempty"`
-	CreateTime      time.Time      `json:"-"`
+	CreateTime      time.Time      `json:",omitempty"`
 	UpdateTime      time.Time      `json:"-"`
 }
 
