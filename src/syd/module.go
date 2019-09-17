@@ -39,9 +39,9 @@ var SYDModule = &core.Module{
 		c.ResourcePath = "/var/site/data/syd/pictures/"
 
 		// c.Port = 8080 //13062 for server
-		c.Port = 13062 //for server
+		c.Port = 16023 //for server
 		c.DBPort = 3306
-		c.DBName = "sydold"
+		c.DBName = "syd"
 		c.DBUser = "root"
 		c.DBPassword = "eserver409$)("
 
@@ -63,7 +63,7 @@ var SYDModule = &core.Module{
 		// --------------------------------------------------------------------------------
 		// Modify some default parmeters.
 		config.LIST_PAGE_SIZE = 50
-		config.ReloadTemplate = true // disable reload template?
+		config.ReloadTemplate = false // disable reload template?
 
 		// Config gxl toolset.
 		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.
