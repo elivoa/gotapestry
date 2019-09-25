@@ -3,7 +3,7 @@
   <head>
 
     <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="打印订单" />    
+    <t:layout.header title="打印订单" />
 
     <link rel="stylesheet" type="text/css" href="/static/css/pages/order-print.css" />
 
@@ -14,11 +14,11 @@
     <script language="javascript" src="/static/js/p/order/order_print_noprice.js"></script>
     <script language="javascript" src="/static/js/native/LodopFuncs.js"></script>
     <script language="javascript" src="/static/js/native/normal-print.js"></script>
-    
-    <object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width="0" height="0"> 
+
+    <object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width="0" height="0">
       <embed id="LODOP_EM" type="application/x-print-lodop" width="0" height="0"></embed>
     </object>
-    
+
   </head>
   <body class="PG_create_order">
     <t:layout.HeaderNav />
@@ -48,7 +48,8 @@
 			  <table class="prt_tbl order-form-container" border="0" cellpadding="0" cellspacing="0">
 				<thead>
 				  <tr>
-					<th align="center" class="th">序号</th>
+          <th align="center" class="th">序号</th>
+          <th align="center" class="th">货号</th>
 					<th align="center" class="th">商品名称</th>
 					<!-- <th align="center" class="th">单价</th> -->
 					<th align="center" class="th">颜色</th>
@@ -62,6 +63,7 @@
 
 				<tr class="total">
 				  <td valign="top" align="right" style="white-space:nowrap;"><strong>总计</strong></td>
+				  <td valign="top">&nbsp;</td>
 				  <td valign="top">&nbsp;</td>
 				  <td valign="top">&nbsp;</td>
 				  <td valign="top">&nbsp;</td>
@@ -83,7 +85,7 @@
               </div>
               <div>
                 合计：
-                {{.Sumprice}} 
+                {{.Sumprice}}
                 {{if .HasExpressFee }} + {{.ExpressFeeHtml }} {{end}}
                 = {{.TotalPriceHtml }}
               </div>
@@ -92,7 +94,7 @@
                 总计: {{.TotalPriceHtml}} + <span class="underline"></span>
                 = <span class="underline"></span>
               </div>
-              
+
               {{if .Order.HasAccumulated }} <div>
                 累计欠款： {{.Order.Accumulated}} + {{.TotalPriceHtml}}
                 + (代发<span class="underline"></span>)
@@ -100,7 +102,7 @@
               </div> {{end}}
             </div>
             --------------------------------------------------------------------------- */}}
-            
+
             <!-- 先用这个版本，隐藏代发，运费始终显示下划线; 订单状态为todeliver，使用实时累计欠款；
             <div id="orderTotal" class="other_info">
               <div>运输方式：{{.DeliveryMethodDisplay }}
@@ -122,17 +124,17 @@
                 = <span class="underline"></span>元
               </div>
               {{end}}
-              
+
             </div>
             -->
-            
+
           </div>
         </div>
         <div class="btn_content">
-          <a class="btn_a_l" href="/order/list/todeliver">返回订单列表</a> 
+          <a class="btn_a_l" href="/order/list/todeliver">返回订单列表</a>
           <a class="btn_a_l" href="/order/create">继续新增订单</a>
         </div>
-        
+
       </div>
     </div>
   </body>
@@ -143,4 +145,3 @@
                op.setData({{.ProductDetailJson}})
              });
     </script>
-

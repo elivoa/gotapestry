@@ -79,7 +79,7 @@
       // if (diff > 0) {
       //   console.log('=========+++++', osumPrice, sumPrice)
       //   var httt = $('原价：' + osumPrice.toFixed(2) + '元，已优惠：' + diff + '元。');
-        
+
       //   console.log('=========+++++', httt)
       //   tbody.append(httt);
       // }
@@ -123,7 +123,8 @@
 
       htmls = [];
       htmls.push("<tr>");
-      htmls.push("  <td>" + idx + "</td>");
+      htmls.push("  <td class='tb_ser'>" + idx + "</td>");
+      htmls.push("  <td>" + json.pid + "</td>");
       if (this.showpic) { // show pictures.
         console.log("showpic:", json.pic);
         htmls.push("  <td valign='top' class='pic' rowspan='" + nquantity + "'>");
@@ -168,6 +169,7 @@
         quantity = _ref1[_j];
         htmls.push("<tr>");
         htmls.push("  <td></td>");
+        htmls.push("  <td></td>");
         if (quantity[0] === "默认颜色") {
           htmls.push("  <td>-</td>");
         } else {
@@ -186,6 +188,7 @@
       var priiii = enableSales ? sumPrice.toFixed(2) : osumPrice;
       footer.push("<tr class='total'>");
       footer.push("<td valign='top' align='right'><strong>总计</strong></td>");
+      footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");

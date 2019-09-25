@@ -73,6 +73,7 @@
       htmls = [];
       htmls.push("<tr>");
       htmls.push("  <td>" + idx + "</td>");
+      htmls.push("  <td>" + json.id + "</td>");
       htmls.push("  <td valign='top' class='title' rowspan='" + nquantity + "'>");
       htmls.push("    <strong>" + json.name + "</strong>");
       htmls.push("  </td>");
@@ -101,6 +102,7 @@
         quantity = _ref1[_j];
         htmls.push("<tr>");
         htmls.push("  <td></td>");
+        htmls.push("  <td></td>");
         if (quantity[0] === "默认颜色") {
           htmls.push("  <td>-</td>");
         } else {
@@ -118,6 +120,7 @@
       footer = [];
       footer.push("<tr class='total'>");
       footer.push("<td valign='top' align='right'><strong>总计</strong></td>");
+      footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
       // footer.push("<td valign='top'>&nbsp;</td>");
       footer.push("<td valign='top'>&nbsp;</td>");
