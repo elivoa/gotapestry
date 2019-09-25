@@ -41,7 +41,7 @@ var SYDModule = &core.Module{
 		// c.Port = 8080 //13062 for server
 		c.Port = 16023 //for server
 		c.DBPort = 3306
-		c.DBName = "syd"
+		c.DBName = "sydold"
 		c.DBUser = "root"
 		c.DBPassword = "eserver409$)("
 
