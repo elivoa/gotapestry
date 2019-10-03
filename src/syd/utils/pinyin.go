@@ -63,7 +63,9 @@ func ParsePinyin2(s string) string {
 
 	for _, rune := range s {
 		str = string(rune)
-		if hzRegexp.MatchString(str) { //chinese
+		if str == "玥" {
+			f += "y"
+		} else if hzRegexp.MatchString(str) { //chinese
 			f += strings.ToLower(string(Convert(str)[0]))
 		} else {
 			if enRegexp.MatchString(str) {
