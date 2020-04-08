@@ -28,7 +28,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"got/module/fileupload/resize"
 	"image"
 	"image/png"
 	"io"
@@ -38,6 +37,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"syd/got/module/fileupload/resize"
+
 	// Register image handling libraries by importing them.
 	_ "image/gif"
 	_ "image/jpeg"

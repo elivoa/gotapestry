@@ -65,6 +65,8 @@ func ParsePinyin2(s string) string {
 		str = string(rune)
 		if str == "玥" {
 			f += "y"
+		} else if str == "發" {
+			f += "f"
 		} else if hzRegexp.MatchString(str) { //chinese
 			f += strings.ToLower(string(Convert(str)[0]))
 		} else {

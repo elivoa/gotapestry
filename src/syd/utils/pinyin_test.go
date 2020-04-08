@@ -8,7 +8,15 @@ import (
 )
 
 func TestParsePinyin(t *testing.T) {
-	str := ParsePinyin("高天舒")
+	str := ParsePinyin2("高天舒")
+	strs := []string{
+
+		"山西易露", "山西易露", "易露",
+		"山西易露发", "金莲花", "Jennifer", "0", "旺华芳", "湖南赵蓓", "晒晒", "小雪", "何兴砫", "王晶妍", "小静", "DAN服饰", "卢先生", "边博华", "小薇", "章瑞庆", "吴梦洁", "水车头小兰",
+	}
+	for _, s := range strs {
+		log.Println(">>", s, ParsePinyin2(s))
+	}
 
 	log.Println(">>", str)
 }

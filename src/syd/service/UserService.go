@@ -2,11 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/elivoa/got/config"
-	"github.com/elivoa/got/core/exception"
-	"github.com/elivoa/got/coreservice/sessions"
-	"github.com/elivoa/got/db"
-	"github.com/elivoa/got/logs"
 	"net/http"
 	"strings"
 	"syd/base"
@@ -14,6 +9,12 @@ import (
 	"syd/dal/userdao"
 	"syd/model"
 	"time"
+
+	"github.com/elivoa/got/config"
+	"github.com/elivoa/got/core/exception"
+	"github.com/elivoa/got/coreservice/sessions"
+	"github.com/elivoa/got/db"
+	"github.com/elivoa/got/logs"
 )
 
 var (
@@ -169,7 +170,7 @@ func (s *UserService) LoginFromCookie(r *http.Request) (*model.UserToken, error)
 			return nil, err
 		}
 	}
-	return nil, &base.LoginError{Message: "User not login."}
+	return nil, &base.LoginError{Message: "User not login.^Y^"}
 }
 
 // return username & password pair

@@ -22,26 +22,27 @@ var appversion = "4.1"
 
 // todo: think out a better way to register this.
 var SYDModule = &core.Module{
-	Name:            "syd",       // Don't use this. It's only used to display.
+	Name:            "syd",       // Used to display.
 	Version:         appversion,  // TODO: used to add to assets path to disable cache.
 	VarName:         "SYDModule", // Variable name.
 	BasePath:        utils.CurrentBasePath(),
-	PackagePath:     "syd", // package name used anywhere to locate important things.
+	PackageName:     "syd",
 	Description:     "SYD Selling System Main module.",
 	IsStartupModule: true,
 	Register: func() {
 		c := config.Config
 
 		// config static resources
-		c.AddStaticResource("/static/", "../static/") // static files.
-		c.AddStaticResource("/ng/", "../ng/")         // angularjs modules.
+		c.AddStaticResource("/static/", "static/") // static files.
+		// c.AddStaticResource("/static/", "../static/") // static files.
+		c.AddStaticResource("/ng/", "ng/") // angularjs modules.
 		c.AddStaticResource("/pictures/", "/var/site/data/syd/pictures/")
 		c.ResourcePath = "/var/site/data/syd/pictures/"
 
 		// c.Port = 8080 //13062 for server
-		c.Port = 16023 //for server
+		c.Port = 5925 //for server
 		c.DBPort = 3306
-		c.DBName = "sydold"
+		c.DBName = "syd"
 		c.DBUser = "root"
 		c.DBPassword = "eserver409$)("
 

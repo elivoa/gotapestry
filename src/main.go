@@ -3,6 +3,15 @@ package main
 import (
 	"fmt"
 	"syd"
+
+	// _ "syd/generated"
+	_ "syd"
+	_ "syd/dal/userdao"
+	_ "syd/model"
+	_ "syd/service"
+
+	_ "github.com/elivoa/got"
+	_ "github.com/elivoa/gxl"
 )
 
 // TESTing....

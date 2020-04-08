@@ -12,14 +12,14 @@ func (e *AccessDeniedError) Error() string { return e.Message }
 
 // ___________________________________________________________________________
 
-// login error
-type LoginError struct {
-	Message string
-	Reason  string
-}
+	// login error
+	type LoginError struct {
+		Message string
+		Reason  string
+	}
 
-func (e *LoginError) Error() string { return e.Message }
+	func (e *LoginError) Error() string { return e.Message }
 
-func NewLoginError(message string) *LoginError { return &LoginError{Message: message} }
+	func NewLoginError(message string) *LoginError { return &LoginError{Message: message} }
 
 // ___________________________________________________________________________
