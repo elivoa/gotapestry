@@ -8,3 +8,5 @@ src/syd/generated
 src/syd/generated/*
 static/from_lili/*
 
+go.sum
+go.sum*.tmp
