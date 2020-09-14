@@ -153,7 +153,7 @@
     };
 
     OrderDetailsForm.prototype.generateTR = function (json, totalQuantity, totalPrice, ototalPrice) {
-      // console.log("product --> :",json, totalQuantity, totalPrice)
+      console.log("product --> :", json, totalQuantity, totalPrice)
       var htmls, nquantity, q, quantities, quantity, _i, _j, _len, _len1, _ref, _ref1;
       var downsign = "  ";
       var useDiscount = false;
@@ -173,12 +173,17 @@
 
       var uniquePrice = enableSales && useDiscount ? json.productPrice && json.productPrice.toFixed(2) : json.price;
 
+      var pic = json.pic && json.pic.replace('/pictures', 'http://foolishbar.com:5925/pictures')
+
       htmls = [];
       htmls.push("<tr>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
       htmls.push("    " + json.pid);
       htmls.push("  </td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
+      htmls.push("    <img width='96' src='" + pic + "' />");
+      htmls.push("  </td>");
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
       htmls.push("    <strong><a href='/product/detail/" + json.id + "' target='_blank'>" + json.name + "</a></strong>");
       htmls.push("    <input type='hidden' name='Order.Details.ProductId' value='" + json.id + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.SellingPrice' value='" + uniquePrice + "' />");
@@ -189,30 +194,30 @@
       htmls.push("    <input type='hidden' name='Order.Details.Quantity' value='" + quantities[0][2] + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.Note' value='" + json.note + "' />");
       htmls.push("  </td>");
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
       // 如果折扣价格胜出，那么录入产品原价格和折扣比例，保证计算是准确的。
       htmls.push("    <span class='price'>" + uniquePrice + "</span>");
       htmls.push("  </td>");
       htmls.push("  <td>" + quantities[0][0] + "</td>");
       htmls.push("  <td>" + quantities[0][1] + "</td>");
       htmls.push("  <td>" + quantities[0][2] + "</td>");
-      htmls.push("  <td valign='top' align='center' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='center' align='center' rowspan='" + nquantity + "'>");
       htmls.push("      <strong>" + totalQuantity + "</strong></td>");
       // 输出折扣比例
       if (enableSales) {
-        htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
+        htmls.push("  <td valign='center' align='right' rowspan='" + nquantity + "'>");
         if (useDiscount) {
           htmls.push("      <strong class=''>" + json.discountPercent + "%</strong>");
         }
         htmls.push("</td>");
       }
 
-      htmls.push("  <td valign='top' align='right' rowspan='" + nquantity + "'>");
+      htmls.push("  <td valign='center' align='right' rowspan='" + nquantity + "'>");
       htmls.push("      <strong class='price'>" + downsign + totalPrice.toFixed(2) + "</strong></td>");
 
-      htmls.push("  <td valign='top' rowspan='" + nquantity + "'>" + json.note + "</td>");
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>" + json.note + "</td>");
       if (!this.hideOperation) {
-        htmls.push("  <td valign='top' rowspan='" + nquantity + "'>");
+        htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
         htmls.push("      <a href='#' class='odf-edit'>编辑</a><span class='vline'>|</span>");
         htmls.push("      <a href='#' class='odf-delete'>删除</a>");
         htmls.push("  </td>");

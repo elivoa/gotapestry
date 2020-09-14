@@ -134,8 +134,8 @@ func OrderDetailsJson(order *model.Order, showPicture bool) *OrderDetailJson {
 					showpic = service.Product.ProductPicture(product, 0)
 				}
 
-				fmt.Println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[")
-				fmt.Println(product.Price)
+				// fmt.Println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[")
+				// fmt.Println(product.Price)
 
 				jsonStruct = &ProductDetalJsonStruct{
 					Id:              product.Id,
