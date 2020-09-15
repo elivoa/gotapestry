@@ -1,155 +1,174 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
 
-    <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
-    <t:layout.header title="打印订单" />
+<head>
 
-    <link rel="stylesheet" type="text/css" href="/static/css/pages/order-print.css" />
+  <link href="/static/css/pages/pg_create_order.css" rel="stylesheet" type="text/css">
+  <t:layout.header title="打印订单" />
 
-    <!--
+  <link rel="stylesheet" type="text/css" href="/static/css/pages/order-print.css" />
+
+  <!--
     <link rel="stylesheet" type="text/css" media="screen" href="/static/css/pages/order-print.css" />
     <link rel="stylesheet" type="text/css" media="print" href="/static/css/pages/order-print.css" />
     -->
-    <script language="javascript" src="/static/js/p/order/order_print.js"></script>
-    <script language="javascript" src="/static/js/native/LodopFuncs.js"></script>
-    <script language="javascript" src="/static/js/native/normal-print.js"></script>
+  <script language="javascript" src="/static/js/p/order/order_print.js"></script>
+  <script language="javascript" src="/static/js/native/LodopFuncs.js"></script>
+  <script language="javascript" src="/static/js/native/normal-print.js"></script>
 
-    <object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width="0" height="0">
-      <embed id="LODOP_EM" type="application/x-print-lodop" width="0" height="0"></embed>
-    </object>
+  <!-- new print control -->
+  <script language="javascript" src="/static/js/native/util-call-printer.js"></script>
 
-  </head>
-  <body class="PG_create_order">
-    <t:layout.HeaderNav />
+  <style>
+    /*Show header footer When Print*/
+    @media print {
+      .order_print {
+        margin: 12px;
+        padding: 40px;
+        border: solid 1px red;
+      }
+    }
 
-    <div class="container">
-      <t:layout.LeftNav curPage="/order/list" />
+  </style>
+  <!-- END new print control -->
 
-      <div class="main_content">
-    	<h1>打印订单</h1>
-        <div class="B_order_step3"></div>
-	<div class="B_print_content">
-	  <div class="B_btn_print">
-            <a class="" href="/order/printnoprice/{{.TrackNumber}}?first=true">不含价格</a>
-            <a class="btn_b_s print-order" href="javascript:printOrder();">打印订单</a>
+  <object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width="0" height="0">
+    <embed id="LODOP_EM" type="application/x-print-lodop" width="0" height="0"></embed>
+  </object>
+
+</head>
+
+<body class="PG_create_order">
+  <t:layout.HeaderNav />
+
+  <div class="container">
+    <t:layout.LeftNav curPage="/order/list" />
+
+    <div class="main_content">
+      <h1>打印订单</h1>
+      <div class="B_order_step3"></div>
+      <div class="B_print_content">
+        <div class="B_btn_print">
+          <a class="" href="/order/printnoprice/{{.TrackNumber}}?first=true">不含价格</a>
+          <a class="btn_b_s print-order" href="javascript:printOrder();">打印订单</a>
+          <a class="btn_b_s print-order" href="javascript:printOrderCommon();">普通打印</a>
+        </div>
+        <div class="order_print">
+          <div id="orderTop">
+            <div class="prt_tit">
+              <span>收货单位：{{.Customer.Name}}</span>
+              <span>日期：{{.Order.CreateTime | formattime "2006-01-02"}}</span>
+              <span>订单号：{{.Order.TrackNumber}}</span>
+            </div>
           </div>
-	  <div class="order_print">
-	    <div id="orderTop">
-	      <div class="prt_tit">
-		<span>收货单位：{{.Customer.Name}}</span>
-		<span>日期：{{.Order.CreateTime | formattime "2006-01-02"}}</span>
-		<span>订单号：{{.Order.TrackNumber}}</span>
-	      </div>
-	    </div>
-	    <div id="orderTable">
-	      <table class="prt_tbl order-form-container" border="0" cellpadding="0" cellspacing="0">
-		<thead>
-		  <tr>
-		    <th align="center" class="th tb_ser">序号</th>
-		    <th align="center" class="th">货号</th>
-		    <th align="center" class="th">商品名称</th>
-		    <th align="center" class="th">单价</th>
-		    <th align="center" class="th">颜色</th>
-		    <th align="center" class="th">尺码</th>
-		    <th align="center" class="th">数量</th>
-		    <th align="center" class="th">合计数量</th>
-		    <th align="center" class="th">折扣</th>
-		    <th align="center" class="th">金额</th>
-		    <th align="center" class="th">备注</th>
-		  </tr>
-		</thead>
+          <div id="orderTable">
+            <table class="prt_tbl order-form-container" border="0" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th align="center" class="th tb_ser">序号</th>
+                  <th align="center" class="th">货号</th>
+                  <th align="center" class="th">商品名称</th>
+                  <th align="center" class="th">单价</th>
+                  <th align="center" class="th">颜色</th>
+                  <th align="center" class="th">尺码</th>
+                  <th align="center" class="th">数量</th>
+                  <th align="center" class="th">合计数量</th>
+                  <th align="center" class="th">折扣</th>
+                  <th align="center" class="th">金额</th>
+                  <th align="center" class="th">备注</th>
+                </tr>
+              </thead>
 
-		<tr class="total">
-		  <td valign="top" align="right" style="white-space:nowrap;"><strong>总计</strong></td>
-		  <td valign="top">&nbsp;</td>
-		  <td valign="top">&nbsp;</td>
-		  <td valign="top">&nbsp;</td>
-		  <td valign="top">&nbsp;</td>
-		  <td valign="top">&nbsp;</td>
-		  <td valign="top" align="center" rowspan="1"><strong>0</strong></td>
-		  <td valign="top" align="right" rowspan="1"><strong class="price">0,000.00</strong></td>
-      <td valign="top">&nbsp;</td>
-    </tr>
-  </table>
-<div class="additionalSumLine"
-    style="font-size:14px;width:70%;text-align:right;margin:4px 12px;">
-</div>
-
+              <tr class="total">
+                <td valign="top" align="right" style="white-space:nowrap;"><strong>总计</strong></td>
+                <td valign="top">&nbsp;</td>
+                <td valign="top">&nbsp;</td>
+                <td valign="top">&nbsp;</td>
+                <td valign="top">&nbsp;</td>
+                <td valign="top">&nbsp;</td>
+                <td valign="top" align="center" rowspan="1"><strong>0</strong></td>
+                <td valign="top" align="right" rowspan="1"><strong class="price">0,000.00</strong></td>
+                <td valign="top">&nbsp;</td>
+              </tr>
+            </table>
+            <div class="additionalSumLine" style="font-size:14px;width:70%;text-align:right;margin:4px 12px;">
             </div>
 
-            <!-- 隐藏：如果有运费就显示  -->
-            {{/* -------------------------------------------------------------------
+          </div>
+
+          <!-- 隐藏：如果有运费就显示  -->
+          {{/* -------------------------------------------------------------------
             <div id="orderTotal" class="other_info" style="display:none">
               <div>运输方式：{{.DeliveryMethodDisplay }}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{if .DeliveryMethodIs "TakeAway"}} 到付 {{end}}
-                {{if .HasExpressFee }} 运费: {{.ExpressFeeHtml }} {{end}}
-              </div>
-              <div>
-                合计：
-                {{.Sumprice}}
-                {{if .HasExpressFee }} + {{.ExpressFeeHtml }} {{end}}
-                = {{.TotalPriceHtml }}
-              </div>
-              <div>代发货款：<span class="underline"></span></div>
-              <div>
-                总计: {{.TotalPriceHtml}} + <span class="underline"></span>
-                = <span class="underline"></span>
-              </div>
-
-              {{if .Order.HasAccumulated }} <div>
-                累计欠款： {{.Order.Accumulated}} + {{.TotalPriceHtml}}
-                + (代发<span class="underline"></span>)
-                = <span class="underline"></span>
-              </div> {{end}}
-            </div>
-            --------------------------------------------------------------------------- */}}
-
-            <!-- 这里是备注信息 -->
-            <div id="orderMemo" class="other_info">
-              订单备注：<span style="font-size:16px;font-weight:bold">{{.Order.Note}}</span>
-            </div>
-
-            <!-- 先用这个版本，隐藏代发，运费始终显示下划线; 订单状态为todeliver，使用实时累计欠款；-->
-            <div id="orderTotal" class="other_info">
-              <div>运输方式：{{.DeliveryMethodDisplay }}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span>元 {{end}}
-              </div>
-
-              {{if .DeliveryMethodIs "TakeAway"}}
-              <div>合计： {{.Sumprice}} 元</div>
-              {{else}}
-              <div>
-                合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>元
-              </div>
-              {{end}}
-
-              {{if .Order.HasAccumulated }}
-              <div>
-                累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
-                = <span class="underline"></span>元
-              </div>
-              {{end}}
-
-            </div>
-
-          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {{if .DeliveryMethodIs "TakeAway"}} 到付 {{end}}
+          {{if .HasExpressFee }} 运费: {{.ExpressFeeHtml }} {{end}}
         </div>
-        <div class="btn_content">
-          <a class="btn_a_l" href="/order/list/todeliver">返回订单列表</a>
-          <a class="btn_a_l" href="/order/create">继续新增订单</a>
+        <div>
+          合计：
+          {{.Sumprice}}
+          {{if .HasExpressFee }} + {{.ExpressFeeHtml }} {{end}}
+          = {{.TotalPriceHtml }}
         </div>
+        <div>代发货款：<span class="underline"></span></div>
+        <div>
+          总计: {{.TotalPriceHtml}} + <span class="underline"></span>
+          = <span class="underline"></span>
+        </div>
+
+        {{if .Order.HasAccumulated }} <div>
+          累计欠款： {{.Order.Accumulated}} + {{.TotalPriceHtml}}
+          + (代发<span class="underline"></span>)
+          = <span class="underline"></span>
+        </div> {{end}}
+      </div>
+      --------------------------------------------------------------------------- */}}
+
+      <!-- 这里是备注信息 -->
+      <div id="orderMemo" class="other_info">
+        订单备注：<span style="font-size:16px;font-weight:bold">{{.Order.Note}}</span>
+      </div>
+
+      <!-- 先用这个版本，隐藏代发，运费始终显示下划线; 订单状态为todeliver，使用实时累计欠款；-->
+      <div id="orderTotal" class="other_info">
+        <div>运输方式：{{.DeliveryMethodDisplay }}
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {{if not (.DeliveryMethodIs "TakeAway")}} 运费: <span class="underline"></span>元 {{end}}
+        </div>
+
+        {{if .DeliveryMethodIs "TakeAway"}}
+        <div>合计： {{.Sumprice}} 元</div>
+        {{else}}
+        <div>
+          合计： {{.Sumprice}} + <span class="underline"></span> = <span class="underline"></span>元
+        </div>
+        {{end}}
+
+        {{if .Order.HasAccumulated }}
+        <div>
+          累计欠款： {{.Order.Accumulated}} + <span class="underline"></span>
+          = <span class="underline"></span>元
+        </div>
+        {{end}}
 
       </div>
+
     </div>
-  </body>
+  </div>
+  <div class="btn_content">
+    <a class="btn_a_l" href="/order/list/todeliver">返回订单列表</a>
+    <a class="btn_a_l" href="/order/create">继续新增订单</a>
+  </div>
+
+  </div>
+  </div>
+</body>
+
 </html>
 <script type="text/javascript">
-  $(function(){
-    op  = new OrderPrint()
-    op.setData({{.ProductDetailJson}})
+  $(function () {
+    op = new OrderPrint()
+    op.setData({{.ProductDetailJson }})
   });
 //
-  </script>
+</script>
