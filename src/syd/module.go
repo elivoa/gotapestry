@@ -64,7 +64,7 @@ var SYDModule = &core.Module{
 		// --------------------------------------------------------------------------------
 		// Modify some default parmeters.
 		config.LIST_PAGE_SIZE = 50
-		config.ReloadTemplate = false // disable reload template?
+		config.ReloadTemplate = true // disable reload template?
 
 		// Config gxl toolset.
 		gxl.Locale = gxl.CN // set gxl toolset language to Chinese.

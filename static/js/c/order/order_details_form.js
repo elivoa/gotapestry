@@ -194,15 +194,18 @@
       htmls.push("    <input type='hidden' name='Order.Details.Quantity' value='" + quantities[0][2] + "' />");
       htmls.push("    <input type='hidden' name='Order.Details.Note' value='" + json.note + "' />");
       htmls.push("  </td>");
-      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
-      // 如果折扣价格胜出，那么录入产品原价格和折扣比例，保证计算是准确的。
-      htmls.push("    <span class='price'>" + uniquePrice + "</span>");
-      htmls.push("  </td>");
       htmls.push("  <td>" + quantities[0][0] + "</td>");
       htmls.push("  <td>" + quantities[0][1] + "</td>");
       htmls.push("  <td>" + quantities[0][2] + "</td>");
+
       htmls.push("  <td valign='center' align='center' rowspan='" + nquantity + "'>");
       htmls.push("      <strong>" + totalQuantity + "</strong></td>");
+
+      // 如果折扣价格胜出，那么录入产品原价格和折扣比例，保证计算是准确的。
+      htmls.push("  <td valign='center' rowspan='" + nquantity + "'>");
+      htmls.push("    <span class='price'>" + uniquePrice + "</span>");
+      htmls.push("  </td>");
+
       // 输出折扣比例
       if (enableSales) {
         htmls.push("  <td valign='center' align='right' rowspan='" + nquantity + "'>");
